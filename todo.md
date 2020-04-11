@@ -1,0 +1,37 @@
+# Liste des choses à faire pour ce bot
+
+- [x] Initialisation du bot
+	- [x] Gestion des logs
+	- [x] (Re)Chargement des cogs
+	- [x] Préfixe custom
+	- [x] Gestion de la config générale
+	- [x] Gestion de la config par serveur
+- [x] Module global
+	- [x] Commandes de shutdown/reboot
+	- [x] Commande de ping
+	- [x] Statistiques du bot
+- [x] Système de gestion des kikoos
+	- [x] Configurations dans le fichier config.json
+	- [x] Gestion de l'event "on_member_join"
+	- [x] Gestion de l'event "on_message"
+- [ ] Système de contact
+	- [x] Gestion de l'event "on_message"
+	- [x] Création des salons privés
+	- [ ] Commande pour supprimer les salons inutiles
+- [ ] Système de salons vocaux
+	- [ ] Gestion de l'event "on_voice_state_update"
+	- [ ] Création des salons vocaux
+	- [ ] Suppression des salons vides
+	- [ ] Commande pour supprimer les salons inutiles
+- [ ] Système de role-reactions
+	- [ ] Fichier de configuration
+	- [ ] Mise à jour d'un message
+	- [ ] Ajout/suppression d'un rôle
+	- [ ] Gestion de l'event "on_raw_reaction_add"
+	- [ ] Gestion de l'event "on_raw_reaction_remove"
+- [ ] Système de gestion de rôles
+	- [ ] Rôles donnés aux nouveaux arrivants
+- [ ] Système de récompense
+	- [ ] Configuration par serveur
+	- [ ] Sauvegarde des points de /thx, avec date
+	- [ ] Don des rôles si plus de X thx en Y durée

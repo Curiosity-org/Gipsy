@@ -1,0 +1,295 @@
+[02/04/2020 16:26] INFO: Lancement du bot
+[02/04/2020 16:27] INFO: Lancement du bot
+[02/04/2020 16:27] ERROR: Impossible de trouver le salon de vérification !
+[02/04/2020 16:27] ERROR: Impossible de trouver le salon d'informations !
+[02/04/2020 16:27] ERROR: 
+Failed to load extension antikikoo
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/site-packages/discord/ext/commands/bot.py", line 608, in _load_from_module_spec
+    setup(self)
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/antikikoo.py", line 74, in setup
+    bot.add_cog(Antikikoo(bot))
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/antikikoo.py", line 32, in __init__
+    self.verif_role = self.verif_channel.guild.get_role(self.bot.config["verification_role_id"])
+AttributeError: 'NoneType' object has no attribute 'guild'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/start.py", line 103, in main
+    client.load_extension(extension)
+  File "/usr/local/lib/python3.7/site-packages/discord/ext/commands/bot.py", line 653, in load_extension
+    self._load_from_module_spec(spec, name)
+  File "/usr/local/lib/python3.7/site-packages/discord/ext/commands/bot.py", line 613, in _load_from_module_spec
+    raise errors.ExtensionFailed(key, e) from e
+discord.ext.commands.errors.ExtensionFailed: Extension 'antikikoo' raised an error: AttributeError: 'NoneType' object has no attribute 'guild'
+[02/04/2020 16:29] INFO: Lancement du bot
+[02/04/2020 16:29] ERROR: Impossible de trouver le salon de vérification !
+[02/04/2020 16:29] ERROR: Impossible de trouver le salon d'informations !
+[02/04/2020 16:31] INFO: Lancement du bot
+[02/04/2020 16:31] INFO: Lancement du bot
+[02/04/2020 16:32] INFO: Lancement du bot
+[02/04/2020 16:33] INFO: Lancement du bot
+[02/04/2020 16:33] INFO: Lancement du bot
+[02/04/2020 16:34] INFO: Lancement du bot
+[02/04/2020 16:35] INFO: someone#3530 (392766377078816789) joined the server
+[02/04/2020 16:35] ERROR: Impossible de donner ou d'enlever le rôle de vérification au membre someone#3530
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/antikikoo.py", line 65, in on_message
+    await message.author.add_roles(self.verif_role)
+  File "/usr/local/lib/python3.7/site-packages/discord/member.py", line 641, in add_roles
+    await req(guild_id, user_id, role.id, reason=reason)
+  File "/usr/local/lib/python3.7/site-packages/discord/http.py", line 221, in request
+    raise Forbidden(r, data)
+discord.errors.Forbidden: 403 Forbidden (error code: 50001): Missing Access
+[02/04/2020 16:36] INFO: someone#3530 (392766377078816789) joined the server
+[02/04/2020 17:24] INFO: Lancement du bot
+[11/04/2020 16:56] INFO: Lancement du bot
+[11/04/2020 16:57] INFO: Lancement du bot
+[11/04/2020 16:57] ERROR: 
+Failed to load extension general
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/site-packages/discord/ext/commands/bot.py", line 602, in _load_from_module_spec
+    setup = getattr(lib, 'setup')
+AttributeError: module 'general' has no attribute 'setup'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/start.py", line 105, in main
+    client.load_extension(extension)
+  File "/usr/local/lib/python3.7/site-packages/discord/ext/commands/bot.py", line 653, in load_extension
+    self._load_from_module_spec(spec, name)
+  File "/usr/local/lib/python3.7/site-packages/discord/ext/commands/bot.py", line 605, in _load_from_module_spec
+    raise errors.NoEntryPointError(key)
+discord.ext.commands.errors.NoEntryPointError: Extension 'general' has no 'setup' function.
+[11/04/2020 16:58] INFO: Lancement du bot
+[11/04/2020 16:58] INFO: Lancement du bot
+[11/04/2020 17:12] INFO: Redémarrage du bot
+[11/04/2020 17:13] INFO: Lancement du bot
+[11/04/2020 17:30] INFO: Redémarrage du bot
+[11/04/2020 17:30] INFO: Lancement du bot
+[11/04/2020 17:30] WARNING: Ignoring exception in command /admin reload admin:
+[11/04/2020 17:31] INFO: Redémarrage du bot
+[11/04/2020 17:31] INFO: Lancement du bot
+[11/04/2020 17:31] INFO: Redémarrage du bot
+[11/04/2020 17:31] INFO: Lancement du bot
+[11/04/2020 17:32] INFO: Redémarrage du bot
+[11/04/2020 17:32] INFO: Lancement du bot
+[11/04/2020 17:32] INFO: Module admin rechargé
+[11/04/2020 17:32] WARNING: Ignoring exception in command /admin reload admin:
+[11/04/2020 17:37] INFO: Module admin rechargé
+[11/04/2020 17:37] INFO: Module errors rechargé
+[11/04/2020 17:37] WARNING: Ignoring exception in command /admin reload admin errors:
+[11/04/2020 17:37] WARNING: [on_error] 'errors_channel'
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 148, in on_error
+    await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 158, in senf_err_msg
+    salon = self.bot.get_channel(self.bot.config["errors_channel"])
+KeyError: 'errors_channel'
+[11/04/2020 17:37] INFO: Module admin rechargé
+[11/04/2020 17:37] WARNING: Ignoring exception in command /admin reload admin:
+[11/04/2020 17:37] WARNING: [on_error] 'errors_channel'
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 148, in on_error
+    await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 158, in senf_err_msg
+    salon = self.bot.get_channel(self.bot.config["errors_channel"])
+KeyError: 'errors_channel'
+[11/04/2020 17:38] WARNING: [on_error] 'errors_channel'
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/site-packages/discord/ext/commands/bot.py", line 596, in _load_from_module_spec
+    spec.loader.exec_module(lib)
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/general.py", line 6, in <module>
+    class General(commands.Cog):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/general.py", line 12, in General
+    @commands.Cog.listener
+  File "/usr/local/lib/python3.7/site-packages/discord/ext/commands/cog.py", line 252, in listener
+    raise TypeError('Cog.listener expected str but received {0.__class__.__name__!r} instead.'.format(name))
+TypeError: Cog.listener expected str but received 'function' instead.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/admin.py", line 66, in reload_cog
+    self.bot.reload_extension(cog)
+  File "/usr/local/lib/python3.7/site-packages/discord/ext/commands/bot.py", line 728, in reload_extension
+    self.load_extension(name)
+  File "/usr/local/lib/python3.7/site-packages/discord/ext/commands/bot.py", line 653, in load_extension
+    self._load_from_module_spec(spec, name)
+  File "/usr/local/lib/python3.7/site-packages/discord/ext/commands/bot.py", line 599, in _load_from_module_spec
+    raise errors.ExtensionFailed(key, e) from e
+discord.ext.commands.errors.ExtensionFailed: Extension 'general' raised an error: TypeError: Cog.listener expected str but received 'function' instead.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 148, in on_error
+    await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 158, in senf_err_msg
+    salon = self.bot.get_channel(self.bot.config["errors_channel"])
+KeyError: 'errors_channel'
+[11/04/2020 17:38] INFO: Module general rechargé
+[11/04/2020 17:38] WARNING: [on_error] 'errors_channel'
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/general.py", line 24, in count_lines_code
+    for file in [x.file for x in self.bot.cogs.values()]+['checks']:
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/general.py", line 24, in <listcomp>
+    for file in [x.file for x in self.bot.cogs.values()]+['checks']:
+AttributeError: 'Antikikoo' object has no attribute 'file'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 142, in on_error
+    await self.senf_err_msg(f"Internal Error\n{msg}")
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 158, in senf_err_msg
+    salon = self.bot.get_channel(self.bot.config["errors_channel"])
+KeyError: 'errors_channel'
+[11/04/2020 17:40] INFO: Module general rechargé
+[11/04/2020 17:40] WARNING: [on_error] 'errors_channel'
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/general.py", line 28, in count_lines_code
+    for file in [x.file for x in self.bot.cogs.values()]+['checks']:
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/general.py", line 28, in <listcomp>
+    for file in [x.file for x in self.bot.cogs.values()]+['checks']:
+AttributeError: 'Antikikoo' object has no attribute 'file'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 142, in on_error
+    await self.senf_err_msg(f"Internal Error\n{msg}")
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 158, in senf_err_msg
+    salon = self.bot.get_channel(self.bot.config["errors_channel"])
+KeyError: 'errors_channel'
+[11/04/2020 17:49] INFO: Module general rechargé
+[11/04/2020 17:49] WARNING: [on_error] 'errors_channel'
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/general.py", line 31, in count_lines_code
+    for file in [x.file for x in self.bot.cogs.values()]+['checks']:
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/general.py", line 31, in <listcomp>
+    for file in [x.file for x in self.bot.cogs.values()]+['checks']:
+AttributeError: 'Antikikoo' object has no attribute 'file'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 142, in on_error
+    await self.senf_err_msg(f"Internal Error\n{msg}")
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 158, in senf_err_msg
+    salon = self.bot.get_channel(self.bot.config["errors_channel"])
+KeyError: 'errors_channel'
+[11/04/2020 17:50] INFO: Module general rechargé
+[11/04/2020 17:50] WARNING: [on_error] 'errors_channel'
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/general.py", line 31, in count_lines_code
+    for file in [x.file for x in self.bot.cogs.values()]+['checks']:
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/general.py", line 31, in <listcomp>
+    for file in [x.file for x in self.bot.cogs.values()]+['checks']:
+AttributeError: 'Antikikoo' object has no attribute 'file'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 142, in on_error
+    await self.senf_err_msg(f"Internal Error\n{msg}")
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 158, in senf_err_msg
+    salon = self.bot.get_channel(self.bot.config["errors_channel"])
+KeyError: 'errors_channel'
+[11/04/2020 18:05] WARNING: Ignoring exception in command /admin reload all:
+[11/04/2020 18:05] WARNING: [on_error] 'errors_channel'
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 148, in on_error
+    await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 158, in senf_err_msg
+    salon = self.bot.get_channel(self.bot.config["errors_channel"])
+KeyError: 'errors_channel'
+[11/04/2020 18:06] WARNING: Ignoring exception in command /admin reload all:
+[11/04/2020 18:06] WARNING: [on_error] 'errors_channel'
+Traceback (most recent call last):
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 148, in on_error
+    await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
+  File "/Users/arthur/Documents/Synology/Autres/discord_bot/gunibot/errors.py", line 158, in senf_err_msg
+    salon = self.bot.get_channel(self.bot.config["errors_channel"])
+KeyError: 'errors_channel'
+[11/04/2020 18:06] INFO: Redémarrage du bot
+[11/04/2020 18:06] INFO: Lancement du bot
+[11/04/2020 18:06] INFO: Module admin rechargé
+[11/04/2020 18:06] INFO: Module antikikoo rechargé
+[11/04/2020 18:06] INFO: Module errors rechargé
+[11/04/2020 18:06] INFO: Module general rechargé
+[11/04/2020 18:08] INFO: Redémarrage du bot
+[11/04/2020 18:08] INFO: Lancement du bot
+[11/04/2020 18:09] INFO: Redémarrage du bot
+[11/04/2020 18:09] INFO: Lancement du bot
+[11/04/2020 18:09] INFO: Lancement du bot
+[11/04/2020 18:10] INFO: Module general rechargé
+[11/04/2020 18:10] INFO: Module admin rechargé
+[11/04/2020 18:11] INFO: Module admin rechargé
+[11/04/2020 18:11] INFO: Redémarrage du bot
+[11/04/2020 18:11] INFO: Lancement du bot
+[11/04/2020 18:59] INFO: Lancement du bot
+[11/04/2020 19:07] INFO: Module admin rechargé
+[11/04/2020 19:07] INFO: Module sconfig ajouté
+[11/04/2020 19:07] WARNING: Ignoring exception in command /config:
+[11/04/2020 19:08] INFO: Redémarrage du bot
+[11/04/2020 19:08] INFO: Lancement du bot
+[11/04/2020 19:09] WARNING: Ignoring exception in command /config:
+[11/04/2020 19:11] INFO: Redémarrage du bot
+[11/04/2020 19:11] INFO: Lancement du bot
+[11/04/2020 19:11] INFO: Module sconfig rechargé
+[11/04/2020 19:12] INFO: Module sconfig rechargé
+[11/04/2020 19:13] INFO: Redémarrage du bot
+[11/04/2020 19:13] INFO: Lancement du bot
+[11/04/2020 19:30] INFO: Redémarrage du bot
+[11/04/2020 19:30] INFO: Lancement du bot
+[11/04/2020 21:53] INFO: Redémarrage du bot
+[11/04/2020 21:53] INFO: Lancement du bot
+[11/04/2020 21:53] INFO: Redémarrage du bot
+[11/04/2020 21:53] INFO: Lancement du bot
+[11/04/2020 21:54] WARNING: Ignoring exception in command /config:
+[11/04/2020 21:54] INFO: Redémarrage du bot
+[11/04/2020 21:54] INFO: Lancement du bot
+[11/04/2020 21:54] WARNING: Ignoring exception in command /config:
+[11/04/2020 21:55] INFO: Redémarrage du bot
+[11/04/2020 21:55] INFO: Lancement du bot
+[11/04/2020 22:30] INFO: Module configManager rechargé
+[11/04/2020 22:31] WARNING: Ignoring exception in command /config mdr:
+[11/04/2020 22:32] INFO: Module configManager rechargé
+[11/04/2020 22:32] WARNING: Ignoring exception in command /config mdr:
+[11/04/2020 22:33] INFO: Module sconfig rechargé
+[11/04/2020 22:34] INFO: Redémarrage du bot
+[11/04/2020 22:34] INFO: Lancement du bot
+[11/04/2020 22:43] INFO: Module sconfig rechargé
+[11/04/2020 22:44] WARNING: Ignoring exception in command =config:
+[11/04/2020 22:44] INFO: Module sconfig rechargé
+[11/04/2020 22:44] WARNING: Ignoring exception in command =config:
+[11/04/2020 22:45] INFO: Module sconfig rechargé
+[11/04/2020 23:06] INFO: Module sconfig rechargé
+[11/04/2020 23:17] INFO: Lancement du bot
+[11/04/2020 23:48] INFO: Module admin rechargé
+[11/04/2020 23:48] INFO: Module antikikoo rechargé
+[11/04/2020 23:48] INFO: Module configManager rechargé
+[11/04/2020 23:48] INFO: Module errors rechargé
+[11/04/2020 23:48] INFO: Module general rechargé
+[11/04/2020 23:48] INFO: Module sconfig rechargé
+[11/04/2020 23:49] INFO: Module sconfig rechargé
+[11/04/2020 23:49] WARNING: Ignoring exception in command /config prefix:
+[11/04/2020 23:50] INFO: Module sconfig rechargé
+[11/04/2020 23:55] INFO: Module sconfig rechargé
+[11/04/2020 23:58] INFO: Module sconfig rechargé
+[12/04/2020 00:19] INFO: Module antikikoo rechargé
+[12/04/2020 00:33] INFO: Module contact ajouté
+[12/04/2020 00:35] INFO: Module configManager rechargé
+[12/04/2020 00:37] INFO: Module configManager rechargé
+[12/04/2020 00:38] INFO: Module sconfig rechargé
+[12/04/2020 00:39] INFO: Module contact rechargé
+[12/04/2020 00:40] INFO: Module contact rechargé
+[12/04/2020 00:41] INFO: Module contact rechargé
+[12/04/2020 00:42] INFO: Module contact rechargé
+[12/04/2020 01:07] INFO: Module contact rechargé
+[12/04/2020 01:14] INFO: Fermeture du bot
