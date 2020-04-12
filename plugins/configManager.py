@@ -13,7 +13,8 @@ CONFIG_TEMPLATE = {
     "verification_role": None,
     "verification_add_role": True,
     "contact_channel": None,
-    "contact_category": None
+    "contact_category": None,
+    "welcome_roles": None
 }
 
 class serverConfig(dict):

@@ -8,6 +8,24 @@ class Sconfig(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.file = "sconfig"
+    
+    @commands.Cog.listener()
+    async def on_member_join(self, member: discord.Member):
+        """Called when a member joins a guild"""
+        if not member.guild.me.guild_permissions.manage_roles: # si pas la perm de gérer les rôles
+            return
+        config = self.bot.server_configs[member.guild.id]
+        if config["welcome_roles"] == None: # si rien n'a été configuré
+            return
+        roles = list()
+        for roleID in config["welcome_roles"]:
+            try:
+                role = member.guild.get_role(roleID)
+                if role.position < member.guild.me.roles[-1].position:
+                    roles.append(role)
+            except discord.errors.NotFound:
+                pass
+        await member.add_roles(*roles, reason="Welcome plugin")
 
     def edit_config(self, guildID, key, value):
         try:
@@ -66,6 +84,12 @@ class Sconfig(commands.Cog):
     @main_config.command(name="contact_category")
     async def config_contact_category(self, ctx:commands.Context, *, category:discord.CategoryChannel):
         await ctx.send(self.edit_config(ctx.guild.id, "contact_category", category.id))
+    
+    @main_config.command(name="welcome_roles")
+    async def config_welcome_roles(self, ctx:commands.Context, roles:commands.Greedy[discord.Role]):
+        if len(roles)==0:
+            return
+        await ctx.send(self.edit_config(ctx.guild.id, "welcome_roles", [role.id for role in roles]))
     
     
 

@@ -29,8 +29,8 @@
 	- [ ] Ajout/suppression d'un rôle
 	- [ ] Gestion de l'event "on_raw_reaction_add"
 	- [ ] Gestion de l'event "on_raw_reaction_remove"
-- [ ] Système de gestion de rôles
-	- [ ] Rôles donnés aux nouveaux arrivants
+- [x] Système de gestion de rôles
+	- [x] Rôles donnés aux nouveaux arrivants
 - [ ] Système de récompense
 	- [ ] Configuration par serveur
 	- [ ] Sauvegarde des points de /thx, avec date
