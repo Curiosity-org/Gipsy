@@ -29,8 +29,8 @@ class General(commands.Cog):
                 for line in file.read().split("\n"):
                     if len(line.strip()) > 2 and line[0] != '#':
                         count += 1
-            for file in [x.file for x in self.bot.cogs.values()]+['checks']:
-                with open(file+'.py', 'r') as file:
+            for filename in [f"plugins/{x.file}.py" for x in self.bot.cogs.values()]+['checks.py']:
+                with open(filename, 'r') as file:
                     for line in file.read().split("\n"):
                         if len(line.strip()) > 2 and line[0] != '#':
                             count += 1

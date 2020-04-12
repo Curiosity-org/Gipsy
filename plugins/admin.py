@@ -64,7 +64,7 @@ class Admin(commands.Cog):
         reloaded_cogs = list()
         for cog in cogs:
             try:
-                self.bot.reload_extension(cog)
+                self.bot.reload_extension("plugins."+cog)
             except ModuleNotFoundError:
                 await ctx.send("Cog {} can't be found".format(cog))
             except commands.errors.ExtensionNotLoaded:
@@ -83,7 +83,7 @@ class Admin(commands.Cog):
     async def add_cog(self, ctx, name):
         """Ajouter un cog au bot"""
         try:
-            self.bot.load_extension(name)
+            self.bot.load_extension("plugins."+name)
             await ctx.send("Module '{}' ajouté !".format(name))
             self.bot.log.info("Module {} ajouté".format(name))
         except Exception as e:
@@ -93,7 +93,7 @@ class Admin(commands.Cog):
     async def rm_cog(self, ctx, name):
         """Enlever un cog au bot"""
         try:
-            self.bot.unload_extension(+name)
+            self.bot.unload_extension("plugins."+name)
             await ctx.send("Module '{}' désactivé !".format(name))
             self.bot.log.info("Module {} ajouté".format(name))
         except Exception as e:

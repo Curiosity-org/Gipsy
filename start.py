@@ -112,7 +112,7 @@ def main():
     count = 0
     for extension in initial_extensions:
         try:
-            client.load_extension(extension)
+            client.load_extension("plugins."+extension)
         except:
             log.exception(f'\nFailed to load extension {extension}')
             count += 1
