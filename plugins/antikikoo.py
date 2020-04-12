@@ -23,12 +23,12 @@ class Antikikoo(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         """Called when a member joins a guild"""
-        if member.guild.id != self.bot.config["main_server"]:
-            return
         self.bot.log.info(f"{member} ({member.id}) joined the server")
         config = self.bot.server_configs[member.guild.id]
+        if config["verification_channel"] == None:  # si rien n'a été configuré
+            return
         verif_channel = self.bot.get_channel(config["verification_channel"])
-        info_channel = "<#"+config["info_channel"]+">"
+        info_channel = "<#{}>".format(config["info_channel"])
         await verif_channel.send(WELCOME_MESSAGE.format(user=member.mention, channel=info_channel))
 
     @commands.Cog.listener()
@@ -40,7 +40,7 @@ class Antikikoo(commands.Cog):
         config = self.bot.server_configs[message.guild.id]
         if message.channel.id != config["verification_channel"]:
             return
-        info_channel = "<#"+config["info_channel"]+">"
+        info_channel = "<#{}>".format(config["info_channel"])
         if message.content.lower() == config["pass_message"].lower():
             emb = discord.Embed(description=CONFIRM_MESSAGE.format(
                 user=message.author.mention, channel=info_channel))
