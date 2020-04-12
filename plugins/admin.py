@@ -95,7 +95,7 @@ class Admin(commands.Cog):
         try:
             self.bot.unload_extension("plugins."+name)
             await ctx.send("Module '{}' désactivé !".format(name))
-            self.bot.log.info("Module {} ajouté".format(name))
+            self.bot.log.info("Module {} désactivé".format(name))
         except Exception as e:
             await ctx.send(str(e))
     
