@@ -14,10 +14,10 @@
 	- [x] Configurations dans le fichier config.json
 	- [x] Gestion de l'event "on_member_join"
 	- [x] Gestion de l'event "on_message"
-- [ ] Système de contact
+- [x] Système de contact
 	- [x] Gestion de l'event "on_message"
 	- [x] Création des salons privés
-	- [ ] Commande pour supprimer les salons inutiles
+	- [x] Commande pour supprimer les salons inutiles
 - [ ] Système de salons vocaux
 	- [ ] Gestion de l'event "on_voice_state_update"
 	- [ ] Création des salons vocaux
