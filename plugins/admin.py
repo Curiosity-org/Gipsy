@@ -2,7 +2,19 @@ import discord
 from discord.ext import commands
 import os
 import sys
+import io
+import textwrap
+import traceback
+from contextlib import redirect_stdout
 import checks
+
+def cleanup_code(content):
+    """Automatically removes code blocks from the code."""
+    # remove ```py\n```
+    if content.startswith('```') and content.endswith('```'):
+        return '\n'.join(content.split('\n')[1:-1])
+    # remove `foo`
+    return content.strip('` \n')
 
 
 class Admin(commands.Cog):
@@ -10,6 +22,7 @@ class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.file = "admin"
+        self._last_result = None
 
     @commands.group(name='admin', hidden=True)
     @commands.check(checks.is_bot_admin)
@@ -122,6 +135,51 @@ class Admin(commands.Cog):
         else:
             await ctx.send("Sélectionnez *play*, *watch*, *listen* ou *stream* suivi du nom")
         await ctx.message.delete()
+
+    @commands.command(name='eval')
+    @commands.check(checks.is_bot_admin)
+    async def _eval(self, ctx, *, body: str):
+        """Evaluates a code
+        Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)"""
+        env = {
+            'bot': self.bot,
+            'ctx': ctx,
+            'channel': ctx.channel,
+            'author': ctx.author,
+            'guild': ctx.guild,
+            'message': ctx.message,
+            '_': self._last_result
+        }
+        env.update(globals())
+
+        body = cleanup_code(body)
+        stdout = io.StringIO()
+        try:
+            to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
+        except Exception as e:
+            await self.bot.get_cog('Errors').on_error(e,ctx)
+            return
+        try:
+            exec(to_compile, env)
+        except Exception as e:
+            return await ctx.send(f'```py\n{e.__class__.__name__}: {e}\n```')
+
+        func = env['func']
+        try:
+            with redirect_stdout(stdout):
+                ret = await func()
+        except Exception as e:
+            value = stdout.getvalue()
+            await ctx.send(f'```py\n{value}{traceback.format_exc()}\n```')
+        else:
+            value = stdout.getvalue()
+
+            if ret is None:
+                if value:
+                    await ctx.send(f'```py\n{value}\n```')
+            else:
+                self._last_result = ret
+                await ctx.send(f'```py\n{value}{ret}\n```')
 
 
 def setup(bot):
