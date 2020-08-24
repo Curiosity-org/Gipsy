@@ -14,7 +14,9 @@ CONFIG_TEMPLATE = {
     "verification_add_role": True,
     "contact_channel": None,
     "contact_category": None,
-    "welcome_roles": None
+    "welcome_roles": None,
+    "voices_category": None,
+    "voice_channel": None
 }
 
 class serverConfig(dict):

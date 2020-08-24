@@ -91,6 +91,14 @@ class Sconfig(commands.Cog):
             return
         await ctx.send(self.edit_config(ctx.guild.id, "welcome_roles", [role.id for role in roles]))
     
+    @main_config.command(name="voices_category")
+    async def config_voices_category(self, ctx:commands.Context, *, category:discord.CategoryChannel):
+        await ctx.send(self.edit_config(ctx.guild.id, "voices_category", category.id))
+    
+    @main_config.command(name="voice_channel")
+    async def config_voice_channel(self, ctx:commands.Context, *, channel:discord.VoiceChannel):
+        await ctx.send(self.edit_config(ctx.guild.id, "voice_channel", channel.id))
+    
     
 
 def setup(bot):

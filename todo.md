@@ -18,9 +18,9 @@
 	- [x] Gestion de l'event "on_message"
 	- [x] Création des salons privés
 	- [x] Commande pour supprimer les salons inutiles
-- [ ] Système de salons vocaux
-	- [ ] Gestion de l'event "on_voice_state_update"
-	- [ ] Création des salons vocaux
+- [-] Système de salons vocaux
+	- [x] Gestion de l'event "on_voice_state_update"
+	- [x] Création des salons vocaux
 	- [ ] Suppression des salons vides
 	- [ ] Commande pour supprimer les salons inutiles
 - [ ] Système de role-reactions
