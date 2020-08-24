@@ -21,7 +21,7 @@
 - [-] Système de salons vocaux
 	- [x] Gestion de l'event "on_voice_state_update"
 	- [x] Création des salons vocaux
-	- [ ] Suppression des salons vides
+	- [x] Suppression des salons vides
 	- [ ] Commande pour supprimer les salons inutiles
 - [ ] Système de role-reactions
 	- [ ] Fichier de configuration
