@@ -46,7 +46,7 @@ class gunibot(commands.bot.BotBase, discord.Client):
         prefix = None
         if hasattr(msg, "guild"):
             prefix = self.server_configs[msg.guild.id]["prefix"]
-        if prefix == None:
+        if prefix is None:
             prefix = "?"
         return commands.when_mentioned_or(prefix)(self, msg)
 

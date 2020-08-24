@@ -15,11 +15,11 @@ class Admin(commands.Cog):
     @commands.check(checks.is_bot_admin)
     async def main_msg(self, ctx):
         """Commandes réservées aux administrateurs de ZBot"""
-        if ctx.subcommand_passed == None:
+        if ctx.subcommand_passed is None:
             text = "Liste des commandes disponibles :"
             for cmd in sorted(self.main_msg.commands, key=lambda x: x.name):
                 text += "\n- {} *({})*".format(cmd.name,
-                                               '...' if cmd.help == None else cmd.help.split('\n')[0])
+                                               '...' if cmd.help is None else cmd.help.split('\n')[0])
                 if type(cmd) == commands.core.Group:
                     for cmds in cmd.commands:
                         text += "\n        - {} *({})*".format(

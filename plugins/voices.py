@@ -17,7 +17,7 @@ class VoiceChannels(commands.Cog):
         if before.channel == after.channel:
             return
         config = self.bot.server_configs[member.guild.id]
-        if config["voice_channel"] == None:  # si rien n'a été configuré
+        if config["voice_channel"] is None:  # si rien n'a été configuré
             return
         if after.channel is not None and after.channel.id == config["voice_channel"]:
             await self.create_channel(member, config)
@@ -25,7 +25,7 @@ class VoiceChannels(commands.Cog):
     async def create_channel(self, member: discord.Member, config: dict):
         """Create a new voice channel
         The member will get "Manage channel" permissions automatically"""
-        if config["voices_category"] == None:  # si rien n'a été configuré
+        if config["voices_category"] is None:  # si rien n'a été configuré
             return
         voice_category: discord.CategoryChannel = self.bot.get_channel(config["voices_category"])
         if not isinstance(voice_category, discord.CategoryChannel):

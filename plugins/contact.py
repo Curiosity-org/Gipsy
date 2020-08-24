@@ -15,7 +15,7 @@ class Contact(commands.Cog):
     async def on_message(self, message:discord.Message):
         """Called for every new message
         We use it to check when someone send a message in the contact channel"""
-        if message.guild == None: # si le message n'est pas dans un serveur
+        if message.guild is None: # si le message n'est pas dans un serveur
             return
         if message.author.bot: # si le message a été envoyé par un bot
             return
@@ -24,7 +24,7 @@ class Contact(commands.Cog):
             return
         category = self.bot.get_channel(config["contact_category"])
         channel = discord.utils.get(category.text_channels, topic=str(message.author.id))
-        if channel == None:
+        if channel is None:
             try:
                 channel = await category.create_text_channel(str(message.author))
                 await channel.edit(topic=str(message.author.id))
@@ -46,11 +46,11 @@ class Contact(commands.Cog):
     async def ct_clear(self, ctx: commands.Context, days: int=15):
         """Nettoie tous les salons inutilisés depuix X jours"""
         categ_id = self.bot.server_configs[ctx.guild.id]["contact_category"]
-        if categ_id == None:
+        if categ_id is None:
             await ctx.send("Aucune catégorie de contact n'a été créée !")
             return
         categ = ctx.guild.get_channel(categ_id)
-        if categ == None:
+        if categ is None:
             await ctx.send("Impossible de trouver la catégorie de contact ! Vérifiez votre configuration")
             return
         i = 0 # compteur de suppressions

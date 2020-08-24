@@ -25,7 +25,7 @@ class Antikikoo(commands.Cog):
         """Called when a member joins a guild"""
         self.bot.log.info(f"{member} ({member.id}) joined the server")
         config = self.bot.server_configs[member.guild.id]
-        if config["verification_channel"] == None:  # si rien n'a été configuré
+        if config["verification_channel"] is None:  # si rien n'a été configuré
             return
         verif_channel = self.bot.get_channel(config["verification_channel"])
         info_channel = "<#{}>".format(config["info_channel"])
@@ -35,7 +35,7 @@ class Antikikoo(commands.Cog):
     async def on_message(self, message: discord.Message):
         """Called for every new message
         We use it to check when someone send the verification message"""
-        if message.guild == None: # si le message n'est pas dans un serveur
+        if message.guild is None: # si le message n'est pas dans un serveur
             return
         config = self.bot.server_configs[message.guild.id]
         if message.channel.id != config["verification_channel"]:

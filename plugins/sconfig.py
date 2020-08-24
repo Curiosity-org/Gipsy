@@ -15,7 +15,7 @@ class Sconfig(commands.Cog):
         if not member.guild.me.guild_permissions.manage_roles: # si pas la perm de gérer les rôles
             return
         config = self.bot.server_configs[member.guild.id]
-        if config["welcome_roles"] == None: # si rien n'a été configuré
+        if config["welcome_roles"] is None: # si rien n'a été configuré
             return
         roles = list()
         for roleID in config["welcome_roles"]:
@@ -50,7 +50,7 @@ class Sconfig(commands.Cog):
 
     @main_config.command(name="prefix")
     async def config_prefix(self, ctx:commands.Context, new_prefix=None):
-        if new_prefix != None and len(new_prefix) > 5:
+        if new_prefix is not None and len(new_prefix) > 5:
             await ctx.send("Le préfixe doit faire moins de 5 caractères !")
             return
         await ctx.send(self.edit_config(ctx.guild.id, "prefix", new_prefix))

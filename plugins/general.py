@@ -42,7 +42,7 @@ class General(commands.Cog):
     async def rep(self, ctx, ip=None):
         """Get bot latency
         You can also use this command to ping any other server"""
-        if ip == None:
+        if ip is None:
             m = await ctx.send("Ping...")
             t = (m.created_at - ctx.message.created_at).total_seconds()
             await m.edit(content=":ping_pong:  Pong !\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000), round(self.bot.latency*1000)))
@@ -70,7 +70,7 @@ class General(commands.Cog):
             await ctx.send("Pong ! (average of {}ms per 64 byte, sent at {})".format(round(t, 2), ip))
         else:
             await ctx.send("Unable to ping this adress")
-        if m != None:
+        if m is not None:
             await m.delete()
 
     @commands.command(name="stats", enabled=True)
