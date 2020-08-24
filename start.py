@@ -7,6 +7,7 @@ import asyncio
 import logging
 import json
 import sys
+import sqlite3
 from signal import SIGTERM
 from discord.ext import commands
 
@@ -21,10 +22,19 @@ class gunibot(commands.bot.BotBase, discord.Client):
                          case_insensitive=case_insensitive, status=status)
         self.log = logging.getLogger("runner")
         self.beta = beta
+        self.database = sqlite3.connect('data/database.db')
+        self._update_database_structure()
     
     @property
     def server_configs(self):
         return self.get_cog("ConfigCog").confManager
+    
+    def _update_database_structure(self):
+        """Create tables and indexes from 'data/model.sql' file"""
+        c = self.database.cursor()
+        with open('data/model.sql', 'r', encoding='utf-8') as f:
+            c.executescript(f.read())
+        c.close()
 
     async def user_avatar_as(self, user, size=512):
         """Get the avatar of an user, format gif or png (as webp isn't supported by some browsers)"""
