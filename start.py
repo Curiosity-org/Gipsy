@@ -8,7 +8,6 @@ import logging
 import json
 import sys
 import sqlite3
-from signal import SIGTERM
 from discord.ext import commands
 
 
