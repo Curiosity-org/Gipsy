@@ -49,11 +49,14 @@ class Antikikoo(commands.Cog):
                 await message.delete()
             except:
                 self.bot.log.exception(f"Impossible de supprimer le message de vérification")
+            verif_role = message.guild.get_role(config["verification_role"])
+            if verif_role == None:
+                return
             try:
                 if config["verification_add_role"]:
-                    await message.author.add_roles(self.verif_role)
+                    await message.author.add_roles(verif_role)
                 else:
-                    await message.author.remove_roles(self.verif_role)
+                    await message.author.remove_roles(verif_role)
             except:
                 self.bot.log.exception(f"Impossible de donner ou d'enlever le rôle de vérification au membre {message.author}")
 
