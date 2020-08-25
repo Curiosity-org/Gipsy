@@ -35,3 +35,12 @@
 	- [ ] Configuration par serveur
 	- [ ] Sauvegarde des points de /thx, avec date
 	- [ ] Don des rôles si plus de X thx en Y durée
+- [ ] Salon de logs
+	- [ ] Configuration du salon par serveur
+	- [ ] Activation/désactivation des logs par serveur (système de flags ?) 
+	- [ ] Suppression/edition de messages
+	- [ ] Départ/arrivée de membres
+	- [ ] Invitation créée/supprimée
+	- [ ] Logs de salons vocaux
+	- [ ] Kick/ban
+	- [ ] Boosts de serveur
