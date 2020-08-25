@@ -39,6 +39,10 @@ class serverConfig(dict):
             self.manager[self.serverID] = self
         else:
             raise ValueError("Invalid config key")
+    
+    def __delitem__(self, key):
+        super().__setitem__(key, CONFIG_TEMPLATE['key'])
+        self.manager[self.serverID] = self
 
 class ConfigCog(commands.Cog):
 
