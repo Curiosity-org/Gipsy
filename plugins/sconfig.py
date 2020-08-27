@@ -58,9 +58,11 @@ class Sconfig(commands.Cog):
     @main_config.command(name="verification_channel")
     async def config_verification_channel_id(self, ctx:commands.Context, *, channel:discord.TextChannel):
         await ctx.send(self.edit_config(ctx.guild.id, "verification_channel", channel.id))
+
     @main_config.command(name="logs_channel")
     async def config_logs_channel(self, ctx:commands.Context, *, channel:discord.TextChannel):
         await ctx.send(self.edit_config(ctx.guild.id, "logs_channel", channel.id))
+
     @main_config.command(name="info_channel")
     async def config_info_channel(self, ctx:commands.Context, *, channel:discord.TextChannel):
         await ctx.send(self.edit_config(ctx.guild.id, "info_channel", channel.id))
