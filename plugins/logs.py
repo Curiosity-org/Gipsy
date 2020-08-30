@@ -1,14 +1,14 @@
 import discord
 from discord.ext import commands
 import checks
-
+import datetime
 
 class Logs(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
         self.file = "logs"
-    
+
     async def has_logs(self, guild) -> bool:
         """Check if a Guild has a valid logs channel"""
         if guild is None: return False
@@ -26,7 +26,7 @@ class Logs(commands.Cog):
         if not isinstance(logs_channel, discord.TextChannel): return
         await logs_channel.send(embed=embed)
 
-    
+
     @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_message_delete"
@@ -40,7 +40,7 @@ class Logs(commands.Cog):
         embed.set_footer(text=f"Author ID:{message.author.id} • Message ID: {message.id}")
         embed.add_field(name="Contenu", value=message.content)
         await self.send_embed(message.guild, embed)
-    
+
     @commands.Cog.listener()
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_message_edit"
@@ -55,7 +55,7 @@ class Logs(commands.Cog):
         embed.add_field(name='Avant', value=before.content, inline=False)
         embed.add_field(name="Après", value=after.content, inline=False)
         await self.send_embed(before.guild, embed)
-    
+
     @commands.Cog.listener()
     async def on_raw_bulk_message_delete(self, payload: discord.RawBulkMessageDeleteEvent):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_raw_bulk_message_delete"
@@ -66,6 +66,28 @@ class Logs(commands.Cog):
             description=f"{len(payload.message_ids)} messages **ont été supprimés** dans <#{payload.channel_id}>",
             colour=discord.Colour.red()
         )
+        await self.send_embed(guild, embed)
+
+    @commands.Cog.listener()
+    async def on_invite_create(self, invite: discord.Invite):
+        "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_invite_create"
+        guild = self.bot.get_guild(invite.guild)
+        if not await self.has_logs(guild): return
+        embed = discord.Embed(
+            timestamp=invite.created_at,
+            name="Invite",
+            url=invite.url,
+            description=f"Invitation vers #{channel.name}",
+            colour=discord.Colour.green()
+        )
+        embed.set_author(name=f'{invite.inviter.name}#{invite.inviter.discriminator}',
+                         icon_url=invite.inviter.avatar_url_as(static_format='jpg'))
+        if invite.max_age == 0:
+            embed.add_field(name="Durée :", value="♾")
+        else:
+            embed.add_field(name="Durée :", value=f"{datetime.timedelta(seconds=invite.max_age)}")
+        embed.set_footer(text=f"Author ID:{invite.inviter.id} • Invite ID: {invite.id}")
+        
         await self.send_embed(guild, embed)
 
 def setup(bot):
