@@ -146,7 +146,7 @@ def main():
 
     client.add_listener(on_ready)
 
-    client.run(conf["token"])
+    client.run(conf["token"] if input("Lancer la version stable ? (y/n)").lower() == "y" else conf["token_beta"])
 
 
 if __name__ == "__main__":
