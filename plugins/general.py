@@ -104,6 +104,18 @@ class General(commands.Cog):
         except Exception as e:
             await ctx.bot.get_cog("Errors").on_cmd_error(ctx, e)
 
+    @commands.command(name="halp", enabled=True)
+    async def halp(self, ctx):
+        embed = discord.Embed(
+            name="Help",
+            colour=discord.Colour.green()
+        )
+        embed.set_author(name=f'Gunibot commands')
+        embed.add_field(name="admin", value="Affiche les commandes admin disponibles")
+        embed.add_field(name="admin", value="Affiche les commandes admin disponibles")
+        await ctx.send(embed=embed)
+
+
 
 def setup(bot):
     bot.add_cog(General(bot))
