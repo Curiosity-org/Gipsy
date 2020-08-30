@@ -44,3 +44,4 @@
 	- [ ] Logs de salons vocaux
 	- [ ] Kick/ban
 	- [ ] Boosts de serveur
+- [ ] Rôles donnés aux nouveaus arrivants
