@@ -1,6 +1,6 @@
 .vscode
 __pycache__
-configs
+configs/*.json
 debug.log
 .DS_Store
 data/*.db*
