@@ -4,3 +4,4 @@ configs
 debug.log
 .DS_Store
 data/*.db*
+config.json
