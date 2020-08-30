@@ -71,24 +71,23 @@ class Logs(commands.Cog):
     @commands.Cog.listener()
     async def on_invite_create(self, invite: discord.Invite):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_invite_create"
-        guild = self.bot.get_guild(invite.guild)
-        if not await self.has_logs(guild): return
+        if not await self.has_logs(invite.guild): return
         embed = discord.Embed(
             timestamp=invite.created_at,
             name="Invite",
-            url=invite.url,
-            description=f"Invitation vers #{channel.name}",
+            description=f"Invitation vers {invite.channel.mention}",
             colour=discord.Colour.green()
         )
         embed.set_author(name=f'{invite.inviter.name}#{invite.inviter.discriminator}',
                          icon_url=invite.inviter.avatar_url_as(static_format='jpg'))
         if invite.max_age == 0:
-            embed.add_field(name="Durée :", value="♾")
+            embed.add_field(name="Durée", value="♾")
         else:
-            embed.add_field(name="Durée :", value=f"{datetime.timedelta(seconds=invite.max_age)}")
-        embed.set_footer(text=f"Author ID:{invite.inviter.id} • Invite ID: {invite.id}")
-        
-        await self.send_embed(guild, embed)
+            embed.add_field(name="Durée", value=f"{datetime.timedelta(seconds=invite.max_age)}")
+        embed.add_field(name="URL", value=invite.url)
+        embed.add_field(name="Nombre max d'utilisations", value="♾" if invite.max_uses==0 else str(invite.max_uses))
+        embed.set_footer(text=f"Author ID:{invite.inviter.id}")
+        await self.send_embed(invite.guild, embed)
 
 def setup(bot):
     bot.add_cog(Logs(bot))
