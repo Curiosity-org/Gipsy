@@ -9,7 +9,7 @@ class VoiceChannels(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.file = "voices"
-        self.names = list()
+        self.names = {'random': [], 'asterix': []}
         self.channels = dict()
         self.get_channels()
     
@@ -61,7 +61,14 @@ class VoiceChannels(commands.Cog):
             return
         p = len(voice_category.channels)
         over = { member: discord.PermissionOverwrite(manage_channels=True) }
-        new_channel = await voice_category.create_voice_channel(name=await self.get_names(), position=p, overwrites=over)
+        chan_name = config['voice_channel_format']
+        args = {'user': str(member)}
+        if "{random}" in chan_name:
+            args['random'] = await self.get_names()
+        if "{asterix}" in chan_name:
+            args['asterix'] = await self.get_names('asterix')
+        chan_name = chan_name.format_map(self.bot.SafeDict(args))
+        new_channel = await voice_category.create_voice_channel(name=chan_name, position=p, overwrites=over)
         await member.move_to(new_channel)
         self.db_add_channel(new_channel)
     
@@ -71,14 +78,18 @@ class VoiceChannels(commands.Cog):
             await channel.delete(reason="Unusued")
             self.db_delete_channel(channel)
 
-    async def get_names(self):
-        if len(self.names) != 0:
-            return self.names.pop()
+    async def get_names(self, source='random'):
+        if len(self.names[source]) != 0:
+            return self.names[source].pop()
         async with aiohttp.ClientSession() as session:
             h = {'X-Api-Key': self.bot.config['random_api_token']}
-            async with session.get('https://randommer.io/api/Name?nameType=surname&quantity=20', headers=h) as resp:
-                self.names = await resp.json()
-        return self.names.pop()
+            if source == 'asterix':
+                async with session.get('https://raw.githubusercontent.com/Gunivers/Gunibot/master/src/main/resources/other/bdd%20name', headers=h) as resp:
+                    self.names[source] = (await resp.text()).split('\n')
+            else:
+                async with session.get('https://randommer.io/api/Name?nameType=surname&quantity=20', headers=h) as resp:
+                    self.names[source] = await resp.json()
+        return self.names[source].pop()
     
     @commands.command(name="voice-clean")
     @commands.guild_only()

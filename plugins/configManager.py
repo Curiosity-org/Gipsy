@@ -17,6 +17,7 @@ CONFIG_TEMPLATE = {
     "welcome_roles": None,
     "voices_category": None,
     "voice_channel": None,
+    "voice_channel_format": "{random}",
     "modlogs_flags": 0
 }
 

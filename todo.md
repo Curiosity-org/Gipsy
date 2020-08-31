@@ -14,7 +14,7 @@
 	- [x] Configurations dans le fichier config.json
 	- [x] Gestion de l'event "on_member_join"
 	- [x] Gestion de l'event "on_message"
-- [-] Système de contact
+- [x] Système de contact
 	- [x] Gestion de l'event "on_message"
 	- [x] Création des salons privés
 	- [x] Commande pour supprimer les salons inutiles
@@ -26,7 +26,7 @@
 	- [x] Commande pour supprimer les salons inutiles
 	- [ ] Don d'un rôle custom à toute personne en vocal
 	- [ ] Permissions pour les utilisateurs
-	- [ ] Format de nom custom
+	- [x] Format de nom custom
 - [ ] Système de role-reactions
 	- [ ] Fichier de configuration
 	- [ ] Mise à jour d'un message

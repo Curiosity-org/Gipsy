@@ -142,6 +142,11 @@ class Sconfig(commands.Cog):
         f = self.bot.get_cog('ConfigCog').LogsFlags.FLAGS.values()
         await ctx.send("Liste des logs disponibles : " + " - ".join(f))
 
+    @main_config.command(name="voice_channel_format")
+    async def config_voice_channel_format(self, ctx:commands.Context, *, text:str):
+        """Format of voice channels names
+        Use {random} for any random name, {asterix} for any asterix name"""
+        await ctx.send(self.edit_config(ctx.guild.id, "voice_channel_format", text[:40]))
 
     
     
