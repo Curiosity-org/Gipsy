@@ -37,10 +37,10 @@
 	- [ ] Don des rôles si plus de X thx en Y durée
 - [-] Salon de logs
 	- [x] Configuration du salon par serveur
-	- [ ] Activation/désactivation des logs par serveur (système de flags ?) 
+	- [x] Activation/désactivation des logs par serveur (système de flags ?) 
 	- [x] Suppression/edition de messages
 	- [ ] Départ/arrivée de membres
-	- [ ] Invitation créée/supprimée
+	- [x] Invitation créée/supprimée
 	- [ ] Logs de salons vocaux
 	- [ ] Kick/ban
 	- [ ] Boosts de serveur
