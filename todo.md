@@ -18,7 +18,7 @@
 	- [x] Gestion de l'event "on_message"
 	- [x] Création des salons privés
 	- [x] Commande pour supprimer les salons inutiles
-	- [ ] Création d'un webhook avec nom et avatar de la personne
+	- [x] Création d'un webhook avec nom et avatar de la personne
 - [-] Système de salons vocaux
 	- [x] Gestion de l'event "on_voice_state_update"
 	- [x] Création des salons vocaux

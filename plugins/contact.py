@@ -1,4 +1,6 @@
 import discord
+import aiohttp
+import typing
 from discord.ext import commands
 from discord.utils import snowflake_time
 from datetime import datetime, timedelta
@@ -10,6 +12,15 @@ class Contact(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.file = "contact"
+    
+    async def urlToByte(self,url:str) -> typing.Optional[bytes]:
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
+            async with session.get(url) as response:
+                if response.status>=200 and response.status<300:
+                    res = await response.read()
+                else:
+                    res = None
+        return res
     
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
@@ -34,7 +45,11 @@ class Contact(commands.Cog):
         else:
             if channel.name != str(message.author):
                 await channel.edit(name=str(message.author))
-        await channel.send(message.content)
+        try:
+            webhook = await channel.create_webhook(name=message.author.name)
+            await webhook.send(message.content, avatar_url=message.author.avatar_url)
+        except discord.Forbidden:
+            await channel.send(message.content)
         await channel.set_permissions(message.author, read_messages=True,send_messages=True)
         try:
             await message.delete()
