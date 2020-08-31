@@ -16,7 +16,8 @@ CONFIG_TEMPLATE = {
     "contact_category": None,
     "welcome_roles": None,
     "voices_category": None,
-    "voice_channel": None
+    "voice_channel": None,
+    "modlogs_flags": 0
 }
 
 class serverConfig(dict):
@@ -105,6 +106,26 @@ class ConfigCog(commands.Cog):
 
         def __contains__(self, item):
             return self.has_key(item)
+
+    class LogsFlags:
+        FLAGS = {
+            1 << 0: "messages",
+            1 << 1: "joins",
+            1 << 2: "invites",
+            1 << 3: "voice",
+            1 << 4: "moderation",
+            1 << 5: "boosts"
+        }
+        def flagsToInt(self, flags:list) -> int:
+            r = 0
+            for k, v in self.FLAGS.items():
+                if v in flags:
+                    r |= k
+            return r
+        
+        def intToFlags(self, i:int) -> list:
+            return [v for k, v in self.FLAGS.items() if i&k == k]
+
 
 def setup(bot):
     bot.add_cog(ConfigCog(bot))

@@ -101,6 +101,49 @@ class Sconfig(commands.Cog):
     async def config_voice_channel(self, ctx:commands.Context, *, channel:discord.VoiceChannel):
         await ctx.send(self.edit_config(ctx.guild.id, "voice_channel", channel.id))
     
+    @main_config.command(name="modlogs_flags")
+    async def config_modlogs_flags(self, ctx:commands.Context):
+        await ctx.send("Cette option n'est pas directement modifiable. Vous pouvez utiliser les commandes `{p}config modlogs enable/disable <option>` pour activer ou désactiver certains logs, et `{p}config modlogs list` pour avoir la liste des logs possibles.".format(p=ctx.prefix))
+    
+    @main_config.group(name="modlogs")
+    async def config_modlogs(self, ctx:commands.Context):
+        # await ctx.send(self.edit_config(ctx.guild.id, "voice_channel", channel.id))
+        pass
+    @config_modlogs.command(name="enable")
+    async def modlogs_enable(self, ctx:commands.Context, option:str):
+        LogsFlags = self.bot.get_cog('ConfigCog').LogsFlags()
+        if option not in LogsFlags.FLAGS.values():
+            await ctx.send("Option invalide")
+            return
+        flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
+        flags = LogsFlags.intToFlags(flags)
+        if option in flags:
+            await ctx.send("Ce type de logs est déjà actif !")
+            return
+        flags.append(option)
+        self.edit_config(ctx.guild.id, 'modlogs_flags', LogsFlags.flagsToInt(flags))
+        await ctx.send(f"Les logs de type {option} ont bien été activés")
+    @config_modlogs.command(name="disable")
+    async def modlogs_disable(self, ctx:commands.Context, option:str):
+        LogsFlags = self.bot.get_cog('ConfigCog').LogsFlags()
+        if option not in LogsFlags.FLAGS.values():
+            await ctx.send("Option invalide")
+            return
+        flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
+        flags = LogsFlags.intToFlags(flags)
+        if option not in flags:
+            await ctx.send("Ce type de logs est déjà désactivé !")
+            return
+        flags.remove(option)
+        self.edit_config(ctx.guild.id, 'modlogs_flags', LogsFlags.flagsToInt(flags))
+        await ctx.send(f"Les logs de type {option} ont bien été désactivés")
+    @config_modlogs.command(name="list")
+    async def modlogs_list(self, ctx:commands.Context):
+        f = self.bot.get_cog('ConfigCog').LogsFlags.FLAGS.values()
+        await ctx.send("Liste des logs disponibles : " + " - ".join(f))
+
+
+    
     
 
 def setup(bot):
