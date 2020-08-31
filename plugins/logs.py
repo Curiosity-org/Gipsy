@@ -25,12 +25,17 @@ class Logs(commands.Cog):
         logs_channel: discord.TextChannel = guild.get_channel(config["logs_channel"])
         if not isinstance(logs_channel, discord.TextChannel): return
         await logs_channel.send(embed=embed)
+    
+    def get_flags(self, guildID):
+        f = self.bot.get_cog('ConfigCog').LogsFlags().intToFlags
+        return f(self.bot.server_configs[guildID]['modlogs_flags'])
 
 
     @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_message_delete"
         if message.author.bot or (not await self.has_logs(message.guild)): return
+        if 'messages' not in self.get_flags(message.guild.id): return
         embed = discord.Embed(
             timestamp=message.created_at,
             description=f"Un message de {message.author.mention} ** a été supprimé** dans {message.channel.mention}",
@@ -45,6 +50,7 @@ class Logs(commands.Cog):
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_message_edit"
         if before.author.bot or (not await self.has_logs(before.guild)): return
+        if 'messages' not in self.get_flags(before.guild.id): return
         embed = discord.Embed(
             timestamp=after.created_at,
             description=f"Un message de {before.author.mention} **a été édité** dans {before.channel.mention}.",
@@ -61,6 +67,7 @@ class Logs(commands.Cog):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_raw_bulk_message_delete"
         guild = self.bot.get_guild(payload.guild_id)
         if not await self.has_logs(guild): return
+        if 'messages' not in self.get_flags(guild.id): return
         embed = discord.Embed(
             timestamp=message.created_at,
             description=f"{len(payload.message_ids)} messages **ont été supprimés** dans <#{payload.channel_id}>",
@@ -72,6 +79,7 @@ class Logs(commands.Cog):
     async def on_invite_create(self, invite: discord.Invite):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_invite_create"
         if not await self.has_logs(invite.guild): return
+        if 'invites' not in self.get_flags(invite.guild.id): return
         embed = discord.Embed(
             timestamp=invite.created_at,
             name="Invite",
