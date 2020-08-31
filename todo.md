@@ -25,7 +25,7 @@
 	- [x] Suppression des salons vides
 	- [x] Commande pour supprimer les salons inutiles
 	- [ ] Don d'un rôle custom à toute personne en vocal
-	- [ ] Permissions pour les utilisateurs
+	- [x] Permissions pour les utilisateurs
 	- [x] Format de nom custom
 - [ ] Système de role-reactions
 	- [ ] Fichier de configuration

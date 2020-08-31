@@ -12,28 +12,31 @@ class VoiceChannels(commands.Cog):
         self.names = {'random': [], 'asterix': []}
         self.channels = dict()
         self.get_channels()
-    
+
     def get_channels(self):
         c = self.bot.database.cursor()
         for row in c.execute('SELECT * FROM voices_chats'):
-            self.channels[row[0]] = self.channels.get(row[0], list()) + [row[1]]
+            self.channels[row[0]] = self.channels.get(
+                row[0], list()) + [row[1]]
         c.close()
         # print(self.channels)
-    
+
     def db_add_channel(self, channel: discord.VoiceChannel):
         c = self.bot.database.cursor()
-        c.execute(f"INSERT INTO voices_chats (guild,channel) VALUES (?, ?)", (channel.guild.id, channel.id))
+        c.execute(f"INSERT INTO voices_chats (guild,channel) VALUES (?, ?)",
+                  (channel.guild.id, channel.id))
         self.bot.database.commit()
         c.close()
-        self.channels[channel.guild.id] = self.channels.get(channel.guild.id, list()) + [channel.id]
-    
+        self.channels[channel.guild.id] = self.channels.get(
+            channel.guild.id, list()) + [channel.id]
+
     def db_delete_channel(self, channel: discord.VoiceChannel):
         c = self.bot.database.cursor()
-        c.execute(f"DELETE FROM voices_chats WHERE guild=? AND channel=?", (channel.guild.id, channel.id))
+        c.execute(f"DELETE FROM voices_chats WHERE guild=? AND channel=?",
+                  (channel.guild.id, channel.id))
         self.bot.database.commit()
         c.close()
         self.channels[channel.guild.id].remove(channel.id)
-
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
@@ -47,20 +50,23 @@ class VoiceChannels(commands.Cog):
             await self.create_channel(member, config)
         if (before.channel is not None) and (member.guild.id in self.channels.keys()) and (before.channel.id in self.channels[member.guild.id]):
             await self.delete_channel(before.channel)
-    
+
     async def create_channel(self, member: discord.Member, config: dict):
         """Create a new voice channel
         The member will get "Manage channel" permissions automatically"""
         if config["voices_category"] is None:  # si rien n'a été configuré
             return
-        voice_category: discord.CategoryChannel = self.bot.get_channel(config["voices_category"])
+        voice_category: discord.CategoryChannel = self.bot.get_channel(
+            config["voices_category"])
         if not isinstance(voice_category, discord.CategoryChannel):
             return
         perms = voice_category.permissions_for(member.guild.me)
-        if not (perms.manage_channels and perms.move_members): # S'il manque des perms au bot: abort
+        # S'il manque des perms au bot: abort
+        if not (perms.manage_channels and perms.move_members):
             return
         p = len(voice_category.channels)
-        over = { member: discord.PermissionOverwrite(manage_channels=True) }
+        d = dict(discord.Permissions.all())
+        over = {member: discord.PermissionOverwrite(**d)}
         chan_name = config['voice_channel_format']
         args = {'user': str(member)}
         if "{random}" in chan_name:
@@ -71,7 +77,7 @@ class VoiceChannels(commands.Cog):
         new_channel = await voice_category.create_voice_channel(name=chan_name, position=p, overwrites=over)
         await member.move_to(new_channel)
         self.db_add_channel(new_channel)
-    
+
     async def delete_channel(self, channel: discord.VoiceChannel):
         """Delete an unusued channel if no one is in"""
         if len(channel.members) == 0 and channel.permissions_for(channel.guild.me).manage_channels:
@@ -90,7 +96,7 @@ class VoiceChannels(commands.Cog):
                 async with session.get('https://randommer.io/api/Name?nameType=surname&quantity=20', headers=h) as resp:
                     self.names[source] = await resp.json()
         return self.names[source].pop()
-    
+
     @commands.command(name="voice-clean")
     @commands.guild_only()
     @commands.has_guild_permissions(manage_channels=True)
