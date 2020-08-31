@@ -11,23 +11,25 @@ import sqlite3
 from discord.ext import commands
 
 
-initial_extensions = ["admin", "antikikoo", "contact", "errors", "general", "sconfig", "configManager", "voices", "logs", "perms"]
+initial_extensions = ["admin", "antikikoo", "contact", "errors",
+                      "general", "sconfig", "configManager", "voices", "logs", "perms"]
+
 
 class gunibot(commands.bot.BotBase, discord.Client):
 
     def __init__(self, case_insensitive=None, status=None, beta=False, config: dict = None):
         self.config = config
-        super().__init__(command_prefix=self.get_prefix,
-                         case_insensitive=case_insensitive, status=status)
+        super().__init__(command_prefix=self.get_prefix, case_insensitive=case_insensitive,
+                         status=status, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
         self.log = logging.getLogger("runner")
         self.beta = beta
         self.database = sqlite3.connect('data/database.db')
         self._update_database_structure()
-    
+
     @property
     def server_configs(self):
         return self.get_cog("ConfigCog").confManager
-    
+
     def _update_database_structure(self):
         """Create tables and indexes from 'data/model.sql' file"""
         c = self.database.cursor()
@@ -59,7 +61,7 @@ class gunibot(commands.bot.BotBase, discord.Client):
             prefix = "?"
         return commands.when_mentioned_or(prefix)(self, msg)
 
-    async def update_config(self, key:str, value):
+    async def update_config(self, key: str, value):
         """Change a value in the config file
         No undo can be done"""
         self.config[key] = value
@@ -125,7 +127,7 @@ def main():
         except:
             log.exception(f'\nFailed to load extension {extension}')
             count += 1
-        if count >0:
+        if count > 0:
             raise Exception("\n{} modules not loaded".format(count))
     del count
 
@@ -146,7 +148,8 @@ def main():
 
     client.add_listener(on_ready)
 
-    client.run(conf["token"] if input("Lancer la version stable ? (y/n)").lower() == "y" else conf["token_beta"])
+    client.run(conf["token"] if input(
+        "Lancer la version stable ? (y/n)").lower() == "y" else conf["token_beta"])
 
 
 if __name__ == "__main__":
