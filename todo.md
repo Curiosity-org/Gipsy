@@ -14,15 +14,19 @@
 	- [x] Configurations dans le fichier config.json
 	- [x] Gestion de l'event "on_member_join"
 	- [x] Gestion de l'event "on_message"
-- [x] Système de contact
+- [-] Système de contact
 	- [x] Gestion de l'event "on_message"
 	- [x] Création des salons privés
 	- [x] Commande pour supprimer les salons inutiles
-- [x] Système de salons vocaux
+	- [ ] Création d'un webhook avec nom et avatar de la personne
+- [-] Système de salons vocaux
 	- [x] Gestion de l'event "on_voice_state_update"
 	- [x] Création des salons vocaux
 	- [x] Suppression des salons vides
 	- [x] Commande pour supprimer les salons inutiles
+	- [ ] Don d'un rôle custom à toute personne en vocal
+	- [ ] Permissions pour les utilisateurs
+	- [ ] Format de nom custom
 - [ ] Système de role-reactions
 	- [ ] Fichier de configuration
 	- [ ] Mise à jour d'un message
