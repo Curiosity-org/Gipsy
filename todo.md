@@ -19,12 +19,12 @@
 	- [x] Création des salons privés
 	- [x] Commande pour supprimer les salons inutiles
 	- [x] Création d'un webhook avec nom et avatar de la personne
-- [-] Système de salons vocaux
+- [x] Système de salons vocaux
 	- [x] Gestion de l'event "on_voice_state_update"
 	- [x] Création des salons vocaux
 	- [x] Suppression des salons vides
 	- [x] Commande pour supprimer les salons inutiles
-	- [ ] Don d'un rôle custom à toute personne en vocal
+	- [x] Don d'un rôle custom à toute personne en vocal
 	- [x] Permissions pour les utilisateurs
 	- [x] Format de nom custom
 - [ ] Système de role-reactions

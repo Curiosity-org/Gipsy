@@ -89,9 +89,11 @@ class Sconfig(commands.Cog):
     
     @main_config.command(name="welcome_roles")
     async def config_welcome_roles(self, ctx:commands.Context, roles:commands.Greedy[discord.Role]):
-        if len(roles)==0:
-            return
-        await ctx.send(self.edit_config(ctx.guild.id, "welcome_roles", [role.id for role in roles]))
+        if len(roles) == 0:
+            roles = None
+        else:
+            roles = [role.id for role in roles]
+        await ctx.send(self.edit_config(ctx.guild.id, "welcome_roles", roles))
     
     @main_config.command(name="voices_category")
     async def config_voices_category(self, ctx:commands.Context, *, category:discord.CategoryChannel):
@@ -147,6 +149,14 @@ class Sconfig(commands.Cog):
         """Format of voice channels names
         Use {random} for any random name, {asterix} for any asterix name"""
         await ctx.send(self.edit_config(ctx.guild.id, "voice_channel_format", text[:40]))
+    
+    @main_config.command(name="voice_roles")
+    async def config_voice_roles(self, ctx:commands.Context, roles:commands.Greedy[discord.Role]):
+        if len(roles) == 0:
+            roles = None
+        else:
+            roles = [role.id for role in roles]
+        await ctx.send(self.edit_config(ctx.guild.id, "voice_roles", roles))
 
     
     

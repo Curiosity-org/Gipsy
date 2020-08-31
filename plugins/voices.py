@@ -37,6 +37,21 @@ class VoiceChannels(commands.Cog):
         self.bot.database.commit()
         c.close()
         self.channels[channel.guild.id].remove(channel.id)
+    
+    async def give_roles(self, member: discord.Member, remove=False):
+        if not member.guild.me.guild_permissions.manage_roles:
+            return
+        g = member.guild
+        rolesID = self.bot.server_configs[g.id]['voice_roles']
+        if not rolesID:
+            return
+        roles = [g.get_role(x) for x in rolesID]
+        pos = g.me.top_role.position
+        roles = filter(lambda x: (x is not None) and (x.position < pos), roles)
+        if remove:
+             await member.remove_roles(*roles, reason="Left the voice chat")
+        else:
+            await member.add_roles(*roles, reason="In a voice chat")
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
@@ -50,6 +65,10 @@ class VoiceChannels(commands.Cog):
             await self.create_channel(member, config)
         if (before.channel is not None) and (member.guild.id in self.channels.keys()) and (before.channel.id in self.channels[member.guild.id]):
             await self.delete_channel(before.channel)
+        if after.channel is None:
+            await self.give_roles(member, remove=True)
+        if before.channel is None:
+            await self.give_roles(member)
 
     async def create_channel(self, member: discord.Member, config: dict):
         """Create a new voice channel
