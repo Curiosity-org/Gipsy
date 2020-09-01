@@ -46,7 +46,7 @@ class Logs(commands.Cog):
             return
         embed = discord.Embed(
             timestamp=message.created_at,
-            title="Message édité",
+            title="Message supprimé",
             description=f"Un message de {message.author.mention} ** a été supprimé** dans {message.channel.mention}",
             colour=discord.Colour.red()
         )
@@ -66,7 +66,7 @@ class Logs(commands.Cog):
             return
         embed = discord.Embed(
             timestamp=after.created_at,
-            title="Message supprimé",
+            title="Message édité",
             description=f"Un message de {before.author.mention} **a été édité** dans {before.channel.mention}.",
             colour=discord.Colour(0x00FF00)
         )
