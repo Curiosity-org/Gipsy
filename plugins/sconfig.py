@@ -2,6 +2,11 @@ import discord
 from discord.ext import commands
 import checks
 
+roles_config = ('verification_role', 'welcome_roles', 'voice_roles', 'contact_roles', 'thanks_allowed_roles', 'thanks_roles')
+channels_config = ('verification_channel', 'logs_channel', 'info_channel', 'contact_channel', 'voice_channel')
+categories_config = ('contact_category', 'voices_category')
+duration_config = ('thanks_duration')
+
 
 class Sconfig(commands.Cog):
 
@@ -28,6 +33,9 @@ class Sconfig(commands.Cog):
         await member.add_roles(*roles, reason="Welcome plugin")
 
     def edit_config(self, guildID, key, value):
+        if value is None:
+            del self.bot.server_configs[guildID][key]
+            return
         try:
             self.bot.server_configs[guildID][key] = value
         except ValueError:
@@ -40,21 +48,24 @@ class Sconfig(commands.Cog):
             return None
         getname = lambda x: (x.mention if mention else x.name)
         sep = ' ' if mention else ' | '
-        if key in ('verification_role', 'welcome_roles', 'voice_roles', 'contact_roles'): # roles
+        if key in roles_config:
             value = [value] if isinstance(value, int) else value
             roles = [guild.get_role(x) for x in value]
             roles = [getname(x) for x in roles if x is not None]
             return sep.join(roles)
-        if key in ('verification_channel', 'logs_channel', 'info_channel', 'contact_channel', 'voice_channel'): # channels
+        if key in channels_config: # channels
             value = [value] if isinstance(value, int) else value
             channels = [guild.get_channel(x) for x in value]
             channels = [getname(x) for x in channels if x is not None]
             return sep.join(channels)
-        if key in ('contact_category', 'voices_category'): # categories
+        if key in categories_config: # categories
             value = [value] if isinstance(value, int) else value
             categories = [guild.get_channel(x) for x in value]
             categories = [x.name for x in categories if x is not None]
             return " | ".join(categories)
+        if key == 'modlogs_flags':
+            flags = self.bot.get_cog("ConfigCog").LogsFlags().intToFlags(value)
+            return " - ".join(flags)
         return value
 
     @commands.group(name="config")
@@ -196,6 +207,22 @@ class Sconfig(commands.Cog):
         else:
             roles = [role.id for role in roles]
         await ctx.send(self.edit_config(ctx.guild.id, "voice_roles", roles))
+
+    @main_config.command(name="thanks_allowed_roles")
+    async def config_thanks_allowed_roles(self, ctx:commands.Context, roles:commands.Greedy[discord.Role]):
+        if len(roles) == 0:
+            roles = None
+        else:
+            roles = [role.id for role in roles]
+        await ctx.send(self.edit_config(ctx.guild.id, "thanks_allowed_roles", roles))
+    
+    @main_config.command(name="thanks_roles")
+    async def config_thanks_roles(self, ctx:commands.Context, roles:commands.Greedy[discord.Role]):
+        if len(roles) == 0:
+            roles = None
+        else:
+            roles = [role.id for role in roles]
+        await ctx.send(self.edit_config(ctx.guild.id, "thanks_roles", roles))
 
     
     

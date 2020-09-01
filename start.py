@@ -11,8 +11,7 @@ import sqlite3
 from discord.ext import commands
 
 
-initial_extensions = ["admin", "antikikoo", "contact", "errors",
-                      "general", "sconfig", "configManager", "voices", "logs", "perms", "welcome"]
+initial_extensions = ["admin", "antikikoo", "contact", "errors", "general", "sconfig", "configManager", "voices", "logs", "perms", "welcome", "thanks"]
 
 
 class gunibot(commands.bot.BotBase, discord.Client):
