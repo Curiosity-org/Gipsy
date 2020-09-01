@@ -34,6 +34,26 @@ class Sconfig(commands.Cog):
             return "Cette option de configuration n'existe pas :confused:"
         else:
             return f"L'option `{key}` a bien été modifiée !"
+    
+    async def format_config(self, guild:discord.Guild, key:str, value:str, mention:bool=True) -> str:
+        getname = lambda x: (x.mention if mention else x.name)
+        sep = ' ' if mention else ' | '
+        if key in ('verification_role', 'welcome_roles', 'voice_roles'): # roles
+            value = [value] if isinstance(value, int) else value
+            roles = [guild.get_role(x) for x in value]
+            roles = [getname(x) for x in roles if x is not None]
+            return sep.join(roles)
+        if key in ('verification_channel', 'logs_channel', 'info_channel', 'contact_channel', 'voice_channel'): # channels
+            value = [value] if isinstance(value, int) else value
+            channels = [guild.get_channel(x) for x in value]
+            channels = [getname(x) for x in channels if x is not None]
+            return sep.join(channels)
+        if key in ('contact_category', 'voices_category'): # categories
+            value = [value] if isinstance(value, int) else value
+            categories = [guild.get_channel(x) for x in value]
+            categories = [x.name for x in categories if x is not None]
+            return " | ".join(categories)
+        return value
 
     @commands.group(name="config")
     @commands.guild_only()
@@ -43,10 +63,19 @@ class Sconfig(commands.Cog):
             res = ""
             config = ctx.bot.server_configs[ctx.guild.id]
             max_length = max([len(k)+2 for k in config.keys()])
-            for k,v in config.items():
-                res += (f"[{k}]").ljust(max_length+1) + f" {v}\n"
-            res = "```ini\n"+res+"```"
-            await ctx.send(res)
+            # Let's desactivate embeds with a small False
+            if False and ctx.guild.me.guild_permissions.embed_links:
+                emb = discord.Embed(title="Server configuration", color=16098851)
+                for k, v in config.items():
+                    v = await self.format_config(ctx.guild, k, v, True)
+                    emb.add_field(name=k, value=v, inline=False)
+                await ctx.send(embed=emb)
+            else:
+                for k, v in config.items():
+                    v = await self.format_config(ctx.guild, k, v, False)
+                    res += (f"[{k}]").ljust(max_length+1) + f" {v}\n"
+                res = "```ini\n"+res+"```"
+                await ctx.send(res)
 
     @main_config.command(name="prefix")
     async def config_prefix(self, ctx:commands.Context, new_prefix=None):
