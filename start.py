@@ -12,7 +12,7 @@ from discord.ext import commands
 
 
 initial_extensions = ["admin", "antikikoo", "contact", "errors",
-                      "general", "sconfig", "configManager", "voices", "logs", "perms"]
+                      "general", "sconfig", "configManager", "voices", "logs", "perms", "welcome"]
 
 
 class gunibot(commands.bot.BotBase, discord.Client):
