@@ -36,6 +36,8 @@ class Sconfig(commands.Cog):
             return f"L'option `{key}` a bien été modifiée !"
     
     async def format_config(self, guild:discord.Guild, key:str, value:str, mention:bool=True) -> str:
+        if value is None:
+            return None
         getname = lambda x: (x.mention if mention else x.name)
         sep = ' ' if mention else ' | '
         if key in ('verification_role', 'welcome_roles', 'voice_roles', 'contact_roles'): # roles
