@@ -38,7 +38,7 @@ class Sconfig(commands.Cog):
     async def format_config(self, guild:discord.Guild, key:str, value:str, mention:bool=True) -> str:
         getname = lambda x: (x.mention if mention else x.name)
         sep = ' ' if mention else ' | '
-        if key in ('verification_role', 'welcome_roles', 'voice_roles'): # roles
+        if key in ('verification_role', 'welcome_roles', 'voice_roles', 'contact_roles'): # roles
             value = [value] if isinstance(value, int) else value
             roles = [guild.get_role(x) for x in value]
             roles = [getname(x) for x in roles if x is not None]
@@ -115,6 +115,14 @@ class Sconfig(commands.Cog):
     @main_config.command(name="contact_category")
     async def config_contact_category(self, ctx:commands.Context, *, category:discord.CategoryChannel):
         await ctx.send(self.edit_config(ctx.guild.id, "contact_category", category.id))
+    
+    @main_config.command(name="contact_roles")
+    async def config_contact_roles(self, ctx:commands.Context, roles:commands.Greedy[discord.Role]):
+        if len(roles) == 0:
+            roles = None
+        else:
+            roles = [role.id for role in roles]
+        await ctx.send(self.edit_config(ctx.guild.id, "contact_roles", roles))
     
     @main_config.command(name="welcome_roles")
     async def config_welcome_roles(self, ctx:commands.Context, roles:commands.Greedy[discord.Role]):

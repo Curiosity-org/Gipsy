@@ -14,6 +14,7 @@ CONFIG_TEMPLATE = {
     "verification_add_role": True,
     "contact_channel": None,
     "contact_category": None,
+    "contact_roles": None,
     "welcome_roles": None,
     "voices_category": None,
     "voice_channel": None,

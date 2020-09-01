@@ -33,12 +33,17 @@ class Contact(commands.Cog):
         config = self.bot.server_configs[message.guild.id]
         if message.channel.id != config["contact_channel"]:
             return
-        category = self.bot.get_channel(config["contact_category"])
-        channel = discord.utils.get(category.text_channels, topic=str(message.author.id))
+        category: discord.CategoryChannel = self.bot.get_channel(config["contact_category"])
+        channel: discord.TextChannel = discord.utils.get(category.text_channels, topic=str(message.author.id))
         if channel is None:
             try:
-                channel = await category.create_text_channel(str(message.author))
-                await channel.edit(topic=str(message.author.id))
+                perms = dict()
+                if config["contact_roles"]:
+                    over = discord.PermissionOverwrite(**dict(discord.Permissions.all()))
+                    perms = { message.guild.get_role(x): over for x in config["contact_roles"] }
+                    perms.pop(None, None)
+                perms[message.author] = discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
+                channel = await category.create_text_channel(str(message.author), topic=str(message.author.id), overwrites=perms)
             except discord.errors.Forbidden as e:
                 await self.bot.get_cog("Errors").on_error(e, await self.bot.get_context(message))
                 return
@@ -50,7 +55,6 @@ class Contact(commands.Cog):
             await webhook.send(message.content, avatar_url=message.author.avatar_url)
         except discord.Forbidden:
             await channel.send(message.content)
-        await channel.set_permissions(message.author, read_messages=True,send_messages=True)
         try:
             await message.delete()
         except discord.errors.Forbidden:
