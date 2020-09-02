@@ -100,7 +100,7 @@ class Thanks(commands.Cog):
                 await ctx.send("Vous avez déjà remercié cet utilisateur il y a moins d'un jour !")
                 return
         self.db_add_thanks(ctx.guild.id, user.id, ctx.author.id)
-        duration = self.bot.server_configs[guild.id]['thanks_duration']
+        duration = self.bot.server_configs[ctx.guild.id]['thanks_duration']
         amount = self.db_get_amount(ctx.guild.id, user.id, duration)
         await ctx.send(f"{user} a bien reçu votre remerciement. Il a maintenant {amount} remerciements actifs !")
         await self.give_roles(user)
