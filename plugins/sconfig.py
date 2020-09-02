@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
-import checks, args
+import checks
+import args
 
 roles_config = ('verification_role', 'welcome_roles', 'voice_roles', 'contact_roles', 'thanks_allowed_roles', 'thanks_roles')
 channels_config = ('verification_channel', 'logs_channel', 'info_channel', 'contact_channel', 'voice_channel')
@@ -13,24 +14,6 @@ class Sconfig(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.file = "sconfig"
-    
-    @commands.Cog.listener()
-    async def on_member_join(self, member: discord.Member):
-        """Called when a member joins a guild"""
-        if not member.guild.me.guild_permissions.manage_roles: # si pas la perm de gérer les rôles
-            return
-        config = self.bot.server_configs[member.guild.id]
-        if config["welcome_roles"] is None: # si rien n'a été configuré
-            return
-        roles = list()
-        for roleID in config["welcome_roles"]:
-            try:
-                role = member.guild.get_role(roleID)
-                if role.position < member.guild.me.roles[-1].position:
-                    roles.append(role)
-            except discord.errors.NotFound:
-                pass
-        await member.add_roles(*roles, reason="Welcome plugin")
 
     def edit_config(self, guildID, key, value):
         if value is None:
