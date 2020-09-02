@@ -35,10 +35,10 @@
 	- [ ] Gestion de l'event "on_raw_reaction_remove"
 - [x] Système de gestion de rôles
 	- [x] Rôles donnés aux nouveaux arrivants
-- [-] Système de récompense
+- [x] Système de récompense
 	- [x] Configuration par serveur des rôles autorisés
 	- [x] Configuration par serveur des rôles donnés
-	- [ ] Configuration par serveur de la durée de validité
+	- [x] Configuration par serveur de la durée de validité
 	- [x] Sauvegarde des points de /thx, avec date
 	- [x] Don des rôles si plus de X thx en Y durée
 - [-] Salon de logs
