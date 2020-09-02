@@ -120,7 +120,7 @@ class Thanks(commands.Cog):
             liste[e] = [self.bot.get_guild(l[0]), self.bot.get_user(l[1]), self.bot.get_user(l[2]), datetime.datetime.strptime(l[3], "%Y-%m-%d %H:%M:%S")]
         duration = self.bot.server_configs[ctx.guild.id]['thanks_duration']
         current = [x for x in liste if (datetime.datetime.utcnow() - x[3]).total_seconds() < duration]
-        if ctx.guild.me.guild_permissions.embed_links:
+        if ctx.channel.permissions_for(ctx.guild.me).embed_links:
             emb = discord.Embed(title=f"Remerciements à {user}")
             if len(current) > 0:
                 t = ["• {} ({})".format(x[2].mention, x[3].strftime("%d/%m/%y %HH%M")) for x in current]
@@ -131,7 +131,14 @@ class Thanks(commands.Cog):
                 emb.add_field(name="\u200b", value=f"et {old} inactifs")
             await ctx.send(embed=emb)
         else:
-            await ctx.send(str(current))
+            txt = "```md\n"
+            if len(current) > 0:
+                t = ["- {} ({})".format(str(x[2]), x[3].strftime("%d/%m/%y %HH%M")) for x in current]
+                txt += "# Remerciements actifs ({})\n{}\n".format(len(current), "\n".join(t))
+            old = len(liste) - len(current)
+            if old > 0:
+                txt += f"\net {old} inactifs\n"
+            await ctx.send(txt+"```")
 
     @commands.command(name="thanksreload", aliases=['thanks-reload'])
     @commands.guild_only()
