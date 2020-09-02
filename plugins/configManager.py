@@ -48,7 +48,7 @@ class serverConfig(dict):
             raise ValueError("Invalid config key")
     
     def __delitem__(self, key):
-        super().__setitem__(key, CONFIG_TEMPLATE['key'])
+        super().__setitem__(key, CONFIG_TEMPLATE[key])
         self.manager[self.serverID] = self
 
 class ConfigCog(commands.Cog):
@@ -69,7 +69,7 @@ class ConfigCog(commands.Cog):
         def __getitem__(self, key):
             if not (isinstance(key, int) or key.isnumeric()):
                 raise ValueError("Key need to be a valid guild ID")
-            result = CONFIG_TEMPLATE
+            result = dict(CONFIG_TEMPLATE)
             try:
                 with open(f"{CONFIG_FOLDER}/{key}.json", "r", encoding="utf8") as f:
                     result.update(load(f))
