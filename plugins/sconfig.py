@@ -50,7 +50,7 @@ class Sconfig(commands.Cog):
             return await self.bot.get_cog("TimeCog").time_delta(value, lang='fr', year=True, precision=0)
         if key == 'modlogs_flags':
             flags = self.bot.get_cog("ConfigCog").LogsFlags().intToFlags(value)
-            return " - ".join(flags)
+            return " - ".join(flags) if len(flags) > 0 else None
         return value
 
     @commands.group(name="config")
