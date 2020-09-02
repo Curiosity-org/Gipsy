@@ -22,6 +22,27 @@ class Contact(commands.Cog):
                     res = None
         return res
     
+    def db_get_channels(self, guildID:int):
+        c = self.bot.database.cursor()
+        c.execute('SELECT * FROM contact_channels WHERE guild=?', (guildID,))
+        res = list(c)
+        c.close()
+        return res
+
+    def db_add_channel(self, channel: discord.TextChannel):
+        c = self.bot.database.cursor()
+        c.execute(f"INSERT INTO contact_channels (guild,channel, author) VALUES (?, ?, ?)",
+                  (channel.guild.id, channel.id, int(channel.topic)))
+        self.bot.database.commit()
+        c.close()
+
+    def db_delete_channel(self, guildID:int, channelID: int):
+        c = self.bot.database.cursor()
+        c.execute(f"DELETE FROM contact_channels WHERE guild=? AND channel=?",
+                  (guildID, channelID))
+        self.bot.database.commit()
+        c.close()
+    
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
         """Called for every new message
@@ -44,6 +65,7 @@ class Contact(commands.Cog):
                     perms.pop(None, None)
                 perms[message.author] = discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
                 channel = await category.create_text_channel(str(message.author), topic=str(message.author.id), overwrites=perms)
+                self.db_add_channel(channel)
             except discord.errors.Forbidden as e:
                 await self.bot.get_cog("Errors").on_error(e, await self.bot.get_context(message))
                 return
@@ -60,10 +82,14 @@ class Contact(commands.Cog):
         except discord.errors.Forbidden:
             pass
 
-    @commands.command(name="contact-clear", aliases=["ctc", "ct-clear"])
+    @commands.command(name="contact-clear", aliases=["ct-clear"])
+    @commands.check(checks.is_admin)
     @commands.guild_only()
     async def ct_clear(self, ctx: commands.Context, days: int=15):
         """Nettoie tous les salons inutilisés depuix X jours"""
+        if days < 1:
+            await ctx.send("Vous ne pouvez pas choisir une durée de moins d'un jour")
+            return
         categ_id = self.bot.server_configs[ctx.guild.id]["contact_category"]
         if categ_id is None:
             await ctx.send("Aucune catégorie de contact n'a été créée !")
@@ -75,13 +101,20 @@ class Contact(commands.Cog):
         i = 0 # compteur de suppressions
         errors = list() # liste des éventuelles erreurs
         max_date = datetime.now()-timedelta(days=days)
-        for chan in categ.text_channels:
-            if snowflake_time(chan.last_message_id) < max_date: # si la date du dernier message est trop ancienne
-                try:
-                    await chan.delete(reason="channel too old")
-                    i += 1
-                except discord.DiscordException as e:
-                    errors.append(str(e))
+        channels = self.db_get_channels(ctx.guild.id)
+        for data in channels:
+            chan = ctx.guild.get_channel(data[1])
+            if chan is None:
+                self.db_delete_channel(ctx.guild.id, data[1])
+            else:
+                if snowflake_time(chan.last_message_id) < max_date: # si la date du dernier message est trop ancienne
+                    try:
+                        await chan.delete(reason="Channel too old")
+                        i += 1
+                    except discord.DiscordException as e:
+                        errors.append(str(e))
+                    else:
+                        self.db_delete_channel(ctx.guild.id, data[1])
         answer = "" if i==0 else f"{i} salons ont été supprimés !"
         if len(errors) > 0:
             answer += "\n{} salons n'ont pu être supprimés :\n • {}".format(len(errors), "\n • ".join(errors))
