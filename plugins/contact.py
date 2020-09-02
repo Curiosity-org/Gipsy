@@ -62,6 +62,8 @@ class Contact(commands.Cog):
                 if config["contact_roles"]:
                     over = discord.PermissionOverwrite(**dict(discord.Permissions.all()))
                     perms = { message.guild.get_role(x): over for x in config["contact_roles"] }
+                    if message.guild.default_role not in perms.keys():
+                        perms[message.guild.default_role] = discord.PermissionOverwrite(read_messages=False)
                     perms.pop(None, None)
                 perms[message.author] = discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True, embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
                 channel = await category.create_text_channel(str(message.author), topic=str(message.author.id), overwrites=perms)
@@ -119,7 +121,7 @@ class Contact(commands.Cog):
         if len(errors) > 0:
             answer += "\n{} salons n'ont pu être supprimés :\n • {}".format(len(errors), "\n • ".join(errors))
         if len(answer) == 0: # si aucun salon n'a eu besoin d'être supprimé
-            answer = "Aucun salon n'est aussi vieux !"
+            answer = "Aucun salon n'est assez vieux !"
         await ctx.send(answer)
 
 def setup(bot):
