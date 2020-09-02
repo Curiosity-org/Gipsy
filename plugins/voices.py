@@ -11,15 +11,14 @@ class VoiceChannels(commands.Cog):
         self.file = "voices"
         self.names = {'random': [], 'asterix': []}
         self.channels = dict()
-        self.get_channels()
+        self.db_get_channels()
 
-    def get_channels(self):
+    def db_get_channels(self):
         c = self.bot.database.cursor()
         for row in c.execute('SELECT * FROM voices_chats'):
             self.channels[row[0]] = self.channels.get(
                 row[0], list()) + [row[1]]
         c.close()
-        # print(self.channels)
 
     def db_add_channel(self, channel: discord.VoiceChannel):
         c = self.bot.database.cursor()
