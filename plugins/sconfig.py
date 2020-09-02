@@ -74,7 +74,7 @@ class Sconfig(commands.Cog):
     @commands.guild_only()
     async def main_config(self, ctx:commands.Context):
         """Edit your server configuration"""
-        if ctx.subcommand_passed==None:
+        if ctx.subcommand_passed is None:
             res = ""
             config = ctx.bot.server_configs[ctx.guild.id]
             max_length = max([len(k)+2 for k in config.keys()])
@@ -91,6 +91,8 @@ class Sconfig(commands.Cog):
                     res += (f"[{k}]").ljust(max_length+1) + f" {v}\n"
                 res = "```ini\n"+res+"```"
                 await ctx.send(res)
+        elif ctx.invoked_subcommand is None:
+            await ctx.send("Option inexistante")
 
     @main_config.command(name="prefix")
     async def config_prefix(self, ctx:commands.Context, new_prefix=None):
