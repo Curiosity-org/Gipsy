@@ -25,7 +25,7 @@ class Thanks(commands.Cog):
             c.execute('SELECT * FROM thanks WHERE guild=? AND user=? AND author=?', (guildID, userID, authorID))
             res = list(c)
             c.close()
-        return res[-1]
+        return res[-1] if len(res) > 0 else None
     
     def db_get_amount(self, guildID:int, userID:int, duration:int=None) -> int:
         c = self.bot.database.cursor()
@@ -78,7 +78,7 @@ class Thanks(commands.Cog):
         return len(roles) > 0   
 
 
-    @commands.command(name="thanks")
+    @commands.command(name="thanks", aliases=['thx'])
     @commands.guild_only()
     async def thanks(self, ctx:commands.Context, *, user:discord.User):
         """Thanks a user for their work.
