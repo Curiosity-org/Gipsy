@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import checks
+import checks, args
 
 roles_config = ('verification_role', 'welcome_roles', 'voice_roles', 'contact_roles', 'thanks_allowed_roles', 'thanks_roles')
 channels_config = ('verification_channel', 'logs_channel', 'info_channel', 'contact_channel', 'voice_channel')
@@ -53,16 +53,18 @@ class Sconfig(commands.Cog):
             roles = [guild.get_role(x) for x in value]
             roles = [getname(x) for x in roles if x is not None]
             return sep.join(roles)
-        if key in channels_config: # channels
+        if key in channels_config:
             value = [value] if isinstance(value, int) else value
             channels = [guild.get_channel(x) for x in value]
             channels = [getname(x) for x in channels if x is not None]
             return sep.join(channels)
-        if key in categories_config: # categories
+        if key in categories_config:
             value = [value] if isinstance(value, int) else value
             categories = [guild.get_channel(x) for x in value]
             categories = [x.name for x in categories if x is not None]
             return " | ".join(categories)
+        if key in duration_config:
+            return await self.bot.get_cog("TimeCog").time_delta(value, lang='fr', year=True, precision=0)
         if key == 'modlogs_flags':
             flags = self.bot.get_cog("ConfigCog").LogsFlags().intToFlags(value)
             return " - ".join(flags)
@@ -79,12 +81,12 @@ class Sconfig(commands.Cog):
             # Let's desactivate embeds with a small False
             if False and ctx.guild.me.guild_permissions.embed_links:
                 emb = discord.Embed(title="Server configuration", color=16098851)
-                for k, v in config.items():
+                for k, v in sorted(config.items()):
                     v = await self.format_config(ctx.guild, k, v, True)
                     emb.add_field(name=k, value=v, inline=False)
                 await ctx.send(embed=emb)
             else:
-                for k, v in config.items():
+                for k, v in sorted(config.items()):
                     v = await self.format_config(ctx.guild, k, v, False)
                     res += (f"[{k}]").ljust(max_length+1) + f" {v}\n"
                 res = "```ini\n"+res+"```"
@@ -224,8 +226,13 @@ class Sconfig(commands.Cog):
             roles = [role.id for role in roles]
         await ctx.send(self.edit_config(ctx.guild.id, "thanks_roles", roles))
 
-    
-    
+    @main_config.command(name="thanks_duration")
+    async def config_thanks_duration(self, ctx:commands.Context, duration:commands.Greedy[args.tempdelta]):
+        duration = sum(duration)
+        if duration == 0:
+            duration = None
+        await ctx.send(self.edit_config(ctx.guild.id, "thanks_duration", duration))
+
 
 def setup(bot):
     bot.add_cog(Sconfig(bot))
