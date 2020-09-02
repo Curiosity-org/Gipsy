@@ -55,6 +55,7 @@ class Sconfig(commands.Cog):
 
     @commands.group(name="config")
     @commands.guild_only()
+    @commands.check(checks.is_admin)
     async def main_config(self, ctx:commands.Context):
         """Edit your server configuration"""
         if ctx.subcommand_passed is None:

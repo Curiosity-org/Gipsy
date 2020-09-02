@@ -142,6 +142,7 @@ class Thanks(commands.Cog):
 
     @commands.command(name="thanksreload", aliases=['thanks-reload'])
     @commands.guild_only()
+    @commands.check(checks.is_admin)
     async def thanks_reload(self, ctx:commands.Context, *, user:discord.Member=None):
         """Reload the thanks roles for a user, or everyone"""
         users = [user] if user is not None else ctx.guild.members

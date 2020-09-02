@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import checks
 
 WELCOME_MESSAGE = """(FR) Bienvenue sur GUNIVERS {user} !
 Vous n'avez accès qu'au salon Lobby pour le moment. Pour débloquer l'accès au reste du Discord, lisez les instructions présentes dans le salon {channel} :wink:
@@ -68,6 +69,7 @@ class Antikikoo(commands.Cog):
         pass
 
     @ak_main.command(name="channel")
+    @commands.check(checks.is_admin)
     async def ak_channel(self, ctx: commands.Context, channel: discord.TextChannel):
         """Modifie le salon où les membres devront se vérifier"""
         self.bot.server_configs[ctx.guild.id]["verification_channel"] =  channel.id
