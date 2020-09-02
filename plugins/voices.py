@@ -1,5 +1,6 @@
 import discord
 import aiohttp
+import random
 from discord.ext import commands
 import checks
 
@@ -110,6 +111,7 @@ class VoiceChannels(commands.Cog):
             if source == 'asterix':
                 async with session.get('https://raw.githubusercontent.com/Gunivers/Gunibot/master/src/main/resources/other/bdd%20name', headers=h) as resp:
                     self.names[source] = (await resp.text()).split('\n')
+                    random.shuffle(self.names[source])
             else:
                 async with session.get('https://randommer.io/api/Name?nameType=surname&quantity=20', headers=h) as resp:
                     self.names[source] = await resp.json()
@@ -124,12 +126,15 @@ class VoiceChannels(commands.Cog):
             await ctx.send("There's no generated voice channel here")
             return
         i = 0
+        temp = list()
         for chan in self.channels[ctx.guild.id]:
             d_chan = ctx.guild.get_channel(chan)
             if d_chan is not None and len(d_chan.members) == 0:
                 await d_chan.delete(reason="unusued")
-                self.db_delete_channel(d_chan)
+                temp.append(d_chan)
                 i += 1
+        for chan in temp:
+            self.db_delete_channel(chan)
         await ctx.send(f"Deleted {i} channel" + ('' if i == 1 else 's'))
 
 
