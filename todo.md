@@ -6,10 +6,11 @@
 	- [x] Préfixe custom
 	- [x] Gestion de la config générale
 	- [x] Gestion de la config par serveur
-- [x] Module global
+- [x] Fonctionnalités diverses
 	- [x] Commandes de shutdown/reboot
 	- [x] Commande de ping
 	- [x] Statistiques du bot
+	- [x] Rôles donnés aux nouveaux arrivants
 - [x] Système de gestion des kikoos
 	- [x] Configurations dans le fichier config.json
 	- [x] Gestion de l'event "on_member_join"
@@ -33,8 +34,6 @@
 	- [ ] Ajout/suppression d'un rôle
 	- [ ] Gestion de l'event "on_raw_reaction_add"
 	- [ ] Gestion de l'event "on_raw_reaction_remove"
-- [x] Système de gestion de rôles
-	- [x] Rôles donnés aux nouveaux arrivants
 - [x] Système de récompense
 	- [x] Configuration par serveur des rôles autorisés
 	- [x] Configuration par serveur des rôles donnés
@@ -50,4 +49,3 @@
 	- [ ] Logs de salons vocaux
 	- [ ] Kick/ban
 	- [ ] Boosts de serveur
-- [ ] Rôles donnés aux nouveaus arrivants
