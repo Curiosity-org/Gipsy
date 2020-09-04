@@ -2,10 +2,10 @@ import discord
 from discord.ext import commands
 import checks
 
-WELCOME_MESSAGE = """(FR) Bienvenue sur GUNIVERS {user} !
+WELCOME_MESSAGE = """(FR) Bienvenue sur {server} {user} !
 Vous n'avez accès qu'au salon Lobby pour le moment. Pour débloquer l'accès au reste du Discord, lisez les instructions présentes dans le salon {channel} :wink:
 
-(EN) Welcome to GUNIVERS {user} !
+(EN) Welcome to {server} {user} !
 You only have access to the Lobby channel. To unlock the acess to the rest of our Discord, please follow the instructions in the {channel} channel :wink:"""
 
 CONFIRM_MESSAGE = """{user} a lu {channel}
@@ -30,7 +30,7 @@ class Antikikoo(commands.Cog):
             return
         verif_channel = self.bot.get_channel(config["verification_channel"])
         info_channel = "<#{}>".format(config["info_channel"])
-        await verif_channel.send(WELCOME_MESSAGE.format(user=member.mention, channel=info_channel))
+        await verif_channel.send(WELCOME_MESSAGE.format(user=member.mention, channel=info_channel, server=member.guild.name))
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
