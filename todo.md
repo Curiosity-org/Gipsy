@@ -34,12 +34,14 @@
 	- [ ] Ajout/suppression d'un rôle
 	- [ ] Gestion de l'event "on_raw_reaction_add"
 	- [ ] Gestion de l'event "on_raw_reaction_remove"
-- [x] Système de récompense
+- [-] Système de récompense
 	- [x] Configuration par serveur des rôles autorisés
 	- [x] Configuration par serveur des rôles donnés
 	- [x] Configuration par serveur de la durée de validité
 	- [x] Sauvegarde des points de /thx, avec date
 	- [x] Don des rôles si plus de X thx en Y durée
+	- [ ] Retrait automatique des rôles après la durée
+	- [ ] Gestion de plusieurs paliers par serveur
 - [-] Salon de logs
 	- [x] Configuration du salon par serveur
 	- [x] Activation/désactivation des logs par serveur (système de flags ?) 
