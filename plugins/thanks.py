@@ -96,7 +96,7 @@ class Thanks(commands.Cog):
         if duration is None:
             duration = self.bot.server_configs[member.guild.id]['thanks_duration']
         amount = self.db_get_amount(member.guild.id, member.id, duration)
-        if amount > 1:
+        if amount > 0:
             roles = list(filter(lambda x: x not in member.roles, roles))
             if len(roles) > 0:
                 await member.add_roles(*roles, reason="Thanks system")
