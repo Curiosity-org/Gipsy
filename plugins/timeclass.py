@@ -1,6 +1,7 @@
 import discord
 import datetime
 import time
+from discord.ext import tasks
 
 
 fr_months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
@@ -17,6 +18,20 @@ class TimeCog(discord.ext.commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.file = "timeclass"
+
+    def add_task(self, delay:int, coro, *args, **kwargs):
+        """Schedule a task for later, using discord.ext tasks manager"""
+        delay = round(delay)
+        async def launch(task, coro, *args, **kwargs):
+            if task.current_loop != 0:
+                await self.bot.wait_until_ready()
+                self.bot.log.info("[TaskManager] Tâche {} arrivée à terme".format(coro.__func__))
+                await coro(*args, **kwargs)
+        a = tasks.loop(seconds=delay, count=2)(launch)
+        a.error(self.bot.get_cog("Errors").on_error)
+        a.start(a, coro, *args, **kwargs)
+        self.bot.log.info("[TaskManager] Nouvelle tâche {} programmée pour dans {}s".format(coro.__func__, delay))
+        return a
 
     class timedelta:
 
