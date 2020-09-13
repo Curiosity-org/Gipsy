@@ -137,9 +137,9 @@ class Thanks(commands.Cog):
         if last:
             last_date = datetime.datetime.strptime(last[3], "%Y-%m-%d %H:%M:%S")
             delta = datetime.datetime.utcnow() - last_date
-            # if delta.days < 1:
-            #     await ctx.send("Vous avez déjà remercié cet utilisateur il y a moins d'un jour !")
-            #     return
+            if delta.days < 1:
+                await ctx.send("Vous avez déjà remercié cet utilisateur il y a moins d'un jour !")
+                return
         self.db_add_thanks(ctx.guild.id, user.id, ctx.author.id)
         duration = self.bot.server_configs[ctx.guild.id]['thanks_duration']
         amount = self.db_get_amount(ctx.guild.id, user.id, duration)
