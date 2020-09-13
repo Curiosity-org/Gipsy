@@ -18,7 +18,7 @@ class Sconfig(commands.Cog):
     def edit_config(self, guildID, key, value):
         if value is None:
             del self.bot.server_configs[guildID][key]
-            return
+            return f"L'option `{key}` a bien été remise à zéro !"
         try:
             self.bot.server_configs[guildID][key] = value
         except ValueError:
@@ -216,8 +216,12 @@ class Sconfig(commands.Cog):
     async def config_thanks_duration(self, ctx:commands.Context, duration:commands.Greedy[args.tempdelta]):
         duration = sum(duration)
         if duration == 0:
+            if ctx.message.content.split(" ")[-1] != "thanks_duration":
+                await ctx.send("Durée invalide")
+                return
             duration = None
-        await ctx.send(self.edit_config(ctx.guild.id, "thanks_duration", duration))
+        x = self.edit_config(ctx.guild.id, "thanks_duration", duration)
+        await ctx.send(x)
 
 
 def setup(bot):
