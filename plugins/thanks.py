@@ -9,6 +9,27 @@ class Thanks(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.file = "thanks"
+        self.tasks = list()
+        self.schedule_tasks()
+
+    def schedule_tasks(self):
+        c = self.bot.database.cursor()
+        c.execute('SELECT * FROM thanks')
+        res = list(c)
+        c.close()
+        now = datetime.datetime.now()
+        for task in res:
+            task = list(task)
+            task[3] = datetime.datetime.strptime(task[3], "%Y-%m-%d %H:%M:%S")
+            delta = (task[3] - now).total_seconds()
+            delta += self.bot.server_configs[task[0]]['thanks_duration']
+            if delta > 0:
+                T = self.bot.get_cog("TimeCog").add_task(delta, self.reload_roles, *task)
+                self.tasks.append(T)
+
+    def cog_unload(self):
+        for task in self.tasks:
+            task.cancel()
 
     def db_get_user(self, guildID:int, userID:int):
         c = self.bot.database.cursor()
@@ -59,24 +80,44 @@ class Thanks(commands.Cog):
                 return True
         return False
     
-    async def give_roles(self, member:discord.Member, roles:[discord.Role]=None):
+    async def give_remove_roles(self, member:discord.Member, roles:[discord.Role]=None, duration:int=None) -> bool:
+        """Give or remove thanks roles if needed
+        Return True if roles were given/removed, else False"""
         if not member.guild.me.guild_permissions.manage_roles:
             return False
         g = member.guild
         if roles is None:
-            rolesID = self.bot.server_configs[guild.id]['thanks_roles']
+            rolesID = self.bot.server_configs[member.guild.id]['thanks_roles']
             if not rolesID:
-                return
+                return False
             roles = [g.get_role(x) for x in rolesID]
-        duration = self.bot.server_configs[member.guild.id]['thanks_duration']
-        amount = self.db_get_amount(member.guild.id, member.id, duration)
-        if amount < 1:
-            return False
         pos = g.me.top_role.position
-        roles = list(filter(lambda x: (x is not None) and (x.position < pos) and (x not in member.roles), roles))
-        await member.add_roles(*roles, reason="Thanks system")
-        return len(roles) > 0   
-
+        roles = list(filter(lambda x: (x is not None) and (x.position < pos), roles))
+        if duration is None:
+            duration = self.bot.server_configs[member.guild.id]['thanks_duration']
+        amount = self.db_get_amount(member.guild.id, member.id, duration)
+        if amount > 1:
+            roles = list(filter(lambda x: x not in member.roles, roles))
+            if len(roles) > 0:
+                await member.add_roles(*roles, reason="Thanks system")
+        else:
+            roles = list(filter(lambda x: x in member.roles, roles))
+            if len(roles) > 0:
+                await member.remove_roles(*roles, reason="Thanks system")
+        return len(roles) > 0
+    
+    async def reload_roles(self, guildID:int, memberID:int, author:int, date:datetime.datetime):
+        """Remove roles if needed"""
+        delta = self.bot.server_configs[guildID]['thanks_duration']
+        if (datetime.datetime.now() - date).total_seconds() < delta:
+            return
+        guild = self.bot.get_guild(guildID)
+        if guild is None:
+            return
+        member = guild.get_member(memberID)
+        if member is None:
+            return
+        await self.give_remove_roles(member, duration=delta)
 
     @commands.command(name="thanks", aliases=['thx'])
     @commands.guild_only()
@@ -96,14 +137,18 @@ class Thanks(commands.Cog):
         if last:
             last_date = datetime.datetime.strptime(last[3], "%Y-%m-%d %H:%M:%S")
             delta = datetime.datetime.utcnow() - last_date
-            if delta.days < 1:
-                await ctx.send("Vous avez déjà remercié cet utilisateur il y a moins d'un jour !")
-                return
+            # if delta.days < 1:
+            #     await ctx.send("Vous avez déjà remercié cet utilisateur il y a moins d'un jour !")
+            #     return
         self.db_add_thanks(ctx.guild.id, user.id, ctx.author.id)
         duration = self.bot.server_configs[ctx.guild.id]['thanks_duration']
         amount = self.db_get_amount(ctx.guild.id, user.id, duration)
         await ctx.send(f"{user} a bien reçu votre remerciement. Il a maintenant {amount} remerciements actifs !")
-        await self.give_roles(user)
+        T = self.bot.get_cog("TimeCog").add_task(duration, self.reload_roles, ctx.guild.id, user.id, ctx.author.id, datetime.datetime.utcnow())
+        self.tasks.append(T)
+        member = ctx.guild.get_member(user.id)
+        if member is not None:
+            await self.give_remove_roles(member)
     
     @commands.command(name="thankslist", aliases=['thanks-list'])
     @commands.guild_only()
@@ -162,22 +207,23 @@ class Thanks(commands.Cog):
         if not ctx.guild.me.guild_permissions.manage_roles:
             await ctx.send("Il me manque la permission de Gérer les rôles")
             return
+        delta = self.bot.server_configs[ctx.guild.id]['thanks_duration']
         i = 0
         for m in users:
-            if await self.give_roles(m, roles):
+            if await self.give_remove_roles(m, roles, delta):
                 i += 1
         if i == 0:
             if len(users) == 1:
-                await ctx.send("Ce membre n'avait pas besoin de nouveau rôle")
+                await ctx.send("Ce membre n'avait pas besoin de recharger ses rôles")
             else:
-                await ctx.send("Aucun membre n'avait besoin de nouveau rôle")
+                await ctx.send("Aucun membre n'avait besoin de recharger ses rôles")
         elif i == 1:
             if len(users) == 1:
-                await ctx.send("Ce membre a bien reçu ses rôles !")
+                await ctx.send("Les rôles de ce membre ont bien été recalculés !")
             else:
-                await ctx.send("1 membre a bien reçu ses rôles !")
+                await ctx.send("Les rôles d'un membre ont bien été recalculés !")
         else:
-            await ctx.send(f"{i} membres ont bien reçu leurs rôles !")
+            await ctx.send(f"Les rôles de {i} membres ont bien été recalculés !")
         
 
 
