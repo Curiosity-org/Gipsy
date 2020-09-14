@@ -40,11 +40,12 @@
 	- [x] Configuration par serveur de la durée de validité
 	- [x] Sauvegarde des points de /thx, avec date
 	- [x] Don des rôles si plus de X thx en Y durée
-	- [ ] Retrait automatique des rôles après la durée
+	- [x] Retrait automatique des rôles après la durée
 	- [ ] Gestion de plusieurs paliers par serveur
 - [-] Salon de logs
 	- [x] Configuration du salon par serveur
-	- [x] Activation/désactivation des logs par serveur (système de flags ?) 
+	- [x] Activation/désactivation des logs par serveur (système de flags ?)
+	- [x] Message envoyé dans le salon des logs lors de la configuration
 	- [x] Suppression/edition de messages
 	- [ ] Départ/arrivée de membres
 	- [x] Invitation créée/supprimée
