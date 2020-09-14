@@ -92,6 +92,10 @@ class Sconfig(commands.Cog):
     @main_config.command(name="logs_channel")
     async def config_logs_channel(self, ctx:commands.Context, *, channel:discord.TextChannel):
         await ctx.send(self.edit_config(ctx.guild.id, "logs_channel", channel.id))
+        logs_cog = self.bot.get_cog("Logs")
+        if logs_cog:
+            emb = discord.Embed(title="Configuration activée", description="Ce salon sera maintenant utilisé pour les logs du serveur", color=16098851)
+            await logs_cog.send_embed(ctx.guild, emb)
 
     @main_config.command(name="info_channel")
     async def config_info_channel(self, ctx:commands.Context, *, channel:discord.TextChannel):
