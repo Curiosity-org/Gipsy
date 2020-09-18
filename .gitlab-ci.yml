@@ -1,0 +1,14 @@
+
+image: ubuntu:18.04
+
+before_script:
+  - apt-get update -qy
+  - apt-get install -y lftp
+
+build:
+  script:
+    #  - echo $GUNIBOT_IP
+    #  - echo $GUNIBOT_USER
+    #  - echo $GUNIBOT_PASS
+    - lftp -e "set sftp:auto-confirm yes;set ssl:verify-certificate no;mirror -X .* -X .*/ --reverse --verbose --delete . ~/; quit" -u $GUNIBOT_USER,$GUNIBOT_PASS sftp://$GUNIBOT_IP -p 22
+
