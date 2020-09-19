@@ -40,7 +40,7 @@ class Admin(commands.Cog):
                             cmds.name, cmds.help.split('\n')[0])
             await ctx.send(text)
 
-    @commands.group(name='admin', hidden=True)
+    @commands.command(hidden=True)
     @commands.check(checks.is_bot_admin)
     async def gitpull(self, ctx):
         """Tire des changements de GitLab"""
@@ -49,10 +49,7 @@ class Admin(commands.Cog):
         assert not repo.bare
         origin = repo.remotes.origin
         origin.pull()
-        await ctx.send(content="Redémarrage en cours...")
-        await self.cleanup_workspace()
-        self.bot.log.info("Redémarrage du bot")
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        await self.restart_bot(ctx)
 
 
     @main_msg.command(name='shutdown')
