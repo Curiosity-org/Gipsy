@@ -1,5 +1,8 @@
 import discord
 from discord.ext import commands
+import io
+import json
+import asyncio
 import checks
 import args
 
@@ -226,6 +229,51 @@ class Sconfig(commands.Cog):
             duration = None
         x = self.edit_config(ctx.guild.id, "thanks_duration", duration)
         await ctx.send(x)
+    
+    @commands.group(name="config-backup", aliases=["config-bkp"])
+    @commands.guild_only()
+    @commands.check(checks.is_admin)
+    async def config_backup(self, ctx:commands.Context):
+        """Create or load your server configuration"""
+        if ctx.subcommand_passed is None:
+            await ctx.send_help('config-backup')
+        
+    @config_backup.command(name="get", aliases=["create"])
+    async def backup_create(self, ctx:commands.Context):
+        "Create a backup of your configuration"
+        data = json.dumps(self.bot.server_configs[ctx.guild.id])
+        data = io.BytesIO(data.encode("utf8"))
+        await ctx.send("Here you go!", file=discord.File(data, filename="config-backup.json"))
+    
+    @config_backup.command(name="load")
+    async def backup_load(self, ctx:commands.Context):
+        "Load a backup of your configuration (in attached file) and apply it"
+        if not (ctx.message.attachments and ctx.message.attachments[0].filename.endswith(".json")):
+            await ctx.send("Aucun fichier compatible trouvé")
+            return
+        data = json.loads(await ctx.message.attachments[0].read())
+        conf = self.bot.server_configs[ctx.guild.id]
+        for k in data.keys():
+            if not k in conf.keys():
+                await ctx.send("Fichier incompatible")
+                return
+        merge = {k:v for k, v in data.items() if v != conf[k]}
+        if len(merge) == 0:
+            await ctx.send("Aucune modification appliquable")
+            return
+        msg = await ctx.send("Êtes-vous sûr de vouloir écraser votre configuration ? Cela écrasera {} options".format(len(merge)))
+        await msg.add_reaction("✅")
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) == "✅" and reaction.message.id == msg.id
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+        except asyncio.TimeoutError:
+            await ctx.send('Trop long ! Abandon de la procédure')
+        else:
+            d = dict(self.bot.server_configs[ctx.guild.id])
+            d.update(merge)
+            self.bot.server_configs[ctx.guild.id] = d
+            await ctx.send('👍')
 
 
 def setup(bot):
