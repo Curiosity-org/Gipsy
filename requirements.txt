@@ -1,3 +1,4 @@
 discord.py>=1.4
 psutil==5.7
 aiohttp>=3.6
+GitPython-3.1.8

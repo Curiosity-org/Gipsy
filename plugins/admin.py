@@ -7,6 +7,7 @@ import textwrap
 import traceback
 from contextlib import redirect_stdout
 import checks
+from git import Repo, Remote
 
 def cleanup_code(content):
     """Automatically removes code blocks from the code."""
@@ -38,6 +39,18 @@ class Admin(commands.Cog):
                         text += "\n        - {} *({})*".format(
                             cmds.name, cmds.help.split('\n')[0])
             await ctx.send(text)
+
+    @commands.command(hidden=True)
+    @commands.check(checks.is_bot_admin)
+    async def gitpull(self, ctx):
+        """Tire des changements de GitLab"""
+        m = await ctx.send("Mise à jour depuis gitlab...")
+        repo = Repo('/home/Gunibot.py')
+        assert not repo.bare
+        origin = repo.remotes.origin
+        origin.pull()
+        await self.restart_bot(ctx)
+
 
     @main_msg.command(name='shutdown')
     @commands.check(checks.is_bot_admin)
