@@ -47,7 +47,7 @@
 	- [x] Activation/désactivation des logs par serveur (système de flags ?)
 	- [x] Message envoyé dans le salon des logs lors de la configuration
 	- [x] Suppression/edition de messages
-	- [ ] Départ/arrivée de membres
+	- [x] Départ/arrivée de membres
 	- [x] Invitation créée/supprimée
 	- [ ] Logs de salons vocaux
 	- [ ] Kick/ban

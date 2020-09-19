@@ -53,7 +53,7 @@ class Logs(commands.Cog):
         embed.set_author(name=str(message.author),
                          icon_url=message.author.avatar_url)
         embed.set_footer(
-            text=f"Author ID:{message.author.id} • Message ID: {message.id}")
+            text=f"Author ID: {message.author.id} • Message ID: {message.id}")
         embed.add_field(name="Contenu", value=message.content)
         await self.send_embed(message.guild, embed)
 
@@ -73,7 +73,7 @@ class Logs(commands.Cog):
         embed.set_author(name=str(before.author),
                          icon_url=before.author.avatar_url)
         embed.set_footer(
-            text=f"Author ID:{before.author.id} • Message ID: {before.id}")
+            text=f"Author ID: {before.author.id} • Message ID: {before.id}")
         embed.add_field(name='Avant', value=before.content, inline=False)
         embed.add_field(name="Après", value=after.content, inline=False)
         await self.send_embed(before.guild, embed)
@@ -108,7 +108,7 @@ class Logs(commands.Cog):
             colour=discord.Colour.green()
         )
         embed.set_author(name=f'{invite.inviter.name}#{invite.inviter.discriminator}',
-                         icon_url=invite.inviter.avatar_url_as(static_format='jpg'))
+                         icon_url=invite.inviter.avatar_url_as(static_format='png'))
         if invite.max_age == 0:
             embed.add_field(name="Durée", value="♾")
         else:
@@ -117,7 +117,7 @@ class Logs(commands.Cog):
         embed.add_field(name="URL", value=invite.url)
         embed.add_field(name="Nombre max d'utilisations",
                         value="♾" if invite.max_uses == 0 else str(invite.max_uses))
-        embed.set_footer(text=f"Author ID:{invite.inviter.id}")
+        embed.set_footer(text=f"Author ID: {invite.inviter.id}")
         await self.send_embed(invite.guild, embed)
 
     @commands.Cog.listener()
@@ -134,10 +134,46 @@ class Logs(commands.Cog):
         )
         if invite.inviter:
             embed.set_author(name=f'{invite.inviter.name}#{invite.inviter.discriminator}',
-                             icon_url=invite.inviter.avatar_url_as(static_format='jpg'))
-            embed.set_footer(text=f"Author ID:{invite.inviter.id}")
+                             icon_url=invite.inviter.avatar_url_as(static_format='png'))
+            embed.set_footer(text=f"Author ID: {invite.inviter.id}")
         embed.add_field(name="URL", value=invite.url)
         await self.send_embed(invite.guild, embed)
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member:discord.Member):
+        "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_member_join"
+        await self.on_member_join_remove(member, True)
+    
+    @commands.Cog.listener()
+    async def on_member_remove(self, member:discord.Member):
+        "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_member_remove"
+        await self.on_member_join_remove(member, False)
+    
+    async def on_member_join_remove(self, member:discord.Member, join:bool):
+        "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_invite_delete"
+        if not await self.has_logs(member.guild):
+            return
+        if 'joins' not in self.get_flags(member.guild.id):
+            return
+        if join:
+            embed = discord.Embed(
+                title="Arrivée d'un membre",
+                description=member.mention + " a rejoint votre serveur",
+            colour=discord.Colour.green()
+            )
+            date = await self.bot.get_cog("TimeCog").date(member.created_at, year=True)
+            embed.add_field(name="Compte créé le", value=date)
+        else:
+            embed = discord.Embed(
+                title="Départ d'un membre",
+                description=member.mention + " a quitté votre serveur",
+            colour=discord.Colour(15994684)
+            )
+            delta = await self.bot.get_cog("TimeCog").time_delta(member.joined_at, datetime.datetime.utcnow(), lang="fr", year=True, precision=0)
+            embed.add_field(name=f"Dans le serveur depuis", value=delta)
+        embed.set_author(name=str(member), icon_url=member.avatar_url_as(static_format='png'))
+        embed.set_footer(text=f"Member ID: {member.id}")
+        await self.send_embed(member.guild, embed)
 
 
 def setup(bot):
