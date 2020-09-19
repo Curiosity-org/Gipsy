@@ -5,3 +5,7 @@ debug.log
 .DS_Store
 data/*.db*
 config.json
+.ssh/
+.cache
+.bash*
+.profile
