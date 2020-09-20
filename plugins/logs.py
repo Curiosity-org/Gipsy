@@ -62,6 +62,8 @@ class Logs(commands.Cog):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_message_edit"
         if before.author.bot or (not await self.has_logs(before.guild)):
             return
+        if before.content == after.content:
+            return # when edition is only adding an embed, for example
         if 'messages' not in self.get_flags(before.guild.id):
             return
         embed = discord.Embed(
