@@ -48,7 +48,7 @@ class Logs(commands.Cog):
             timestamp=message.created_at,
             title="Message supprimé",
             description=f"Un message de {message.author.mention} ** a été supprimé** dans {message.channel.mention}",
-            colour=discord.Colour.red()
+            colour=discord.Colour(13632027)
         )
         embed.set_author(name=str(message.author),
                          icon_url=message.author.avatar_url)
@@ -70,7 +70,7 @@ class Logs(commands.Cog):
             timestamp=after.created_at,
             title="Message édité",
             description=f"Un message de {before.author.mention} **a été édité** dans {before.channel.mention}.",
-            colour=discord.Colour(0x00FF00)
+            colour=discord.Colour(16294684)
         )
         embed.set_author(name=str(before.author),
                          icon_url=before.author.avatar_url)
