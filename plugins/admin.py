@@ -88,6 +88,7 @@ class Admin(commands.Cog):
         elif not ctx.channel.permissions_for(ctx.guild.me).read_message_history:
             await ctx.send("Il me manque la permission de lire l'historique des messages")
         else:
+            await ctx.message.delete()
             deleted = await ctx.channel.purge(limit=limit)
             await ctx.send('{} messages supprimés !'.format(len(deleted)), delete_after=3.0)
 
