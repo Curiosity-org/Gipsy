@@ -147,8 +147,15 @@ def main():
 
     client.add_listener(on_ready)
 
-    client.run(conf["token"] if input(
-        "Lancer la version stable ? (y/n)").lower() == "y" else conf["token_beta"])
+    if (not len(sys.argv) < 2):
+        if (sys.argv[1].lower() == "stable"):
+            client.run(conf["token"])
+        elif (sys.argv[1].lower() == "beta"):
+            client.run(conf["token_beta"])
+    else:
+        log.debug("Pas d'arguments trouvés!")
+        client.run(conf["token"] if input(
+        "Lancer la version stable ? (y/n) ").lower() == "y" else conf["token_beta"])
 
 
 if __name__ == "__main__":
