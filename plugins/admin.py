@@ -9,6 +9,7 @@ from contextlib import redirect_stdout
 import checks
 from git import Repo, Remote
 
+
 def cleanup_code(content):
     """Automatically removes code blocks from the code."""
     # remove ```py\n```
@@ -27,7 +28,7 @@ class Admin(commands.Cog):
 
     @commands.group(name='admin', hidden=True)
     @commands.check(checks.is_bot_admin)
-    async def main_msg(self, ctx):
+    async def main_msg(self, ctx: commands.Context):
         """Commandes réservées aux administrateurs de ZBot"""
         if ctx.subcommand_passed is None:
             text = "Liste des commandes disponibles :"
@@ -41,8 +42,7 @@ class Admin(commands.Cog):
             await ctx.send(text)
 
     @main_msg.command(name='pull', hidden=True)
-    @commands.check(checks.is_bot_admin)
-    async def gitpull(self, ctx):
+    async def gitpull(self, ctx: commands.Context):
         """Tire des changements de GitLab"""
         m = await ctx.send("Mise à jour depuis gitlab...")
         repo = Repo(os.getcwd())
@@ -51,10 +51,8 @@ class Admin(commands.Cog):
         origin.pull()
         await self.restart_bot(ctx)
 
-
     @main_msg.command(name='shutdown')
-    @commands.check(checks.is_bot_admin)
-    async def shutdown(self, ctx):
+    async def shutdown(self, ctx: commands.Context):
         """Eteint le bot"""
         m = await ctx.send("Nettoyage de l'espace de travail...")
         await self.cleanup_workspace()
@@ -73,22 +71,28 @@ class Admin(commands.Cog):
                 os.rmdir(folderName)
 
     @main_msg.command(name='reboot')
-    async def restart_bot(self, ctx):
+    async def restart_bot(self, ctx: commands.Context):
         """Relance le bot"""
         await ctx.send(content="Redémarrage en cours...")
         await self.cleanup_workspace()
         self.bot.log.info("Redémarrage du bot")
         sys.argv.append('beta' if self.bot.beta else 'stable')
         os.execl(sys.executable, sys.executable, *sys.argv)
-    
+
     @main_msg.command(name='purge')
-    async def clean(self, ctx, limit: int):
+    @commands.guild_only()
+    async def clean(self, ctx: commands.Context, limit: int):
         """Enleve <x> messages"""
-        await ctx.channel.purge(limit=limit)
-        message = await ctx.send('Purged by {}'.format(ctx.author.mention), delete_after=3.0)
+        if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            await ctx.send("Il me manque la permission de gérer les messages")
+        elif not ctx.channel.permissions_for(ctx.guild.me).read_message_history:
+            await ctx.send("Il me manque la permission de lire l'historique des messages")
+        else:
+            deleted = await ctx.channel.purge(limit=limit)
+            await ctx.send('{} messages supprimés !'.format(len(deleted)), delete_after=3.0)
 
     @main_msg.command(name='reload')
-    async def reload_cog(self, ctx, *, cog: str):
+    async def reload_cog(self, ctx: commands.Context, *, cog: str):
         """Recharge un module"""
         cogs = cog.split(" ")
         errors_cog = self.bot.get_cog("Errors")
@@ -113,7 +117,7 @@ class Admin(commands.Cog):
             await ctx.send("These cogs has successfully reloaded: {}".format(", ".join(reloaded_cogs)))
 
     @main_msg.command(name="add_cog", hidden=True)
-    async def add_cog(self, ctx, name):
+    async def add_cog(self, ctx: commands.Context, name: str):
         """Ajouter un cog au bot"""
         try:
             self.bot.load_extension("plugins."+name)
@@ -123,7 +127,7 @@ class Admin(commands.Cog):
             await ctx.send(str(e))
 
     @main_msg.command(name="del_cog", aliases=['remove_cog'], hidden=True)
-    async def rm_cog(self, ctx, name):
+    async def rm_cog(self, ctx: commands.Context, name: str):
         """Enlever un cog au bot"""
         try:
             self.bot.unload_extension("plugins."+name)
@@ -131,17 +135,17 @@ class Admin(commands.Cog):
             self.bot.log.info("Module {} désactivé".format(name))
         except Exception as e:
             await ctx.send(str(e))
-    
-    @main_msg.command(name="cogs",hidden=True)
-    async def cogs_list(self,ctx):
+
+    @main_msg.command(name="cogs", hidden=True)
+    async def cogs_list(self, ctx: commands.Context):
         """Voir la liste de tout les cogs"""
         text = str()
-        for k,v in self.bot.cogs.items():
-            text +="- {} ({}) \n".format(v.file,k)
+        for k, v in self.bot.cogs.items():
+            text += "- {} ({}) \n".format(v.file, k)
         await ctx.send(text)
 
     @main_msg.command(name="activity")
-    async def change_activity(self, ctx, Type: str, * act: str):
+    async def change_activity(self, ctx: commands.Context, Type: str, * act: str):
         """Change l'activité du bot (play, watch, listen, stream)"""
         act = " ".join(act)
         if Type in ['game', 'play', 'playing']:
@@ -158,7 +162,7 @@ class Admin(commands.Cog):
 
     @main_msg.command(name='eval')
     @commands.check(checks.is_bot_admin)
-    async def _eval(self, ctx, *, body: str):
+    async def _eval(self, ctx: commands.Context, *, body: str):
         """Evaluates a code
         Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)"""
         env = {
@@ -177,7 +181,7 @@ class Admin(commands.Cog):
         try:
             to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
         except Exception as e:
-            await self.bot.get_cog('Errors').on_error(e,ctx)
+            await self.bot.get_cog('Errors').on_error(e, ctx)
             return
         try:
             exec(to_compile, env)
