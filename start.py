@@ -54,7 +54,7 @@ class gunibot(commands.bot.BotBase, discord.Client):
 
     async def get_prefix(self, msg):
         prefix = None
-        if hasattr(msg, "guild"):
+        if msg.guild is not None:
             prefix = self.server_configs[msg.guild.id]["prefix"]
         if prefix is None:
             prefix = "?"
