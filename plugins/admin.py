@@ -42,14 +42,14 @@ class Admin(commands.Cog):
 
     @main_msg.command(name='pull', hidden=True)
     @commands.check(checks.is_bot_admin)
-    async def gitpull(self, ctx, mode: str):
+    async def gitpull(self, ctx):
         """Tire des changements de GitLab"""
         m = await ctx.send("Mise à jour depuis gitlab...")
         repo = Repo(os.getcwd())
         assert not repo.bare
         origin = repo.remotes.origin
         origin.pull()
-        await self.restart_bot(ctx, mode)
+        await self.restart_bot(ctx)
 
 
     @main_msg.command(name='shutdown')
@@ -73,12 +73,13 @@ class Admin(commands.Cog):
                 os.rmdir(folderName)
 
     @main_msg.command(name='reboot')
-    async def restart_bot(self, ctx, mode: str):
+    async def restart_bot(self, ctx):
         """Relance le bot"""
         await ctx.send(content="Redémarrage en cours...")
         await self.cleanup_workspace()
         self.bot.log.info("Redémarrage du bot")
-        os.execl(sys.executable, sys.executable, 'start.py', mode)
+        sys.argv.append('beta' if self.bot.beta else 'stable')
+        os.execl(sys.executable, sys.executable, *sys.argv)
     
     @main_msg.command(name='purge')
     async def clean(self, ctx, limit: int):
