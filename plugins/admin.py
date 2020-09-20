@@ -40,16 +40,16 @@ class Admin(commands.Cog):
                             cmds.name, cmds.help.split('\n')[0])
             await ctx.send(text)
 
-    @commands.command(hidden=True)
+    @main_msg.command(name='pull', hidden=True)
     @commands.check(checks.is_bot_admin)
-    async def gitpull(self, ctx):
+    async def gitpull(self, ctx, mode: str):
         """Tire des changements de GitLab"""
         m = await ctx.send("Mise à jour depuis gitlab...")
-        repo = Repo('/home/Gunibot.py')
+        repo = Repo(os.getcwd())
         assert not repo.bare
         origin = repo.remotes.origin
         origin.pull()
-        await self.restart_bot(ctx)
+        await self.restart_bot(ctx, mode)
 
 
     @main_msg.command(name='shutdown')
@@ -73,12 +73,18 @@ class Admin(commands.Cog):
                 os.rmdir(folderName)
 
     @main_msg.command(name='reboot')
-    async def restart_bot(self, ctx):
+    async def restart_bot(self, ctx, mode: str):
         """Relance le bot"""
         await ctx.send(content="Redémarrage en cours...")
         await self.cleanup_workspace()
         self.bot.log.info("Redémarrage du bot")
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        os.execl(sys.executable, sys.executable, 'start.py', mode)
+    
+    @main_msg.command(name='purge')
+    async def clean(self, ctx, limit: int):
+        """Enleve <x> messages"""
+        await ctx.channel.purge(limit=limit)
+        message = await ctx.send('Purged by {}'.format(ctx.author.mention), delete_after=3.0)
 
     @main_msg.command(name='reload')
     async def reload_cog(self, ctx, *, cog: str):
@@ -149,7 +155,7 @@ class Admin(commands.Cog):
             await ctx.send("Sélectionnez *play*, *watch*, *listen* ou *stream* suivi du nom")
         await ctx.message.delete()
 
-    @commands.command(name='eval')
+    @main_msg.command(name='eval')
     @commands.check(checks.is_bot_admin)
     async def _eval(self, ctx, *, body: str):
         """Evaluates a code
