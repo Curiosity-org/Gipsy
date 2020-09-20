@@ -13,7 +13,8 @@ class Errors(commands.Cog):
         self.bot = bot
         self.file = "errors"
 
-    async def on_cmd_error(self, ctx, error):
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
         """The event triggered when an error is raised while invoking a command."""
         # This prevents any commands with local handlers being handled here in on_command_error.
         if hasattr(ctx.command, 'on_error'):
@@ -127,10 +128,6 @@ class Errors(commands.Cog):
         await self.on_error(error, ctx)
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
-        await self.on_cmd_error(ctx, error)
-
-    @commands.Cog.listener()
     async def on_error(self, error, ctx=None):
         try:
             if isinstance(ctx, discord.Message):
@@ -142,8 +139,8 @@ class Errors(commands.Cog):
                 await self.senf_err_msg(f"Internal Error\n{msg}")
             elif ctx.guild is None:
                 await self.senf_err_msg(f"DM | {ctx.channel.recipient.name}\n{msg}")
-            # elif ctx.channel.id == 625319425465384960:
-            #     return await ctx.send(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
+            elif ctx.channel.id == 698547216155017236:
+                return await ctx.send(msg)
             else:
                 await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
         except Exception as e:
