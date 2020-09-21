@@ -19,9 +19,10 @@ class TimeCog(discord.ext.commands.Cog):
         self.bot = bot
         self.file = "timeclass"
 
-    def add_task(self, delay:int, coro, *args, **kwargs):
+    def add_task(self, delay: int, coro, *args, **kwargs):
         """Schedule a task for later, using discord.ext tasks manager"""
         delay = round(delay)
+
         async def launch(task, coro, *args, **kwargs):
             if task.current_loop != 0:
                 await self.bot.wait_until_ready()
@@ -30,7 +31,8 @@ class TimeCog(discord.ext.commands.Cog):
         a = tasks.loop(seconds=delay, count=2)(launch)
         a.error(self.bot.get_cog("Errors").on_error)
         a.start(a, coro, *args, **kwargs)
-        self.bot.log.info("[TaskManager] Nouvelle tâche {} programmée pour dans {}s".format(coro.__func__, delay))
+        self.bot.log.info(
+            "[TaskManager] Nouvelle tâche {} programmée pour dans {}s".format(coro.__func__, delay))
         return a
 
     class timedelta:

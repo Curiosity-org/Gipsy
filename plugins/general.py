@@ -97,7 +97,8 @@ class General(commands.Cog):
 **Charge sur le CPU :** {cpu} %
 **Temps de latence de l'api :** {api} ms""".format(s_count=len_servers, m_count=users, b_count=bots, l_count=self.codelines, p_v=version, d_v=discord.__version__, ram=ram_cpu[0], cpu=ram_cpu[1], api=latency,)
             if isinstance(ctx.channel, discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).embed_links:
-                embed = discord.Embed(title="**Statistiques du bot**", color=8311585, timestamp=ctx.message.created_at, description=d, thumbnail=self.bot.user.avatar_url_as(format="png"))
+                embed = discord.Embed(title="**Statistiques du bot**", color=8311585, timestamp=ctx.message.created_at,
+                                      description=d, thumbnail=self.bot.user.avatar_url_as(format="png"))
                 await ctx.send(embed=embed)
             else:
                 await ctx.send(d)
@@ -114,7 +115,6 @@ class General(commands.Cog):
         embed.add_field(name="admin", value="Affiche les commandes admin disponibles")
         embed.add_field(name="admin", value="Affiche les commandes admin disponibles")
         await ctx.send(embed=embed)
-
 
 
 def setup(bot):

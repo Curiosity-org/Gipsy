@@ -11,7 +11,8 @@ import sqlite3
 from discord.ext import commands
 
 
-initial_extensions = ["admin", "timeclass", "antikikoo", "contact", "errors", "general", "sconfig", "configManager", "voices", "logs", "perms", "welcome", "thanks"]
+initial_extensions = ["admin", "timeclass", "antikikoo", "contact", "errors",
+                      "general", "sconfig", "configManager", "voices", "logs", "perms", "welcome", "thanks"]
 
 
 class gunibot(commands.bot.BotBase, discord.Client):
@@ -160,7 +161,6 @@ def main():
         else:
             client.beta = True
             client.run(conf["token_beta"])
-            
 
 
 if __name__ == "__main__":

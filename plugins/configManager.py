@@ -21,10 +21,11 @@ CONFIG_TEMPLATE = {
     "voice_channel_format": "{random}",
     "voice_roles": None,
     "modlogs_flags": 0,
-    "thanks_duration": 86400*30, # 30 days
+    "thanks_duration": 86400*30,  # 30 days
     "thanks_allowed_roles": None,
     "thanks_roles": None,
 }
+
 
 class serverConfig(dict):
     def __init__(self, manager, serverID, value):
@@ -46,10 +47,11 @@ class serverConfig(dict):
             self.manager[self.serverID] = self
         else:
             raise ValueError("Invalid config key")
-    
+
     def __delitem__(self, key):
         super().__setitem__(key, CONFIG_TEMPLATE[key])
         self.manager[self.serverID] = self
+
 
 class ConfigCog(commands.Cog):
 
@@ -122,15 +124,16 @@ class ConfigCog(commands.Cog):
             1 << 4: "moderation",
             1 << 5: "boosts"
         }
-        def flagsToInt(self, flags:list) -> int:
+
+        def flagsToInt(self, flags: list) -> int:
             r = 0
             for k, v in self.FLAGS.items():
                 if v in flags:
                     r |= k
             return r
-        
-        def intToFlags(self, i:int) -> list:
-            return [v for k, v in self.FLAGS.items() if i&k == k]
+
+        def intToFlags(self, i: int) -> list:
+            return [v for k, v in self.FLAGS.items() if i & k == k]
 
 
 def setup(bot):
