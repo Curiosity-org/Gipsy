@@ -208,6 +208,38 @@ class Logs(commands.Cog):
         embed.set_author(name=str(user), icon_url=user.avatar_url_as(static_format='png'))
         embed.set_footer(text=f"User ID: {user.id}")
         await self.send_embed(guild, embed)
+    
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
+        "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_voice_state_update"
+        if not await self.has_logs(member.guild):
+            return
+        if 'voice' not in self.get_flags(member.guild.id):
+            return
+        # member joined a channel
+        if before.channel is None and after.channel is not None:
+            embed = discord.Embed(
+                title="Mouvement en vocal",
+                description=f"Le membre {member.mention} vient de rejoindre le salon {after.channel.name}",
+                colour=discord.Colour.light_grey()
+            )
+        # member left a channel
+        elif before.channel is not None and after.channel is None:
+            embed = discord.Embed(
+                title="Mouvement en vocal",
+                description=f"Le membre {member.mention} vient de quitter le salon {before.channel.name}",
+                colour=discord.Colour.light_grey()
+            )
+        # member moved in another channel
+        elif before.channel != after.channel:
+            embed = discord.Embed(
+                title="Mouvement en vocal",
+                description=f"Le membre {member.mention} est passé du salon {before.channel.name} au salon {after.channel.name}",
+                colour=discord.Colour.light_grey()
+            )
+        embed.set_author(name=str(member), icon_url=member.avatar_url_as(static_format='png'))
+        embed.set_footer(text=f"Member ID: {member.id}")
+        await self.send_embed(member.guild, embed)
 
 
 def setup(bot):

@@ -49,6 +49,6 @@
 	- [x] Suppression/edition de messages
 	- [x] Départ/arrivée de membres
 	- [x] Invitation créée/supprimée
-	- [ ] Logs de salons vocaux
+	- [x] Logs de salons vocaux
 	- [x] Ban/Unban
 	- [ ] Boosts de serveur
