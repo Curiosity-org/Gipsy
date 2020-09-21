@@ -13,7 +13,7 @@ class Welcome(commands.Cog):
     async def on_member_join(self, member: discord.Member):
         """Called when a member joins a guild"""
         g = member.guild
-        if not g.me.guild_permissions.manage_roles: # si pas la perm de gérer les rôles
+        if not g.me.guild_permissions.manage_roles:  # si pas la perm de gérer les rôles
             return
         config = self.bot.server_configs[g.id]
         rolesID = config["welcome_roles"]

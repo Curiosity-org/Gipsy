@@ -20,7 +20,6 @@ class Antikikoo(commands.Cog):
         self.bot = bot
         self.file = "antikikoo"
 
-
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         """Called when a member joins a guild"""
@@ -36,7 +35,7 @@ class Antikikoo(commands.Cog):
     async def on_message(self, message: discord.Message):
         """Called for every new message
         We use it to check when someone send the verification message"""
-        if message.guild is None: # si le message n'est pas dans un serveur
+        if message.guild is None:  # si le message n'est pas dans un serveur
             return
         config = self.bot.server_configs[message.guild.id]
         if message.channel.id != config["verification_channel"]:
@@ -59,8 +58,8 @@ class Antikikoo(commands.Cog):
                 else:
                     await message.author.remove_roles(verif_role)
             except:
-                self.bot.log.exception(f"Impossible de donner ou d'enlever le rôle de vérification au membre {message.author}")
-
+                self.bot.log.exception(
+                    f"Impossible de donner ou d'enlever le rôle de vérification au membre {message.author}")
 
     @commands.group(name="antikikoo", aliases=["ak", "antitroll"])
     @commands.guild_only()
@@ -72,7 +71,7 @@ class Antikikoo(commands.Cog):
     @commands.check(checks.is_admin)
     async def ak_channel(self, ctx: commands.Context, channel: discord.TextChannel):
         """Modifie le salon où les membres devront se vérifier"""
-        self.bot.server_configs[ctx.guild.id]["verification_channel"] =  channel.id
+        self.bot.server_configs[ctx.guild.id]["verification_channel"] = channel.id
         await ctx.send("Le salon de vérification est maintenant {} !".format(channel.mention))
 
 

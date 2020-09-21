@@ -37,7 +37,7 @@ class VoiceChannels(commands.Cog):
         self.bot.database.commit()
         c.close()
         self.channels[channel.guild.id].remove(channel.id)
-    
+
     async def give_roles(self, member: discord.Member, remove=False):
         if not member.guild.me.guild_permissions.manage_roles:
             return
@@ -49,7 +49,7 @@ class VoiceChannels(commands.Cog):
         pos = g.me.top_role.position
         roles = filter(lambda x: (x is not None) and (x.position < pos), roles)
         if remove:
-             await member.remove_roles(*roles, reason="Left the voice chat")
+            await member.remove_roles(*roles, reason="Left the voice chat")
         else:
             await member.add_roles(*roles, reason="In a voice chat")
 

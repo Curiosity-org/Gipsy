@@ -150,7 +150,7 @@ class Errors(commands.Cog):
                 type(error), error, error.__traceback__, file=sys.stderr)
         except Exception as e:
             self.bot.log.warning(f"[on_error] {e}", exc_info=True)
-            
+
     async def senf_err_msg(self, msg):
         """Envoie un message dans le salon d'erreur"""
         salon = self.bot.get_channel(self.bot.config["errors_channel"])

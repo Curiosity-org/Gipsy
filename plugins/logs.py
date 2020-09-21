@@ -63,7 +63,7 @@ class Logs(commands.Cog):
         if before.author.bot or (not await self.has_logs(before.guild)):
             return
         if before.content == after.content:
-            return # when edition is only adding an embed, for example
+            return  # when edition is only adding an embed, for example
         if 'messages' not in self.get_flags(before.guild.id):
             return
         embed = discord.Embed(
@@ -142,16 +142,16 @@ class Logs(commands.Cog):
         await self.send_embed(invite.guild, embed)
 
     @commands.Cog.listener()
-    async def on_member_join(self, member:discord.Member):
+    async def on_member_join(self, member: discord.Member):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_member_join"
         await self.on_member_join_remove(member, True)
-    
+
     @commands.Cog.listener()
-    async def on_member_remove(self, member:discord.Member):
+    async def on_member_remove(self, member: discord.Member):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_member_remove"
         await self.on_member_join_remove(member, False)
-    
-    async def on_member_join_remove(self, member:discord.Member, join:bool):
+
+    async def on_member_join_remove(self, member: discord.Member, join: bool):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_invite_delete"
         if not await self.has_logs(member.guild):
             return
@@ -161,7 +161,7 @@ class Logs(commands.Cog):
             embed = discord.Embed(
                 title="Arrivée d'un membre",
                 description=member.mention + " a rejoint votre serveur",
-            colour=discord.Colour.green()
+                colour=discord.Colour.green()
             )
             date = await self.bot.get_cog("TimeCog").date(member.created_at, year=True)
             embed.add_field(name="Compte créé le", value=date)
@@ -169,7 +169,7 @@ class Logs(commands.Cog):
             embed = discord.Embed(
                 title="Départ d'un membre",
                 description=member.mention + " a quitté votre serveur",
-            colour=discord.Colour(15994684)
+                colour=discord.Colour(15994684)
             )
             delta = await self.bot.get_cog("TimeCog").time_delta(member.joined_at, datetime.datetime.utcnow(), lang="fr", year=True, precision=0)
             embed.add_field(name=f"Dans le serveur depuis", value=delta)
