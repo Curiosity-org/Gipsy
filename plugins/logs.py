@@ -220,26 +220,48 @@ class Logs(commands.Cog):
         if before.channel is None and after.channel is not None:
             embed = discord.Embed(
                 title="Mouvement en vocal",
-                description=f"Le membre {member.mention} vient de rejoindre le salon {after.channel.name}",
-                colour=discord.Colour.light_grey()
+                description=f"Le membre {member.mention} vient de rejoindre le salon {after.channel.name}"
             )
         # member left a channel
         elif before.channel is not None and after.channel is None:
             embed = discord.Embed(
                 title="Mouvement en vocal",
-                description=f"Le membre {member.mention} vient de quitter le salon {before.channel.name}",
-                colour=discord.Colour.light_grey()
+                description=f"Le membre {member.mention} vient de quitter le salon {before.channel.name}"
             )
         # member moved in another channel
         elif before.channel != after.channel:
             embed = discord.Embed(
                 title="Mouvement en vocal",
-                description=f"Le membre {member.mention} est passé du salon {before.channel.name} au salon {after.channel.name}",
-                colour=discord.Colour.light_grey()
+                description=f"Le membre {member.mention} est passé du salon {before.channel.name} au salon {after.channel.name}"
             )
+        embed.colour = discord.Color.light_gray()
         embed.set_author(name=str(member), icon_url=member.avatar_url_as(static_format='png'))
         embed.set_footer(text=f"Member ID: {member.id}")
         await self.send_embed(member.guild, embed)
+    
+    @commands.Cog.listener()
+    async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
+        "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_guild_update"
+        if before.premium_subscription_count == after.premium_subscription_count:
+            return # not interesting
+        if not await self.has_logs(guild):
+            return
+        if 'boosts' not in self.get_flags(guild.id):
+            return
+        if before.premium_subscription_count < after.premium_subscription_count:
+            embed = discord.Embed(
+                title="Nouveau boost",
+                description=f"Votre serveur a reçu un nouveau boost !"
+            )
+        else:
+            embed = discord.Embed(
+                title="Boost perdu",
+                description=f"Votre serveur vient de perdre un boost"
+            )
+        if before.premium_tier != after.premium_tier:
+            embed.description += f"\nVous êtes passé du niveau {before.premium_tier} au niveau {after.premium_tier}"
+        embed.color = discord.Color(0xf47fff)
+        await self.send_embed(guild, embed)
 
 
 def setup(bot):

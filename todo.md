@@ -42,7 +42,7 @@
 	- [x] Don des rôles si plus de X thx en Y durée
 	- [x] Retrait automatique des rôles après la durée
 	- [ ] Gestion de plusieurs paliers par serveur
-- [-] Salon de logs
+- [x] Salon de logs
 	- [x] Configuration du salon par serveur
 	- [x] Activation/désactivation des logs par serveur (système de flags ?)
 	- [x] Message envoyé dans le salon des logs lors de la configuration
@@ -51,4 +51,4 @@
 	- [x] Invitation créée/supprimée
 	- [x] Logs de salons vocaux
 	- [x] Ban/Unban
-	- [ ] Boosts de serveur
+	- [x] Boosts de serveur
