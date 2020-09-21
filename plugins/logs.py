@@ -176,6 +176,38 @@ class Logs(commands.Cog):
         embed.set_author(name=str(member), icon_url=member.avatar_url_as(static_format='png'))
         embed.set_footer(text=f"Member ID: {member.id}")
         await self.send_embed(member.guild, embed)
+    
+    @commands.Cog.listener()
+    async def on_member_ban(self, guild: discord.Guild, user: discord.User):
+        "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_member_ban"
+        if not await self.has_logs(guild):
+            return
+        if 'moderation' not in self.get_flags(guild.id):
+            return
+        embed = discord.Embed(
+            title="Membre banni",
+            description=f"Le membre {user.mention} vient d'être banni",
+            colour=discord.Colour.red()
+        )
+        embed.set_author(name=str(user), icon_url=user.avatar_url_as(static_format='png'))
+        embed.set_footer(text=f"Member ID: {user.id}")
+        await self.send_embed(guild, embed)
+    
+    @commands.Cog.listener()
+    async def on_member_unban(self, guild: discord.Guild, user: discord.User):
+        "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_member_unban"
+        if not await self.has_logs(guild):
+            return
+        if 'moderation' not in self.get_flags(guild.id):
+            return
+        embed = discord.Embed(
+            title="Membre débanni",
+            description=f"Le membre {user.mention} n'est plus banni",
+            colour=discord.Colour.green()
+        )
+        embed.set_author(name=str(user), icon_url=user.avatar_url_as(static_format='png'))
+        embed.set_footer(text=f"User ID: {user.id}")
+        await self.send_embed(guild, embed)
 
 
 def setup(bot):

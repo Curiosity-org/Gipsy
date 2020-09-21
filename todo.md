@@ -50,5 +50,5 @@
 	- [x] Départ/arrivée de membres
 	- [x] Invitation créée/supprimée
 	- [ ] Logs de salons vocaux
-	- [ ] Kick/ban
+	- [x] Ban/Unban
 	- [ ] Boosts de serveur
