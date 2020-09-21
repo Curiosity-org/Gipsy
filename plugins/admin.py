@@ -29,7 +29,7 @@ class Admin(commands.Cog):
     @commands.group(name='admin', hidden=True)
     @commands.check(checks.is_bot_admin)
     async def main_msg(self, ctx: commands.Context):
-        """Commandes réservées aux administrateurs de ZBot"""
+        """Commandes réservées aux administrateurs de GuniBot"""
         if ctx.subcommand_passed is None:
             text = "Liste des commandes disponibles :"
             for cmd in sorted(self.main_msg.commands, key=lambda x: x.name):
