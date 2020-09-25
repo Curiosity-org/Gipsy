@@ -7,7 +7,7 @@ def is_bot_admin(ctx: commands.Context):
 
 async def is_admin(ctx: commands.Context):
     admin = ctx.guild is None or ctx.author.guild_permissions.administrator or is_bot_admin(ctx)
-    if not admin:
+    if not admin and ctx.invoked_with != "help":
         try:
             await ctx.send("Il vous manque la permission 'Administrateur' pour faire cela")
         except discord.errors.Forbidden:
