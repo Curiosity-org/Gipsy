@@ -62,21 +62,28 @@ class ConfigCog(commands.Cog):
 
     class configManager(dict):
 
+        def __init__(self):
+            super().__init__()
+            self.cache = dict()
+
         def __setitem__(self, key, item):
             if not (isinstance(key, int) or key.isnumeric()):
                 raise ValueError("Key need to be a valid guild ID")
             with open(f"{CONFIG_FOLDER}/{key}.json", "w", encoding="utf8") as f:
                 dump(item, f)
+            self.cache[key] = item
 
         def __getitem__(self, key):
             if not (isinstance(key, int) or key.isnumeric()):
                 raise ValueError("Key need to be a valid guild ID")
             result = dict(CONFIG_TEMPLATE)
-            try:
-                with open(f"{CONFIG_FOLDER}/{key}.json", "r", encoding="utf8") as f:
-                    result.update(load(f))
-            except FileNotFoundError:
-                pass
+            if key not in self.cache.keys():
+                try:
+                    with open(f"{CONFIG_FOLDER}/{key}.json", "r", encoding="utf8") as f:
+                        self.cache[key] = load(f)
+                except FileNotFoundError:
+                    pass
+            result.update(self.cache[key])
             return serverConfig(self, key, result)
 
         def __repr__(self):
