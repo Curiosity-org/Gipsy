@@ -308,3 +308,5 @@ class Sconfig(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Sconfig(bot))
+    if bot.get_cog("Thanks"):
+        bot.get_command("config thanks").enabled = True
