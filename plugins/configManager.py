@@ -83,7 +83,7 @@ class ConfigCog(commands.Cog):
                     with open(f"{CONFIG_FOLDER}/{key}.json", "r", encoding="utf8") as f:
                         self.cache[key] = load(f)
                 except FileNotFoundError:
-                    pass
+                    self.cache[key] = result
             result.update(self.cache[key])
             allowed_keys = CONFIG_TEMPLATE.keys()
             result = {k: v for k, v in result.items() if k in allowed_keys}
