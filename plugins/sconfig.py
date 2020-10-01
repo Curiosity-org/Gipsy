@@ -7,7 +7,7 @@ import checks
 import args
 
 roles_config = ('verification_role', 'welcome_roles', 'voice_roles',
-                'contact_roles', 'thanks_allowed_roles', 'thanks_roles')
+                'contact_roles', 'thanks_allowed_roles')
 channels_config = ('verification_channel', 'logs_channel',
                    'info_channel', 'contact_channel', 'voice_channel')
 categories_config = ('contact_category', 'voices_category')

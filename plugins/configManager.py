@@ -23,7 +23,6 @@ CONFIG_TEMPLATE = {
     "modlogs_flags": 0,
     "thanks_duration": 86400*30,  # 30 days
     "thanks_allowed_roles": None,
-    "thanks_roles": None,
 }
 
 
