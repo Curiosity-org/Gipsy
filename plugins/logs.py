@@ -109,8 +109,10 @@ class Logs(commands.Cog):
             description=f"Invitation créée vers {invite.channel.mention}",
             colour=discord.Colour.green()
         )
-        embed.set_author(name=f'{invite.inviter.name}#{invite.inviter.discriminator}',
-                         icon_url=invite.inviter.avatar_url_as(static_format='png'))
+        if invite.inviter: # sometimes Discord doesn't send that info
+            embed.set_author(name=f'{invite.inviter.name}#{invite.inviter.discriminator}',
+                             icon_url=invite.inviter.avatar_url_as(static_format='png'))
+            embed.set_footer(text=f"Author ID: {invite.inviter.id}")
         if invite.max_age == 0:
             embed.add_field(name="Durée", value="♾")
         else:
@@ -119,7 +121,6 @@ class Logs(commands.Cog):
         embed.add_field(name="URL", value=invite.url)
         embed.add_field(name="Nombre max d'utilisations",
                         value="♾" if invite.max_uses == 0 else str(invite.max_uses))
-        embed.set_footer(text=f"Author ID: {invite.inviter.id}")
         await self.send_embed(invite.guild, embed)
 
     @commands.Cog.listener()
