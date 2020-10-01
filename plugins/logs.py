@@ -76,6 +76,10 @@ class Logs(commands.Cog):
                          icon_url=before.author.avatar_url)
         embed.set_footer(
             text=f"Author ID: {before.author.id} • Message ID: {before.id}")
+        if len(before.content) > 1024:
+            before.content = before.content[:1020] + '...'
+        if len(after.content) > 1024:
+            after.content = after.content[:1020] + '...'
         embed.add_field(name='Avant', value=before.content, inline=False)
         embed.add_field(name="Après", value=after.content, inline=False)
         await self.send_embed(before.guild, embed)
