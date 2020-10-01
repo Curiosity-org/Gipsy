@@ -93,7 +93,7 @@ class Logs(commands.Cog):
         if 'messages' not in self.get_flags(guild.id):
             return
         embed = discord.Embed(
-            timestamp=message.created_at,
+            timestamp=datetime.datetime.utcnow(),
             title="Messages supprimés",
             description=f"{len(payload.message_ids)} messages **ont été supprimés** dans <#{payload.channel_id}>",
             colour=discord.Colour.red()
@@ -249,9 +249,9 @@ class Logs(commands.Cog):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_guild_update"
         if before.premium_subscription_count == after.premium_subscription_count:
             return # not interesting
-        if not await self.has_logs(guild):
+        if not await self.has_logs(after):
             return
-        if 'boosts' not in self.get_flags(guild.id):
+        if 'boosts' not in self.get_flags(after.id):
             return
         if before.premium_subscription_count < after.premium_subscription_count:
             embed = discord.Embed(
@@ -266,7 +266,7 @@ class Logs(commands.Cog):
         if before.premium_tier != after.premium_tier:
             embed.description += f"\nVous êtes passé du niveau {before.premium_tier} au niveau {after.premium_tier}"
         embed.color = discord.Color(0xf47fff)
-        await self.send_embed(guild, embed)
+        await self.send_embed(after, embed)
 
 
 def setup(bot):
