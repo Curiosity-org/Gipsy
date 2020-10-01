@@ -159,10 +159,14 @@ class Sconfig(commands.Cog):
 
     @main_config.group(name="modlogs")
     async def config_modlogs(self, ctx: commands.Context):
-        pass
+        """Enable or disable logs categories in your logs channel
+        You can set your channel with the 'logs_channel' config option"""
+        if ctx.subcommand_passed is None:
+            await ctx.send_help("config modlogs")
 
     @config_modlogs.command(name="enable")
     async def modlogs_enable(self, ctx: commands.Context, options: commands.Greedy[args.moderatorFlag]):
+        """Enable one or multiple logs categories"""
         LogsFlags = self.bot.get_cog('ConfigCog').LogsFlags()
         flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
         flags = LogsFlags.intToFlags(flags) + options
@@ -173,6 +177,7 @@ class Sconfig(commands.Cog):
 
     @config_modlogs.command(name="disable")
     async def modlogs_disable(self, ctx: commands.Context, options: commands.Greedy[args.moderatorFlag]):
+        """Disable one or multiple logs categories"""
         LogsFlags = self.bot.get_cog('ConfigCog').LogsFlags()
         flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
         flags = LogsFlags.intToFlags(flags)
@@ -182,6 +187,7 @@ class Sconfig(commands.Cog):
 
     @config_modlogs.command(name="list")
     async def modlogs_list(self, ctx: commands.Context):
+        """See available logs categories"""
         f = self.bot.get_cog('ConfigCog').LogsFlags.FLAGS.values()
         await ctx.send("Liste des logs disponibles : " + " - ".join(f))
 
