@@ -68,6 +68,8 @@ class ConfigCog(commands.Cog):
         def __setitem__(self, key, item):
             if not (isinstance(key, int) or key.isnumeric()):
                 raise ValueError("Key need to be a valid guild ID")
+            allowed_keys = CONFIG_TEMPLATE.keys()
+            item = {k: v for k, v in item.items() if k in allowed_keys}
             with open(f"{CONFIG_FOLDER}/{key}.json", "w", encoding="utf8") as f:
                 dump(item, f)
             self.cache[key] = item
@@ -83,6 +85,8 @@ class ConfigCog(commands.Cog):
                 except FileNotFoundError:
                     pass
             result.update(self.cache[key])
+            allowed_keys = CONFIG_TEMPLATE.keys()
+            result = {k: v for k, v in result.items() if k in allowed_keys}
             return serverConfig(self, key, result)
 
         def __repr__(self):
