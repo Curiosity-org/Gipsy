@@ -70,7 +70,8 @@ class Sconfig(commands.Cog):
             max_length = max([len(k)+2 for k in config.keys()])
             # Let's desactivate embeds with a small False
             if False and ctx.guild.me.guild_permissions.embed_links:
-                emb = discord.Embed(title="Server configuration", color=16098851)
+                emb = discord.Embed(
+                    title="Server configuration", color=16098851)
                 for k, v in sorted(config.items()):
                     v = await self.format_config(ctx.guild, k, v, True)
                     emb.add_field(name=k, value=v, inline=False)
@@ -158,7 +159,6 @@ class Sconfig(commands.Cog):
 
     @main_config.group(name="modlogs")
     async def config_modlogs(self, ctx: commands.Context):
-        # await ctx.send(self.edit_config(ctx.guild.id, "voice_channel", channel.id))
         pass
 
     @config_modlogs.command(name="enable")
@@ -173,7 +173,8 @@ class Sconfig(commands.Cog):
             await ctx.send("Ce type de logs est déjà actif !")
             return
         flags.append(option)
-        self.edit_config(ctx.guild.id, 'modlogs_flags', LogsFlags.flagsToInt(flags))
+        self.edit_config(ctx.guild.id, 'modlogs_flags',
+                         LogsFlags.flagsToInt(flags))
         await ctx.send(f"Les logs de type {option} ont bien été activés")
 
     @config_modlogs.command(name="disable")
@@ -188,7 +189,8 @@ class Sconfig(commands.Cog):
             await ctx.send("Ce type de logs est déjà désactivé !")
             return
         flags.remove(option)
-        self.edit_config(ctx.guild.id, 'modlogs_flags', LogsFlags.flagsToInt(flags))
+        self.edit_config(ctx.guild.id, 'modlogs_flags',
+                         LogsFlags.flagsToInt(flags))
         await ctx.send(f"Les logs de type {option} ont bien été désactivés")
 
     @config_modlogs.command(name="list")
@@ -218,13 +220,13 @@ class Sconfig(commands.Cog):
             roles = [role.id for role in roles]
         await ctx.send(self.edit_config(ctx.guild.id, "thanks_allowed_roles", roles))
 
-    @main_config.command(name="thanks_roles")
-    async def config_thanks_roles(self, ctx: commands.Context, roles: commands.Greedy[discord.Role]):
-        if len(roles) == 0:
-            roles = None
-        else:
-            roles = [role.id for role in roles]
-        await ctx.send(self.edit_config(ctx.guild.id, "thanks_roles", roles))
+    # @main_config.command(name="thanks_roles")
+    # async def config_thanks_roles(self, ctx: commands.Context, roles: commands.Greedy[discord.Role]):
+    #     if len(roles) == 0:
+    #         roles = None
+    #     else:
+    #         roles = [role.id for role in roles]
+    #     await ctx.send(self.edit_config(ctx.guild.id, "thanks_roles", roles))
 
     @main_config.command(name="thanks_duration")
     async def config_thanks_duration(self, ctx: commands.Context, duration: commands.Greedy[args.tempdelta]):
@@ -274,7 +276,7 @@ class Sconfig(commands.Cog):
         def check(reaction, user):
             return user == ctx.author and str(reaction.emoji) == "✅" and reaction.message.id == msg.id
         try:
-            reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+            await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
             await ctx.send('Trop long ! Abandon de la procédure')
         else:
@@ -282,6 +284,33 @@ class Sconfig(commands.Cog):
             d.update(merge)
             self.bot.server_configs[ctx.guild.id] = d
             await ctx.send('👍')
+
+    @main_config.group(name="thanks", aliases=['thx'], enabled=False)
+    async def thanks_main(self, ctx: commands.Context):
+        """Edit your thanks-levels settings"""
+        if ctx.subcommand_passed is None:
+            await ctx.send_help("config thanks")
+
+    @thanks_main.command(name="list")
+    async def thanks_list(self, ctx: commands.Context):
+        """List your current thanks levels"""
+        await self.bot.get_cog("Thanks").thankslevels_list(ctx)
+
+    @thanks_main.command(name="add")
+    async def thanks_add(self, ctx: commands.Context, amount: int, role: discord.Role):
+        """Add a role to give when someone reaches a certain amount of thanks"""
+        await self.bot.get_cog("Thanks").thankslevel_add(ctx, amount, role)
+    
+    @thanks_main.command(name="reset")
+    async def thanks_reset(self, ctx: commands.Context, amount: int = None):
+        """Remove every role given for a certain amount of thanks
+        If no amount is specified, it will reset the whole configuration"""
+        if amount is None:
+            await self.bot.get_cog("Thanks").thankslevel_reset(ctx)
+        else:
+            await self.bot.get_cog("Thanks").thankslevel_remove(ctx, amount)
+
+
 
 
 def setup(bot):

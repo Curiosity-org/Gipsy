@@ -20,3 +20,11 @@ CREATE TABLE IF NOT EXISTS `contact_channels` (
   `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_contactchannels_guild ON `contact_channels` (`guild`);
+
+CREATE TABLE IF NOT EXISTS `thanks_levels` (
+  `guild` BIGINT NOT NULL,
+  `role` BIGINT NOT NULL,
+  `level` BIGINT DEFAULT 1,
+  `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_thankslevels_guild ON `thanks_levels` (`guild`);
