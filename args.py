@@ -4,10 +4,7 @@ from discord.ext import commands
 
 
 class tempdelta(commands.Converter):
-    def __init__(self):
-        pass
-
-    async def convert(self, ctx: commands.Context, argument) -> int:
+    async def convert(self, ctx: commands.Context, argument: str) -> int:
         d = 0
         found = False
         # ctx.invoked_with
@@ -23,3 +20,10 @@ class tempdelta(commands.Converter):
         if not found:
             raise commands.errors.BadArgument('Invalid duration: '+argument)
         return d
+
+class moderatorFlag(commands.Converter):
+    async def convert(self, ctx: commands.Context, argument: str) -> str:
+        LogsFlags = ctx.bot.get_cog('ConfigCog').LogsFlags.FLAGS
+        if argument not in LogsFlags.values():
+            raise commands.errors.BadArgument('Invalid moderation flag: '+argument)
+        return argument

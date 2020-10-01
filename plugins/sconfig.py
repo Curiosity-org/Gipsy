@@ -162,36 +162,23 @@ class Sconfig(commands.Cog):
         pass
 
     @config_modlogs.command(name="enable")
-    async def modlogs_enable(self, ctx: commands.Context, option: str):
+    async def modlogs_enable(self, ctx: commands.Context, options: commands.Greedy[args.moderatorFlag]):
         LogsFlags = self.bot.get_cog('ConfigCog').LogsFlags()
-        if option not in LogsFlags.FLAGS.values():
-            await ctx.send("Option invalide")
-            return
         flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
-        flags = LogsFlags.intToFlags(flags)
-        if option in flags:
-            await ctx.send("Ce type de logs est déjà actif !")
-            return
-        flags.append(option)
+        flags = LogsFlags.intToFlags(flags) + options
+        flags = list(set(flags)) # remove duplicates
         self.edit_config(ctx.guild.id, 'modlogs_flags',
                          LogsFlags.flagsToInt(flags))
-        await ctx.send(f"Les logs de type {option} ont bien été activés")
+        await ctx.send("Les logs de type {} ont bien été activés".format(', '.join(options)))
 
     @config_modlogs.command(name="disable")
-    async def modlogs_disable(self, ctx: commands.Context, option: str):
+    async def modlogs_disable(self, ctx: commands.Context, options: commands.Greedy[args.moderatorFlag]):
         LogsFlags = self.bot.get_cog('ConfigCog').LogsFlags()
-        if option not in LogsFlags.FLAGS.values():
-            await ctx.send("Option invalide")
-            return
         flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
         flags = LogsFlags.intToFlags(flags)
-        if option not in flags:
-            await ctx.send("Ce type de logs est déjà désactivé !")
-            return
-        flags.remove(option)
-        self.edit_config(ctx.guild.id, 'modlogs_flags',
-                         LogsFlags.flagsToInt(flags))
-        await ctx.send(f"Les logs de type {option} ont bien été désactivés")
+        flags = [x for x in flags if x not in options]
+        self.edit_config(ctx.guild.id, 'modlogs_flags', LogsFlags.flagsToInt(flags))
+        await ctx.send("Les logs de type {} ont bien été désactivés".format(', '.join(options)))
 
     @config_modlogs.command(name="list")
     async def modlogs_list(self, ctx: commands.Context):
