@@ -32,7 +32,7 @@ class Errors(commands.Cog):
         if isinstance(error, ignored) and not isinstance(error, actually_not_ignored):
             return
         elif isinstance(error, commands.errors.CommandOnCooldown):
-            if await self.bot.cogs['AdminCog'].check_if_admin(ctx):
+            if await self.bot.cogs['Admin'].check_if_admin(ctx):
                 await ctx.reinvoke()
                 return
             await ctx.send("Vous êtes en cooldown pour cette commande. Veuillez attendre encore {} secondes...".format(round(error.retry_after, 2)))

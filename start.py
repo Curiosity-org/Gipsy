@@ -49,7 +49,7 @@ class gunibot(commands.bot.BotBase, discord.Client):
             else:
                 return user.avatar_url_as(format='png', size=size)
         except Exception as e:
-            await self.cogs['ErrorsCog'].on_error(e, None)
+            await self.cogs['Errors'].on_error(e, None)
 
     class SafeDict(dict):
         def __missing__(self, key):

@@ -37,7 +37,7 @@ perms_translations = {
 }
 
 
-class PermsCog(commands.Cog):
+class Perms(commands.Cog):
     """Cog with a single command, allowing you to see the permissions of a member or a role in a channel."""
 
     def __init__(self, bot):
@@ -123,4 +123,4 @@ class PermsCog(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(PermsCog(bot))
+    bot.add_cog(Perms(bot))
