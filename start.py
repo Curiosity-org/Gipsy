@@ -19,8 +19,10 @@ class gunibot(commands.bot.BotBase, discord.Client):
 
     def __init__(self, case_insensitive=None, status=None, beta=False, config: dict = None):
         self.config = config
-        super().__init__(command_prefix=self.get_prefix, case_insensitive=case_insensitive,
-                         status=status, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
+        intents = discord.Intents.default()
+        intents.members = True
+        super().__init__(command_prefix=self.get_prefix, case_insensitive=case_insensitive, status=status,
+                         allowed_mentions=discord.AllowedMentions(everyone=False, roles=False), intents=intents)
         self.log = logging.getLogger("runner")
         self.beta = beta
         self.database = sqlite3.connect('data/database.db')
