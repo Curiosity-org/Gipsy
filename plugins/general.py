@@ -81,8 +81,9 @@ class General(commands.Cog):
         version = str(v.major)+"."+str(v.minor)+"."+str(v.micro)
         pid = os.getpid()
         py = psutil.Process(pid)
-        ram_cpu = [round(py.memory_info()[0]/2.**30, 3), psutil.cpu_percent()]
+        ram_usage = round(py.memory_info()[0]/2.**30, 3) #, py.cpu_percent()]
         latency = round(self.bot.latency*1000, 3)
+        CPU_INTERVAL = 3.0
         try:
             async with ctx.channel.typing():
                 len_servers = len(ctx.bot.guilds)
@@ -94,14 +95,19 @@ class General(commands.Cog):
 **Version de Python :** {p_v}
 **Version de la bibliothèque `discord.py` :** {d_v}
 **Charge sur la mémoire vive :** {ram} GB
-**Charge sur le CPU :** {cpu} %
-**Temps de latence de l'api :** {api} ms""".format(s_count=len_servers, m_count=users, b_count=bots, l_count=self.codelines, p_v=version, d_v=discord.__version__, ram=ram_cpu[0], cpu=ram_cpu[1], api=latency,)
+**Charge sur le CPU :** *calcul en cours*
+**Temps de latence de l'api :** {api} ms""".format(s_count=len_servers, m_count=users, b_count=bots, l_count=self.codelines, p_v=version, d_v=discord.__version__, ram=ram_usage, api=latency,)
             if isinstance(ctx.channel, discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).embed_links:
-                embed = discord.Embed(title="**Statistiques du bot**", color=8311585, timestamp=ctx.message.created_at,
-                                      description=d, thumbnail=self.bot.user.avatar_url_as(format="png"))
-                await ctx.send(embed=embed)
+                embed = discord.Embed(title="**Statistiques du bot**", color=8311585, timestamp=ctx.message.created_at, description=d, thumbnail=self.bot.user.avatar_url_as(format="png"))
+                msg = await ctx.send(embed=embed)
+                cpu_usage = py.cpu_percent(CPU_INTERVAL)
+                embed.description = embed.description.replace("*calcul en cours*", f"{cpu_usage} %")
+                await msg.edit(embed=embed)
             else:
-                await ctx.send(d)
+                msg = await ctx.send(d)
+                cpu_usage = py.cpu_percent(CPU_INTERVAL)
+                d = d.replace("*calcul en cours*", f"{cpu_usage} %")
+                await msg.edit(content=d)
         except Exception as e:
             await ctx.bot.get_cog("Errors").on_cmd_error(ctx, e)
 
