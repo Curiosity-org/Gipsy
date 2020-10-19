@@ -213,14 +213,6 @@ class Sconfig(commands.Cog):
             roles = [role.id for role in roles]
         await ctx.send(self.edit_config(ctx.guild.id, "thanks_allowed_roles", roles))
 
-    # @main_config.command(name="thanks_roles")
-    # async def config_thanks_roles(self, ctx: commands.Context, roles: commands.Greedy[discord.Role]):
-    #     if len(roles) == 0:
-    #         roles = None
-    #     else:
-    #         roles = [role.id for role in roles]
-    #     await ctx.send(self.edit_config(ctx.guild.id, "thanks_roles", roles))
-
     @main_config.command(name="thanks_duration")
     async def config_thanks_duration(self, ctx: commands.Context, duration: commands.Greedy[args.tempdelta]):
         duration = sum(duration)
