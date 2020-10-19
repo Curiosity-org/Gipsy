@@ -113,7 +113,7 @@ class Logs(commands.Cog):
             description=f"Invitation créée vers {invite.channel.mention}",
             colour=discord.Colour.green()
         )
-        if invite.inviter: # sometimes Discord doesn't send that info
+        if invite.inviter:  # sometimes Discord doesn't send that info
             embed.set_author(name=f'{invite.inviter.name}#{invite.inviter.discriminator}',
                              icon_url=invite.inviter.avatar_url_as(static_format='png'))
             embed.set_footer(text=f"Author ID: {invite.inviter.id}")
@@ -178,10 +178,11 @@ class Logs(commands.Cog):
             )
             delta = await self.bot.get_cog("TimeCog").time_delta(member.joined_at, datetime.datetime.utcnow(), lang="fr", year=True, precision=0)
             embed.add_field(name=f"Dans le serveur depuis", value=delta)
-        embed.set_author(name=str(member), icon_url=member.avatar_url_as(static_format='png'))
+        embed.set_author(name=str(member),
+                         icon_url=member.avatar_url_as(static_format='png'))
         embed.set_footer(text=f"Member ID: {member.id}")
         await self.send_embed(member.guild, embed)
-    
+
     @commands.Cog.listener()
     async def on_member_ban(self, guild: discord.Guild, user: discord.User):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_member_ban"
@@ -194,10 +195,11 @@ class Logs(commands.Cog):
             description=f"Le membre {user.mention} vient d'être banni",
             colour=discord.Colour.red()
         )
-        embed.set_author(name=str(user), icon_url=user.avatar_url_as(static_format='png'))
+        embed.set_author(
+            name=str(user), icon_url=user.avatar_url_as(static_format='png'))
         embed.set_footer(text=f"Member ID: {user.id}")
         await self.send_embed(guild, embed)
-    
+
     @commands.Cog.listener()
     async def on_member_unban(self, guild: discord.Guild, user: discord.User):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_member_unban"
@@ -210,10 +212,11 @@ class Logs(commands.Cog):
             description=f"Le membre {user.mention} n'est plus banni",
             colour=discord.Colour.green()
         )
-        embed.set_author(name=str(user), icon_url=user.avatar_url_as(static_format='png'))
+        embed.set_author(
+            name=str(user), icon_url=user.avatar_url_as(static_format='png'))
         embed.set_footer(text=f"User ID: {user.id}")
         await self.send_embed(guild, embed)
-    
+
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_voice_state_update"
@@ -240,15 +243,16 @@ class Logs(commands.Cog):
                 description=f"Le membre {member.mention} est passé du salon {before.channel.name} au salon {after.channel.name}"
             )
         embed.colour = discord.Color.light_gray()
-        embed.set_author(name=str(member), icon_url=member.avatar_url_as(static_format='png'))
+        embed.set_author(name=str(member),
+                         icon_url=member.avatar_url_as(static_format='png'))
         embed.set_footer(text=f"Member ID: {member.id}")
         await self.send_embed(member.guild, embed)
-    
+
     @commands.Cog.listener()
     async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_guild_update"
         if before.premium_subscription_count == after.premium_subscription_count:
-            return # not interesting
+            return  # not interesting
         if not await self.has_logs(after):
             return
         if 'boosts' not in self.get_flags(after.id):
@@ -267,6 +271,88 @@ class Logs(commands.Cog):
             embed.description += f"\nVous êtes passé du niveau {before.premium_tier} au niveau {after.premium_tier}"
         embed.color = discord.Color(0xf47fff)
         await self.send_embed(after, embed)
+
+    @commands.Cog.listener()
+    async def on_guild_role_create(self, role: discord.Role):
+        "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_guild_role_create"
+        if not await self.has_logs(role.guild):
+            return
+        if 'roles' not in self.get_flags(role.guild.id):
+            return
+        embed = discord.Embed(
+            title="Rôle créé",
+            description=f"Le rôle {role.mention} ({role.name}) vient d'être créé"
+        )
+        data = [f'Position : {role.position}',
+                'Mentionnable : '+('oui' if role.mentionable else 'non')]
+        if role.color != discord.Color.default():
+            data.append(f"Couleur: {role.color}")
+        if role.hoist:
+            data.append("Rôle affiché séparément")
+        if role.permissions.administrator:
+            data.append("Permissions administrateur")
+        embed.add_field(name="Informations : ", value="\n".join(data))
+        embed.color = discord.Color.green()
+        await self.send_embed(role.guild, embed)
+
+    @commands.Cog.listener()
+    async def on_guild_role_delete(self, role: discord.Role):
+        "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_guild_role_delete"
+        if not await self.has_logs(role.guild):
+            return
+        if 'roles' not in self.get_flags(role.guild.id):
+            return
+        embed = discord.Embed(
+            title="Rôle supprimé",
+            description=f"Le rôle {role.name} vient d'être supprimé"
+        )
+        data = [f'Position : {role.position}',
+                'Mentionnable : '+('oui' if role.mentionable else 'non')]
+        if role.color != discord.Color.default():
+            data.append(f"Couleur : {role.color}")
+        if role.hoist:
+            data.append("Rôle affiché séparément")
+        if role.permissions.administrator:
+            data.append("Permissions administrateur")
+        if role.members:
+            data.append(f"Nombre de membres : {len(role.members)}")
+        embed.add_field(name="Informations : ", value="\n".join(data))
+        embed.color = discord.Color.red()
+        await self.send_embed(role.guild, embed)
+
+    @commands.Cog.listener()
+    async def on_guild_role_update(self, before: discord.Role, after: discord.Role):
+        "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_guild_role_update"
+        if not await self.has_logs(before.guild):
+            return
+        if 'roles' not in self.get_flags(before.guild.id):
+            return
+        embed = discord.Embed(
+            title="Rôle édité",
+            description=f"Le rôle {after.mention} ({after.name}) vient d'être modifié"
+        )
+        data = list()
+        if before.color != after.color:
+            data.append(f"Couleur : {before.color} -> {after.color}")
+        if before.name != after.name:
+            data.append(f"Nom : {before.name} -> {after.name}")
+        if before.permissions.administrator != after.permissions.administrator:
+            b1 = 'oui' if before.permissions.administrator else 'non'
+            b2 = 'oui' if after.permissions.administrator else 'non'
+            data.append(f"Permissions administrateur : {b1} -> {b2}")
+        if before.mentionable != after.mentionable:
+            b1 = 'oui' if before.mentionable else 'non'
+            b2 = 'oui' if after.mentionable else 'non'
+            data.append(f"Mentionnable : {b1} -> {b2}")
+        if before.hoist != after.hoist:
+            b1 = 'oui' if before.hoist else 'non'
+            b2 = 'oui' if after.hoist else 'non'
+            data.append(f"Rôle affiché séparément : {b1} -> {b2}")
+        if len(data) == 0:
+            return
+        embed.add_field(name="Changements : ", value="\n".join(data))
+        embed.color = discord.Color.orange()
+        await self.send_embed(before.guild, embed)
 
 
 def setup(bot):
