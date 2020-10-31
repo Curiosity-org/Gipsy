@@ -38,8 +38,9 @@ class Errors(commands.Cog):
             await ctx.send("Vous êtes en cooldown pour cette commande. Veuillez attendre encore {} secondes...".format(round(error.retry_after, 2)))
             return
         elif isinstance(error, (commands.BadArgument, commands.BadUnionArgument)):
-            raw_error = str(error).replace(
-                '@eveyrone', '@​everyone').replace('@here', '@​here')
+            raw_error = str(error).replace('@eveyrone', '@​everyone').replace('@here', '@​here')
+            if str(error) == "Unknown argument":
+                return await ctx.send("Argument inconnu")
             # Could not convert "limit" into int. OR Converting to "int" failed for parameter "number".
             r = re.search(
                 r'Could not convert \"(?P<arg>[^\"]+)\" into (?P<type>[^.\n]+)', raw_error)

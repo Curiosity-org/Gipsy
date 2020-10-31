@@ -21,9 +21,21 @@ class tempdelta(commands.Converter):
             raise commands.errors.BadArgument('Invalid duration: '+argument)
         return d
 
+
 class moderatorFlag(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> str:
         LogsFlags = ctx.bot.get_cog('ConfigCog').LogsFlags.FLAGS
         if argument not in LogsFlags.values():
-            raise commands.errors.BadArgument('Invalid moderation flag: '+argument)
+            raise commands.errors.BadArgument(
+                'Invalid moderation flag: '+argument)
         return argument
+
+
+def constant(word: str):
+    class Constant(commands.Converter):
+        w = word
+
+        async def convert(self, ctx: commands.Context, arg: str):
+            if arg != self.w:
+                raise commands.errors.BadArgument('Unknown argument')
+    return Constant
