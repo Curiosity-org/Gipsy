@@ -46,7 +46,7 @@ class TriggerType(commands.Converter):
         raise commands.errors.BadArgument("Type de déclencheur invalide")
 
 
-class Action:
+class Dependency:
     def __init__(self, action: ActionType, target_role: int, trigger: TriggerType, trigger_roles: List[int], guild: int):
         self.action = action
         self.target_role = target_role
@@ -74,8 +74,8 @@ class GroupRoles(commands.Cog):
         self.bot = bot
         self.file = "groupRoles"
 
-    def db_get_config(self, guildID: int) -> List[Action]:
-        """Get every action of a specific guild"""
+    def db_get_config(self, guildID: int) -> List[Dependency]:
+        """Get every dependencies of a specific guild"""
         c = self.bot.database.cursor()
         c.execute('SELECT rowid, * FROM group_roles WHERE guild=?', (guildID,))
         # comes as: (row, guild, action, target, trigger, trigger-roles)
@@ -84,12 +84,12 @@ class GroupRoles(commands.Cog):
             #       Action            target_role  trigger           trigger_roles  guild
             temp = (ActionType(row[2]), row[3], TriggerType(
                 row[4]), loads(row[5]), row[1])
-            res.append(Action(*temp))
+            res.append(Dependency(*temp))
             res[-1].id = row[0]
         c.close()
         return res if len(res) > 0 else None
 
-    def db_add_action(self, action: Action) -> int:
+    def db_add_action(self, action: Dependency) -> int:
         """Add an action into a guild
         Return the inserted row ID"""
         c = self.bot.database.cursor()
@@ -150,7 +150,7 @@ class GroupRoles(commands.Cog):
             await member.remove_roles(*roles, reason="Linked roles")
 
     async def check_got_roles(self, member: discord.Member, roles: List[discord.Role]):
-        """Trigger actions based on granted roles"""
+        """Trigger dependencies based on granted roles"""
         actions = self.db_get_config(member.guild.id)
         for action in actions:
             if action.trigger.type == 0:  # if trigger is 'get-one'
@@ -169,7 +169,7 @@ class GroupRoles(commands.Cog):
                             break
 
     async def check_lost_roles(self, member: discord.Member, roles: List[discord.Role]):
-        """Trigger actions based on revoked roles"""
+        """Trigger dependencies based on revoked roles"""
         actions = self.db_get_config(member.guild.id)
         for action in actions:
             if action.trigger.type == 2:  # if trigger is 'loose-one'
@@ -187,8 +187,8 @@ class GroupRoles(commands.Cog):
                             await self.give_remove_roles(member, alwd_roles, action.action)
                             break
 
-    async def get_triggers(self, action: Action, actions: List[Action]) -> List[Action]:
-        """Get every action which will directly trigger a selected action"""
+    async def get_triggers(self, action: Dependency, actions: List[Dependency]) -> List[Dependency]:
+        """Get every dependency which will directly trigger a selected action"""
         triggers = list()
         unwanted_action = 0 if action.trigger.type <= 1 else 1
         for a in actions:
@@ -206,8 +206,8 @@ class GroupRoles(commands.Cog):
                 return triggers
         return triggers
 
-    async def compute_actions(self, action: Action, actions_done: list, all_actions: list):
-        """Check if a list of actions may contain a loop"""
+    async def compute_actions(self, action: Dependency, actions_done: list, all_actions: list):
+        """Check if a list of dependencies may contain a loop"""
         for target_action in await self.get_triggers(action, all_actions):
             already_noted = target_action in actions_done
             if already_noted:
@@ -228,7 +228,7 @@ class GroupRoles(commands.Cog):
         if not trigger_roles:
             await ctx.send("Il vous faut au moins 1 rôle déclencheur !")
             return
-        action = Action(action, target_role.id, trigger, [
+        action = Dependency(action, target_role.id, trigger, [
                         x.id for x in trigger_roles], ctx.guild.id)
         try:
             all_actions = self.db_get_config(ctx.guild.id)
@@ -236,7 +236,7 @@ class GroupRoles(commands.Cog):
                 await self.compute_actions(action, list(), all_actions+[action])
         except ConflictingCyclicDependencyError as e:
             timeout = 20
-            await ctx.send("Oups, il semble que cette action puisse entraîner une boucle infinie avec au moins l'action suivante : \"{}\"\nSi vous êtes sûr de vouloir continuer, entrez 'oui' dans les {} prochaines secondes".format(e.args[0].to_str(False), timeout))
+            await ctx.send("Oups, il semble que cette dépendance puisse entraîner une boucle infinie avec au moins la dépendance suivante : \"{}\"\nSi vous êtes sûr de vouloir continuer, entrez 'oui' dans les {} prochaines secondes".format(e.args[0].to_str(False), timeout))
 
             def check(m):
                 return m.author == ctx.author and m.channel == ctx.channel and m.content.lower() == "oui"
@@ -252,7 +252,7 @@ class GroupRoles(commands.Cog):
         """List your roles-links"""
         actions = self.db_get_config(ctx.guild.id)
         if not actions:
-            await ctx.send("Vous n'avez aucune action de configurée pour le moment.\nUtilisez la commande `rolelink create` pour en ajouter")
+            await ctx.send("Vous n'avez aucune dépendance de configurée pour le moment.\nUtilisez la commande `rolelink create` pour en ajouter")
             return
         txt = "**Liste de vos rôles-liaisons :**\n"
         for action in actions:
