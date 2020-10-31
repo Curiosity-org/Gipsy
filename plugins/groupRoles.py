@@ -4,6 +4,7 @@ from marshal import loads, dumps
 from typing import List, Union
 import checks
 import args
+import asyncio
 
 
 # /rolelink <grant/revoke> <role> when <get/loose> <one/all> <roles>
@@ -54,6 +55,17 @@ class Action:
         self.b_trigger_roles = dumps(trigger_roles)
         self.guild = guild
         self.id = None
+
+    def to_str(self, useID: bool = True) -> str:
+        triggers = ' '.join([f'<@&{r}>' for r in self.trigger_roles])
+        target = f'<@&{self.target_role}>'
+        ID = f"{self.id}. " if useID else ''
+        return f"{ID}{self.action.name} {target} when {self.trigger.name.replace('-', ' ')} of {triggers}"
+
+
+class ConflictingCyclicDependencyError(Exception):
+    """Used when a loop is found when analyzing a role dependencies system"""
+    pass
 
 
 class GroupRoles(commands.Cog):
@@ -129,9 +141,12 @@ class GroupRoles(commands.Cog):
     async def give_remove_roles(self, member: discord.Member, roles: List[discord.Role], action: ActionType):
         if not roles:  # list is empty or None
             return
+        names = [x.name for x in roles]
         if action.type == 0:
+            self.bot.log.debug(f"Giving {names} to {member}")
             await member.add_roles(*roles, reason="Linked roles")
         else:
+            self.bot.log.debug(f"Removing {names} to {member}")
             await member.remove_roles(*roles, reason="Linked roles")
 
     async def check_got_roles(self, member: discord.Member, roles: List[discord.Role]):
@@ -172,6 +187,34 @@ class GroupRoles(commands.Cog):
                             await self.give_remove_roles(member, alwd_roles, action.action)
                             break
 
+    async def get_triggers(self, action: Action, actions: List[Action]) -> List[Action]:
+        """Get every action which will directly trigger a selected action"""
+        triggers = list()
+        unwanted_action = 0 if action.trigger.type <= 1 else 1
+        for a in actions:
+            if a.id == action.id:
+                continue
+            # if a will trigger action
+            if a.action.type == unwanted_action and a.target_role in action.trigger_roles:
+                triggers.append(a)
+        if action.trigger.type in (1, 3):  # get-all or loose-all
+            roles = list(action.trigger_roles)
+            for a in triggers:
+                if a in roles:
+                    roles.remove(a)
+            if len(roles) > 0:
+                return triggers
+        return triggers
+
+    async def compute_actions(self, action: Action, actions_done: list, all_actions: list):
+        """Check if a list of actions may contain a loop"""
+        for target_action in await self.get_triggers(action, all_actions):
+            already_noted = target_action in actions_done
+            if already_noted:
+                raise ConflictingCyclicDependencyError(target_action)
+            actions_done.append(target_action)
+            await self.compute_actions(target_action, actions_done, all_actions)
+
     @commands.group(name="rolelink")
     @commands.guild_only()
     async def rolelink_main(self, ctx: commands.Context):
@@ -187,6 +230,20 @@ class GroupRoles(commands.Cog):
             return
         action = Action(action, target_role.id, trigger, [
                         x.id for x in trigger_roles], ctx.guild.id)
+        try:
+            all_actions = self.db_get_config(ctx.guild.id)
+            if all_actions is not None:
+                await self.compute_actions(action, list(), all_actions+[action])
+        except ConflictingCyclicDependencyError as e:
+            timeout = 20
+            await ctx.send("Oups, il semble que cette action puisse entraîner une boucle infinie avec au moins l'action suivante : \"{}\"\nSi vous êtes sûr de vouloir continuer, entrez 'oui' dans les {} prochaines secondes".format(e.args[0].to_str(False), timeout))
+
+            def check(m):
+                return m.author == ctx.author and m.channel == ctx.channel and m.content.lower() == "oui"
+            try:
+                await self.bot.wait_for('message', check=check, timeout=timeout)
+            except asyncio.TimeoutError:
+                return
         actionID = self.db_add_action(action)
         await ctx.send(f"Une nouvelle action a bien été ajoutée, avec l'ID {actionID} !")
 
@@ -199,9 +256,7 @@ class GroupRoles(commands.Cog):
             return
         txt = "**Liste de vos rôles-liaisons :**\n"
         for action in actions:
-            triggers = ' '.join([f'<@&{r}>' for r in action.trigger_roles])
-            target = f'<@&{action.target_role}>'
-            txt += f"{action.id}. {action.action.name} {target} when {action.trigger.name.replace('-', ' ')} of {triggers}\n"
+            txt += action.to_str() + "\n"
         await ctx.send(txt)
 
     @rolelink_main.command(name="delete")
