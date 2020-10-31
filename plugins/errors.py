@@ -41,6 +41,10 @@ class Errors(commands.Cog):
             raw_error = str(error).replace('@eveyrone', '@​everyone').replace('@here', '@​here')
             if str(error) == "Unknown argument":
                 return await ctx.send("Argument inconnu")
+            elif str(error) == "Unknown dependency action type":
+                return await ctx.send("Type d'action de dépendance invalide")
+            elif str(error) == "Unknown dependency trigger type":
+                return await ctx.send("Type de déclencheur de dépendance invalide")
             # Could not convert "limit" into int. OR Converting to "int" failed for parameter "number".
             r = re.search(
                 r'Could not convert \"(?P<arg>[^\"]+)\" into (?P<type>[^.\n]+)', raw_error)

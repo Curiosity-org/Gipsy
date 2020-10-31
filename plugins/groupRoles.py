@@ -25,7 +25,7 @@ class ActionType(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str):
         if argument in self.types:
             return ActionType(argument)
-        raise commands.errors.BadArgument("Type d'action invalide")
+        raise commands.errors.BadArgument("Unknown dependency action type")
 
 
 class TriggerType(commands.Converter):
@@ -43,7 +43,7 @@ class TriggerType(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str):
         if argument in self.types:
             return TriggerType(argument)
-        raise commands.errors.BadArgument("Type de déclencheur invalide")
+        raise commands.errors.BadArgument("Unknown dependency trigger type")
 
 
 class Dependency:
@@ -224,7 +224,9 @@ class GroupRoles(commands.Cog):
 
     @rolelink_main.command(name="create")
     async def rolelink_create(self, ctx: commands.Context, action: ActionType, target_role: discord.Role, when: args.constant('when'), trigger: TriggerType, trigger_roles: commands.Greedy[discord.Role]):
-        """Create a new roles-link"""
+        """Create a new roles-link
+        Actions can be either grant or revoke
+        Trigger can be either get-one, get-all, loose-one or loose-all"""
         if not trigger_roles:
             await ctx.send("Il vous faut au moins 1 rôle déclencheur !")
             return
