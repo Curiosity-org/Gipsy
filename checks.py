@@ -14,3 +14,12 @@ async def is_admin(ctx: commands.Context):
         except discord.errors.Forbidden:
             pass
     return admin
+
+async def is_server_manager(ctx: commands.Context):
+    g_manager = ctx.guild is None or ctx.author.guild_permissions.manage_guild or is_bot_admin(ctx)
+    if not g_manager and ctx.invoked_with != "help":
+        try:
+            await ctx.send("Il vous manque la permission 'Gérer le serveur' pour faire cela")
+        except discord.errors.Forbidden:
+            pass
+    return g_manager

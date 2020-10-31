@@ -223,6 +223,7 @@ class GroupRoles(commands.Cog):
             await ctx.send_help('rolelink')
 
     @rolelink_main.command(name="create")
+    @commands.check(checks.is_server_manager())
     async def rolelink_create(self, ctx: commands.Context, action: ActionType, target_role: discord.Role, when: args.constant('when'), trigger: TriggerType, trigger_roles: commands.Greedy[discord.Role]):
         """Create a new roles-link
         Actions can be either grant or revoke
@@ -250,6 +251,7 @@ class GroupRoles(commands.Cog):
         await ctx.send(f"Une nouvelle action a bien été ajoutée, avec l'ID {actionID} !")
 
     @rolelink_main.command(name="list")
+    @commands.cooldown(1, 10, commands.BucketType.guild)
     async def rolelink_list(self, ctx: commands.Context):
         """List your roles-links"""
         actions = self.db_get_config(ctx.guild.id)
@@ -262,6 +264,7 @@ class GroupRoles(commands.Cog):
         await ctx.send(txt)
 
     @rolelink_main.command(name="delete")
+    @commands.check(checks.is_server_manager())
     async def rolelink_delete(self, ctx: commands.Context, id: int):
         """Delete one of your roles-links"""
         deleted = self.db_delete_action(ctx.guild.id, id)
