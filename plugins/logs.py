@@ -372,6 +372,8 @@ class Logs(commands.Cog):
                 embed.add_field(name="Rôles ajoutés", value=" ".join(got), inline=False)
             if lost:
                 embed.add_field(name="Rôles enlevés", value=" ".join(lost), inline=False)
+        if len(embed.fields) == 0:
+            return
         embed.set_author(name=str(before), icon_url=before.avatar_url_as(static_format='png'))
         embed.set_footer(text=f"Member ID: {before.id}")
         await self.send_embed(before.guild, embed)
