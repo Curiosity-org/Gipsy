@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import checks
 import datetime
+from typing import List
 
 
 class Logs(commands.Cog):
@@ -353,6 +354,59 @@ class Logs(commands.Cog):
         embed.add_field(name="Changements : ", value="\n".join(data))
         embed.color = discord.Color.orange()
         await self.send_embed(before.guild, embed)
+    
+    @commands.Cog.listener()
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+        """https://discordpy.readthedocs.io/en/latest/api.html#discord.on_member_update"""
+        if not await self.has_logs(before.guild):
+            return
+        if 'members' not in self.get_flags(before.guild.id):
+            return
+        embed = discord.Embed(title="Membre modifié", color=discord.Color(0xf8bd1c))
+        if before.nick != after.nick:
+            embed.add_field(name="Surnom édité", value=f"{before.nick} -> {after.nick}")
+        if before.roles != after.roles:
+            got = [r.mention for r in after.roles if r not in before.roles]
+            lost = [r.mention for r in before.roles if r not in after.roles]
+            if got:
+                embed.add_field(name="Rôles ajoutés", value=" ".join(got), inline=False)
+            if lost:
+                embed.add_field(name="Rôles enlevés", value=" ".join(lost), inline=False)
+        embed.set_author(name=str(before), icon_url=before.avatar_url_as(static_format='png'))
+        embed.set_footer(text=f"Member ID: {before.id}")
+        await self.send_embed(before.guild, embed)
+
+    @commands.Cog.listener()
+    async def on_guild_emojis_update(self, guild: discord.Guild, before: List[discord.Emoji], after: List[discord.Emoji]):
+        """https://discordpy.readthedocs.io/en/latest/api.html#discord.on_guild_emojis_update"""
+        if not await self.has_logs(guild):
+            return
+        if 'emojis' not in self.get_flags(guild.id):
+            return
+        embed = discord.Embed(title="Emojis mis à jour", color=discord.Color(0xf8d71c))
+        new = [str(e) for e in after if e not in before]
+        lost = [str(e) for e in before if e not in after]
+        renamed = list()
+        for b in before:
+            for a in after:
+                if a.id == b.id:
+                    if a.name != b.name:
+                        renamed.append(f'{a} :{b.name}: -> :{a.name}:')
+                    continue
+        if not (new or lost or renamed):
+            # can happen when Discord fetch emojis from Twitch without any change
+            return
+        if new:
+            n = "Emoji ajouté" if len(new)==1 else "Emojis ajoutés"
+            embed.add_field(name=n, value="".join(new), inline=False)
+        if lost:
+            n = "Emoji supprimé" if len(lost)==1 else "Emojis supprimés"
+            embed.add_field(name=n, value="".join(lost), inline=False)
+        if renamed:
+            n = "Emoji renommé" if len(renamed)==1 else "Emojis renommés"
+            embed.add_field(name=n, value="\n".join(renamed), inline=False)
+        await self.send_embed(guild, embed)
+
 
 
 def setup(bot):

@@ -133,7 +133,9 @@ class ConfigCog(commands.Cog):
             1 << 3: "voice",
             1 << 4: "moderation",
             1 << 5: "boosts",
-            1 << 6: "roles"
+            1 << 6: "roles",
+            1 << 7: "members",
+            1 << 8: "emojis"
         }
 
         def flagsToInt(self, flags: list) -> int:
