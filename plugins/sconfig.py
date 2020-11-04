@@ -167,6 +167,9 @@ class Sconfig(commands.Cog):
     @config_modlogs.command(name="enable")
     async def modlogs_enable(self, ctx: commands.Context, options: commands.Greedy[args.moderatorFlag]):
         """Enable one or multiple logs categories"""
+        if not options:
+            await ctx.send("Catégorie invalide")
+            return
         LogsFlags = self.bot.get_cog('ConfigCog').LogsFlags()
         flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
         flags = LogsFlags.intToFlags(flags) + options
@@ -178,6 +181,9 @@ class Sconfig(commands.Cog):
     @config_modlogs.command(name="disable")
     async def modlogs_disable(self, ctx: commands.Context, options: commands.Greedy[args.moderatorFlag]):
         """Disable one or multiple logs categories"""
+        if not options:
+            await ctx.send("Catégorie invalide")
+            return
         LogsFlags = self.bot.get_cog('ConfigCog').LogsFlags()
         flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
         flags = LogsFlags.intToFlags(flags)
