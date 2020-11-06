@@ -46,7 +46,7 @@ class General(commands.Cog):
         else:
             msg = f"⚠️ Vous vous trouvez actuellement dans le salon {ctx.channel.mention}, veuillez passer dans un salon plus approprié afin de continuer votre discussion "
         if ctx.channel.permissions_for(ctx.guild.me).embed_links:
-            emb = discord.Embed(title=msg, color=discord.Color.red())
+            emb = discord.Embed(description=msg, color=discord.Color.red())
             await ctx.send(embed=emb)
         else:
             await ctx.send(msg)
