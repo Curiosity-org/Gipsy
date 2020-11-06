@@ -38,6 +38,11 @@ class General(commands.Cog):
             await self.bot.get_cog('Errors').on_error(e, None)
         self.codelines = count
 
+    
+    @commands.command(name='hs')
+    async def hs(self, ctx, channel: discord.TextChannel):
+        await ctx.send("⚠️ VOUS VOUS TROUVEZ ACTUELLEMENT DANS LE SALON " + ctx.channel.mention + " , VEUILLEZ PASSER DANS LE SALON "+ channel.mention + " AFIN DE CONTINUER VOTRE DISCUSSION ⚠️")
+
     @commands.command(name="ping")
     async def rep(self, ctx, ip=None):
         """Get bot latency
