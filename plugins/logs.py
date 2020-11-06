@@ -70,7 +70,7 @@ class Logs(commands.Cog):
         embed = discord.Embed(
             timestamp=after.created_at,
             title="Message édité",
-            description=f"Un message de {before.author.mention} **a été édité** dans {before.channel.mention}.",
+            description=f"Un [message]({before.jump_url}) de {before.author.mention} **a été édité** dans {before.channel.mention}.",
             colour=discord.Colour(16294684)
         )
         embed.set_author(name=str(before.author),
