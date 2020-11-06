@@ -40,8 +40,16 @@ class General(commands.Cog):
 
     
     @commands.command(name='hs')
-    async def hs(self, ctx, channel: discord.TextChannel):
-        await ctx.send("⚠️ VOUS VOUS TROUVEZ ACTUELLEMENT DANS LE SALON " + ctx.channel.mention + " , VEUILLEZ PASSER DANS LE SALON "+ channel.mention + " AFIN DE CONTINUER VOTRE DISCUSSION ⚠️")
+    async def hs(self, ctx, channel: discord.TextChannel = None):
+        if channel:
+            msg = f"⚠️ Vous vous trouvez actuellement dans le salon {ctx.channel.mention}, veuillez passer dans le salon {channel.mention} afin de continuer votre discussion"
+        else:
+            msg = f"⚠️ Vous vous trouvez actuellement dans le salon {ctx.channel.mention}, veuillez passer dans un salon plus approprié afin de continuer votre discussion "
+        if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            emb = discord.Embed(title=msg, color=discord.Color.red())
+            await ctx.send(embed=emb)
+        else:
+            await ctx.send(msg)
 
     @commands.command(name="ping")
     async def rep(self, ctx, ip=None):
