@@ -11,7 +11,7 @@ class Alakon(commands.Cog):
     @commands.command(name="cookie")
     async def cookie(self, ctx):
         """La fonction la plus complexe du bot: donne un cookie à l'utilisateur qui en demande."""
-        message = f"Voilà pour vous {ctx..mention}: :cookie:"
+        message = f"Voilà pour vous {ctx.author.mention}: :cookie:"
         await ctx.send(message)
 
 def setup(bot):
