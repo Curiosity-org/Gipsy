@@ -129,7 +129,7 @@ class Thanks(commands.Cog):
         """Give or remove thanks roles if needed
         Return True if roles were given/removed, else False"""
         if not member.guild.me.guild_permissions.manage_roles:
-            self.bot.log.info("Module - Thanks: Missing \"manage_roles\" permission on guild \"", member.guild.name, "\"")
+            self.bot.log.info(f"Module - Thanks: Missing \"manage_roles\" permission on guild \"{member.guild.name}\"")
             return False
         g = member.guild
         pos = g.me.top_role.position
