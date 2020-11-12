@@ -40,7 +40,7 @@ class VoiceChannels(commands.Cog):
 
     async def give_roles(self, member: discord.Member, remove=False):
         if not member.guild.me.guild_permissions.manage_roles:
-            print("Module - Voice: Missing \"manage_roles\" permission on guild \"", member.guild.name, "\"")
+            self.bot.log.info("Module - Voice: Missing \"manage_roles\" permission on guild \"", member.guild.name, "\"")
             return
         g = member.guild
         rolesID = self.bot.server_configs[g.id]['voice_roles']
@@ -83,7 +83,7 @@ class VoiceChannels(commands.Cog):
         perms = voice_category.permissions_for(member.guild.me)
         # S'il manque des perms au bot: abort
         if not (perms.manage_channels and perms.move_members):
-            print("Module - Voice: Missing \"manage_channels, move_members\" permission on guild \"", member.guild.name, "\"")
+            self.bot.log.info("Module - Voice: Missing \"manage_channels, move_members\" permission on guild \"", member.guild.name, "\"")
             return
         p = len(voice_category.channels)
         d = dict(discord.Permissions.all())

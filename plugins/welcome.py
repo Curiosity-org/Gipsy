@@ -14,7 +14,7 @@ class Welcome(commands.Cog):
         """Called when a member joins a guild"""
         g = member.guild
         if not g.me.guild_permissions.manage_roles:  # si pas la perm de gérer les rôles
-            print("Module - Welcome: Missing \"manage_roles\" permission on guild \"", g.name, "\"")
+            self.bot.log.info("Module - Welcome: Missing \"manage_roles\" permission on guild \"", g.name, "\"")
             return
         config = self.bot.server_configs[g.id]
         rolesID = config["welcome_roles"]
