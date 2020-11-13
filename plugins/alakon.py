@@ -16,8 +16,9 @@ class Alakon(commands.Cog):
             message = f"Voilà pour vous {user.mention}: :cookie:"
         else:
             message = f"Voilà pour vou {ctx.author.mention} :cookie:"
-        webhook = ctx.channel.create_webhook(*,"Villager number 6", avatar="https://d31sxl6qgne2yj.cloudfront.net/wordpress/wp-content/uploads/20190121140737/Minecraft-Villager-Head.jpg")
-        await webhook.send(message)
+        webhook = await ctx.channel.create_webhook(name="Villager number 6", avatar_url="https://d31sxl6qgne2yj.cloudfront.net/wordpress/wp-content/uploads/20190121140737/Minecraft-Villager-Head.jpg")
+        await webhook.send(content=message)
+        await webhook.delete()
         await ctx.message.delete()
 
 
