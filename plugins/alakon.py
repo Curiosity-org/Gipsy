@@ -12,7 +12,7 @@ class Alakon(commands.Cog):
     async def cookie(self, ctx: commands.Context, *, user: discord.User = None):
         """La fonction la plus complexe du bot: donne un cookie à l'utilisateur qui en demande."""
         if user:
-            message = f"Voilà pour vous {user.mention} :cookie:"
+            message = f"Voilà pour vous {user.mention}: :cookie:\nDe la part de {ctx.author.mention}"
         else:
             message = f"Voilà pour vous {ctx.author.mention} :cookie:"
         webhook = await ctx.channel.create_webhook(name="Villager number 6")
