@@ -14,7 +14,7 @@ class Alakon(commands.Cog):
         if user:
             await ctx.send(f"Voilà pour vous {user.mention}: :cookie:"
         else:
-            await ctx.send(f"Voilà pour vous {ctx.author.mention}: :cookie:"
+            await ctx.send(f"Voilà pour vous {ctx.author.mention}: :cookie: TEST"
 
 
 def setup(bot):
