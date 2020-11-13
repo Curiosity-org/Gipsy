@@ -7,7 +7,7 @@ import textwrap
 import traceback
 from contextlib import redirect_stdout
 import checks
-from git import Repo, Remote
+from git import Repo, Remote, exc
 
 
 def cleanup_code(content):
@@ -41,15 +41,31 @@ class Admin(commands.Cog):
                             cmds.name, cmds.help.split('\n')[0])
             await ctx.send(text)
 
-    @main_msg.command(name='pull', hidden=True)
-    async def gitpull(self, ctx: commands.Context):
+    @main_msg.command(name='pull')
+    async def gitpull(self, ctx: commands.Context, branch: str = None):
         """Tire des changements de GitLab"""
         m = await ctx.send("Mise à jour depuis gitlab...")
         repo = Repo(os.getcwd())
         assert not repo.bare
+        if branch:
+            try:
+                repo.git.checkout(branch)
+            except exc.GitCommandError as e:
+                self.bot.log.exception(e)
+                await m.edit(content=m.content+"\nNom de branche invalide - abandon de la procédure")
+                return
+            else:
+                await m.edit(content=m.content+f"\nBranche {branch} correctement sélectionnée")
         origin = repo.remotes.origin
         origin.pull()
         await self.restart_bot(ctx)
+    
+    @main_msg.command(name="branches", aliases=['branch-list'])
+    async def git_branches(self, ctx: commands.Context):
+        """Montre la liste des branches disponibles"""
+        repo = Repo(os.getcwd())
+        branches = " ".join(map(str, repo.branches))
+        await ctx.send("Liste des branches : "+branches)
 
     @main_msg.command(name='shutdown')
     async def shutdown(self, ctx: commands.Context):

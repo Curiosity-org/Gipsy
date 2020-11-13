@@ -12,9 +12,9 @@ class Alakon(commands.Cog):
     async def cookie(self, ctx: commands.Context, *, user: discord.User = None):
         """La fonction la plus complexe du bot: donne un cookie à l'utilisateur qui en demande."""
         if user:
-            await ctx.send(f"Voilà pour vous {user.mention}: :cookie:"
+            await ctx.send(f"Voilà pour vous {user.mention}: :cookie:")
         else:
-            await ctx.send(f"Voilà pour vous {ctx.author.mention}: :cookie: TEST"
+            await ctx.send(f"Voilà pour vous {ctx.author.mention}: :cookie: TEST")
 
 
 def setup(bot):
