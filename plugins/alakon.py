@@ -31,16 +31,17 @@ class Alakon(commands.Cog):
 
     # Commande /imitate
     @commands.command(name="imitate")
-    async def imitate(self, ctx: commands.Context, *, user: discord.User = None, text):
+    async def imitate(self, ctx: commands.Context, user: discord.User = None, *, text=None):
         """Permet de dire quelque chose sous l'apparence de quelqu'un d'autre"""
 
-        # Créer un webhook à l'image du membre ciblé
-        webhook = await ctx.channel.create_webhook(name=user.name)
-        await webhook.send(content=text, avatar_url=user.avatar_url)
+        if user and text:
+            # Créer un webhook à l'image du membre ciblé
+            webhook = await ctx.channel.create_webhook(name=user.name)
+            await webhook.send(content=text, avatar_url=user.avatar_url)
 
-        # Supprime le message originel ainsi que le webhook
-        await webhook.delete()
-        await ctx.message.delete()
+            # Supprime le message originel ainsi que le webhook
+            await webhook.delete()
+            await ctx.message.delete()
 
 
 
