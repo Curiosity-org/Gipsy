@@ -7,7 +7,6 @@ class tempdelta(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> int:
         d = 0
         found = False
-        # ctx.invoked_with
         for x in [('y', 86400*365), ('w', 604800), ('d', 86400), ('h', 3600), ('m', 60), ('min', 60)]:
             r = re.search(r'^(\d+)'+x[0]+'$', argument)
             if r is not None:
