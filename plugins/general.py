@@ -8,6 +8,7 @@ import psutil
 import os
 from platform import system as system_name  # Returns the system/OS name
 from subprocess import call as system_call  # Execute a shell command
+from git import Repo
 
 
 class General(commands.Cog):
@@ -99,6 +100,7 @@ class General(commands.Cog):
         CPU_INTERVAL = 3.0
         try:
             async with ctx.channel.typing():
+                branch = Repo(os.getcwd()).active_branch
                 len_servers = len(ctx.bot.guilds)
                 users = len(ctx.bot.users)
                 bots = len([None for u in ctx.bot.users if u.bot])
@@ -107,9 +109,10 @@ class General(commands.Cog):
 **Nombre de lignes de code :** {l_count}
 **Version de Python :** {p_v}
 **Version de la bibliothèque `discord.py` :** {d_v}
+**Branche Git actuelle :** {branch}
 **Charge sur la mémoire vive :** {ram} GB
 **Charge sur le CPU :** *calcul en cours*
-**Temps de latence de l'api :** {api} ms""".format(s_count=len_servers, m_count=users, b_count=bots, l_count=self.codelines, p_v=version, d_v=discord.__version__, ram=ram_usage, api=latency,)
+**Temps de latence de l'api :** {api} ms""".format(s_count=len_servers, m_count=users, b_count=bots, l_count=self.codelines, p_v=version, d_v=discord.__version__, branch=branch, ram=ram_usage, api=latency,)
             if isinstance(ctx.channel, discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).embed_links:
                 embed = discord.Embed(title="**Statistiques du bot**", color=8311585, timestamp=ctx.message.created_at, description=d, thumbnail=self.bot.user.avatar_url_as(format="png"))
                 msg = await ctx.send(embed=embed)
