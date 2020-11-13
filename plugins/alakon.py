@@ -1,4 +1,5 @@
 import discord
+import random
 from discord.ext import commands
 
 class Alakon(commands.Cog):
@@ -15,7 +16,7 @@ class Alakon(commands.Cog):
             message = f"Voilà pour vous {user.mention}: :cookie:\nDe la part de {ctx.author.mention}"
         else:
             message = f"Voilà pour vous {ctx.author.mention} :cookie:"
-        webhook = await ctx.channel.create_webhook(name="Villager number 6")
+        webhook = await ctx.channel.create_webhook(name=f"Villager #{random.randint(1, 9)}")
         await webhook.send(content=message, avatar_url="https://d31sxl6qgne2yj.cloudfront.net/wordpress/wp-content/uploads/20190121140737/Minecraft-Villager-Head.jpg")
         await webhook.delete()
         await ctx.message.delete()
