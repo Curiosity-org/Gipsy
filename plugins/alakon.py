@@ -45,5 +45,10 @@ class Alakon(commands.Cog):
 
 
 
+    @commands.command(name="dataja")
+    async def dataja(self, ctx: commands.Context):
+        ctx.send("https://zrunner.me/d-a-t-a/fr.html")
+
+
 def setup(bot):
     bot.add_cog(Alakon(bot))
