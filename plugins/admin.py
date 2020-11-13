@@ -7,7 +7,7 @@ import textwrap
 import traceback
 from contextlib import redirect_stdout
 import checks
-from git import Repo, Remote, exc
+from git import Repo, exc
 
 
 def cleanup_code(content):
