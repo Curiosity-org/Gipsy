@@ -73,27 +73,6 @@ class Alakon(commands.Cog):
         await ctx.message.delete()
 
 
-    # Commande /moveall <MessageID> <MessageID> <Channel>
-    @commands.command(names="move")
-    async def move(self, ctx: commands.Context, msg1: discord.Message, msg2: discord.Message, channel: discord.TextChannel, *, confirm : Bool = True):
-        """Permet de déplacer plusieurs messages d'un seul coup"""
-        if msg1.channel == msg2.channel:
-            if msg1.created_at > msg2.created_at:
-                msg = msg1
-                msg1 = msg2
-                msg2 = msg1
-
-            msgList = await channel.history(limit=1, around=msg1.id).flatten()
-            if len(msgList) == 0:
-                ctx.send("Aucun message trouvé")
-
-            msg = msg1
-            while msg != msg2:
-                move(self, ctx, msg.id, channel, False)
-                await ctx.send(.)
-
-
-
 
 def setup(bot):
     bot.add_cog(Alakon(bot))
