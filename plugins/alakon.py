@@ -5,7 +5,8 @@ from discord.ext import commands
 
 # Déplace un message depuis son salon d'origine vers un salon passé en paramètre, le tout en utilisant un webhook donné
 async def moveMessage(msg, channel, webhook):
-    await webhook.send(content=msg.content, avatar_url=msg.author.avatar_url, username=msg.author.name)
+    files = [await x.to_file() for x in msg.attachments]
+    await webhook.send(content=msg.content, files=files, embeds=msg.embeds, avatar_url=msg.author.avatar_url, username=msg.author.name)
     await msg.delete()
 
 
