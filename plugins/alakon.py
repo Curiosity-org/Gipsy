@@ -51,15 +51,15 @@ class Alakon(commands.Cog):
 
     # Commande /move <MessageID> <Channel>
     @commands.command(names="move")
-    async def move(self, ctx: commands.Context, msg: discord.Message, channel: discord.TextChannel):
+    async def move(self, ctx: commands.Context, msg: discord.Message, channel: discord.TextChannel, *, confirm : Bool = True):
         """Permet de déplacer un message d'un salon à un autre"""
-        if msg and channel:
 
-            # Créé un webhook pour renvoyer le message dans un autre salon
-            webhook = await channel.create_webhook(name=msg.author.name)
-            await webhook.send(content=msg.content, avatar_url=msg.author.avatar_url)
-            await webhook.delete()
+        # Créé un webhook pour renvoyer le message dans un autre salon
+        webhook = await channel.create_webhook(name=msg.author.name)
+        await webhook.send(content=msg.content, avatar_url=msg.author.avatar_url)
+        await webhook.delete()
 
+        if confirm:
             # Créé un embed pour prévenir que le message à été déplacé
             embed = discord.Embed(
                 description=f"{msg.author.mention}, votre message à été déplacé dans {channel.mention}",
@@ -68,9 +68,32 @@ class Alakon(commands.Cog):
             embed.set_footer(text=f"Déplacé par {ctx.author.name}")
             await ctx.send(embed=embed)
 
-            # Supprime la commande ainsi que le message originel
-            await msg.delete()
-            await ctx.message.delete()
+        # Supprime la commande ainsi que le message originel
+        await msg.delete()
+        await ctx.message.delete()
+
+
+    # Commande /moveall <MessageID> <MessageID> <Channel>
+    @commands.command(names="move")
+    async def move(self, ctx: commands.Context, msg1: discord.Message, msg2: discord.Message, channel: discord.TextChannel, *, confirm : Bool = True):
+        """Permet de déplacer plusieurs messages d'un seul coup"""
+        if msg1.channel == msg2.channel:
+            if msg1.created_at > msg2.created_at:
+                msg = msg1
+                msg1 = msg2
+                msg2 = msg1
+
+            msgList = await channel.history(limit=1, around=msg1.id).flatten()
+            if len(msgList) == 0:
+                ctx.send("Aucun message trouvé")
+
+            msg = msg1
+            while msg != msg2:
+                move(self, ctx, msg.id, channel, False)
+                await ctx.send(.)
+
+
+
 
 def setup(bot):
     bot.add_cog(Alakon(bot))
