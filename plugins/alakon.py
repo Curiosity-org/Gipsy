@@ -51,7 +51,7 @@ class Alakon(commands.Cog):
 
     # Commande /move <MessageID> <Channel>
     @commands.command(names="move")
-    async def move(self, ctx: commands.Context, msg: discord.Message, channel: discord.TextChannel, *, confirm : Bool = True):
+    async def move(self, ctx: commands.Context, msg: discord.Message, channel: discord.TextChannel, *, confirm: bool = True):
         """Permet de déplacer un message d'un salon à un autre"""
 
         # Créé un webhook pour renvoyer le message dans un autre salon
