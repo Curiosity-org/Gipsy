@@ -2,11 +2,19 @@ import discord
 import random
 from discord.ext import commands
 
+
+# Déplace un message depuis son salon d'origine vers un salon passé en paramètre, le tout en utilisant un webhook donné
+async def moveMessage(msg, channel, webhook):
+    await webhook.send(content=msg.content, avatar_url=msg.author.avatar_url, username=msg.author.name)
+    await msg.delete()
+
+
 class Alakon(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
         self.file = "alakon"
+
 
     # Commande /cookie
     @commands.command(name="cookie")
@@ -50,13 +58,13 @@ class Alakon(commands.Cog):
 
 
     # Commande /move <MessageID> <Channel>
-    @commands.command(names="move")
-    async def move(self, ctx: commands.Context, msg: discord.Message, channel: discord.TextChannel, *, confirm: bool = True):
+    @commands.command(names="move", aliases=['mv'])
+    async def move(self, ctx: commands.Context, msg: discord.Message, channel: discord.TextChannel, *, confirm = True):
         """Permet de déplacer un message d'un salon à un autre"""
 
         # Créé un webhook pour renvoyer le message dans un autre salon
-        webhook = await channel.create_webhook(name=msg.author.name)
-        await webhook.send(content=msg.content, avatar_url=msg.author.avatar_url)
+        webhook = await channel.create_webhook(name="Gunipy Hook")
+        await moveMessage(msg, channel, webhook)
         await webhook.delete()
 
         if confirm:
@@ -65,12 +73,73 @@ class Alakon(commands.Cog):
                 description=f"{msg.author.mention}, votre message à été déplacé dans {channel.mention}",
                 colour=discord.Colour(51711)
             )
-            embed.set_footer(text=f"Déplacé par {ctx.author.name}")
+            embed.set_footer(text=f"Message déplacé par {ctx.author.name}")
             await ctx.send(embed=embed)
 
-        # Supprime la commande ainsi que le message originel
-        await msg.delete()
+        # Supprime la commande
         await ctx.message.delete()
+
+
+    # Commande /moveall <MessageID> <MessageID> <Channel>
+    @commands.command(names="moveall", aliases=['mva'])
+    async def moveall(self, ctx: commands.Context, msg1: discord.Message, msg2: discord.Message, channel: discord.TextChannel, *, confirm = True):
+        """Permet de déplacer plusieurs messages d'un seul coup"""
+
+        # Vérification des permissions
+        perm1 = ctx.channel.permissions_for(ctx.guild.me)
+        perm2 = channel.permissions_for(ctx.guild.me)
+
+        if not (perm1.read_messages and perm1.read_message_history and perm1.manage_messages and perm2.read_messages and perm2.manage_webhooks):
+            ctx.send("pas les perms >:(")
+            self.bot.log.info(f"Alakon - /moveall: Missing permissions on guild \"{ctx.guild.name}\"")
+            return
+
+        # Création du webhook (commun à tous les messages)
+        webhook = await channel.create_webhook(name="Gunipy Hook")
+
+        # Vérifie que les messages sont dans le même salon
+        if msg1.channel != msg2.channel:
+            ctx.send("Les messages doivent être dans le même salon")
+        else:
+
+            # Fait en sorte que msg1 soit bel et bien le premier message des deux
+            if msg1.created_at > msg2.created_at:
+                msg = msg1
+                msg1 = msg2
+                msg2 = msg1
+
+            # Récupère la liste des messages depuis msg1
+            msgList = await msg1.channel.history(limit=20, after=msg1).flatten()
+            if len(msgList) == 0:
+                ctx.send("Aucun message trouvé")
+            else:
+
+                # Déplace successivement tous les messages de la liste jusqu'à arriver à msg2
+                msg = msg1
+                await moveMessage(msg, channel, webhook)
+
+                i = 0
+                msg = msgList[0]
+                while msg != msg2:
+                    await moveMessage(msg, channel, webhook)
+                    i += 1
+                    msg = msgList[i]
+
+                msg = msg2
+                await moveMessage(msg, channel, webhook)
+
+                if confirm:
+                    # Créé un embed pour prévenir que le message à été déplacé
+                    embed = discord.Embed(
+                        description = f"Plusieurs messages ont été déplacés dans {channel.mention}",
+                        colour = discord.Colour(51711)
+                    )
+                    embed.set_footer(text=f"Messages déplacés par {ctx.author.name}")
+                    await ctx.send(embed=embed)
+                    await ctx.message.delete()
+
+                await webhook.delete()
+
 
 
 
