@@ -46,7 +46,7 @@ class General(commands.Cog):
             msg = f"⚠️ Vous vous trouvez actuellement dans le salon {ctx.channel.mention}, veuillez passer dans le salon {channel.mention} afin de continuer votre discussion"
         else:
             msg = f"⚠️ Vous vous trouvez actuellement dans le salon {ctx.channel.mention}, veuillez passer dans un salon plus approprié afin de continuer votre discussion "
-        if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if ctx.can_send_embed:
             emb = discord.Embed(description=msg, color=discord.Color.red())
             await ctx.send(embed=emb)
         else:
@@ -113,7 +113,7 @@ class General(commands.Cog):
 **Charge sur la mémoire vive :** {ram} GB
 **Charge sur le CPU :** *calcul en cours*
 **Temps de latence de l'api :** {api} ms""".format(s_count=len_servers, m_count=users, b_count=bots, l_count=self.codelines, p_v=version, d_v=discord.__version__, branch=branch, ram=ram_usage, api=latency,)
-            if isinstance(ctx.channel, discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            if ctx.can_send_embed:
                 embed = discord.Embed(title="**Statistiques du bot**", color=8311585, timestamp=ctx.message.created_at, description=d, thumbnail=self.bot.user.avatar_url_as(format="png"))
                 msg = await ctx.send(embed=embed)
                 cpu_usage = py.cpu_percent(CPU_INTERVAL)

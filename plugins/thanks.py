@@ -223,7 +223,7 @@ class Thanks(commands.Cog):
         duration = self.bot.server_configs[ctx.guild.id]['thanks_duration']
         current = [x for x in liste if (datetime.datetime.utcnow() -
                                         x[3]).total_seconds() < duration]
-        if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if ctx.can_send_embed:
             emb = discord.Embed(title=f"Remerciements à {user}")
             if len(current) > 0:
                 t = ["• {} ({})".format(x[2].mention, x[3].strftime("%d/%m/%y %HH%M"))
@@ -293,7 +293,7 @@ class Thanks(commands.Cog):
             [f"{k} remerciements : "+" ".join([f"<@&{r}>" for r in v]) for k, v in roles.items()])
         if text == "":
             text = "Vous n'avez aucun rôle-remerciement configuré"
-        if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if ctx.can_send_embed:
             embed = discord.Embed(
                 title="Liste de vos rôles-remerciements", description=text)
             await ctx.send(embed=embed)

@@ -64,8 +64,9 @@ class Admin(commands.Cog):
     async def git_branches(self, ctx: commands.Context):
         """Montre la liste des branches disponibles"""
         repo = Repo(os.getcwd())
-        branches = " ".join(map(str, repo.branches))
-        await ctx.send("Liste des branches : "+branches)
+        branches = repo.git.branch('-r').split('\n')
+        branches = [x.strip().replace('origin/','') for x in branches[1:]]
+        await ctx.send("Liste des branches : "+" ".join(branches))
 
     @main_msg.command(name='shutdown')
     async def shutdown(self, ctx: commands.Context):
@@ -99,9 +100,9 @@ class Admin(commands.Cog):
     @commands.guild_only()
     async def clean(self, ctx: commands.Context, limit: int):
         """Enleve <x> messages"""
-        if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+        if not ctx.bot_permissions.manage_messages:
             await ctx.send("Il me manque la permission de gérer les messages")
-        elif not ctx.channel.permissions_for(ctx.guild.me).read_message_history:
+        elif not ctx.bot_permissions.read_message_history:
             await ctx.send("Il me manque la permission de lire l'historique des messages")
         else:
             await ctx.message.delete()

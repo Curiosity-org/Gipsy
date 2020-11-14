@@ -99,7 +99,7 @@ class Perms(commands.Cog):
                     permsl.append(":white_check_mark:" + perm)
                 else:
                     permsl.append(":x:" + perm)
-        if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+        if ctx.can_send_embed:
             # \uFEFF is a Zero-Width Space, which basically allows us to have an empty field name.
             # And to make it look nice, we wrap it in an Embed.
             desc = "Permissions générales" if channel is None else channel.mention
