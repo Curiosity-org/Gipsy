@@ -77,18 +77,29 @@ class Giveaways(commands.Cog):
             return None
         return loads(res[0][0])
 
-    def db_add_participant(self, rowID: int, userID: int) -> bool:
+    def db_edit_participant(self, rowID: int, userID: int, add: bool=True) -> bool:
         """
         Add a participant to a giveaway
         rowID: the ID of the giveaway to edit
         userID: the participant ID
+        add: if we should add or remove the user
         Returns: if the operation succeed
         """
         current_participants = self.db_get_users(rowID)
         if current_participants is None:
             # means that the giveaway doesn't exist
             return False
-        current_participants = dumps(current_participants+[userID])
+        if add:
+            if userID in current_participants:
+                # user was already participating
+                return
+            current_participants = dumps(current_participants+[userID])
+        else:
+            try:
+                current_participants.remove(userID)
+            except ValueError:
+                # user was not participating
+                return
         c = self.bot.database.cursor()
         c.execute("UPDATE giveaways SET users=? WHERE rowid=?",
                   (current_participants, rowID))
@@ -291,6 +302,7 @@ class Giveaways(commands.Cog):
                 await status.edit(content="Les gagnants sont : {} ! Félicitations, vous avez gagné {} !".format(" ".join(winners), giveaway))
 
     @giveaway.command(pass_context=True)
+    @commands.cooldown(2, 40, commands.BucketType.user)
     async def enter(self, ctx, *, giveaway):
         """Enter a giveaway.
         Example:
@@ -298,7 +310,6 @@ class Giveaways(commands.Cog):
         if ctx.author.bot:
             await ctx.send("Les bots ne peuvent pas participer à un giveaway !")
             return
-        server = ctx.message.guild
         author = ctx.message.author
 
         giveaways = self.db_get_giveaways(ctx.guild.id)
@@ -315,10 +326,40 @@ class Giveaways(commands.Cog):
         elif not ga['running']:
             await ctx.send("Ce giveaway a été arrêté")
         else:
-            if self.db_add_participant(ga['rowid'], author.id):
+            if self.db_edit_participant(ga['rowid'], author.id):
                 await ctx.send("Vous participez maintenant au giveaway **{}**, bonne chance !".format(ga['name']))
             else:
                 await ctx.send("Oups, quelque chose s'est mal passé pendant l'ajout :confused:")
+    
+    @giveaway.command(pass_context=True)
+    @commands.cooldown(2, 40, commands.BucketType.user)
+    async def leave(self, ctx, *, giveaway):
+        """Leave a giveaway.
+        Example:
+        [p]giveaway leave Minecraft account"""
+        if ctx.author.bot:
+            await ctx.send("Les bots ne peuvent pas participer à un giveaway !")
+            return
+        author = ctx.message.author
+
+        giveaways = self.db_get_giveaways(ctx.guild.id)
+        if len(giveaways) == 0:
+            await ctx.send("Il n'y a aucun giveaway dans ce serveur")
+            return
+        giveaways = [x for x in giveaways if x['name'] == giveaway or str(x['rowid']) == giveaway]
+        if len(giveaways) == 0:
+            await ctx.send("Ce n'est pas un giveaway existant")
+            return
+        ga = giveaways[0]
+        if author.id not in ga['users']:
+            await ctx.send("Vous ne participez déjà pas à ce giveaway !")
+        elif not ga['running']:
+            await ctx.send("Ce giveaway a été arrêté")
+        else:
+            if self.db_edit_participant(ga['rowid'], author.id, add=False):
+                await ctx.send("Vous ne participerez pas au giveaway **{}** !".format(ga['name']))
+            else:
+                await ctx.send("Oups, quelque chose s'est mal passé pendant la modification :confused:")
 
     @giveaway.command(pass_context=True)
     async def list(self, ctx):
