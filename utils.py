@@ -99,6 +99,15 @@ class Gunibot(commands.bot.AutoShardedBot):
         self.config[key] = value
         with open("config.json", 'w', encoding='utf-8') as f:
             json.dump(self.config, f, indent=4)
+    
+    @property
+    def _(self) -> str:
+        """Translate something"""
+        cog = self.get_cog('Languages')
+        if cog is None:
+            self.log.error("Unable to load Languages cog")
+            return lambda *args, **kwargs: args[1]
+        return cog.tr
 
 
 # async def get_prefix(bot, msg):
