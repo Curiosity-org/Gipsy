@@ -5,7 +5,11 @@ import sqlite3
 import json
 import sys
 
+
 class MyContext(commands.Context):
+    """Replacement for the official commands.Context class
+    It allows us to add more methods and properties in the whole bot code"""
+
     @property
     def bot_permissions(self) -> discord.Permissions:
         """Permissions of the bot in the current context"""
@@ -15,30 +19,36 @@ class MyContext(commands.Context):
         else:
             # message in DM
             return self.channel.permissions_for(self.bot)
-        
+
     @property
     def user_permissions(self) -> discord.Permissions:
         """Permissions of the message author in the current context"""
         return self.channel.permissions_for(self.author)
-    
+
     @property
     def can_send_embed(self) -> bool:
         """If the bot has the right permissions to send an embed in the current context"""
         return self.bot_permissions.embed_links
 
+
 class Gunibot(commands.bot.AutoShardedBot):
+    """Bot class, with everything needed to run it"""
 
     def __init__(self, case_insensitive=None, status=None, beta=False, config: dict = None):
         self.config = config
+        # defining allowed default mentions
+        ALLOWED = discord.AllowedMentions(everyone=False, roles=False)
+        # defining intents usage
         intents = discord.Intents.default()
         intents.members = True
+        # we now initialize the bot class
         super().__init__(command_prefix=self.get_prefix, case_insensitive=case_insensitive, status=status,
-                         allowed_mentions=discord.AllowedMentions(everyone=False, roles=False), intents=intents)
-        self.log = logging.getLogger("runner")
-        self.beta = beta
-        self.database = sqlite3.connect('data/database.db')
+                         allowed_mentions=ALLOWED, intents=intents)
+        self.log = logging.getLogger("runner") # logs module
+        self.beta = beta # if the bot is in beta mode
+        self.database = sqlite3.connect('data/database.db') # database connection
         self._update_database_structure()
-    
+
     async def get_context(self, message: discord.Message, *, cls=MyContext):
         """Get a custom context class when creating one from a message"""
         # when you override this method, you pass your new Context
@@ -48,6 +58,7 @@ class Gunibot(commands.bot.AutoShardedBot):
 
     @property
     def server_configs(self):
+        """Guilds configuration manager"""
         return self.get_cog("ConfigCog").confManager
 
     def _update_database_structure(self):
@@ -74,6 +85,7 @@ class Gunibot(commands.bot.AutoShardedBot):
             return '{' + key + '}'
 
     async def get_prefix(self, msg):
+        """Get a prefix from a message... what did you expect?"""
         prefix = None
         if msg.guild is not None:
             prefix = self.server_configs[msg.guild.id]["prefix"]
@@ -93,6 +105,7 @@ class Gunibot(commands.bot.AutoShardedBot):
 #     return commands.when_mentioned_or(bot.config.get("prefix", "?"))(bot, msg)
 
 def setup_logger():
+    """Create the logger module, used for logs"""
     # on chope le premier logger
     log = logging.getLogger("runner")
     # on défini un formatteur
