@@ -1,11 +1,11 @@
 import discord
 from discord.ext import commands
-import checks
+from utils import Gunibot
 
 
 class Template(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "template"
 
