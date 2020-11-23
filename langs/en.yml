@@ -1,0 +1,5 @@
+en:
+  sconfig:
+    option-reset: The `%{opt}` option has been reset!
+    option-notfound: "This configuration option does not exist :confused:"
+    option-edited: The `%{opt}` option has been changed!
