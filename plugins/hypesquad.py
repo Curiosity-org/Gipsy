@@ -24,11 +24,11 @@ class Hypesquad(commands.Cog):
         """Check every 12h the members roles"""
         t1 = time.time()
         self.bot.log.debug("[hypesquad] Started roles check")
-        count = 0 # count of edited members
+        count = 0  # count of edited members
         for g in self.bot.guilds:
             try:
                 roles = await self.get_roles(g)
-                if any(roles.values()): # if at least a role is set
+                if any(roles.values()):  # if at least a role is set
                     for member in g.members:
                         count += await self.edit_roles(member, roles)
             except discord.Forbidden:
@@ -41,7 +41,7 @@ class Hypesquad(commands.Cog):
     async def before_roles_loop(self):
         """Waiting until the bot is ready"""
         await self.bot.wait_until_ready()
-    
+
     @roles_loop.error
     async def error_roles_loop(self, error: Exception):
         """When something went wrong during a loop round"""
@@ -50,7 +50,7 @@ class Hypesquad(commands.Cog):
     async def edit_roles(self, member: discord.Member, roles: dict[str, discord.Role]) -> bool:
         """Add or remove roles to a member based on their hypesquad
         Returns True if a role has been given/removed"""
-        if member.bot: # we don't want bots here
+        if member.bot:  # we don't want bots here
             return False
         roles_list = list(member.roles)
         unwanted = list()
@@ -60,35 +60,42 @@ class Hypesquad(commands.Cog):
                     # add bravery
                     roles_list.append(roles['hs_bravery_role'])
                 # remove brilliance balance none
-                unwanted = (roles['hs_brilliance_role'], roles['hs_balance_role'], roles['hs_none_role'])
+                unwanted = (roles['hs_brilliance_role'],
+                            roles['hs_balance_role'], roles['hs_none_role'])
         elif member.public_flags.hypesquad_brilliance:
             if roles['hs_brilliance_role']:
                 if roles['hs_brilliance_role'] not in member.roles:
                     # add brilliance
                     roles_list.append(roles['hs_brilliance_role'])
                 # remove bravery balance none
-                unwanted = (roles['hs_bravery_role'], roles['hs_balance_role'], roles['hs_none_role'])
+                unwanted = (roles['hs_bravery_role'],
+                            roles['hs_balance_role'], roles['hs_none_role'])
         elif member.public_flags.hypesquad_balance:
             if roles['hs_balance_role']:
                 # add balance
                 if roles['hs_balance_role'] not in member.roles:
                     roles_list.append(roles['hs_balance_role'])
                 # remove brilliance bravery none
-                unwanted = (roles['hs_brilliance_role'], roles['hs_bravery_role'], roles['hs_none_role'])
+                unwanted = (roles['hs_brilliance_role'],
+                            roles['hs_bravery_role'], roles['hs_none_role'])
         elif roles['hs_none_role']:
             if roles['hs_none_role'] not in member.roles:
                 # add none
                 roles_list.append(roles['hs_none_role'])
             # remove brilliance balance bravery
-            unwanted = (roles['hs_brilliance_role'], roles['hs_balance_role'], roles['hs_bravery_role'])
-        roles_list = [r for r in roles_list if r not in unwanted] # we remove unwanted roles
-        roles_list = list(set(roles_list)) # we remove duplicates
-        if set(roles_list) != set(member.roles): # check for any change (set doesn't care about ordering)
+            unwanted = (roles['hs_brilliance_role'],
+                        roles['hs_balance_role'], roles['hs_bravery_role'])
+        # we remove unwanted roles
+        roles_list = [r for r in roles_list if r not in unwanted]
+        # we remove duplicates
+        roles_list = list(set(roles_list))
+        # check for any change (set doesn't care about ordering)
+        if set(roles_list) != set(member.roles):
             # if changes were applied
             await member.edit(roles=roles_list, reason="Hypesquad roles")
             return True
         return False
-    
+
     async def get_roles(self, guild: discord.Guild) -> dict[str, discord.Role]:
         """Get the hypesquads roles according to the guild config"""
         config = self.bot.server_configs[guild.id]
@@ -99,7 +106,7 @@ class Hypesquad(commands.Cog):
             else:
                 result[k] = guild.get_role(config[k])
         return result
-    
+
     @commands.group(name="hypesquad")
     async def hs_main(self, ctx: MyContext):
         """Hypesquads-related commands"""
@@ -127,6 +134,7 @@ class Hypesquad(commands.Cog):
     @hs_main.command()
     async def test(self, ctx):
         return 3/0
+
 
 def setup(bot):
     bot.add_cog(Hypesquad(bot))
