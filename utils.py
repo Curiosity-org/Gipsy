@@ -4,6 +4,7 @@ import logging
 import sqlite3
 import json
 import sys
+from typing import Any, Callable, Coroutine
 
 
 class MyContext(commands.Context):
@@ -101,7 +102,7 @@ class Gunibot(commands.bot.AutoShardedBot):
             json.dump(self.config, f, indent=4)
     
     @property
-    def _(self) -> str:
+    def _(self) -> Callable[[Any, str], Coroutine[Any, Any, Any, str]]:
         """Translate something"""
         cog = self.get_cog('Languages')
         if cog is None:
