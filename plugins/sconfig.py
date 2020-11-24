@@ -7,8 +7,8 @@ import checks
 import args
 from utils import Gunibot, MyContext
 
-roles_config = ('verification_role', 'welcome_roles', 'voice_roles',
-                'contact_roles', 'thanks_allowed_roles')
+roles_config = ('verification_role', 'welcome_roles', 'voice_roles', 'contact_roles',
+                'thanks_allowed_roles', 'hs_bravery_role', 'hs_brilliance_role', 'hs_balance_role', 'hs_none_role')
 channels_config = ('verification_channel', 'logs_channel',
                    'info_channel', 'contact_channel', 'voice_channel')
 categories_config = ('contact_category', 'voices_category')
@@ -313,6 +313,30 @@ class Sconfig(commands.Cog):
         else:  # correct case
             selected = cog.languages.index(lang)
             await ctx.send(await self.edit_config(ctx.guild.id, "language", selected))
+    
+    @main_config.group(name="hypesquad", aliases=['hs'], enabled=False)
+    async def hs_main(self, ctx: MyContext):
+        """Manage options about Discord ypesquads"""
+        if ctx.subcommand_passed is None:
+            await ctx.send_help("config hypesquad")
+    
+    @hs_main.command(name="role")
+    async def hs_role(self, ctx: MyContext, house: str, *, role: discord.Role=None):
+        """Set a role to give to a hypesquad house members
+        Valid houses are: bravery, brilliance, balance and none"""
+        role = role.id if isinstance(role, discord.Role) else None
+        house = house.lower()
+        if house == 'none':
+            await ctx.send(await self.edit_config(ctx.guild.id, "hs_none_role", role))
+        elif house == 'bravery':
+            await ctx.send(await self.edit_config(ctx.guild.id, "hs_bravery_role", role))
+        elif house == 'brilliance':
+            await ctx.send(await self.edit_config(ctx.guild.id, "hs_brilliance_role", role))
+        elif house == 'balance':
+            await ctx.send(await self.edit_config(ctx.guild.id, "hs_balance_role", role))
+        else:
+            await ctx.send(await self.bot._(ctx.guild.id, 'sconfig.hypesquad.unknown'))
+
 
 
 def setup(bot):
