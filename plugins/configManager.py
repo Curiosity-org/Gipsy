@@ -23,7 +23,11 @@ CONFIG_TEMPLATE = {
     "modlogs_flags": 0,
     "thanks_duration": 86400*30,  # 30 days
     "thanks_allowed_roles": None,
-    "language": 0
+    "language": 0,
+    "hs_bravery_role": None,
+    "hs_brilliance_role": None,
+    "hs_balance_role": None,
+    "hs_none_role": None
 }
 
 
