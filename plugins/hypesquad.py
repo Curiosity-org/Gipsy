@@ -46,6 +46,15 @@ class Hypesquad(commands.Cog):
     async def error_roles_loop(self, error: Exception):
         """When something went wrong during a loop round"""
         await self.bot.get_cog("Errors").on_error(error)
+    
+    @commands.Cog.listener()
+    async def on_member_join(self, member: discord.Member):
+        """Give hypesquad houses roles upon joining a server"""
+        if member.bot:
+            return
+        roles = await self.get_roles(member.guild)
+        if any(roles.values()):
+            await self.edit_roles(member, roles)
 
     async def edit_roles(self, member: discord.Member, roles: dict[str, discord.Role]) -> bool:
         """Add or remove roles to a member based on their hypesquad
