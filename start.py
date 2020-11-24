@@ -12,8 +12,8 @@ from discord.ext import commands
 from utils import Gunibot, setup_logger
 
 
-initial_extensions = ["admin", "timeclass", "antikikoo", "contact", "errors", "general", "sconfig",
-                      "configManager", "voices", "logs", "perms", "welcome", "thanks", "groupRoles", "alakon", "giveaways", "languages"]
+initial_extensions = ["admin", "timeclass", "antikikoo", "contact", "errors", "general", "sconfig", "configManager",
+                      "voices", "logs", "perms", "welcome", "thanks", "groupRoles", "alakon", "giveaways", "languages", "hypesquad"]
 
 
 def main():
