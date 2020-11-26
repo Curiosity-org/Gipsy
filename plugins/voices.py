@@ -53,6 +53,13 @@ class VoiceChannels(commands.Cog):
             await member.remove_roles(*roles, reason="Left the voice chat")
         else:
             await member.add_roles(*roles, reason="In a voice chat")
+    
+    @commands.Cog.listener()
+    async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel):
+        """Deletes a voice channel in the database when deleted in Discord"""
+        if isinstance(channel, discord.VoiceChannel):
+            self.db_delete_channel(channel)
+        # other cases are not interesting
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
@@ -63,6 +70,11 @@ class VoiceChannels(commands.Cog):
         if config["voice_channel"] is None:  # si rien n'a été configuré
             return
         if after.channel is not None and after.channel.id == config["voice_channel"]:
+            if before.channel is not None and len(before.channel.members) == 0: # move from another channel which is now empty
+                if (member.guild.id in self.channels.keys()) and (before.channel.id in self.channels[member.guild.id]):
+                    # if they come from an automated channel, we move them back if the channel is now empty
+                    await member.move_to(before.channel)
+                    return
             await self.create_channel(member, config)
         if (before.channel is not None) and (member.guild.id in self.channels.keys()) and (before.channel.id in self.channels[member.guild.id]):
             await self.delete_channel(before.channel)
