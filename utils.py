@@ -102,7 +102,7 @@ class Gunibot(commands.bot.AutoShardedBot):
             json.dump(self.config, f, indent=4)
     
     @property
-    def _(self) -> Callable[[Any, str], Coroutine[Any, Any, Any, str]]:
+    def _(self) -> Callable[[Any, str], Coroutine[Any, Any, str]]:
         """Translate something"""
         cog = self.get_cog('Languages')
         if cog is None:
