@@ -3,6 +3,7 @@ import time
 from discord.ext import commands, tasks
 from utils import Gunibot, MyContext
 from checks import is_roles_manager
+from typing import Dict
 
 
 class Hypesquad(commands.Cog):
@@ -56,7 +57,7 @@ class Hypesquad(commands.Cog):
         if any(roles.values()):
             await self.edit_roles(member, roles)
 
-    async def edit_roles(self, member: discord.Member, roles: dict[str, discord.Role]) -> bool:
+    async def edit_roles(self, member: discord.Member, roles: Dict[str, discord.Role]) -> bool:
         """Add or remove roles to a member based on their hypesquad
         Returns True if a role has been given/removed"""
         if member.bot:  # we don't want bots here
