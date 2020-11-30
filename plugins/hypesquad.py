@@ -106,7 +106,7 @@ class Hypesquad(commands.Cog):
             return True
         return False
 
-    async def get_roles(self, guild: discord.Guild) -> dict[str, discord.Role]:
+    async def get_roles(self, guild: discord.Guild) -> Dict[str, discord.Role]:
         """Get the hypesquads roles according to the guild config"""
         config = self.bot.server_configs[guild.id]
         result = dict()
