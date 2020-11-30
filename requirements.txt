@@ -3,3 +3,4 @@ psutil==5.7
 aiohttp>=3.6
 GitPython>=3.1.8
 python-i18n>=0.3
+PyYAML>=5.3
