@@ -34,6 +34,18 @@ class Alakon(commands.Cog):
 
 
 
+    # Commande /flipacoin
+    @commands.command(name="flipacoin", aliases=['fc'])
+    async def cookie(self, ctx: commands.Context, *, user: discord.User = None):
+        """Flip a coin."""
+        if random.randint(0, 1):
+            await ctx.send("Pile !")
+        else:
+            await ctx.send("Face !")
+
+                    
+
+
     # Commande /imitate
     @commands.command(name="imitate")
     async def imitate(self, ctx: commands.Context, user: discord.User = None, *, text=None):
