@@ -1,17 +1,16 @@
 import discord
 from discord.ext import commands, tasks
 import random
-import traceback
-import re
 import time
 import datetime
 from marshal import loads, dumps
+from utils import Gunibot
 import checks, args
 
 
 class Giveaways(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "giveaways"
         self.internal_task.start()
@@ -200,6 +199,10 @@ class Giveaways(commands.Cog):
             await ctx.send("Le paramètre 'length' ne peut pas être vide")
             return
         settings['ends_at'] = datetime.datetime.fromtimestamp(round(time.time()) + settings['length'])
+        # If the channel is too big, bugs will for sure happen, so we abort
+        if len(settings['channel'].members) > 10000:
+            await ctx.send(await self.bot._(ctx.guild.id, 'giveaways.too-many-members'))
+            return
         # Send embed now
         try:
             emb = discord.Embed(title="New giveaway!", description=settings["name"], timestamp=datetime.datetime.utcnow(

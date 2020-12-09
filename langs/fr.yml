@@ -1,4 +1,6 @@
 fr:
+  giveaways:
+    too-many-members: Ce salon a trop de membres, et le giveaway risque de ne pas y fonctionner ! Veuillez utiliser un autre salon
   hypesquad:
     no-role: Vous n'avez aucun rôle de maison configuré !
     forbidden: Oups, une erreur est survenue. Veuillez vérifier mes permissions !

@@ -1,4 +1,6 @@
 en:
+  giveaways:
+    too-many-members: This channel has too many members, and the giveaway may not work there! Please use another chat
   hypesquad:
     no-role: You don't have any house roles configured!
     forbidden: Oops, an error occurred. Please check my permissions!
