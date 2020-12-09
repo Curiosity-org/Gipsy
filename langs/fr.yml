@@ -1,4 +1,12 @@
 fr:
+  alakon:
+    cookie:
+      give: Voilà pour vous %{to}: :cookie:\nDe la part de %{from}
+      selfcookie: Voilà pour vous %{to}: :cookie:
+    flipacoin:
+      heads: Face !
+      tails: Pile !
+      side: Coté !
   hypesquad:
     no-role: Vous n'avez aucun rôle de maison configuré !
     forbidden: Oups, une erreur est survenue. Veuillez vérifier mes permissions !
