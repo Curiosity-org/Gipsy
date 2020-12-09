@@ -20,17 +20,31 @@ class Alakon(commands.Cog):
     # Commande /cookie
     @commands.command(name="cookie")
     async def cookie(self, ctx: commands.Context, *, user: discord.User = None):
-        """La fonction la plus complexe du bot: donne un cookie à l'utilisateur qui en demande."""
+        """The most usefull command: give a cookie to yourself or someone else."""
         if user:
-            message = f"Voilà pour vous {user.mention}: :cookie:\nDe la part de {ctx.author.mention}"
+            message = await self.bot._(ctx.guild.id, 'alakon.cookie.give', to=user.mention, from=ctx.author.mention)
         else:
-            message = f"Voilà pour vous {ctx.author.mention} :cookie:"
+            message = await self.bot._(ctx.guild.id, 'alakon.cookie.self', to=user.mention)
 
         # Créer un webhook qui prend l'apparence d'un Villageois
         webhook = await ctx.channel.create_webhook(name=f"Villager #{random.randint(1, 9)}")
         await webhook.send(content=message, avatar_url="https://d31sxl6qgne2yj.cloudfront.net/wordpress/wp-content/uploads/20190121140737/Minecraft-Villager-Head.jpg")
         await webhook.delete()
         await ctx.message.delete()
+
+
+
+    # Commande /flipacoin
+    @commands.command(name="flipacoin", aliases=['fc'])
+    async def cookie(self, ctx: commands.Context, *, user: discord.User = None):
+        """Flip a coin."""
+        if random.randint(0, 101):
+            await ctx.send(await self.bot._(ctx.guild.id, 'alakon.flipacoin.side'))
+        elif random.randint(0, 1):
+            await ctx.send(await self.bot._(ctx.guild.id, 'alakon.flipacoin.heads')
+        else:
+            await ctx.send(await self.bot._(ctx.guild.id, 'alakon.flipacoin.tails')
+
 
 
 

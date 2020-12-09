@@ -1,4 +1,12 @@
 en:
+  alakon:
+    cookie:
+      give: Here is for you %{to}: :cookie:\nFrom %{from}
+      self: Here is for you %{to}: :cookie:
+    flipacoin:
+      heads: Heads!
+      tails: Tails!
+      side: Side!
   giveaways:
   creation:
       empty-name: The argument 'nom' cannot be empty!

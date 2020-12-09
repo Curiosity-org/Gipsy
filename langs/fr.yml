@@ -1,4 +1,12 @@
 fr:
+  alakon:
+    cookie:
+      give: Voilà pour vous %{to}: :cookie:\nDe la part de %{from}
+      selfcookie: Voilà pour vous %{to}: :cookie:
+    flipacoin:
+      heads: Face !
+      tails: Pile !
+      side: Coté !
   giveaways:
     creation:
       empty-name: Le paramètre 'nom' ne peut pas être vide !
