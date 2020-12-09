@@ -1,17 +1,17 @@
 import discord
 from discord.ext import commands, tasks
 import random
-import traceback
-import re
 import time
 import datetime
+from typing import List
 from marshal import loads, dumps
+from utils import Gunibot, MyContext
 import checks, args
 
 
 class Giveaways(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "giveaways"
         self.internal_task.start()
@@ -34,7 +34,7 @@ class Giveaways(commands.Cog):
         c.close()
         return rowid
 
-    def db_get_giveaways(self, guildID: int) -> [dict]:
+    def db_get_giveaways(self, guildID: int) -> List[dict]:
         """
         Get giveaways attached to a server
         guildID: the guild (server) ID
@@ -49,7 +49,7 @@ class Giveaways(commands.Cog):
         c.close()
         return res
     
-    def db_get_expired_giveaways(self) -> [dict]:
+    def db_get_expired_giveaways(self) -> List[dict]:
         """
         Get every running giveaway
         Returns: a list of dicts containing the giveaways info
@@ -63,7 +63,7 @@ class Giveaways(commands.Cog):
         c.close()
         return res
 
-    def db_get_users(self, rowID: int) -> [int]:
+    def db_get_users(self, rowID: int) -> List[int]:
         """
         Get the users participating into a giveaway via command
         rowID: the ID of the giveaway to edit
@@ -100,6 +100,7 @@ class Giveaways(commands.Cog):
             except ValueError:
                 # user was not participating
                 return
+            current_participants = dumps(current_participants)
         c = self.bot.database.cursor()
         c.execute("UPDATE giveaways SET users=? WHERE rowid=?",
                   (current_participants, rowID))
@@ -134,153 +135,159 @@ class Giveaways(commands.Cog):
         c.close()
         return deleted
 
-    @commands.group(pass_context=True, aliases=["gaw", "giveaways"])
-    async def giveaway(self, ctx):
+    @commands.group(aliases=["gaw", "giveaways"])
+    async def giveaway(self, ctx: MyContext):
         """Start or stop giveaways."""
         if ctx.subcommand_passed is None:
             await ctx.send_help('giveaways')
 
-    @giveaway.command(pass_context=True)
+    @giveaway.command()
     @commands.check(checks.is_admin)
-    async def start(self, ctx, *, settings):
+    async def start(self, ctx: MyContext, *, settings: str):
         """Start a giveaway
         Usage"
-        [p]giveaway start name: <Giveaway  name>; length: <Time length>; entries: [winners count]; channel: [channel mention]
+        [p]giveaway start name: <Giveaway name>; duration: <Time duration>; entries: [winners count]; channel: [channel mention]
         Giveaway name is mandatory.
-        Length is mandatory.
+        Duration is mandatory.
         Winners count is optional (default 1).
         Channel is optional (default current channel).
 
         Example:
-        [p]giveaway start name: Minecraft account; length: 3d;
-        [p]giveaway start name: Minecraft account; length: 2h; channel: #announcements
-        [p]giveaway start name: Minecraft account; length: 5h 3min; entries: 5"""
+        [p]giveaway start name: Minecraft account; duration: 3d;
+        [p]giveaway start name: Minecraft account; duration: 2h; channel: #announcements
+        [p]giveaway start name: Minecraft account; duration: 5h 3min; entries: 5"""
         i_settings = settings.split("; ")
         existing_giveaways = self.db_get_giveaways(ctx.guild.id)
         existing_giveaways = [x['name'] for x in existing_giveaways]
 
 
         # Setting all of the settings.
-        settings = {"name": "", "length": -1, "channel": ctx.channel, "entries": 1}
+        settings = {"name": "", "duration": -1, "channel": ctx.channel, "entries": 1}
         for setting in i_settings:
             if setting.startswith("name: "):
                 if setting[6:] in existing_giveaways:
-                    await ctx.send("Il y a déjà un giveaway en cours avec ce nom !")
+                    await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.invalid-name"))
                     return
                 else:
                     settings['name'] = setting[6:].strip()
             elif setting.startswith("entries: "):
                 entries = setting.replace("entries: ", "").strip()
                 if (not entries.isnumeric()) or (entries == "0"):
-                    await ctx.send("Le nombre de gagnants doit être un nombre entier")
+                    await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.invalid-winners"))
                     return
                 settings['entries'] = int(entries)
-            elif setting.startswith("length: "):
+            elif setting.startswith("duration: "):
                 total = 0
-                for elem in setting[7:].split():
+                for elem in setting[10:].split():
                     total += await args.tempdelta().convert(ctx, elem)
                 if total > 0:
-                    settings['length'] = total
+                    settings['duration'] = total
             elif setting.startswith("channel: "):
                 try:
                     channel = await commands.TextChannelConverter().convert(ctx, setting.replace('channel: ', ''))
                 except:
-                    await ctx.send("Le paramètre 'salon' n'est pas un salon valide")
+                    await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.invalid-channel"))
                     return
                 perms = channel.permissions_for(ctx.guild.me)
                 if not (perms.send_messages or perms.embed_links):
-                    await ctx.send("Je ne peux pas envoyer d'embeds dans le salon spécifié")
+                    await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.invalid-perms"))
                     return
                 settings['channel'] = channel
         # Checking if mandatory settings are there.
         if settings['name'] == "":
-            await ctx.send("Le paramètre 'nom' ne peut pas être vide")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.empty-name"))
             return
-        if settings['length'] == -1:
-            await ctx.send("Le paramètre 'length' ne peut pas être vide")
+        if settings['duration'] == -1:
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.empty-duration"))
             return
-        settings['ends_at'] = datetime.datetime.fromtimestamp(round(time.time()) + settings['length'])
+        settings['ends_at'] = datetime.datetime.fromtimestamp(round(time.time()) + settings['duration'])
+        # If the channel is too big, bugs will for sure happen, so we abort
+        if len(settings['channel'].members) > 10000:
+            await ctx.send(await self.bot._(ctx.guild.id, 'giveaways.too-many-members'))
+            return
         # Send embed now
         try:
-            emb = discord.Embed(title="New giveaway!", description=settings["name"], timestamp=datetime.datetime.utcnow(
-            )+datetime.timedelta(seconds=settings['length']), color=random.randint(0, 16777215)).set_footer(text="Finit à")
+            title = await self.bot._(ctx.guild.id, "giveaways.embed.title")
+            ends_at = await self.bot._(ctx.guild.id, "giveaways.embed.ends-at")
+            emb = discord.Embed(title=title, description=settings["name"], timestamp=datetime.datetime.utcnow(
+            )+datetime.timedelta(seconds=settings['duration']), color=random.randint(0, 16777215)).set_footer(text=ends_at)
             msg = await settings['channel'].send(embed=emb)
             settings['message'] = msg.id
         except discord.HTTPException as e:
             await self.bot.get_cog("Errors").on_error(e, ctx) # send error logs
-            await ctx.send("Impossible d'envoyer de message dans " + settings['channel'].mention)
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.httpexception", channe=settings['channel'].mention))
             return
         # Save settings in database
         rowid = self.db_add_giveaway(
             settings['channel'], settings['name'], settings['message'], settings['entries'], settings['ends_at'])
         if rowid:
-            await ctx.send("J'ai correctement créé le giveaway **{}** avec l'ID {}".format(settings['name'], rowid))
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.success", name=settings['name'], id=rowid))
         else:
-            await ctx.send("Oups, quelque chose s'est mal passé !")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.something-went-wrong"))
 
-    @giveaway.command(pass_context=True)
+    @giveaway.command()
     @commands.check(checks.is_admin)
-    async def stop(self, ctx, *, giveaway):
+    async def stop(self, ctx: MyContext, *, giveaway: str):
         """Stops a giveaway early so you can pick a winner
         Example:
         [p]giveaway stop Minecraft account"""
         giveaways = self.db_get_giveaways(ctx.guild.id)
         if len(giveaways) == 0:
-            await ctx.send("Il n'y a aucun giveaway dans ce serveur")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
             return
         giveaway = [x for x in giveaways if x['name']
                     == giveaway or str(x['rowid']) == giveaway]
         if len(giveaway) == 0:
-            await ctx.send("Ce n'est pas un giveaway existant, pour voir tous les giveaways vous pouvez utiliser `{}giveaway list`".format(ctx.prefix))
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix))
             return
         giveaway = giveaway[0]
         if not giveaway['running']:
-            await ctx.send("Ce giveaway est déjà arrêté")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.already-stopped"))
             return
         self.db_stop_giveaway(giveaway['rowid'])
         await self.send_results(giveaway, await self.pick_winners(ctx.guild, giveaway))
     
-    @giveaway.command(pass_context=True)
+    @giveaway.command()
     @commands.check(checks.is_admin)
-    async def delete(self, ctx, *, giveaway):
+    async def delete(self, ctx: MyContext, *, giveaway: str):
         """
         Delete a giveaway from the database
         """
         giveaways = self.db_get_giveaways(ctx.guild.id)
         if len(giveaways) == 0:
-            await ctx.send("Il n'y a aucun giveaway dans ce serveur")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
             return
         giveaway = [x for x in giveaways if x['name'] == giveaway or str(x['rowid']) == giveaway]
         if len(giveaway) == 0:
-            await ctx.send("Ce n'est pas un giveaway existant, pour voir tous les giveaways vous pouvez utiliser `{}giveaway list`".format(ctx.prefix))
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix))
             return
         giveaway = giveaway[0]
         if self.db_delete_giveaway(giveaway['rowid']):
-            await ctx.send("Le giveaway a bien été supprimé !")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.success-deleted"))
         else:
-            await ctx.send("Oups, un problème est survenu :confused:")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.something-went-wrong"))
 
-    @giveaway.command(pass_context=True)
+    @giveaway.command()
     @commands.check(checks.is_admin)
-    async def pick(self, ctx, *, giveaway):
+    async def pick(self, ctx: MyContext, *, giveaway: str):
         """Picks winners for the giveaway, which usually should be 1
         Example:
         [p]giveaway pick Minecraft account (This will pick winners from all the people who entered the Minecraft account giveaway)"""
         giveaways = self.db_get_giveaways(ctx.guild.id)
         if len(giveaways) == 0:
-            await ctx.send("Il n'y a aucun giveaway dans ce serveur")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
             return
         giveaway = [x for x in giveaways if x['name'] == giveaway or str(x['rowid']) == giveaway]
         if len(giveaway) == 0:
-            await ctx.send("Ce n'est pas un giveaway existant")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix))
             return
         giveaway = giveaway[0]
         if giveaway['running']:
-            await ctx.send("Ce giveaway est toujours d'actualité, vous pouvez l'arrêter avec `{}giveaway stop {}`".format(ctx.prefix, giveaway['rowid']))
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.not-stopped", p=ctx.prefix, id=giveaway['rowid']))
             return
         users = set(giveaway['users']) | await self.get_users(giveaway['channel'], giveaway['message'])
         if len(users) == 0:
-            await ctx.send("Personne n'a participé à ce concours ! Je vais le détruire")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.picking.no-participant"))
             self.db_delete_giveaway(giveaway['rowid'])
         else:
             amount = min(giveaway['max_entries'], len(users))
@@ -296,14 +303,15 @@ class Giveaways(commands.Cog):
                 else:
                     trials += 1
             self.db_delete_giveaway(giveaway['rowid'])
-            if amount == 1:
-                await status.edit(content="Le gagnant est : {} ! Félicitations, vous avez gagné {} !".format(" ".join(winners), giveaway))
-            else:
-                await status.edit(content="Les gagnants sont : {} ! Félicitations, vous avez gagné {} !".format(" ".join(winners), giveaway))
+            txt = await self.bot._(ctx.guild.id, "giveaways.picking.winners",
+                count=amount,
+                users=" ".join(winners),
+                price=giveaway)
+            await status.edit(content=txt)
 
-    @giveaway.command(pass_context=True)
+    @giveaway.command()
     @commands.cooldown(2, 40, commands.BucketType.user)
-    async def enter(self, ctx, *, giveaway):
+    async def enter(self, ctx: MyContext, *, giveaway: str):
         """Enter a giveaway.
         Example:
         [p]giveaway enter Minecraft account"""
@@ -314,26 +322,26 @@ class Giveaways(commands.Cog):
 
         giveaways = self.db_get_giveaways(ctx.guild.id)
         if len(giveaways) == 0:
-            await ctx.send("Il n'y a aucun giveaway dans ce serveur")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
             return
         giveaways = [x for x in giveaways if x['name'] == giveaway or str(x['rowid']) == giveaway]
         if len(giveaways) == 0:
-            await ctx.send("Ce n'est pas un giveaway existant")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix))
             return
         ga = giveaways[0]
         if author.id in ga['users']:
-            await ctx.send("Vous participez déjà à ce giveaway")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.already-participant"))
         elif not ga['running']:
-            await ctx.send("Ce giveaway a été arrêté")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.been-stopped"))
         else:
             if self.db_edit_participant(ga['rowid'], author.id):
-                await ctx.send("Vous participez maintenant au giveaway **{}**, bonne chance !".format(ga['name']))
+                await ctx.send(await self.bot._(ctx.guild.id, "giveaways.subscribed", name=ga['name']))
             else:
-                await ctx.send("Oups, quelque chose s'est mal passé pendant l'ajout :confused:")
+                await ctx.send(await self.bot._(ctx.guild.id, "giveaways.something-went-wrong"))
     
-    @giveaway.command(pass_context=True)
+    @giveaway.command()
     @commands.cooldown(2, 40, commands.BucketType.user)
-    async def leave(self, ctx, *, giveaway):
+    async def leave(self, ctx: MyContext, *, giveaway: str):
         """Leave a giveaway.
         Example:
         [p]giveaway leave Minecraft account"""
@@ -344,57 +352,59 @@ class Giveaways(commands.Cog):
 
         giveaways = self.db_get_giveaways(ctx.guild.id)
         if len(giveaways) == 0:
-            await ctx.send("Il n'y a aucun giveaway dans ce serveur")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
             return
         giveaways = [x for x in giveaways if x['name'] == giveaway or str(x['rowid']) == giveaway]
         if len(giveaways) == 0:
-            await ctx.send("Ce n'est pas un giveaway existant")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix))
             return
         ga = giveaways[0]
         if author.id not in ga['users']:
-            await ctx.send("Vous ne participez déjà pas à ce giveaway !")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.alread-left"))
         elif not ga['running']:
-            await ctx.send("Ce giveaway a été arrêté")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.been-stopped"))
         else:
             if self.db_edit_participant(ga['rowid'], author.id, add=False):
-                await ctx.send("Vous ne participerez pas au giveaway **{}** !".format(ga['name']))
+                await ctx.send(await self.bot._(ctx.guild.id, "giveaways.success-left", name=ga['name']))
             else:
-                await ctx.send("Oups, quelque chose s'est mal passé pendant la modification :confused:")
+                await ctx.send(await self.bot._(ctx.guild.id, "giveaways.something-went-wrong"))
 
-    @giveaway.command(pass_context=True)
-    async def list(self, ctx):
+    @giveaway.command()
+    async def list(self, ctx: MyContext):
         """Lists all giveaways running in this server"""
         server = ctx.message.guild
         giveaways = self.db_get_giveaways(server.id)
         if len(giveaways) == 0:
-            await ctx.send("Il n'y a aucun giveaway dans ce serveur")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
             return
         else:
             running = [f"{x['rowid']}. {x['name']}" for x in giveaways if x['running']]
             stopped = [f"{x['rowid']}. {x['name']}" for x in giveaways if not x['running']]
             text = ""
             if len(running) > 0:
-                text += "Les giveaways actuellement actifs :\n\t{}".format("\n\t".join(running))
+                text += await self.bot._(ctx.guild.id, "giveaways.list-active")
+                text += "\n\t{}".format("\n\t".join(running))
             if len(stopped) > 0:
                 text += "\n\n" if len(text) > 0 else ""
-                text += "Les giveaways déjà terminés :\n\t{}".format("\n\t".join(stopped))
+                text += await self.bot._(ctx.guild.id, "giveaways.list-inactive")
+                text += "\n\t{}".format("\n\t".join(stopped))
             if len(text) == 0:
-                text = "Il n'y a aucun giveaway dans ce serveur"
+                text = await self.bot._(ctx.guild.id, "giveaways.no-giveaway")
             await ctx.send(text)
 
-    @giveaway.command(pass_context=True)
-    async def info(self, ctx, *, giveaway):
+    @giveaway.command()
+    async def info(self, ctx: MyContext, *, giveaway: str):
         """Get information for a giveaway
         Example:
         [p]giveaway info Minecraft account"""
         server = ctx.message.guild
         giveaways = self.db_get_giveaways(ctx.guild.id)
         if len(giveaways) == 0:
-            await ctx.send("Il n'y a aucun giveaway dans ce serveur")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
             return
         giveaway = [x for x in giveaways if x['name'] == giveaway or str(x['rowid']) == giveaway]
         if len(giveaway) == 0:
-            await ctx.send("Ce n'est pas un giveaway existant")
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix))
             return
         giveaway = giveaway[0]
         entries = len(set(giveaway['users']) | await self.get_users(giveaway['channel'], giveaway['message']))
@@ -402,11 +412,11 @@ class Giveaways(commands.Cog):
         if d1 < d2:
             time_left = await self.bot.get_cog("TimeCog").time_delta(d2, d1, 'fr', precision=0)
         elif d1 == d2:
-            time_left = "Imminent"
+            time_left = await self.bot._(ctx.guild.id, "giveaways.info.soon")
         else:
-            time_left = "Déjà terminé"
+            time_left = await self.bot._(ctx.guild.id, "giveaways.info.ended")
         name = giveaway['name']
-        await ctx.send("Nom : **{}**\nTemps restant : **{}**\nEntrées : **{}**\nSalon : <#{}>".format(name, time_left, entries, giveaway['channel']))
+        await ctx.send(await self.bot._(ctx.guild.id, "giveaways.info.summary", name=name, time=time_left, nbr=entries, channel=giveaway['channel']))
 
     def cog_unload(self):
         self.internal_task.cancel()
@@ -439,22 +449,21 @@ class Giveaways(commands.Cog):
                     users.add(user.id)
         return users
 
-    async def edit_embed(self, channel: discord.TextChannel, message: int, winners: [discord.Member]) -> int:
+    async def edit_embed(self, channel: discord.TextChannel, message: int, winners: List[discord.Member]) -> int:
         """Edit the embed to display results
         Returns the embed color if the embed was found, None else"""
         message: discord.Message = await channel.fetch_message(message)
-        if message is None or message.author != self.bot.user:
-            return None
-        if len(message.embeds) == 0 or message.embeds[0].title != "New giveaway!":
+        if message is None or message.author != self.bot.user or len(message.embeds) == 0:
             return None
         emb: discord.Embed = message.embeds[0]
-        emb.set_footer(text="Ended at")
-        emb.description = "Price: {}\nWon by: {}".format(
-            emb.description, " ".join([x.mention for x in winners]))
+        emb.set_footer(text=await self.bot._(channel, "giveaways.embed.ended-at"))
+        emb.description = await self.bot._(channel, "giveaways.embed.desc",
+            price=emb.description,
+            winners=" ".join([x.mention for x in winners]))
         await message.edit(embed=emb)
         return emb.color
 
-    async def pick_winners(self, guild: discord.Guild, giveaway: dict) -> [discord.Member]:
+    async def pick_winners(self, guild: discord.Guild, giveaway: dict) -> List[discord.Member]:
         """Select the winner of a giveaway, from both participants using the command and using the message reactions
         Returns a list of members"""
         users = set(giveaway['users']) | await self.get_users(giveaway['channel'], giveaway['message'])
@@ -473,7 +482,7 @@ class Giveaways(commands.Cog):
                     trials += 1
         return winners
 
-    async def send_results(self, giveaway: dict, winners: [discord.Member]):
+    async def send_results(self, giveaway: dict, winners: List[discord.Member]):
         """Send the giveaway results in a new embed"""
         self.bot.log.info(f"Giveaway '{giveaway['name']}' has stopped")
         channel: discord.TextChannel = self.bot.get_channel(giveaway['channel'])
@@ -483,12 +492,9 @@ class Giveaways(commands.Cog):
         if emb_color is None:
             # old embed wasn't found, we select a new color
             emb_color = random.randint(0, 16777215)
-        if len(winners) == 0:
-            win = "Il n'y a eu aucun participant :confused:"
-        else:
-            win = "Le gagnant est" if len(winners) == 1 else "Les gagnants sont"
-        emb = discord.Embed(title="Giveaway is over!", description="Price: {}\n\n{} {}".format(
-            giveaway['name'], win, " ".join([x.mention for x in winners])), color=emb_color)
+        win = await self.bot._(channel, "giveaways.embed.winners", count=len(winners), winner=" ".join([x.mention for x in winners]))
+        desc = "{}: {} \n\n{}".format(await self.bot._(channel, "giveaways.embed.price"), giveaway['name'], win)
+        emb = discord.Embed(title="Giveaway is over!", description=desc, color=emb_color)
         await channel.send(embed=emb)
         self.db_delete_giveaway(giveaway['rowid'])
 
