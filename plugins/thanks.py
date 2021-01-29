@@ -13,8 +13,14 @@ class Thanks(commands.Cog):
         self.bot = bot
         self.file = "thanks"
         self.tasks = list()
+        if bot.is_ready():
+            self.schedule_tasks()
+        self.config_options = ['_thanks_cmd',
+                               'thanks_duration', 'thanks_allowed_roles']
+
+    @commands.Cog.listener()
+    async def on_ready(self):
         self.schedule_tasks()
-        self.config_options = ['_thanks_cmd', 'thanks_duration', 'thanks_allowed_roles']
 
     def schedule_tasks(self):
         c = self.bot.database.cursor()
@@ -37,8 +43,8 @@ class Thanks(commands.Cog):
             task.cancel()
         if self.bot.get_cog("Sconfig"):
             self.bot.get_command("config thanks").enabled = False
-    
-    async def _create_config(self, ctx: MyContext, mentions: bool=False) -> List[Tuple[str,str]]:
+
+    async def _create_config(self, ctx: MyContext, mentions: bool = False) -> List[Tuple[str, str]]:
         """Create a list of (key,value) for the /config command"""
         roles: dict = self.db_get_roles(ctx.guild.id)
         result = list()
@@ -143,7 +149,8 @@ class Thanks(commands.Cog):
         """Give or remove thanks roles if needed
         Return True if roles were given/removed, else False"""
         if not member.guild.me.guild_permissions.manage_roles:
-            self.bot.log.info(f"Module - Thanks: Missing \"manage_roles\" permission on guild \"{member.guild.name}\"")
+            self.bot.log.info(
+                f"Module - Thanks: Missing \"manage_roles\" permission on guild \"{member.guild.name}\"")
             return False
         g = member.guild
         pos = g.me.top_role.position
@@ -306,6 +313,7 @@ class Thanks(commands.Cog):
 
     async def thankslevels_list(self, ctx: MyContext):
         roles: dict = self.db_get_roles(ctx.guild.id)
+
         async def g(k: int) -> str:
             return await self.bot._(ctx.guild.id, "thanks.thanks", count=k)
         text = "\n".join(
