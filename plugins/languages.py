@@ -15,6 +15,7 @@ class Languages(commands.Cog):
         self.bot = bot
         self.file = "languages"
         self.languages = ['fr', 'en']
+        self.config_options = ['language']
 
     async def tr(self, ctx, key: str, **kwargs):
         """Translate something

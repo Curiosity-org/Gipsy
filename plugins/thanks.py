@@ -1,3 +1,5 @@
+from typing import Dict, List, Tuple
+from utils import Gunibot, MyContext
 import discord
 import datetime
 import asyncio
@@ -7,13 +9,12 @@ import checks
 
 class Thanks(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "thanks"
         self.tasks = list()
         self.schedule_tasks()
-        if bot.get_cog("Sconfig"):
-            bot.get_command("config thanks").enabled = True
+        self.config_options = ['_thanks_cmd', 'thanks_duration', 'thanks_allowed_roles']
 
     def schedule_tasks(self):
         c = self.bot.database.cursor()
@@ -36,6 +37,19 @@ class Thanks(commands.Cog):
             task.cancel()
         if self.bot.get_cog("Sconfig"):
             self.bot.get_command("config thanks").enabled = False
+    
+    async def _create_config(self, ctx: MyContext, mentions: bool=False) -> List[Tuple[str,str]]:
+        """Create a list of (key,value) for the /config command"""
+        roles: dict = self.db_get_roles(ctx.guild.id)
+        result = list()
+        for k, v in sorted(roles.items()):
+            subroles = [ctx.guild.get_role(r) for r in v]
+            if mentions:
+                subroles = [r.mention for r in subroles if r is not None]
+            else:
+                subroles = [r.name for r in subroles if r is not None]
+            result.append((f"{k} remerciements", " ".join(subroles)))
+        return result
 
     def db_get_user(self, guildID: int, userID: int):
         c = self.bot.database.cursor()
@@ -125,7 +139,7 @@ class Thanks(commands.Cog):
                 return True
         return False
 
-    async def give_remove_roles(self, member: discord.Member, roles_conf: {int: [discord.Role]} = None, duration: int = None) -> bool:
+    async def give_remove_roles(self, member: discord.Member, roles_conf: Dict[int, List[discord.Role]] = None, duration: int = None) -> bool:
         """Give or remove thanks roles if needed
         Return True if roles were given/removed, else False"""
         if not member.guild.me.guild_permissions.manage_roles:
@@ -175,17 +189,17 @@ class Thanks(commands.Cog):
 
     @commands.command(name="thanks", aliases=['thx'])
     @commands.guild_only()
-    async def thanks(self, ctx: commands.Context, *, user: discord.User):
+    async def thanks(self, ctx: MyContext, *, user: discord.User):
         """Thanks a user for their work.
         The user may get a special role, according to your server configuration"""
         if not await self.has_allowed_roles(ctx.guild, ctx.author):
-            await ctx.send("Vous n'avez pas l'autorisation de faire cela")
+            await ctx.send(await self.bot._(ctx.guild.id, "thanks.add.not-allowed"))
             return
         if user.bot:
-            await ctx.send("Les bots ne peuvent pas être remerciés !")
+            await ctx.send(await self.bot._(ctx.guild.id, "thanks.add.no-bot"))
             return
         if user == ctx.author:
-            await ctx.send("Vous ne pouvez pas vous remercier vous-même !")
+            await ctx.send(await self.bot._(ctx.guild.id, "thanks.add.no-self"))
             return
         last = self.db_get_last(ctx.guild.id, user.id, ctx.author.id)
         if last:
@@ -193,12 +207,12 @@ class Thanks(commands.Cog):
                 last[3], "%Y-%m-%d %H:%M:%S")
             delta = datetime.datetime.utcnow() - last_date
             if delta.days < 1:
-                await ctx.send("Vous avez déjà remercié cet utilisateur il y a moins d'un jour !")
+                await ctx.send(await self.bot._(ctx.guild.id, "thanks.add.too-soon"))
                 return
         self.db_add_thanks(ctx.guild.id, user.id, ctx.author.id)
         duration = self.bot.server_configs[ctx.guild.id]['thanks_duration']
         amount = self.db_get_amount(ctx.guild.id, user.id, duration)
-        await ctx.send(f"{user} a bien reçu votre remerciement. Il a maintenant {amount} remerciements actifs !")
+        await ctx.send(await self.bot._(ctx.guild.id, "thanks.add.done", user=user, amount=amount))
         T = self.bot.get_cog("TimeCog").add_task(
             duration, self.reload_roles, ctx.guild.id, user.id, datetime.datetime.utcnow())
         self.tasks.append(T)
@@ -208,14 +222,18 @@ class Thanks(commands.Cog):
 
     @commands.command(name="thankslist", aliases=['thanks-list', 'thxlist'])
     @commands.guild_only()
-    async def thanks_list(self, ctx: commands.Context, *, user: discord.User = None):
+    async def thanks_list(self, ctx: MyContext, *, user: discord.User = None):
         """Get the list of thanks given to a user (or you by default)"""
         you = user is None
         if you:
             user = ctx.author
         liste = self.db_get_user(ctx.guild.id, user.id)
         if liste is None:
-            await ctx.send(("Vous n'avez" if you else "Cet utilisateur n'a") + " jamais reçu de remerciement")
+            if you:
+                txt = await self.bot._(ctx.guild.id, "thanks.list.nothing-you")
+            else:
+                txt = await self.bot._(ctx.guild.id, "thanks.list.nothing-them")
+            await ctx.send(txt)
             return
         for e, l in enumerate(liste):
             liste[e] = [self.bot.get_guild(l[0]), self.bot.get_user(l[1]), self.bot.get_user(
@@ -224,27 +242,31 @@ class Thanks(commands.Cog):
         current = [x for x in liste if (datetime.datetime.utcnow() -
                                         x[3]).total_seconds() < duration]
         if ctx.can_send_embed:
-            emb = discord.Embed(title=f"Remerciements à {user}")
+            _title = await self.bot._(ctx.guild.id, "thanks.list.title", user=user)
+            emb = discord.Embed(title=_title)
             if len(current) > 0:
                 t = ["• {} ({})".format(x[2].mention, x[3].strftime("%d/%m/%y %HH%M"))
                      for x in current]
-                a = len(current)
+                _active = await self.bot._(ctx.guild.id, "thanks.list.active", count=len(current))
                 emb.add_field(
-                    name=f"Remerciements actifs ({a})", value="\n".join(t))
+                    name=_active, value="\n".join(t))
             old = len(liste) - len(current)
             if old > 0:
-                emb.add_field(name="\u200b", value=f"et {old} inactifs")
+                _inactive = await self.bot._(ctx.guild.id, "thanks.list.inactive", count=len(current))
+                emb.add_field(name="\u200b", value=_inactive, inline=False)
             await ctx.send(embed=emb)
         else:
             txt = "```md\n"
             if len(current) > 0:
                 t = ["- {} ({})".format(str(x[2]), x[3].strftime("%d/%m/%y %HH%M"))
                      for x in current]
-                txt += "# Remerciements actifs ({})\n{}\n".format(
+                _active = await self.bot._(ctx.guild.id, "thanks.list.active", count=len(current))
+                txt += "# " + _active + "\n{}\n".format(
                     len(current), "\n".join(t))
             old = len(liste) - len(current)
             if old > 0:
-                txt += f"\net {old} inactifs\n"
+                _inactive = await self.bot._(ctx.guild.id, "thanks.list.inactive", count=len(current))
+                txt += "\n" + _inactive + "\n"
             await ctx.send(txt+"```")
 
     @commands.command(name="thanksreload", aliases=['thanks-reload'])
@@ -255,7 +277,7 @@ class Thanks(commands.Cog):
         users = [user] if user is not None else ctx.guild.members
         users = list(filter(lambda x: not x.bot, users))
         if len(users) == 0:
-            await ctx.send("Aucun membre sélectionné")
+            await ctx.send(await self.bot._(ctx.guild.id, "thanks.reload.no-member"))
             return
         rolesID = self.db_get_roles(ctx.guild.id)
         roles = list()
@@ -263,69 +285,64 @@ class Thanks(commands.Cog):
             roles += [ctx.guild.get_role(x) for x in r]
         roles = list(filter(None, roles))
         if not roles:
-            await ctx.send("Aucun rôle n'a été configuré")
+            await ctx.send(await self.bot._(ctx.guild.id, "thanks.reload.no-role"))
             return
         if not ctx.guild.me.guild_permissions.manage_roles:
-            await ctx.send("Il me manque la permission de Gérer les rôles")
+            await ctx.send(await self.bot._(ctx.guild.id, "thanks.reload.no-perm"))
             return
-        del roles, r
+        del roles
         delta = self.bot.server_configs[ctx.guild.id]['thanks_duration']
         i = 0
         for m in users:
             if await self.give_remove_roles(m, rolesID, delta):
                 i += 1
         if i == 0:
-            if len(users) == 1:
-                await ctx.send("Ce membre n'avait pas besoin de recharger ses rôles")
-            else:
-                await ctx.send("Aucun membre n'avait besoin de recharger ses rôles")
+            txt = await self.bot._(ctx.guild.id, "thanks.reload.nothing-done", count=len(users))
         elif i == 1:
-            if len(users) == 1:
-                await ctx.send("Les rôles de ce membre ont bien été recalculés !")
-            else:
-                await ctx.send("Les rôles d'un membre ont bien été recalculés !")
+            txt = await self.bot._(ctx.guild.id, "thanks.reload.one-done", count=len(users))
         else:
-            await ctx.send(f"Les rôles de {i} membres ont bien été recalculés !")
+            txt = await self.bot._(ctx.guild.id, "thanks.reload.many-done", i=i)
+        await ctx.send(txt)
 
-    async def thankslevels_list(self, ctx: commands.Context):
+    async def thankslevels_list(self, ctx: MyContext):
         roles: dict = self.db_get_roles(ctx.guild.id)
+        async def g(k: int) -> str:
+            return await self.bot._(ctx.guild.id, "thanks.thanks", count=k)
         text = "\n".join(
-            [f"{k} remerciements : "+" ".join([f"<@&{r}>" for r in v]) for k, v in roles.items()])
+            [await g(k)+" ".join([f"<@&{r}>" for r in v]) for k, v in roles.items()])
         if text == "":
-            text = "Vous n'avez aucun rôle-remerciement configuré"
+            text = await self.bot._(ctx.guild.id, "thanks.no-role")
+        _title = await self.bot._(ctx.guild.id, "thanks.roles-list")
         if ctx.can_send_embed:
             embed = discord.Embed(
-                title="Liste de vos rôles-remerciements", description=text)
+                title=_title, description=text)
             await ctx.send(embed=embed)
         else:
-            await ctx.send("__Liste de vos rôles-remerciements :__\n" + text)
+            await ctx.send("__" + _title + ":__\n" + text)
 
     async def thankslevel_add(self, ctx: commands.Context, level: int, role: discord.Role):
         self.db_set_role(ctx.guild.id, role.id, level)
         roles = self.db_get_roles(ctx.guild.id, level)
         if len(roles) == 0:
-            await ctx.send("Oups, il semble que quelque chose se soit mal passé :confused:")
+            await ctx.send(await self.bot._(ctx.guild.id, "thanks.went-wrong"))
             return
         roles = roles[level]
-        if len(roles) == 1:
-            await ctx.send(f"Ce rôle a bien été configuré. Vous avez maintenant 1 rôle configuré pour le niveau {level}")
-        else:
-            await ctx.send(f"Ce rôle a bien été configuré. Vous avez maintenant {len(roles)} rôles configurés pour le niveau {level}")
+        await ctx.send(await self.bot._(ctx.guild.id, "thanks.role-added", count=len(roles), lvl=level))
 
     async def thankslevel_remove(self, ctx: commands.Context, level: int):
         self.db_remove_level(ctx.guild.id, level)
         roles = self.db_get_roles(ctx.guild.id, level)
         if len(roles) == 0:
-            await ctx.send(f"Rôles du niveau {level} supprimés avec succès !")
+            await ctx.send(await self.bot._(ctx.guild.id, "thanks.roles-deleted", lvl=level))
         else:
-            await ctx.send("Oups, il semble que quelque chose se soit mal passé :confused:")
+            await ctx.send(await self.bot._(ctx.guild.id, "thanks.went-wrong"))
 
     async def thankslevel_reset(self, ctx: commands.Context):
         roles = self.db_get_roles(ctx.guild.id)
         if len(roles) == 0:
-            await ctx.send("Vous n'avez aucun rôle-remerciement configuré")
+            await ctx.send(await self.bot._(ctx.guild.id, "thanks.reload.no-role"))
             return
-        msg = await ctx.send("Êtes-vous sûr de vouloir effacer votre configuration ? Cela empêchera les rôles de {} seuils actuellement configurés d'être donnés".format(len(roles)))
+        msg: discord.Message = await ctx.send(await self.bot._(ctx.guild.id, "thanks.confirm", count=len(roles)))
         await msg.add_reaction("✅")
 
         def check(reaction, user):
@@ -333,14 +350,14 @@ class Thanks(commands.Cog):
         try:
             await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
-            await ctx.send('Trop long ! Abandon de la procédure')
+            await ctx.send(await self.bot._(ctx.guild.id, "thanks.too-long"))
             return
         self.db_reset_level(ctx.guild.id)
         roles = self.db_get_roles(ctx.guild.id)
         if len(roles) == 0:
-            await ctx.send(f"Tous les seuils ont bien été effacés !")
+            await ctx.send(await self.bot._(ctx.guild.id, "thanks.everything-deleted"))
         else:
-            await ctx.send("Oups, il semble que quelque chose se soit mal passé :confused:")
+            await ctx.send(await self.bot._(ctx.guild.id, "thanks.went-wrong"))
 
 
 def setup(bot):

@@ -239,16 +239,16 @@ class GroupRoles(commands.Cog):
                 await self.compute_actions(action, list(), all_actions+[action])
         except ConflictingCyclicDependencyError as e:
             timeout = 20
-            await ctx.send("Oups, il semble que cette dépendance puisse entraîner une boucle infinie avec au moins la dépendance suivante : \"{}\"\nSi vous êtes sûr de vouloir continuer, entrez 'oui' dans les {} prochaines secondes".format(e.args[0].to_str(False), timeout))
+            await ctx.send(await self.bot._(ctx.guild.id, "grouproles.infinite", dep=e.args[0].to_str(False), t=timeout))
 
-            def check(m):
-                return m.author == ctx.author and m.channel == ctx.channel and m.content.lower() == "oui"
+            def check(m: discord.Message):
+                return m.author == ctx.author and m.channel == ctx.channel and m.content.lower() in ("oui", "yes")
             try:
                 await self.bot.wait_for('message', check=check, timeout=timeout)
             except asyncio.TimeoutError:
                 return
         actionID = self.db_add_action(action)
-        await ctx.send(f"Une nouvelle action a bien été ajoutée, avec l'ID {actionID} !")
+        await ctx.send(await self.bot._(ctx.guild.id, "grouproles.dep-added",id=actionID))
 
     @rolelink_main.command(name="list")
     @commands.cooldown(1, 10, commands.BucketType.guild)
@@ -256,9 +256,9 @@ class GroupRoles(commands.Cog):
         """List your roles-links"""
         actions = self.db_get_config(ctx.guild.id)
         if not actions:
-            await ctx.send("Vous n'avez aucune dépendance de configurée pour le moment.\nUtilisez la commande `rolelink create` pour en ajouter")
+            await ctx.send(await self.bot._(ctx.guild.id, "grouproles.no-dep", p=ctx.prefix))
             return
-        txt = "**Liste de vos rôles-liaisons :**\n"
+        txt = "**" + await self.bot._(ctx.guild.id, "grouproles.list") + "**\n"
         for action in actions:
             txt += action.to_str() + "\n"
         await ctx.send(txt)
@@ -269,9 +269,9 @@ class GroupRoles(commands.Cog):
         """Delete one of your roles-links"""
         deleted = self.db_delete_action(ctx.guild.id, id)
         if deleted:
-            await ctx.send("Votre rôle-liaison a bien été supprimée !")
+            await ctx.send(await self.bot._(ctx.guild.id, "grouproles.dep-deleted"))
         else:
-            await ctx.send("Impossible de trouver une rôle-liaison avec cet identifiant.\nVous pouvez obtenir l'identifiant d'une liaison avec la commande `rolelink list`")
+            await ctx.send(await self.bot._(ctx.guild.id, "grouproles.dep-notfound", p=ctx.prefix))
 
 
 def setup(bot):

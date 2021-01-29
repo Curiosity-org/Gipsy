@@ -3,7 +3,9 @@ from discord.ext import commands, tasks
 import random
 import time
 import datetime
-from typing import List
+from discord.ext.commands.core import command
+import emoji
+from typing import List, Optional, Union
 from marshal import loads, dumps
 from utils import Gunibot, MyContext
 import checks, args
@@ -14,6 +16,7 @@ class Giveaways(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "giveaways"
+        self.config_options = ['giveaways_emojis']
         self.internal_task.start()
 
     def db_add_giveaway(self, channel: discord.TextChannel, name: str, message: int, max_entries: int, ends_at: datetime.datetime = None) -> int:
@@ -134,6 +137,23 @@ class Giveaways(commands.Cog):
         deleted = c.rowcount == 1
         c.close()
         return deleted
+    
+    async def get_allowed_emojis(self, guildID:int) -> List[Union[discord.Emoji, str]]:
+        """Get a list of allowed emojis for a specific guild"""
+        value = self.bot.server_configs[guildID]['giveaways_emojis']
+        if value is None:
+            return None
+        def emojis_convert(s_emoji:str, bot_emojis:List[discord.Emoji]) -> Union[str, discord.Emoji]:
+            if s_emoji.isnumeric():
+                d_em = discord.utils.get(bot_emojis, id=int(s_emoji))
+                if d_em is not None:
+                    return d_em
+            return emoji.emojize(s_emoji, use_aliases=True)
+        value = [value] if isinstance(value, str) else value
+        result = list(filter(None, [emojis_convert(x, self.bot.emojis) for x in value]))
+        if len(result) >= 0:
+            return result
+        return None
 
     @commands.group(aliases=["gaw", "giveaways"])
     async def giveaway(self, ctx: MyContext):
@@ -210,20 +230,31 @@ class Giveaways(commands.Cog):
             title = await self.bot._(ctx.guild.id, "giveaways.embed.title")
             ends_at = await self.bot._(ctx.guild.id, "giveaways.embed.ends-at")
             emb = discord.Embed(title=title, description=settings["name"], timestamp=datetime.datetime.utcnow(
-            )+datetime.timedelta(seconds=settings['duration']), color=random.randint(0, 16777215)).set_footer(text=ends_at)
-            msg = await settings['channel'].send(embed=emb)
+            )+datetime.timedelta(seconds=settings['duration']), color=discord.Colour.random()).set_footer(text=ends_at)
+            msg: discord.Message = await settings['channel'].send(embed=emb)
             settings['message'] = msg.id
         except discord.HTTPException as e:
             await self.bot.get_cog("Errors").on_error(e, ctx) # send error logs
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.httpexception", channe=settings['channel'].mention))
             return
         # Save settings in database
-        rowid = self.db_add_giveaway(
-            settings['channel'], settings['name'], settings['message'], settings['entries'], settings['ends_at'])
+        rowid = self.db_add_giveaway(settings['channel'], settings['name'], settings['message'], settings['entries'], settings['ends_at'])
         if rowid:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.success", name=settings['name'], id=rowid))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.something-went-wrong"))
+        allowed_emojis = await self.get_allowed_emojis(ctx.guild.id)
+        if allowed_emojis is None:
+            return
+        if msg.channel.permissions_for(ctx.guild.me).add_reactions:
+            try:
+                for emoji in allowed_emojis:
+                    try:
+                        await msg.add_reaction(emoji)
+                    except discord.NotFound:
+                        pass
+            except discord.Forbidden:
+                pass
 
     @giveaway.command()
     @commands.check(checks.is_admin)
@@ -285,7 +316,8 @@ class Giveaways(commands.Cog):
         if giveaway['running']:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.not-stopped", p=ctx.prefix, id=giveaway['rowid']))
             return
-        users = set(giveaway['users']) | await self.get_users(giveaway['channel'], giveaway['message'])
+        allowed_reactions = await self.get_allowed_emojis(ctx.guild.id)
+        users = set(giveaway['users']) | await self.get_users(giveaway['channel'], giveaway['message'], allowed_reactions)
         if len(users) == 0:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.picking.no-participant"))
             self.db_delete_giveaway(giveaway['rowid'])
@@ -397,7 +429,6 @@ class Giveaways(commands.Cog):
         """Get information for a giveaway
         Example:
         [p]giveaway info Minecraft account"""
-        server = ctx.message.guild
         giveaways = self.db_get_giveaways(ctx.guild.id)
         if len(giveaways) == 0:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
@@ -407,7 +438,8 @@ class Giveaways(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix))
             return
         giveaway = giveaway[0]
-        entries = len(set(giveaway['users']) | await self.get_users(giveaway['channel'], giveaway['message']))
+        allowed_reactions = await self.get_allowed_emojis(ctx.guild.id)
+        entries = len(set(giveaway['users']) | await self.get_users(giveaway['channel'], giveaway['message'], allowed_reactions))
         d1, d2 = datetime.datetime.now(), giveaway['ends_at']
         if d1 < d2:
             time_left = await self.bot.get_cog("TimeCog").time_delta(d2, d1, 'fr', precision=0)
@@ -434,7 +466,7 @@ class Giveaways(commands.Cog):
                     await self.bot.get_cog('Errors').on_error(e)
                     self.db_stop_giveaway(giveaway['rowid'])
 
-    async def get_users(self, channel: int, message: int):
+    async def get_users(self, channel: int, message: int, allowed_reactions: Optional[List[Union[discord.Emoji, str]]]):
         """Get users who reacted to a message"""
         channel: discord.TextChannel = self.bot.get_channel(channel)
         if channel is None:
@@ -444,9 +476,10 @@ class Giveaways(commands.Cog):
             return []
         users = set()
         for react in message.reactions:
-            async for user in react.users():
-                if not user.bot:
-                    users.add(user.id)
+            if allowed_reactions is None or react.emoji in allowed_reactions:
+                async for user in react.users():
+                    if not user.bot:
+                        users.add(user.id)
         return users
 
     async def edit_embed(self, channel: discord.TextChannel, message: int, winners: List[discord.Member]) -> int:
@@ -466,7 +499,8 @@ class Giveaways(commands.Cog):
     async def pick_winners(self, guild: discord.Guild, giveaway: dict) -> List[discord.Member]:
         """Select the winner of a giveaway, from both participants using the command and using the message reactions
         Returns a list of members"""
-        users = set(giveaway['users']) | await self.get_users(giveaway['channel'], giveaway['message'])
+        allowed_reactions = await self.get_allowed_emojis(guild.id)
+        users = set(giveaway['users']) | await self.get_users(giveaway['channel'], giveaway['message'], allowed_reactions)
         if len(users) == 0:
             return list()
         else:
@@ -491,7 +525,7 @@ class Giveaways(commands.Cog):
         emb_color = await self.edit_embed(channel, giveaway['message'], winners)
         if emb_color is None:
             # old embed wasn't found, we select a new color
-            emb_color = random.randint(0, 16777215)
+            emb_color = discord.Colour.random()
         win = await self.bot._(channel, "giveaways.embed.winners", count=len(winners), winner=" ".join([x.mention for x in winners]))
         desc = "{}: {} \n\n{}".format(await self.bot._(channel, "giveaways.embed.price"), giveaway['name'], win)
         emb = discord.Embed(title="Giveaway is over!", description=desc, color=emb_color)

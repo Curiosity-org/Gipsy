@@ -12,8 +12,8 @@ from discord.ext import commands
 from utils import Gunibot, setup_logger
 
 
-initial_extensions = ["admin", "timeclass", "antikikoo", "contact", "errors", "general", "sconfig", "configManager",
-                      "voices", "logs", "perms", "welcome", "thanks", "groupRoles", "alakon", "giveaways", "languages", "hypesquad"]
+initial_extensions = ["admin", "timeclass", "antikikoo", "contact", "errors", "general", "sconfig", "configManager", "voices",
+                      "logs", "perms", "welcome", "thanks", "groupRoles", "misc", "messageManager", "giveaways", "languages", "hypesquad", "xp"]
 
 
 def main():
@@ -62,9 +62,10 @@ def main():
             client.run(conf["token_beta"])
     else:
         log.debug("Pas d'arguments trouvés!")
-        if input("Lancer la version stable ? (y/n) ").lower() == "y":
+        instance_type = input("Lancer la version stable ? (y/n) ").lower()
+        if instance_type == "y":
             client.run(conf["token"])
-        else:
+        elif instance_type == 'n':
             client.beta = True
             client.run(conf["token_beta"])
 

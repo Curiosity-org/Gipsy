@@ -1,3 +1,5 @@
+from discord.channel import TextChannel
+from utils import Gunibot, MyContext
 import discord
 from discord.ext import commands
 import checks
@@ -14,28 +16,31 @@ CONFIRM_MESSAGE = """{user} a lu {channel}
 
 
 class Antikikoo(commands.Cog):
-    """Empêche les kikoos de rentrer dans le serveur"""
+    """Prevents kikoos from entering the server"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "antikikoo"
+        self.config_options = ["verification_channel", "info_channel", "pass_message", "verification_add_role", "verification_info_message", "verification_role"]
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
-        """Called when a member joins a guild"""
+        """Called when a member joins a guild
+        Sends a message in the verification channel to inform new users"""
         self.bot.log.info(f"{member} ({member.id}) joined the server")
         config = self.bot.server_configs[member.guild.id]
-        if config["verification_channel"] is None:  # si rien n'a été configuré
+        if config["verification_channel"] is None or config["verification_info_message"] == "None":  # if nothing has been configured
             return
-        verif_channel = self.bot.get_channel(config["verification_channel"])
+        verif_channel: TextChannel = self.bot.get_channel(config["verification_channel"])
         info_channel = "<#{}>".format(config["info_channel"])
-        await verif_channel.send(WELCOME_MESSAGE.format(user=member.mention, channel=info_channel, server=member.guild.name))
+        welcome_msg: str = config["verification_info_message"] or WELCOME_MESSAGE # if config is None, we use the default one
+        await verif_channel.send(welcome_msg.format(user=member.mention, channel=info_channel, server=member.guild.name))
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         """Called for every new message
         We use it to check when someone send the verification message"""
-        if message.guild is None:  # si le message n'est pas dans un serveur
+        if message.guild is None:  # if the message is not in a server
             return
         config = self.bot.server_configs[message.guild.id]
         if message.channel.id != config["verification_channel"]:
@@ -48,7 +53,7 @@ class Antikikoo(commands.Cog):
             try:
                 await message.delete()
             except:
-                self.bot.log.exception(f"Impossible de supprimer le message de vérification")
+                self.bot.log.exception("Cannot delete the verification message")
             verif_role = message.guild.get_role(config["verification_role"])
             if verif_role == None:
                 return
@@ -59,20 +64,31 @@ class Antikikoo(commands.Cog):
                     await message.author.remove_roles(verif_role)
             except:
                 self.bot.log.exception(
-                    f"Impossible de donner ou d'enlever le rôle de vérification au membre {message.author}")
+                    f"Cannot give or take away verification role from member {message.author}")
 
     @commands.group(name="antikikoo", aliases=["ak", "antitroll"])
     @commands.guild_only()
-    async def ak_main(self, ctx: commands.Context):
-        """Configuration du filtre anti-kikoo"""
-        pass
+    async def ak_main(self, ctx: MyContext):
+        """Kikoo filter configuration"""
+        if ctx.subcommand_passed is None:
+            await ctx.send_help('antikikoo')
 
     @ak_main.command(name="channel")
     @commands.check(checks.is_admin)
-    async def ak_channel(self, ctx: commands.Context, channel: discord.TextChannel):
-        """Modifie le salon où les membres devront se vérifier"""
+    async def ak_channel(self, ctx: MyContext, channel: discord.TextChannel):
+        """Modifies the channel where members will have to check themselves"""
         self.bot.server_configs[ctx.guild.id]["verification_channel"] = channel.id
-        await ctx.send("Le salon de vérification est maintenant {} !".format(channel.mention))
+        await ctx.send(await self.bot._(ctx.guild.id, "antikikoo.channel-edited", channel=channel.mention))
+    
+    @ak_main.command(name="info_message")
+    @commands.check(checks.is_admin)
+    async def ak_msg(self, ctx: MyContext, *, message: str = None):
+        """Modifies the informative message sent in the verification channel
+        Put nothing to reset it, or "None" for no message"""
+        if message.lower() == "none":
+            value = "None" # no message
+        self.bot.server_configs[ctx.guild.id]["verification_info_message"] = message
+        await ctx.send(await self.bot._(ctx.guild.id, "antikikoo.msg-edited"))
 
 
 def setup(bot):

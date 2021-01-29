@@ -1,3 +1,4 @@
+from utils import Gunibot
 import discord
 import aiohttp
 import typing
@@ -9,9 +10,11 @@ import checks
 
 class Contact(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "contact"
+        self.config_options = ['contact_channel',
+                               'contact_category', 'contact_roles']
 
     async def urlToByte(self, url: str) -> typing.Optional[bytes]:
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
@@ -54,15 +57,18 @@ class Contact(commands.Cog):
         config = self.bot.server_configs[message.guild.id]
         if message.channel.id != config["contact_channel"]:
             return
-        category: discord.CategoryChannel = self.bot.get_channel(config["contact_category"])
+        category: discord.CategoryChannel = self.bot.get_channel(
+            config["contact_category"])
         channel: discord.TextChannel = discord.utils.get(
             category.text_channels, topic=str(message.author.id))
         if channel is None:
             try:
                 perms = dict()
                 if config["contact_roles"]:
-                    over = discord.PermissionOverwrite(**dict(discord.Permissions.all()))
-                    perms = {message.guild.get_role(x): over for x in config["contact_roles"]}
+                    over = discord.PermissionOverwrite(
+                        **dict(discord.Permissions.all()))
+                    perms = {message.guild.get_role(
+                        x): over for x in config["contact_roles"]}
                     if message.guild.default_role not in perms.keys():
                         perms[message.guild.default_role] = discord.PermissionOverwrite(
                             read_messages=False)
@@ -93,15 +99,15 @@ class Contact(commands.Cog):
     async def ct_clear(self, ctx: commands.Context, days: int = 15):
         """Nettoie tous les salons inutilisés depuix X jours"""
         if days < 1:
-            await ctx.send("Vous ne pouvez pas choisir une durée de moins d'un jour")
+            await ctx.send(await self.bot._(ctx.guild.id, "contact.duration-short"))
             return
         categ_id = self.bot.server_configs[ctx.guild.id]["contact_category"]
         if categ_id is None:
-            await ctx.send("Aucune catégorie de contact n'a été créée !")
+            await ctx.send(await self.bot._(ctx.guild.id, "contact.no-category"))
             return
         categ = ctx.guild.get_channel(categ_id)
         if categ is None:
-            await ctx.send("Impossible de trouver la catégorie de contact ! Vérifiez votre configuration")
+            await ctx.send(await self.bot._(ctx.guild.id, "contact.category-notfound"))
             return
         i = 0  # compteur de suppressions
         errors = list()  # liste des éventuelles erreurs
@@ -121,12 +127,10 @@ class Contact(commands.Cog):
                         errors.append(str(e))
                     else:
                         self.db_delete_channel(ctx.guild.id, data[1])
-        answer = "" if i == 0 else f"{i} salons ont été supprimés !"
+        answer = await self.bot._(ctx.guild.id, "contact.deleted", count=i)
         if len(errors) > 0:
-            answer += "\n{} salons n'ont pu être supprimés :\n • {}".format(
-                len(errors), "\n • ".join(errors))
-        if len(answer) == 0:  # si aucun salon n'a eu besoin d'être supprimé
-            answer = "Aucun salon n'est assez vieux !"
+            answer += "\n" + await self.bot._(ctx.guild.id, "contact.not-deleted", count=len(errors))
+            answer += "\n • {}" + "\n • ".join(errors)
         await ctx.send(answer)
 
 
