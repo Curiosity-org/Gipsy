@@ -1,34 +1,11 @@
 from discord.ext import commands
 from json import load, dump
 import os
+from utils import CONFIG_OPTIONS
 
 CONFIG_FOLDER = "configs"
 
-CONFIG_TEMPLATE = {
-    "prefix": "/",
-    "verification_channel": None,
-    "logs_channel": None,
-    "info_channel": None,
-    "pass_message": None,
-    "verification_role": None,
-    "verification_add_role": True,
-    "contact_channel": None,
-    "contact_category": None,
-    "contact_roles": None,
-    "welcome_roles": None,
-    "voices_category": None,
-    "voice_channel": None,
-    "voice_channel_format": "{random}",
-    "voice_roles": None,
-    "modlogs_flags": 0,
-    "thanks_duration": 86400*30,  # 30 days
-    "thanks_allowed_roles": None,
-    "language": 0,
-    "hs_bravery_role": None,
-    "hs_brilliance_role": None,
-    "hs_balance_role": None,
-    "hs_none_role": None
-}
+CONFIG_TEMPLATE = {k: v['default'] for k, v in CONFIG_OPTIONS.items() if 'default' in v}
 
 
 class serverConfig(dict):

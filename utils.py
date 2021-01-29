@@ -4,7 +4,7 @@ import logging
 import sqlite3
 import json
 import sys
-from typing import Any, Callable, Coroutine
+from typing import Any, Callable, Coroutine, Dict
 
 
 class MyContext(commands.Context):
@@ -48,6 +48,7 @@ class Gunibot(commands.bot.AutoShardedBot):
         self.log = logging.getLogger("runner") # logs module
         self.beta = beta # if the bot is in beta mode
         self.database = sqlite3.connect('data/database.db') # database connection
+        self.database.row_factory = sqlite3.Row
         self._update_database_structure()
 
     async def get_context(self, message: discord.Message, *, cls=MyContext):
@@ -109,6 +110,54 @@ class Gunibot(commands.bot.AutoShardedBot):
             self.log.error("Unable to load Languages cog")
             return lambda *args, **kwargs: args[1]
         return cog.tr
+    
+    def add_cog(self, cog: commands.Cog):
+        """Adds a "cog" to the bot.
+        A cog is a class that has its own event listeners and commands.
+        
+        Parameters
+        -----------
+        cog: :class:`Cog`
+            The cog to register to the bot.
+
+        Raises
+        -------
+        TypeError
+            The cog does not inherit from :class:`Cog`.
+
+        CommandError
+            An error happened during loading.
+        """
+        super().add_cog(cog)
+        for module in self.cogs.values():
+            if type(cog) != type(module):
+                if hasattr(module, 'on_anycog_load'):
+                    try:
+                        module.on_anycog_load(cog)
+                    except:
+                        self.log.warning(f"[add_cog]", exc_info=True)
+    
+    def remove_cog(self, cog: str):
+        """Removes a cog from the bot.
+
+        All registered commands and event listeners that the
+        cog has registered will be removed as well.
+
+        If no cog is found then this method has no effect.
+
+        Parameters
+        -----------
+        name: :class:`str`
+            The name of the cog to remove.
+        """
+        super().remove_cog(cog)
+        for module in self.cogs.values():
+            if type(cog) != type(module):
+                if hasattr(module, 'on_anycog_unload'):
+                    try:
+                        module.on_anycog_unload(cog)
+                    except:
+                        self.log.warning(f"[remove_cog]", exc_info=True)
 
 
 # async def get_prefix(bot, msg):
@@ -151,3 +200,184 @@ def setup_logger():
     # log.addHandler(sentry_handler)
 
     return log
+
+CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {
+    # "config name": {
+    #     'default': 'default value',
+    #     'type': 'config type',
+    #     'command': 'subcommand of the config command',
+    # },
+    "prefix": {
+        'default': "/",
+        'type': 'prefix',
+        'command': 'prefix',
+    },
+    "verification_channel": {
+        'default': None,
+        'type': 'channels',
+        'command': 'verification_channel',
+    },
+    "logs_channel": {
+        'default': None,
+        'type': 'channels',
+        'command': 'logs_channel',
+    },
+    "info_channel": {
+        'default': None,
+        'type': 'channels',
+        'command': 'info_channel',
+    },
+    "pass_message": {
+        'default': None,
+        'type': 'text',
+        'command': 'pass_message',
+    },
+    "verification_role": {
+        'default': None,
+        'type': 'roles',
+        'command': 'verification_role',
+    },
+    "verification_add_role": {
+        'default': True,
+        'type': 'boolean',
+        'command': 'verification_add_role',
+    },
+    "verification_info_message": {
+        'default': None,
+        'type': 'text',
+        'command': 'verification_info_message',
+    },
+    "contact_channel": {
+        'default': None,
+        'type': 'channels',
+        'command': 'contact_channel',
+    },
+    "contact_category": {
+        'default': None,
+        'type': 'categories',
+        'command': 'contact_category',
+    },
+    "contact_roles": {
+        'default': None,
+        'type': 'roles',
+        'command': 'contact_roles',
+    },
+    "welcome_roles": {
+        'default': None,
+        'type': 'roles',
+        'command': 'welcome_roles',
+    },
+    "voices_category": {
+        'default': None,
+        'type': 'categories',
+        'command': 'voices_category',
+    },
+    "voice_channel": {
+        'default': None,
+        'type': 'channels',
+        'command': 'voice_channels',
+    },
+    "voice_channel_format": {
+        'default': "{random}",
+        'type': 'text',
+        'command': 'voice_channel_format',
+    },
+    "voice_roles": {
+        'default': None,
+        'type': 'roles',
+        'command': 'voice_roles',
+    },
+    "modlogs_flags": {
+        'default': 0,
+        'type': 'modlogsFlags',
+        'command': 'modlogs',
+    },
+    "thanks_duration": {
+        'default': 86400*30,  # 30 days
+        'type': 'duration',
+        'command': 'thanks_duration',
+    },
+    "thanks_allowed_roles": {
+        'default': None,
+        'type': 'roles',
+        'command': 'thanks_allowed_roles',
+    },
+    "language": {
+        'default': 0,
+        'type': 'language',
+        'command': 'language',
+    },
+    "hs_bravery_role": {
+        'default': None,
+        'type': 'roles',
+        'command': 'hypesquad',
+    },
+    "hs_brilliance_role": {
+        'default': None,
+        'type': 'roles',
+        'command': 'hypesquad',
+    },
+    "hs_balance_role": {
+        'default': None,
+        'type': 'roles',
+        'command': 'hypesquad',
+    },
+    "hs_none_role": {
+        'default': None,
+        'type': 'roles',
+        'command': 'hypesquad',
+    },
+    "giveaways_emojis": {
+        'default': None,
+        'type': 'emojis',
+        'command': 'giveaways_emoji',
+    },
+    "_thanks_cmd" : {
+        'command': 'thanks',
+    },
+    "enable_xp": {
+        'default': True,
+        'type': 'boolean',
+        'command': 'enable_xp'
+    },
+    "noxp_channels": {
+        'default': None,
+        'type': 'channels',
+        'command': 'noxp_channels'
+    },
+    "levelup_channel": {
+        'default': 'any',
+        'type': 'channels',
+        'command': 'levelup_channel'
+    },
+    "levelup_message": {
+        'default': None,
+        'type': 'text',
+        'command': 'levelup_message'
+    }
+}
+
+def bytes_subtract(x: int, y: int) -> int:
+    """Subtract two ints according to their bits
+    Useful for subtracting byteflags or permissions"""
+  
+    # Iterate till there 
+    # is no carry 
+    while (y != 0): 
+      
+        # borrow contains common  
+        # set bits of y and unset 
+        # bits of x 
+        borrow = (~x) & y 
+          
+        # Subtraction of bits of x 
+        # and y where at least one 
+        # of the bits is not set 
+        x = x ^ y 
+  
+        # Borrow is shifted by one  
+        # so that subtracting it from  
+        # x gives the required sum 
+        y = borrow << 1
+      
+    return x

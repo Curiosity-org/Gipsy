@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-import checks
 import asyncio
 import time
 import sys
@@ -10,10 +9,12 @@ from platform import system as system_name  # Returns the system/OS name
 from subprocess import call as system_call  # Execute a shell command
 from git import Repo
 
+from utils import Gunibot, MyContext
+
 
 class General(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "general"
         self.codelines = 0
@@ -41,11 +42,11 @@ class General(commands.Cog):
 
     
     @commands.command(name='hs')
-    async def hs(self, ctx, channel: discord.TextChannel = None):
+    async def hs(self, ctx: MyContext, channel: discord.TextChannel = None):
         if channel:
-            msg = f"⚠️ Vous vous trouvez actuellement dans le salon {ctx.channel.mention}, veuillez passer dans le salon {channel.mention} afin de continuer votre discussion"
+            msg = await self.bot._(ctx.channel, "general.hs-1", current=ctx.channel.mention, dest=channel.mention)
         else:
-            msg = f"⚠️ Vous vous trouvez actuellement dans le salon {ctx.channel.mention}, veuillez passer dans un salon plus approprié afin de continuer votre discussion "
+            msg = await self.bot._(ctx.channel, "general.hs-2", current=ctx.channel.mention)
         if ctx.can_send_embed:
             emb = discord.Embed(description=msg, color=discord.Color.red())
             await ctx.send(embed=emb)
@@ -53,7 +54,7 @@ class General(commands.Cog):
             await ctx.send(msg)
 
     @commands.command(name="ping")
-    async def rep(self, ctx, ip=None):
+    async def rep(self, ctx: MyContext, ip=None):
         """Get bot latency
         You can also use this command to ping any other server"""
         if ip is None:
@@ -64,7 +65,7 @@ class General(commands.Cog):
             asyncio.run_coroutine_threadsafe(
                 self.ping_adress(ctx, ip), asyncio.get_event_loop())
 
-    async def ping_adress(self, ctx, ip):
+    async def ping_adress(self, ctx: MyContext, ip: str):
         packages = 30
         wait = 0.3
         try:
@@ -81,15 +82,15 @@ class General(commands.Cog):
             return
         if result:
             t = (time.time() - t1 - wait*(packages-1))/(packages)*1000
-            await ctx.send("Pong ! (average of {}ms per 64 byte, sent at {})".format(round(t, 2), ip))
+            await ctx.send(await self.bot._(ctx.channel, "general.ping-success", time=round(t, 2), ip=ip))
         else:
-            await ctx.send("Unable to ping this adress")
+            await ctx.send(await self.bot._(ctx.channel, "general.ping-failed"))
         if m is not None:
             await m.delete()
 
-    @commands.command(name="stats", enabled=True)
+    @commands.command(name="stats")
     @commands.cooldown(2, 60, commands.BucketType.guild)
-    async def stats(self, ctx):
+    async def stats(self, ctx: MyContext):
         """Display some statistics about the bot"""
         v = sys.version_info
         version = str(v.major)+"."+str(v.minor)+"."+str(v.micro)
@@ -104,30 +105,35 @@ class General(commands.Cog):
                 len_servers = len(ctx.bot.guilds)
                 users = len(ctx.bot.users)
                 bots = len([None for u in ctx.bot.users if u.bot])
-                d = """**Nombre de serveurs :** {s_count}
-**Nombre de membres visibles :** {m_count} (dont {b_count} **bots**)
-**Nombre de lignes de code :** {l_count}
-**Version de Python :** {p_v}
-**Version de la bibliothèque `discord.py` :** {d_v}
-**Branche Git actuelle :** {branch}
-**Charge sur la mémoire vive :** {ram} GB
-**Charge sur le CPU :** *calcul en cours*
-**Temps de latence de l'api :** {api} ms""".format(s_count=len_servers, m_count=users, b_count=bots, l_count=self.codelines, p_v=version, d_v=discord.__version__, branch=branch, ram=ram_usage, api=latency,)
+                d = await self.bot._(ctx.channel, "general.stats.servs", c=len_servers)
+                d += "\n" + await self.bot._(ctx.channel, "general.stats.members", c=users, bots=bots)
+                d += "\n" + await self.bot._(ctx.channel, "general.stats.codelines", c=self.codelines)
+                d += "\n" + await self.bot._(ctx.channel, "general.stats.pyver", v=version)
+                d += "\n" + await self.bot._(ctx.channel, "general.stats.diver", v=discord.__version__)
+                d += "\n" + await self.bot._(ctx.channel, "general.stats.git", b=branch)
+                d += "\n" + await self.bot._(ctx.channel, "general.stats.ram", c=ram_usage)
+                cpu_txt = await self.bot._(ctx.channel, "general.stats.cpu-loading")
+                d += "\n" + cpu_txt
+                d += "\n" + await self.bot._(ctx.channel, "general.stats.ping", c=latency)
             if ctx.can_send_embed:
-                embed = discord.Embed(title="**Statistiques du bot**", color=8311585, timestamp=ctx.message.created_at, description=d, thumbnail=self.bot.user.avatar_url_as(format="png"))
-                msg = await ctx.send(embed=embed)
+                title = '**' + await self.bot._(ctx.channel, "general.stats.title") + '**'
+                embed = discord.Embed(title=title, color=8311585, timestamp=ctx.message.created_at, description=d)
+                embed.set_thumbnail(url=self.bot.user.avatar_url)
+                msg: discord.Message = await ctx.send(embed=embed)
                 cpu_usage = py.cpu_percent(CPU_INTERVAL)
-                embed.description = embed.description.replace("*calcul en cours*", f"{cpu_usage} %")
+                cpu_ended = await self.bot._(ctx.channel, "general.stats.cpu-ended", c=cpu_usage)
+                embed.description = embed.description.replace(cpu_txt, cpu_ended)
                 await msg.edit(embed=embed)
             else:
                 msg = await ctx.send(d)
                 cpu_usage = py.cpu_percent(CPU_INTERVAL)
-                d = d.replace("*calcul en cours*", f"{cpu_usage} %")
+                cpu_ended = await self.bot._(ctx.channel, "general.stats.cpu-ended", c=cpu_usage)
+                d = d.replace(cpu_txt, cpu_ended)
                 await msg.edit(content=d)
         except Exception as e:
             await ctx.bot.get_cog("Errors").on_cmd_error(ctx, e)
 
-    @commands.command(name="halp", enabled=True)
+    @commands.command(name="halp", enabled=False)
     async def halp(self, ctx):
         embed = discord.Embed(
             name="Help",

@@ -1,14 +1,63 @@
 en:
-  alakon:
-    cookie:
-      give: Here is for you %{to}: :cookie:\nFrom %{from}
-      self: Here is for you %{to}: :cookie:
-    flipacoin:
-      heads: Heads!
-      tails: Tails!
-      side: Side!
+  antikikoo:
+    channel-edited: The verification channel is now %{channel}!
+    msg-edited: The information message has been successfully modified!
+  contact:
+    duration-short: You cannot select a duration of less than a day
+    no-category: You didn't setup any contact category!
+    category-notfound: Unable to find your contact category! Please check your configuration
+    deleted:
+      zero: No channel is old enough
+      one: One channel has been deleted
+      many: "%{count} channels have been deleted"
+    not-deleted:
+      one: "One channel could not be deleted:"
+      many: "%{count} channels could not be deleted:"
+  errors:
+    convert-failed: "Oops, could not convert %{p} into %{t} :confused:"
+    cooldown: You are in cooldown for this command. Please wait another %{c} seconds...
+    disabled-cmd: The command %{c} is disabled
+    disabled-dm: This command is not available in Direct Messages
+    error-unknown: "Oops, an unknown error occurred :confused: Please contact support for more information"
+    invalid-color: "Colour %{c} is invalid"
+    invalid-dependency: Unknown dependency action type
+    invalid-duration: "%{d} is not a valid duration"
+    invalid-emoji: Invalid emoji
+    invalid-invite: Invalid invite
+    invalid-trigger: Unknown dependency trigger type
+    invalid-type: "%{p} is not a recognised %{t} option"
+    invalid-url: Invalid URL
+    missing-arg: Oops, missing argument %{a}
+    too-many-text-channels: You have too many accessible text channels
+    unknown-arg: Unknown argument
+    unknown-channel: Channel %{c} not found
+    unknown-emoji: "Emoji %{e} not found"
+    unknown-member: "Unable to find member %{m} :confused:"
+    unknown-message: "Unable to find the message message %{m} :confused:"
+    unknown-role: "Unable to find the role %{r} :confused:"
+    unknown-server: Unknown server
+    unknown-user: "Unable to find user %{u} :confused:"
+  general:
+    stats:
+      title: "Bot statistics"
+      servs: "**Server count:** %{c}"
+      members: "**Visible member count:** %{c} (including %{bots} **bots**)"
+      codelines: "**Number of code lines:** %{c}"
+      pyver: "**Python version:** %{v}"
+      diver: "**`discord.py` library version:** %{v}"
+      git: "**Current Git branch:** %{b}"
+      ram: "**Load on the RAM:** %{c} GB"
+      cpu-loading: "**Load on the CPU:** *calculation in progress*"
+      cpu-ended: "**Load on the CPU:** %{c}%%"
+      ping: "**Discord API latency** %{c} ms"
+    hs-1:
+      You are currently in the %{current} channel, please go to the %{dest} channel to continue your discussion
+    hs-2:
+      You are currently in the %{current} channel, please move to a more appropriate channel to continue your discussion
+    ping-success: Pong! Average %{time}ms per 64 bytes, sent at %{ip}.
+    ping-failed: Impossible to ping this address
   giveaways:
-  creation:
+    creation:
       empty-name: The argument 'nom' cannot be empty!
       empty-duration: The argument 'duration' cannot be empty!
       invalid-name: There is already a running giveaway with this name!
@@ -51,14 +100,274 @@ en:
     something-went-wrong: Oops, something went wrong!
     too-many-members: This channel has too many members, and the giveaway may not work there! Please use another chat
     unknown-giveaway: "This giveaway does not exist. To see all the giveaways, you can use `%{p}giveaway list`"
+  grouproles:
+    dep-added: A new dependency has been added, with the ID %{id}
+    dep-deleted: Your role-link has been removed
+    dep-notfound: Cannot find a role-link with this identifier. You can get the identifier of a link with the `%{p}rolelink list` command
+    infinite: "Oops, it seems that this dependency can lead to an infinite loop with at least the following dependency: \"%{dep}\"\nIf you're sure you want to continue, enter 'yes' in the next %{t} seconds..."
+    list: "List of your roles-links:"
+    no-dep: You do not have any dependencies configured at the moment. Use the `%{p}rolelink create` command to add more dependencies
   hypesquad:
     no-role: You don't have any house roles configured!
     forbidden: Oops, an error occurred. Please check my permissions!
     edited: "The roles of %{user} have been changed"
     not-edited: "The roles of %{user} did not need to be changed"
+  logs:
+    msg_delete:
+      title: Message deleted
+      desc: A message from %{author} **has been deleted** in %{channel}
+      content: Content
+    msg_edit:
+      title: Message edited
+      desc: A [message](%{url}) from %{author} **has been edited** in %{channel}
+    bulk_delete:
+      title: Messages deleted
+      desc:
+        one: "%{count} message has been deleted in <#&{channel}>"
+        many: "%{count} messages have been deleted in <#&{channel}>"
+    invite_created:
+      title: Invite created
+      desc: "Invite created to %{channel}"
+      duration: Duration
+      max_uses: Max number of uses
+    invite_delete:
+      title: Invite deleted
+      desc: Invite deleted to %{channel}
+    member_join:
+      title: Member Arrival
+      desc: "%{user} has joined the server"
+      date: "Account created on"
+    member_left:
+      title: Member departure
+      desc: "%{user} has left the server"
+      date: "In the server since"
+    member_ban:
+      title: Member banned
+      desc: The member %{user} has just been banned
+    member_unban:
+      title: Member unbanned
+      desc: The user %{user} is no longer banned
+    member_update:
+      title: Member updated
+      nick: Edited nickname
+      roles_added:
+        one: Added role
+        many: Added roles
+      roles_removed:
+        one: Removed role
+        many: Removed roles
+    voice_move:
+      title: Vocal movement
+      join: The member %{user} has just joined the %{after} channel
+      left: The member %{user} has just left the %{before} channel
+      move: The member %{user} has moved from the %{before} channel to the %{after} channel
+    boost:
+      title-new: New boost
+      title-lost: Boost lost
+      desc-new: Your server has received a new boost!
+      desc-lost: Your server has just lost a boost
+      change: You have gone from the %{before} level to the %{after} level
+    role_created:
+      title: Role created
+      desc: The role %{mention} (%{name}) has just been created
+      pos: "Position:"
+      mentionnable: "Mentionnable:"
+      color: "Color:"
+      hoisted: Hoisted role
+      admin: Administrator permission
+      info: Information
+    role_deleted:
+      title: Role deleted
+      desc: The role %{name} has just been deleted
+      members: "Member count:"
+    role_update:
+      title: Role updated
+      desc: The role %{mention} (%{name}) has just been modified
+      name: "Name:"
+      changes: Changes
+    emoji_update:
+      title: Emoji(s) updated
+      added:
+        one: Emoji added
+        many: Emojis added
+      removed:
+        one: Emoji deleted
+        many: Emojis deleted
+      renamed:
+        one: Emoji renamed
+        many: Emojis renamed
+      restrict:
+        one: Permission change for an emoji
+        many: Permission change for %{count} emojis
+    after: After
+    before: Before
+    _no: "No"
+    _yes: "Yes"
+    footer1: "Author: %{author} • Message ID: %{message}"
+    footer2: "Author: %{author}"
+    footer3: "Member: %{member}"
+  message_manager:
+    move:
+      confirm: "%{user}, your message was moved in %{channel}"
+      footer: "Message moved by %{user}"
+    moveall:
+      channel-conflict: The two mentioned messages must be in the same chat
+      confirm: "Several messages has been moved in %{channel}"
+      footer: "Messages moved by %{user}"
+      missing-perm: "Unable to do this :confused: Please check that I have permission to Read channel, Read message history, Manage messages in this channel, and Read channel, Manage webhooks in the targeted chat"
+      no-msg: No message found
+  misc:
+    cookie:
+      give: "Here is for you %{to}: :cookie:\nFrom %{giver}"
+      self: "Here is for you %{to}: :cookie:"
+    flipacoin:
+      heads: "Heads!"
+      tails: "Tails!"
+      side: "Side!"
+    dataja: "https://zrunner.me/d-a-t-a/en.html"
+  perms:
+    list:
+      add_reactions: Add reactions
+      administrator: Administrator
+      attach_files: Attach files
+      ban_members: Ban members
+      change_nickname: Change nickname
+      connect: Connect
+      create_instant_invite: Create invite
+      deafen_members: Deafen members
+      embed_links: Embed links
+      external_emojis: Use external emoji
+      kick_members: Kick members
+      manage_channels: Manage channels
+      manage_emojis: Manage emojis
+      manage_guild: Mannage server
+      manage_messages: Manage messages
+      manage_nicknames: Manage nicknames
+      manage_roles: Manage roles
+      manage_webhooks: Manage webhooks
+      mention_everyone: Mention everyone, here and all roles
+      move_members: Move members
+      mute_members: Mute members
+      priority_speaker: Priority speaker
+      read_message_history: Read message history
+      read_messages: View channel
+      send_messages: Send messages
+      send_tts_messages: Send Text-to-Speech messages
+      speak: Speak
+      stream: Video
+      use_voice_activation: Use voice activity
+      view_audit_log: View audit log
+      view_guild_insights: View server insights
   sconfig:
+    invalid-emoji: This emoji is invalid. If it is a custom emoji, make sure I'm on its server
+    invalid-duration: Invalid duration
+    invalid-modlogs: Invalid category
+    invalid-language: Invalid language. Please use the `%{p}config language list` command to get the available languages
     option-reset: The `%{opt}` option has been reset!
     option-notfound: "This configuration option does not exist :confused:"
     option-edited: The `%{opt}` option has been changed!
+    prefix-too-long: Your prefix should be less than %{c} characters!
+    config-enabled: Configuration enabled
+    modlogs-channel-enabled: This channel will now be used for your server logs
+    modlogs-help: "This option is not directly editable. You can use the `%{p}config modlogs enable/disable <option>` commands to enable or disable certain logs, and `%{p}config modlogs list` commands to get the list of possible logs."
+    modlogs-enabled: Logs of type %{type} have been activated
+    modlogs-disabled: Logs of type %{type} have been disabled
+    modlogs-list: "List of available logs: %{list}"
+    languages-list: "Available languages: %{list}"
+    backup:
+      ended: That's it, backup complete!
+      nofile: No compatible file found
+      invalidfile: Incompatible file
+      noedit: No change applicable
+      timeout: Too long! Aborting the procedure
+      check:
+        one: Are you sure you want to overwrite your configuration? This will overwrite %{count} option
+        many: Are you sure you want to overwrite your configuration? This will overwrite %{count} options
     hypesquad:
-      unknown: Cette maison est introuvable
+      unknown: This house cannot be found
+    cog-name:
+      Antikikoo: Anti-kikoos
+      Contact: Contact
+      Giveaways: Giveaways
+      Hypesquad: Hypesquads
+      Languages: Languages
+      Logs: Logs
+      Sconfig: Server configuration
+      Thanks: Acknowledgements
+      VoiceChannels: Voice channels
+      Welcome: Welcome
+      XP: XP levels
+  thanks:
+    add:
+      done: "%{user} has received your thanks. They now have %{amount} active thanks!"
+      no-bot: The bots cannot be thanked!
+      no-self: You can't thank yourself!
+      not-allowed: You do not have permission to do that
+      too-soon: You have already thanked this user less than a day ago
+    list:
+      active:
+        one: Active thanks
+        many: Active acknowledgements (%{count})
+      inactive:
+        one: and %{count} inactive
+        many: and %{count} inactive
+      nothing-them: This user has never received a thanks
+      nothing-you: You have never received a thanks
+      title: Acknowledgements to %{user}
+    reload:
+      no-member: No members selected
+      no-perm: I am missing permission to Manage Roles
+      no-role: No roles have been configured
+      nothing-done:
+        one: This member did not need to reload their roles
+        many: None of the members needed to reload their roles
+      one-done:
+        one: The roles of this member have been recalculated
+        many: The roles of one member among the selected %{count} have been recalculated
+      other-done: The roles of %{i} members have been properly recalculated
+    confirm:
+      one: Are you sure you want to delete your configuration? This will prevent the roles of one currently configured threshold from being given
+      many: Are you sure you want to delete your configuration? This will prevent the roles of %{count} thresholds currently configured from being given
+    everything-deleted: All the thresholds have been erased!
+    no-role: You do not have any acknowledgements-role configured
+    role-added:
+      one: This role has been set up correctly. You now have 1 role configured for the level %{lvl}
+      many:
+        This role has been set up correctly. You now have %{count} roles configured for the level %{lvl}
+    roles-deleted: Level %{lvl} roles successfully deleted!
+    roles-list: List of your acknowledgements-roles
+    thanks:
+      one: "1 acknowledgement:"
+      many: "%{count} acknowledgements:"
+    too-long: Too long! Aborting the process
+    went-wrong: "Oops, looks like something went wrong :confused:"
+  voices:
+    no-channel: There is no voice chat room generated by me here
+    result:
+      one: Deleted 1 channel
+      many: Deleted %{count} channels
+  xp:
+    card:
+      level: Level
+      rank: Rank
+    rr:
+      added: The role %{name} has successfully been added to the level %{level}
+      already-exist: A role-level already exists for this level
+      list-title: Server Roles-Levels (%{nbr})
+      no-rr: You do not have any roles configured for this level
+      no-rr-2: You do not have any role configured in this server!
+      reload: "%{count} roles have been assigned or removed on the %{members} members of the server"
+      removed: No more roles will be given for the level %{level}
+    top:
+      title: Server leaderboard
+      name: "Top %{min}-%{max} (page %{page}/%{pmax})"
+      your: Your score
+      low-page: You cannot enter a negative or zero page number
+      high-page: There are not so many pages!
+    bot-rank: Bots can't have xp!
+    cant-manage-roles: Oops, I can't give the roles! Please give me permission to "manage roles" and check that my role is higher than the ones to be given
+    cant-send-embed: Oops, I can't send the result! Please grant me permission to "embed links"
+    default_levelup: Hey, {user} goes to {level}! GG!
+    no-xp-author: You don't have any xp yet
+    no-xp-user: This user has no xp yet
+    xp-disabled: The xp system is disabled here!

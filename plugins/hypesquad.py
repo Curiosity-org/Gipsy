@@ -11,14 +11,8 @@ class Hypesquad(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "hypesquad"
+        self.config_options = ['hs_bravery_role', 'hs_brilliance_role', 'hs_balance_role', 'hs_none_role']
         self.roles_loop.start()
-        if bot.get_cog("Sconfig"):
-            bot.get_command("config hypesquad").enabled = True
-
-    def cog_unload(self):
-        self.roles_loop.cancel()
-        if self.bot.get_cog("Sconfig"):
-            self.bot.get_command("config hypesquad").enabled = False
 
     @tasks.loop(hours=12)
     async def roles_loop(self):
@@ -47,7 +41,7 @@ class Hypesquad(commands.Cog):
     async def error_roles_loop(self, error: Exception):
         """When something went wrong during a loop round"""
         await self.bot.get_cog("Errors").on_error(error)
-    
+
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         """Give hypesquad houses roles upon joining a server"""

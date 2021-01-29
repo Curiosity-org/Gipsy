@@ -1,12 +1,61 @@
 fr:
-  alakon:
-    cookie:
-      give: Voilà pour vous %{to}: :cookie:\nDe la part de %{from}
-      selfcookie: Voilà pour vous %{to}: :cookie:
-    flipacoin:
-      heads: Face !
-      tails: Pile !
-      side: Coté !
+  antikikoo:
+    channel-edited: Le salon de vérification est maintenant %{channel} !
+    msg-edited: Le message d'information a bien été modifié !
+  contact:
+    duration-short: Vous ne pouvez pas choisir une durée de moins d'un jour
+    no-category: Aucune catégorie de contact n'a été configurée !
+    category-notfound: Impossible de trouver la catégorie de contact ! Vérifiez votre configuration
+    deleted:
+      zero: Aucun salon n'est assez vieux
+      one: Un salon a été supprimé
+      many: "%{count} salons ont été supprimés"
+    not-deleted:
+      one: "Un salon n'a pas pu être supprimé :"
+      many: "%{count} salons n'ont pas pu être supprimés :"
+  errors:
+    convert-failed: "Oups, impossible de convertir le paramètre %{p} en type %{t} :confused:"
+    cooldown: Vous êtes en cooldown pour cette commande. Veuillez attendre encore %{c} secondes...
+    disabled-cmd: La commande %{c} est désactivée
+    disabled-dm: Cette commande est indisponible en Messages Privés
+    error-unknown: "Oups, une erreur inconnue est survenue :confused: Veuillez contacter le support pour plus d'informations"
+    invalid-color: "La couleur %{c} est invalide"
+    invalid-dependency: Type de dépendance invalide
+    invalid-duration: "%{d} n'est pas une durée valide"
+    invalid-emoji: Emoji invalide
+    invalid-invite: Invitation invalide
+    invalid-trigger: Type de déclencheur de dépendance invalide
+    invalid-type: "%{p} n'est pas de type %{t}"
+    invalid-url: URL invalide
+    missing-arg: Oups, il manque l'argument %{a}
+    too-many-text-channels: Vous avez trop de salons textuels accessibles
+    unknown-arg: Argument inconnu
+    unknown-channel: Le salon %{c} est introuvable
+    unknown-emoji: "Emoji %{e} introuvable"
+    unknown-member: "Impossible de trouver le membre %{m} :confused:"
+    unknown-message: "Impossible de trouver le message %{m} :confused:"
+    unknown-role: "Impossible de trouver le rôle %{r} :confused:"
+    unknown-server: Serveur introuvable
+    unknown-user: "Impossible de trouver l'utilisateur %{u} :confused:"
+  general:
+    stats:
+      title: "Statistiques du bot"
+      servs: "**Nombre de serveurs :** %{c}"
+      members: "**Nombre de membres visibles :** %{c} (dont %{bots} **bots**)"
+      codelines: "**Nombre de lignes de code :** %{c}"
+      pyver: "**Version de Python :** %{v}"
+      diver: "**Version de la bibliothèque `discord.py` :** %{v}"
+      git: "**Branche Git actuelle :** %{b}"
+      ram: "**Charge sur la mémoire vive :** %{c} GB"
+      cpu-loading: "**Charge sur le CPU :** *calcul en cours*"
+      cpu-ended: "**Charge sur le CPU :** %{c}%%"
+      ping: "**Temps de latence de l'API Discord :** %{c} ms"
+    hs-1:
+      Vous vous trouvez actuellement dans le salon %{current}, veuillez passer dans le salon %{dest} afin de continuer votre discussion
+    hs-2:
+      Vous vous trouvez actuellement dans le salon %{current}, veuillez passer dans un salon plus approprié afin de continuer votre discussion
+    ping-success: Pong ! Moyenne de %{time}ms par 64 octets, envoyés à %{ip}
+    ping-failed: Impossible de ping cette adresse
   giveaways:
     creation:
       empty-name: Le paramètre 'nom' ne peut pas être vide !
@@ -51,14 +100,274 @@ fr:
     something-went-wrong: Oups, quelque chose s'est mal passé !
     too-many-members: Ce salon a trop de membres, et le giveaway risque de ne pas y fonctionner ! Veuillez utiliser un autre salon
     unknown-giveaway: "Ce giveaway n'existe pas. Pour voir tous les giveaways vous pouvez utiliser `%{p}giveaway list`"
+  grouproles:
+    dep-added: Une nouvelle dépendance a été ajoutée, avec l'ID %{id}
+    dep-deleted: Votre rôle-liaison a bien été supprimée
+    dep-notfound: Impossible de trouver une rôle-liaison avec cet identifiant.\nVous pouvez obtenir l'identifiant d'une liaison avec la commande `%{p}rolelink list`
+    infinite: "Oups, il semble que cette dépendance puisse entraîner une boucle infinie avec au moins la dépendance suivante : \"%{dep}\"\nSi vous êtes sûr de vouloir continuer, entrez 'oui' dans les %{t} prochaines secondes"
+    list: "Liste de vos rôles-liaisons :"
+    no-dep: Vous n'avez aucune dépendance de configurée pour le moment.\nUtilisez la commande `%{p}rolelink create` pour en ajouter
   hypesquad:
     no-role: Vous n'avez aucun rôle de maison configuré !
     forbidden: Oups, une erreur est survenue. Veuillez vérifier mes permissions !
     edited: "Les rôles de %{user} ont bien été modifiés"
     not-edited: "Les rôles de %{user} n'avaient pas besoin d'être modifiés"
+  logs:
+    msg_delete:
+      title: Message supprimé
+      desc: Un message de %{author} **a été supprimé** dans %{channel}
+      content: Contenu
+    msg_edit:
+      title: Message édité
+      desc: Un [message](%{url}) de %{author} **a été édité** dans %{channel}
+    bulk_delete:
+      title: Messages supprimés
+      desc:
+        one: "%{count} message a été supprimé dans <#&{channel}>"
+        many: "%{count} messages ont été supprimés dans <#&{channel}>"
+    invite_created:
+      title: Invitation créée
+      desc: "Invitation créée vers %{channel}"
+      duration: Durée
+      max_uses: Nombre max d'utilisations
+    invite_delete:
+      title: Invitation supprimée
+      desc: Invitation supprimée vers %{channel}
+    member_join:
+      title: Arrivée d'un membre
+      desc: "%{user} a rejoint votre serveur"
+      date: "Compte créé le"
+    member_left:
+      title: Départ d'un membre
+      desc: "%{user} a quitté le serveur"
+      date: "Dans le serveur depuis"
+    member_ban:
+      title: Membre banni
+      desc: Le membre %{user} vient d'être banni
+    member_unban:
+      title: Membre débanni
+      desc: L'utilisateur %{user} n'est plus banni
+    member_update:
+      title: Membre modifié
+      nick: Surnom édité
+      roles_added:
+        one: Rôle ajouté
+        many: Rôles ajoutés
+      roles_removed:
+        one: Rôle enlevé
+        many: Rôles enlevés
+    voice_move:
+      title: Mouvement en vocal
+      join: Le membre %{user} vient de rejoindre le salon %{after}
+      left: Le membre %{user} vient de quitter le salon %{before}
+      move: Le membre %{user} est passé du salon %{before} au salon %{after}
+    boost:
+      title-new: Nouveau boost
+      title-lost: Boost perdu
+      desc-new: Votre serveur a reçu un nouveau boost !
+      desc-lost: Votre serveur vient de perdre un boost
+      change: Vous êtes passé du niveau %{before} au niveau %{after}
+    role_created:
+      title: Rôle créé
+      desc: Le rôle %{mention} (%{name}) vient d'être créé
+      pos: "Position :"
+      mentionnable: "Mentionnable :"
+      color: "Couleur :"
+      hoisted: Rôle affiché séparément
+      admin: Permission administrateur
+      info: Informations
+    role_deleted:
+      title: Rôle supprimé
+      desc: Le rôle %{name} vient d'être supprimé
+      members: "Nombre de membres :"
+    role_update:
+      title: Rôle édité
+      desc: Le rôle %{mention} (%{name}) vient d'être modifié
+      name: "Nom :"
+      changes: Changements
+    emoji_update:
+      title: Emoji(s) mis à jour
+      added:
+        one: Emoji ajouté
+        many: Emojis ajoutés
+      removed:
+        one: Emoji supprimé
+        many: Emojis supprimés
+      renamed:
+        one: Emoji renommé
+        many: Emojis renommés
+      restrict:
+        one: Changement de permissions pour un émoji
+        many: Changement de permissions pour %{count} émojis
+    after: Après
+    before: Avant
+    _no: Non
+    _yes: Oui
+    footer1: "Auteur : %{author} • ID du message : %{message}"
+    footer2: "Auteur : %{author}"
+    footer3: "Membre : %{member}"
+  message_manager:
+    move:
+      confirm: "%{user}, votre message à été déplacé dans %{channel}"
+      footer: "Message déplacé par %{user}"
+    moveall:
+      channel-conflict: Les deux messages cités doivent être dans le même salon
+      confirm: "Plusieurs messages ont été déplacés dans %{channel}"
+      footer: "Messages déplacés par %{user}"
+      missing-perm: "Impossible de faire cela :confused: Vérifiez que je possède la permission de Lire le salon, Lire l'historique des messages, Gérer les messages dans ce salon, et Lire le salon, Gérer les webhooks dans le salon ciblé"
+      no-msg: Aucun message trouvé
+  misc:
+    cookie:
+      give: "Voilà pour vous %{to}: :cookie:\nDe la part de %{giver}"
+      selfcookie: "Voilà pour vous %{to}: :cookie:"
+    flipacoin:
+      heads: "Face !"
+      tails: "Pile !"
+      side: "Coté !"
+    dataja: "https://zrunner.me/d-a-t-a/fr.html"
+  perms:
+    list:
+      add_reactions: Ajouter des réactions
+      administrator: Administrateur
+      attach_files: Joindre des fichiers
+      ban_members: Bannir des membres
+      change_nickname: Changer de pseudo
+      connect: Se connecter
+      create_instant_invite: Créer une invitation
+      deafen_members: Mettre en sourdine des membres
+      embed_links: Intégrer des liens
+      external_emojis: Utiliser des émojis externes
+      kick_members: Expulser des membres
+      manage_channels: Gérer les salons
+      manage_emojis: Gérer les émojis
+      manage_guild: Gérer le serveur
+      manage_messages: Gérer les messages
+      manage_nicknames: Gérer les pseudos
+      manage_roles: Gérer les rôles
+      manage_webhooks: Gérer les webhooks
+      mention_everyone: Mentionner everyone, here et tous les rôles
+      move_members: Déplacer des membres
+      mute_members: Couper le micro de membres
+      priority_speaker: Voix prioritaire
+      read_message_history: Voir les anciens messages
+      read_messages: Voir le salon
+      send_messages: Envoyer des messages
+      send_tts_messages: Envoyer des messages TTS
+      speak: Parler
+      stream: Utiliser la vidéo
+      use_voice_activation: Utiliser la Détection de la voix
+      view_audit_log: Voir les logs du serveur
+      view_guild_insights: Voir les analyses de serveur
   sconfig:
+    invalid-emoji: Cet émoji est invalide. S'il s'agit d'un émoji custom, assurez-vous que je sois dans son serveur
+    invalid-duration: Durée invalide
+    invalid-modlogs: Catégorie invalide
+    invalid-language: Langue invalide ! Utilisez la commande `%{p}config language list` pour obtenir les langues disponibles
     option-reset: L'option `%{opt}` a bien été remise à zéro !
     option-notfound: "Cette option de configuration n'existe pas :confused:"
     option-edited: L'option `%{opt}` a bien été modifiée !
+    prefix-too-long: Le préfixe doit faire moins de %{c} caractères !
+    config-enabled: Configuration activée
+    modlogs-channel-enabled: Ce salon sera maintenant utilisé pour les logs du serveur
+    modlogs-help: "Cette option n'est pas directement modifiable. Vous pouvez utiliser les commandes `%{p}config modlogs enable/disable <option>` pour activer ou désactiver certains logs, et `%{p}config modlogs list` pour avoir la liste des logs possibles."
+    modlogs-enabled: Les logs de type %{type} ont bien été activés
+    modlogs-disabled: Les logs de type %{type} ont bien été désactivés
+    modlogs-list: "Liste des logs disponibles : %{list}"
+    languages-list: "Langues disponibles : %{list}"
+    backup:
+      ended: Et voilà, sauvegarde terminée !
+      nofile: Aucun fichier compatible trouvé
+      invalidfile: Fichier incompatible
+      noedit: Aucune modification appliquable
+      timeout: Trop long ! Abandon de la procédure
+      check:
+        one: Êtes-vous sûr de vouloir écraser votre configuration ? Cela écrasera %{count} option
+        many: Êtes-vous sûr de vouloir écraser votre configuration ? Cela écrasera %{count} options
     hypesquad:
       unknown: Cette maison est introuvable
+    cog-name:
+      Antikikoo: Anti-kikoos
+      Contact: Contact
+      Giveaways: Giveaways
+      Hypesquad: Hypesquads
+      Languages: Langues
+      Logs: Logs
+      Sconfig: Configuration du serveur
+      Thanks: Remerciements
+      VoiceChannels: Salons vocaux
+      Welcome: Bienvenue
+      XP: Niveaux d'XP
+  thanks:
+    add:
+      done: "%{user} a bien reçu votre remerciement. Il a maintenant %{amount} remerciements actifs !"
+      no-bot: Les bots ne peuvent être remerciés !
+      no-self: Vous ne pouvez pas vous remercier vous-même !
+      not-allowed: Vous n'avez pas l'autorisation de faire cela
+      too-soon: Vous avez déjà remercié cet utilisateur il y a moins d'un jour
+    list:
+      active:
+        one: Remerciement actif
+        many: Remerciements actifs (%{count})
+      inactive:
+        one: et 1 inactif
+        many: et %{count} inactifs
+      nothing-them: Cet utilisateur n'a jamais reçu de remerciement
+      nothing-you: Vous n'avez jamais reçu de remerciement
+      title: Remerciements à %{user}
+    reload:
+      no-member: Aucun membre sélectionné
+      no-perm: Il me manque la permission de Gérer les rôles
+      no-role: Aucun rôle n'a été configuré
+      nothing-done:
+        one: Ce membre n'avait pas besoin de recharger ses rôles
+        many: Aucun membre n'avait besoin de recharger ses rôles
+      one-done:
+        one: Les rôles de ce membre ont bien été recalculés
+        many: Les rôles d'un membre parmi les %{count} sélectionnés ont bien été recalculés
+      other-done: Les rôles de %{i} membres ont bien été recalculés
+    confirm:
+      one: Êtes-vous sûr de vouloir effacer votre configuration ? Cela empêchera les rôles d'un seuil actuellement configuré d'être donnés
+      many: Êtes-vous sûr de vouloir effacer votre configuration ? Cela empêchera les rôles de %{count} seuils actuellement configurés d'être donnés
+    everything-deleted: Tous les seuils ont bien été effacés !
+    no-role: Vous n'avez aucun rôle-remerciement configuré
+    role-added:
+      one: Ce rôle a bien été configuré. Vous avez maintenant 1 rôle configuré pour le niveau %{lvl}
+      many:
+        Ce rôle a bien été configuré. Vous avez maintenant %{count} rôles configurés pour le niveau %{lvl}
+    roles-deleted: Rôles du niveau %{lvl} supprimés avec succès !
+    roles-list: Liste de vos rôles-remerciements
+    thanks:
+      one: "1 remerciement :"
+      many: "%{count} remerciements :"
+    too-long: Trop long ! Abandon de la procédure
+    went-wrong: "Oups, il semble que quelque chose se soit mal passé :confused:"
+  voices:
+    no-channel: Il n'y a aucun salon vocal généré par moi ici
+    result:
+      one: Supprimé 1 salon
+      many: Supprimé %{count} salons
+  xp:
+    card:
+      level: Niveau
+      rank: Rang
+    rr:
+      added: Le rôle %{name} a bien été ajouté au niveau %{level}
+      already-exist: Un rôle-niveau existe déjà pour ce niveau
+      list-title: Rôles-niveaux du serveur (%{nbr})
+      no-rr: Vous n'avez aucun rôle configuré pour ce niveau
+      no-rr-2: Vous n'avez aucun rôle configuré dans ce serveur !
+      reload: "%{count} rôles ont été attribués ou enlevés sur les %{members} membres du serveur"
+      removed: Plus aucun rôle ne sera donné pour le niveau %{level}
+    top:
+      title: Classement du serveur
+      name: "Top %{min}-%{max} (page %{page}/%{pmax})"
+      your: Votre classement
+      low-page: Vous ne pouvez pas entrer un numéro de page négatif ou nul
+      high-page: Il n'y a pas autant de pages !
+    bot-rank: Les bots ne peuvent pas avoir de l'xp !
+    cant-manage-roles: Oups, je ne peux pas donner les rôles ! Veuillez m'attribuer la permission "gérer les rôles" et vérifier que mon rôle soit plus haut que ceux à donner
+    cant-send-embed: Oups, je ne peux pas envoyer le résultat ! Veuillez m'attribuer la permission "intégrer des liens"
+    default_levelup: Hey, {user} passe au niveau {level} ! GG !
+    no-xp-author: Vous n'avez encore aucun xp
+    no-xp-user: Cet utilisateur n'a encore aucun xp
+    xp-disabled: Le système d'xp est désactivé ici !

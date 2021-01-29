@@ -1,3 +1,4 @@
+from utils import Gunibot
 import discord
 from discord.ext import commands
 import os
@@ -21,7 +22,7 @@ def cleanup_code(content):
 
 class Admin(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "admin"
         self._last_result = None
@@ -52,7 +53,10 @@ class Admin(commands.Cog):
                 repo.git.checkout(branch)
             except exc.GitCommandError as e:
                 self.bot.log.exception(e)
-                await m.edit(content=m.content+"\nNom de branche invalide - abandon de la procédure")
+                if 'Your local changes to the following files would be overwritten by checkout' in str(e):
+                    await m.edit(content=m.content+"\nCertains fichiers ont été modifiés localement - abandon de la procédure")
+                else:
+                    await m.edit(content=m.content+"\nNom de branche invalide - abandon de la procédure")
                 return
             else:
                 await m.edit(content=m.content+f"\nBranche {branch} correctement sélectionnée")
@@ -224,5 +228,5 @@ class Admin(commands.Cog):
                 await ctx.send(f'```py\n{value}{ret}\n```')
 
 
-def setup(bot):
+def setup(bot: Gunibot):
     bot.add_cog(Admin(bot))

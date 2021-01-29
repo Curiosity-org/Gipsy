@@ -1,46 +1,12 @@
+from utils import Gunibot, MyContext
 import discord
 import typing
 from discord.ext import commands
 
-perms_translations = {
-    "add_reactions": "Ajouter des réactions",
-    "administrator": "Administrateur",
-    "attach_files": "Joindre des fichiers",
-    "ban_members": "Bannir des membres",
-    "change_nickname": "Changer de pseudo",
-    "connect": "Se connecter",
-    "create_instant_invite": "Créer une invitation",
-    "deafen_members": "Mettre en sourdine des membres",
-    "embed_links": "Intégrer des liens",
-    "external_emojis": "Utiliser des émojis externes",
-    "kick_members": "Expulser des membres",
-    "manage_channels": "Gérer les salons",
-    "manage_emojis": "Gérer les émojis",
-    "manage_guild": "Gérer le serveur",
-    "manage_messages": "Gérer les messages",
-    "manage_nicknames": "Gérer les pseudos",
-    "manage_roles": "Gérer les rôles",
-    "manage_webhooks": "Gérer les webhooks",
-    "mention_everyone": "Mentionner tout le monde",
-    "move_members": "Déplacer des membres",
-    "mute_members": "Couper le micro de membres",
-    "priority_speaker": "Voix prioritaire",
-    "read_message_history": "Voir les anciens messages",
-    "read_messages": "Lire les messages",
-    "send_messages": "Envoyer des messages",
-    "send_tts_messages": "Envoyer des messages TTS",
-    "speak": "Parler",
-    "stream": "Passer en direct",
-    "use_voice_activation": "Utiliser la Détection de la voix",
-    "view_audit_log": "Voir les logs du serveur",
-    "view_guild_insights": "Voir les analyses de serveur"
-}
-
-
 class Perms(commands.Cog):
     """Cog with a single command, allowing you to see the permissions of a member or a role in a channel."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "perms"
         chan_perms = [key for key, value in discord.Permissions().all_channel() if value]
@@ -52,11 +18,12 @@ class Perms(commands.Cog):
 
     @commands.command(name='perms', aliases=['permissions'])
     @commands.guild_only()
-    async def check_permissions(self, ctx, channel: typing.Optional[typing.Union[discord.TextChannel, discord.VoiceChannel]] = None, *, target: typing.Union[discord.Member, discord.Role] = None):
+    async def check_permissions(self, ctx: MyContext, channel: typing.Optional[typing.Union[discord.TextChannel, discord.VoiceChannel, discord.CategoryChannel]] = None, *, target: typing.Union[discord.Member, discord.Role] = None):
         """Permissions assigned to a member/role (the user by default)
         The channel used to view permissions is the channel in which the command is entered."""
         if target == None:
             target = ctx.author
+        perms = None
         if isinstance(target, discord.Member):
             if channel == None:
                 perms = target.guild_permissions
@@ -75,30 +42,32 @@ class Perms(commands.Cog):
             avatar = ctx.guild.icon_url_as(format='png', size=256)
             name = str(target)
         permsl = list()
-        # Get the perms translations
+        
+        if perms is None:
+            return
 
-        # if perms[""]
+        async def perms_tr(x) -> str:
+            """Get the translation of a permission"""
+            return await self.bot._(ctx.guild.id, "perms.list."+x)
+
+        # Get the perms translations
         if perms.administrator:
             # If the user is admin, we just say it
-            if "administrator" in perms_translations.keys():
-                perm = perms_translations["administrator"]
-            else:
-                perm = "Administrator"
-            permsl.append(":white_check_mark:" + perm)
+            permsl.append(":white_check_mark: " + await perms_tr('administrator'))
         else:
             # Here we check if the value of each permission is True.
             for perm, value in perms:
                 if (perm not in self.perms_name['text']+self.perms_name['common_channel'] and isinstance(channel, discord.TextChannel)) or (perm not in self.perms_name['voice']+self.perms_name['common_channel'] and isinstance(channel, discord.VoiceChannel)):
                     continue
-                #perm = perm.replace('_',' ').title()
-                if perm in perms_translations.keys():
-                    perm = perms_translations[perm]
-                else:
+                perm = await perms_tr(perm)
+                if 'perms.list.' in perm:
+                    # missing translation
                     perm = perm.replace('_', ' ').title()
+                    self.bot.log.warn(f"[perms] missing permission translation: {perm}")
                 if value:
-                    permsl.append(":white_check_mark:" + perm)
+                    permsl.append(":white_check_mark: " + perm)
                 else:
-                    permsl.append(":x:" + perm)
+                    permsl.append(":x: " + perm)
         if ctx.can_send_embed:
             # \uFEFF is a Zero-Width Space, which basically allows us to have an empty field name.
             # And to make it look nice, we wrap it in an Embed.
