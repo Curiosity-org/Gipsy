@@ -79,7 +79,7 @@ en:
     info:
       soon: Imminent
       ended: Already finished
-      summary: "Name: **%{name}**\nRemaining time: **%{time}**\Participants: **%{nbr}**\Channel: <#%{channel}>"
+      summary: "Name: **%{name}**\nRemaining time: **%{time}**\nParticipants: **%{nbr}**\nChannel: <#%{channel}>"
     picking:
       no-participant: No one has participated in this contest! I will destroy it
       selecting: Selection of winners...
