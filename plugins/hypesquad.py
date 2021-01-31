@@ -135,10 +135,6 @@ class Hypesquad(commands.Cog):
         else:
             await ctx.send(await self.bot._(ctx.guild.id, 'hypesquad.not-edited', user=user))
 
-    @hs_main.command()
-    async def test(self, ctx):
-        return 3/0
-
 
 def setup(bot):
     bot.add_cog(Hypesquad(bot))
