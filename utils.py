@@ -160,8 +160,11 @@ class Gunibot(commands.bot.AutoShardedBot):
                         self.log.warning(f"[remove_cog]", exc_info=True)
 
 
-# async def get_prefix(bot, msg):
-#     return commands.when_mentioned_or(bot.config.get("prefix", "?"))(bot, msg)
+class CheckException(commands.CommandError):
+    """Exception raised when a custom check failed, to send errors when needed"""
+    def __init__(self, id, *args):
+        super().__init__(message=f"Custom check '{id}' failed", *args)
+        self.id = id
 
 def setup_logger():
     """Create the logger module, used for logs"""

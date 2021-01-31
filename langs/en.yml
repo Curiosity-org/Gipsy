@@ -14,6 +14,10 @@ en:
       one: "One channel could not be deleted:"
       many: "%{count} channels could not be deleted:"
   errors:
+    custom_checks:
+      is_admin: You need the "Administrator" permission to do that
+      is_server_manager: "You need the \"Manage server\" permission to use that :confused:"
+      is_roles_manager: You need the "Manage roles" permission for that
     convert-failed: "Oops, could not convert %{p} into %{t} :confused:"
     cooldown: You are in cooldown for this command. Please wait another %{c} seconds...
     disabled-cmd: The command %{c} is disabled

@@ -1,4 +1,4 @@
-from utils import Gunibot, MyContext
+from utils import CheckException, Gunibot, MyContext
 import discord
 import sys
 import traceback
@@ -38,6 +38,8 @@ class Errors(commands.Cog):
                 return
             await ctx.send(await self.bot._(ctx.channel, "errors.cooldown", c=round(error.retry_after, 2)))
             return
+        elif isinstance(error, CheckException):
+            return await ctx.send(await self.bot._(ctx.channel, "errors.custom_checks."+error.id))
         elif isinstance(error, (commands.BadArgument, commands.BadUnionArgument)):
             raw_error = str(error).replace('@eveyrone', '@​everyone').replace('@here', '@​here')
             if str(error) == "Unknown argument":

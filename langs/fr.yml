@@ -14,6 +14,10 @@ fr:
       one: "Un salon n'a pas pu être supprimé :"
       many: "%{count} salons n'ont pas pu être supprimés :"
   errors:
+    custom_checks:
+      is_admin: Il vous faut la permission "Administrateur" pour faire cela
+      is_server_manager: "Il vous faut la permission \"Gérer le serveur\" pour faire cela :confused:"
+      is_roles_manager: Il vous faut la permission de "Gérer les rôles" pour faire cela
     convert-failed: "Oups, impossible de convertir le paramètre %{p} en type %{t} :confused:"
     cooldown: Vous êtes en cooldown pour cette commande. Veuillez attendre encore %{c} secondes...
     disabled-cmd: La commande %{c} est désactivée
