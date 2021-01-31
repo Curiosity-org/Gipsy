@@ -33,7 +33,7 @@ class Misc(commands.Cog):
     #---------------------#
 
     @commands.command(name="flipacoin", aliases=['fc'])
-    async def cookie(self, ctx: MyContext, *, user: discord.User = None):
+    async def flip(self, ctx: MyContext):
         """Flip a coin."""
         a = random.randint(-100, 100)
         if a > 0:
