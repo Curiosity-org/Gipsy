@@ -304,7 +304,7 @@ class XP(commands.Cog):
         """Get the rank of a user
         Set guild=None for global leaderboard"""
         try:
-            query = f"SELECT `userid`,`xp`, rowid AS rank FROM xp WHERE guild = :g ORDER BY xp desc;"
+            query = f"SELECT `userid`,`xp` FROM xp WHERE guild = :g ORDER BY xp desc;"
             cursor = self.bot.database.cursor()
             cursor.execute(query, {'g': guild.id if guild else None})
             userdata = dict()
@@ -317,7 +317,7 @@ class XP(commands.Cog):
                     i += 1
                 if x[0] == userID:
                     userdata = dict(x)
-                    userdata['rank'] = round(x[2])
+                    userdata['rank'] = i
                     break
             cursor.close()
             return userdata
