@@ -371,7 +371,7 @@ en:
     bot-rank: Bots can't have xp!
     cant-manage-roles: Oops, I can't give the roles! Please give me permission to "manage roles" and check that my role is higher than the ones to be given
     cant-send-embed: Oops, I can't send the result! Please grant me permission to "embed links"
-    default_levelup: Hey, {user} goes to {level}! GG!
+    default_levelup: Hey, {user} goes to level {level}! GG!
     no-xp-author: You don't have any xp yet
     no-xp-user: This user has no xp yet
     xp-disabled: The xp system is disabled here!
