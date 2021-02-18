@@ -13,7 +13,7 @@ class VoiceChannels(commands.Cog):
         self.file = "voices"
         self.names = {'random': [], 'asterix': []}
         self.channels = dict()
-        self.config_options = ['voice_channel', 'voice_channel_format', 'voice_roles', 'voice_category']
+        self.config_options = ['voice_channel', 'voice_channel_format', 'voice_roles', 'voices_category']
         self.db_get_channels()
 
     def db_get_channels(self):
