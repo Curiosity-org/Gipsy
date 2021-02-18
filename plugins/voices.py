@@ -13,7 +13,7 @@ class VoiceChannels(commands.Cog):
         self.file = "voices"
         self.names = {'random': [], 'asterix': []}
         self.channels = dict()
-        self.config_options = ['voice_channel', 'voice_channel_format', 'voice_roles']
+        self.config_options = ['voice_channel', 'voice_channel_format', 'voice_roles', 'voice_category']
         self.db_get_channels()
 
     def db_get_channels(self):
@@ -59,7 +59,7 @@ class VoiceChannels(commands.Cog):
             await member.remove_roles(*roles, reason="Left the voice chat")
         else:
             await member.add_roles(*roles, reason="In a voice chat")
-    
+
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel):
         """Deletes a voice channel in the database when deleted in Discord"""
