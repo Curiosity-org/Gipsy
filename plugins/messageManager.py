@@ -81,7 +81,7 @@ class MessageManager(commands.Cog):
     @commands.guild_only()
     async def moveall(self, ctx: commands.Context, msg1: discord.Message, msg2: discord.Message, channel: discord.TextChannel, *, confirm = True):
         """Move several messages in another channel
-        
+
         msg1 and msg2 need to be from the same channel"""
 
         # Permission check
@@ -103,11 +103,11 @@ class MessageManager(commands.Cog):
             msg2, msg1 = msg1, msg2
 
         # Retrieves the message list from msg1
-        msgList = await msg1.channel.history(limit=30, after=msg1).flatten()
+        msgList = await msg1.channel.history(limit=100, after=msg1).flatten()
         if len(msgList) == 0:
             await ctx.send(await self.bot._(ctx.guild.id, "message_manager.moveall.no-msg"))
             return
-        
+
         # Webhook creation (common to all messages)
         webhook = await channel.create_webhook(name="Gunipy Hook")
 
