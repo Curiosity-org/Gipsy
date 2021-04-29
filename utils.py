@@ -4,7 +4,7 @@ import logging
 import sqlite3
 import json
 import sys
-from typing import Any, Callable, Coroutine, Dict
+from typing import Any, Callable, Coroutine, Dict, Union, List
 
 
 class MyContext(commands.Context):
@@ -46,7 +46,7 @@ class Gunibot(commands.bot.AutoShardedBot):
         super().__init__(command_prefix=self.get_prefix, case_insensitive=case_insensitive, status=status,
                          allowed_mentions=ALLOWED, intents=intents)
         self.log = logging.getLogger("runner") # logs module
-        self.beta = beta # if the bot is in beta mode
+        self.beta: bool = beta # if the bot is in beta mode
         self.database = sqlite3.connect('data/database.db') # database connection
         self.database.row_factory = sqlite3.Row
         self._update_database_structure()
@@ -101,6 +101,33 @@ class Gunibot(commands.bot.AutoShardedBot):
         self.config[key] = value
         with open("config.json", 'w', encoding='utf-8') as f:
             json.dump(self.config, f, indent=4)
+    
+    def db_query(self, query: str, args: Union[tuple, dict], *, fetchone: bool=False, returnrowcount: bool=False, astuple: bool=False) -> Union[int, List[dict], dict]:
+        """Do any query to the bot database
+        If SELECT, it will return a list of results, or only the first result (if fetchone)
+        For any other query, it will return the affected row ID if returnrowscount, or the amount of affected rows (if returnrowscount)"""
+        cursor = self.database.cursor()
+        try:
+            cursor.execute(query, args)
+            if query.startswith("SELECT"):
+                _type = tuple if astuple else dict
+                if fetchone:
+                    v = cursor.fetchone()
+                    result = _type() if v is None else _type(v)
+                else:
+                    result = list(map(_type, cursor.fetchall()))
+            else:
+                self.database.commit()
+                if returnrowcount:
+                    result = cursor.rowcount
+                else:
+                    result = cursor.lastrowid
+        except Exception as e:
+            cursor.close()
+            raise e
+        cursor.close()
+        return result
+
     
     @property
     def _(self) -> Callable[[Any, str], Coroutine[Any, Any, str]]:
@@ -211,7 +238,7 @@ CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {
     #     'command': 'subcommand of the config command',
     # },
     "prefix": {
-        'default': "/",
+        'default': "&",
         'type': 'prefix',
         'command': 'prefix',
     },
@@ -357,6 +384,36 @@ CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {
         'default': None,
         'type': 'text',
         'command': 'levelup_message'
+    },
+    "levelup_reaction": {
+        'default': False,
+        'type': 'boolean',
+        'command': 'levelup_reaction',
+    },
+    "reaction_emoji": {
+        'default': None,
+        'type': 'emojis',
+        'command': 'giveaways_emoji',
+    },
+    "group_allowed_role": {
+        'default': None,
+        'type': 'roles',
+        'command': 'group_allowed_role',
+    },
+    "group_channel_category": {
+        'default': None,
+        'type': 'categories',
+        'command': 'group_channel_category',
+    },
+    "group_over_role": {
+        'default': None,
+        'type': 'roles',
+        'command': 'group_over_role',
+    },
+    "max_group": {
+        'default': 5,
+        'type': 'int',
+        'command': 'max_group',
     }
 }
 

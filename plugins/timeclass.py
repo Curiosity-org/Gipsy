@@ -1,8 +1,9 @@
-import discord
 import datetime
 import time
-from discord.ext import tasks
+from utils import Gunibot
 
+import discord
+from discord.ext import tasks
 
 fr_months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
              "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Décembre"]
@@ -15,7 +16,7 @@ fi_months = ['tammikuu', 'helmikuu', 'maaliskuu', 'huhtikuu', 'toukokuu',
 class TimeCog(discord.ext.commands.Cog):
     """This cog handles all manipulations of date, time, and time interval. So cool, and so fast"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "timeclass"
 
@@ -27,7 +28,10 @@ class TimeCog(discord.ext.commands.Cog):
             if task.current_loop != 0:
                 await self.bot.wait_until_ready()
                 self.bot.log.info("[TaskManager] Tâche {} arrivée à terme".format(coro.__func__))
-                await coro(*args, **kwargs)
+                try:
+                    await coro(*args, **kwargs)
+                except Exception as e:
+                    self.bot.get_cog("Errors").on_error(e)
         a = tasks.loop(seconds=delay, count=2)(launch)
         a.error(self.bot.get_cog("Errors").on_error)
         a.start(a, coro, *args, **kwargs)

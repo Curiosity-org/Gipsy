@@ -1,9 +1,10 @@
-import discord
 import time
+from typing import Dict
+
+import discord
+from checks import is_roles_manager
 from discord.ext import commands, tasks
 from utils import Gunibot, MyContext
-from checks import is_roles_manager
-from typing import Dict
 
 
 class Hypesquad(commands.Cog):

@@ -1,6 +1,7 @@
-from discord.ext import commands
-from json import load, dump
 import os
+from json import dump, load
+
+from discord.ext import commands
 from utils import CONFIG_OPTIONS
 
 CONFIG_FOLDER = "configs"

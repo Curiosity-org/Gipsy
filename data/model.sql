@@ -67,3 +67,26 @@ CREATE TABLE IF NOT EXISTS `roles_levels` (
   PRIMARY KEY (guild, role)
 );
 CREATE INDEX IF NOT EXISTS idx_rolesrewards_guild ON `roles_levels` (`guild`);
+
+CREATE TABLE IF NOT EXISTS `rss_flows` (
+  `guild` BIGINT NOT NULL,
+  `channel` BIGINT NOT NULL,
+  `structure` VARCHAR(1000) NOT NULL,
+  `type` VARCHAR(5) NOT NULL,
+  `link` TEXT NOT NULL,
+  `date` DATETIME,
+  `roles` BLOB,
+  `use_embed` BOOLEAN DEFAULT 0,
+  `embed_structure` BLOB,
+  `added_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_rssflows_guild ON `rss_flows` (`guild`);
+
+CREATE TABLE IF NOT EXISTS `groups` (
+  `guild` BIGINT NOT NULL,
+  `roleID` BIGINT NOT NULL,
+  `ownerID` BIGINT NOT NULL,
+  `channelID` BIGINT DEFAULT NULL,
+  `privacy` BOOLEAN NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_groups_guild ON `groups` (`guild`);

@@ -1,14 +1,15 @@
-import discord
-from discord.ext import commands, tasks
+import datetime
 import random
 import time
-import datetime
-from discord.ext.commands.core import command
-import emoji
+from marshal import dumps, loads
 from typing import List, Optional, Union
-from marshal import loads, dumps
+
+import args
+import checks
+import discord
+import emoji
+from discord.ext import commands, tasks
 from utils import Gunibot, MyContext
-import checks, args
 
 
 class Giveaways(commands.Cog):
@@ -28,13 +29,9 @@ class Giveaways(commands.Cog):
         ends_at: the end date of the giveaway (null for a manual end)
         Returns: the row ID of the giveaway
         """
-        c = self.bot.database.cursor()
         data = (channel.guild.id, channel.id, name[:64], max_entries, ends_at, message, dumps(list()))
-        c.execute(
-            "INSERT INTO giveaways (guild, channel, name, max_entries, ends_at, message, users) VALUES (?, ?, ?, ?, ?, ?, ?)", data)
-        self.bot.database.commit()
-        rowid = c.lastrowid
-        c.close()
+        query = "INSERT INTO giveaways (guild, channel, name, max_entries, ends_at, message, users) VALUES (?, ?, ?, ?, ?, ?, ?)"
+        rowid: int = self.bot.db_query(query, data)
         return rowid
 
     def db_get_giveaways(self, guildID: int) -> List[dict]:
@@ -43,13 +40,12 @@ class Giveaways(commands.Cog):
         guildID: the guild (server) ID
         Returns: a list of dicts containing the giveaways info
         """
-        c = self.bot.database.cursor()
-        c.execute("SELECT rowid, * FROM giveaways WHERE guild=?", (guildID,))
-        res = [{c.description[e][0]: value for e, value in enumerate(row)} for row in list(c)]
+        query = "SELECT rowid, * FROM giveaways WHERE guild=?"
+        liste = self.bot.db_query(query, (guildID,))
+        res = list(map(dict, liste))
         for r in res:
             r['users'] = loads(r['users'])
             r['ends_at'] = datetime.datetime.strptime(r['ends_at'], '%Y-%m-%d %H:%M:%S')
-        c.close()
         return res
     
     def db_get_expired_giveaways(self) -> List[dict]:
@@ -57,13 +53,12 @@ class Giveaways(commands.Cog):
         Get every running giveaway
         Returns: a list of dicts containing the giveaways info
         """
-        c = self.bot.database.cursor()
-        c.execute("SELECT rowid, * FROM giveaways WHERE ends_at <= ? AND running = 1", (datetime.datetime.now(),))
-        res = [{c.description[e][0]: value for e,value in enumerate(row)} for row in list(c)]
+        query = "SELECT rowid, * FROM giveaways WHERE ends_at <= ? AND running = 1"
+        liste = self.bot.db_query(query, (datetime.datetime.now(),))
+        res = list(map(dict, liste))
         for r in res:
             r['users'] = loads(r['users'])
             r['ends_at'] = datetime.datetime.strptime(r['ends_at'], '%Y-%m-%d %H:%M:%S')
-        c.close()
         return res
 
     def db_get_users(self, rowID: int) -> List[int]:
@@ -72,13 +67,11 @@ class Giveaways(commands.Cog):
         rowID: the ID of the giveaway to edit
         Returns: list of users IDs
         """
-        c = self.bot.database.cursor()
-        c.execute("SELECT users FROM giveaways WHERE rowid=?", (rowID,))
-        res = list(c)
-        c.close()
+        query = "SELECT users FROM giveaways WHERE rowid=?"
+        res = self.bot.db_query(query, (rowID,))
         if len(res) == 0:
             return None
-        return loads(res[0][0])
+        return loads(res[0]['users'])
 
     def db_edit_participant(self, rowID: int, userID: int, add: bool=True) -> bool:
         """
@@ -104,13 +97,9 @@ class Giveaways(commands.Cog):
                 # user was not participating
                 return
             current_participants = dumps(current_participants)
-        c = self.bot.database.cursor()
-        c.execute("UPDATE giveaways SET users=? WHERE rowid=?",
-                  (current_participants, rowID))
-        self.bot.database.commit()
-        updated = c.rowcount == 1
-        c.close()
-        return updated
+        query = "UPDATE giveaways SET users=? WHERE rowid=?"
+        rowcount = self.bot.db_query(query, (rowID, userID), returnrowcount=True)
+        return rowcount != 0
 
     def db_stop_giveaway(self, rowID: int) -> bool:
         """
@@ -118,12 +107,9 @@ class Giveaways(commands.Cog):
         rowID: the ID of the giveaway to stop
         Returns: if the giveaway has successfully been stopped
         """
-        c = self.bot.database.cursor()
-        c.execute("UPDATE giveaways SET running=0 WHERE rowid=?", (rowID,))
-        self.bot.database.commit()
-        updated = c.rowcount == 1
-        c.close()
-        return updated
+        query = "UPDATE giveaways SET running=0 WHERE rowid=?"
+        rowcount = self.bot.db_query(query, (rowID,), returnrowcount=True)
+        return rowcount == 1
 
     def db_delete_giveaway(self, rowID: int) -> bool:
         """
@@ -131,12 +117,9 @@ class Giveaways(commands.Cog):
         rowID: the ID of the giveaway to delete
         Returns: if the giveaway has successfully been deleted
         """
-        c = self.bot.database.cursor()
-        c.execute("DELETE FROM giveaways WHERE rowid=?", (rowID,))
-        self.bot.database.commit()
-        deleted = c.rowcount == 1
-        c.close()
-        return deleted
+        query = "DELETE FROM giveaways WHERE rowid=?"
+        rowcount = self.bot.db_query(query, (rowID,), returnrowcount=True)
+        return rowcount == 1
     
     async def get_allowed_emojis(self, guildID:int) -> List[Union[discord.Emoji, str]]:
         """Get a list of allowed emojis for a specific guild"""
@@ -392,7 +375,7 @@ class Giveaways(commands.Cog):
             return
         ga = giveaways[0]
         if author.id not in ga['users']:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.alread-left"))
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.already-left"))
         elif not ga['running']:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.been-stopped"))
         else:
@@ -466,14 +449,14 @@ class Giveaways(commands.Cog):
                     await self.bot.get_cog('Errors').on_error(e)
                     self.db_stop_giveaway(giveaway['rowid'])
 
-    async def get_users(self, channel: int, message: int, allowed_reactions: Optional[List[Union[discord.Emoji, str]]]):
+    async def get_users(self, channel: int, message: int, allowed_reactions: Optional[set[Union[discord.Emoji, str]]]):
         """Get users who reacted to a message"""
         channel: discord.TextChannel = self.bot.get_channel(channel)
         if channel is None:
-            return []
+            return set()
         message: discord.Message = await channel.fetch_message(message)
         if message is None or message.author != self.bot.user:
-            return []
+            return set()
         users = set()
         for react in message.reactions:
             if allowed_reactions is None or react.emoji in allowed_reactions:

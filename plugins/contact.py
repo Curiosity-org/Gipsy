@@ -1,11 +1,12 @@
-from utils import Gunibot
-import discord
-import aiohttp
 import typing
+from datetime import datetime, timedelta
+
+import aiohttp
+import checks
+import discord
 from discord.ext import commands
 from discord.utils import snowflake_time
-from datetime import datetime, timedelta
-import checks
+from utils import Gunibot
 
 
 class Contact(commands.Cog):
@@ -26,25 +27,17 @@ class Contact(commands.Cog):
         return res
 
     def db_get_channels(self, guildID: int):
-        c = self.bot.database.cursor()
-        c.execute('SELECT * FROM contact_channels WHERE guild=?', (guildID,))
-        res = list(c)
-        c.close()
+        query = 'SELECT * FROM contact_channels WHERE guild=?'
+        res = self.bot.db_query(query, (guildID,))
         return res
 
     def db_add_channel(self, channel: discord.TextChannel):
-        c = self.bot.database.cursor()
-        c.execute(f"INSERT INTO contact_channels (guild,channel, author) VALUES (?, ?, ?)",
-                  (channel.guild.id, channel.id, int(channel.topic)))
-        self.bot.database.commit()
-        c.close()
+        query = "INSERT INTO contact_channels (guild,channel, author) VALUES (?, ?, ?)"
+        self.bot.db_query(query, (channel.guild.id, channel.id, int(channel.topic)))
 
     def db_delete_channel(self, guildID: int, channelID: int):
-        c = self.bot.database.cursor()
-        c.execute(f"DELETE FROM contact_channels WHERE guild=? AND channel=?",
-                  (guildID, channelID))
-        self.bot.database.commit()
-        c.close()
+        query = "DELETE FROM contact_channels WHERE guild=? AND channel=?"
+        self.bot.db_query(query, (guildID, channelID))
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -114,9 +107,9 @@ class Contact(commands.Cog):
         max_date = datetime.now()-timedelta(days=days)
         channels = self.db_get_channels(ctx.guild.id)
         for data in channels:
-            chan = ctx.guild.get_channel(data[1])
+            chan = ctx.guild.get_channel(data['channel'])
             if chan is None:
-                self.db_delete_channel(ctx.guild.id, data[1])
+                self.db_delete_channel(ctx.guild.id, data['channel'])
             else:
                 # si la date du dernier message est trop ancienne
                 if snowflake_time(chan.last_message_id) < max_date:
@@ -126,7 +119,7 @@ class Contact(commands.Cog):
                     except discord.DiscordException as e:
                         errors.append(str(e))
                     else:
-                        self.db_delete_channel(ctx.guild.id, data[1])
+                        self.db_delete_channel(ctx.guild.id, data['channel'])
         answer = await self.bot._(ctx.guild.id, "contact.deleted", count=i)
         if len(errors) > 0:
             answer += "\n" + await self.bot._(ctx.guild.id, "contact.not-deleted", count=len(errors))

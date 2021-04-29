@@ -1,9 +1,9 @@
-from utils import Gunibot, bytes_subtract
-import discord
-import aiohttp
 import random
+
+import aiohttp
+import discord
 from discord.ext import commands
-import checks
+from utils import Gunibot
 
 
 class VoiceChannels(commands.Cog):
@@ -17,32 +17,25 @@ class VoiceChannels(commands.Cog):
         self.db_get_channels()
 
     def db_get_channels(self):
-        c = self.bot.database.cursor()
-        for row in c.execute('SELECT * FROM voices_chats'):
-            self.channels[row[0]] = self.channels.get(
-                row[0], list()) + [row[1]]
-        c.close()
+        liste = self.bot.db_query('SELECT guild, channel FROM voices_chats', ())
+        for row in liste:
+            self.channels[row['guild']] = self.channels.get(row['guild'], list()) + [row['channel']]
 
     def db_add_channel(self, channel: discord.VoiceChannel):
-        c = self.bot.database.cursor()
-        c.execute(f"INSERT INTO voices_chats (guild,channel) VALUES (?, ?)",
-                  (channel.guild.id, channel.id))
-        self.bot.database.commit()
-        c.close()
-        self.channels[channel.guild.id] = self.channels.get(
-            channel.guild.id, list()) + [channel.id]
+        query = "INSERT INTO voices_chats (guild,channel) VALUES (?, ?)"
+        rowcount = self.bot.db_query(query, (channel.guild.id, channel.id), returnrowcount=True)
+        if rowcount == 1:
+            self.channels[channel.guild.id] = self.channels.get(channel.guild.id, list()) + [channel.id]
 
     def db_delete_channel(self, channel: discord.VoiceChannel):
-        c = self.bot.database.cursor()
-        c.execute(f"DELETE FROM voices_chats WHERE guild=? AND channel=?",
-                  (channel.guild.id, channel.id))
-        self.bot.database.commit()
-        c.close()
-        try:
-            self.channels[channel.guild.id].remove(channel.id)
-        except ValueError:
-            # we don't care about that error
-            pass
+        query = "DELETE FROM voices_chats WHERE guild=? AND channel=?"
+        rowcount = self.bot.db_query(query,  (channel.guild.id, channel.id), returnrowcount=True)
+        if rowcount == 1:
+            try:
+                self.channels[channel.guild.id].remove(channel.id)
+            except ValueError:
+                # we don't care about that error
+                pass
 
     async def give_roles(self, member: discord.Member, remove=False):
         if not member.guild.me.guild_permissions.manage_roles:

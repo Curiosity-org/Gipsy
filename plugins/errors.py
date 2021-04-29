@@ -1,10 +1,10 @@
-from utils import CheckException, Gunibot, MyContext
-import discord
-import sys
-import traceback
 import re
+import traceback
+
 import checks
+import discord
 from discord.ext import commands
+from utils import CheckException, Gunibot, MyContext
 
 
 class Errors(commands.Cog):
@@ -41,12 +41,12 @@ class Errors(commands.Cog):
         elif isinstance(error, CheckException):
             return await ctx.send(await self.bot._(ctx.channel, "errors.custom_checks."+error.id))
         elif isinstance(error, (commands.BadArgument, commands.BadUnionArgument)):
-            raw_error = str(error).replace('@eveyrone', '@​everyone').replace('@here', '@​here')
-            if str(error) == "Unknown argument":
+            raw_error = str(error)
+            if raw_error == "Unknown argument":
                 return await ctx.send(await self.bot._(ctx.channel, "errors.unknown-arg"))
-            elif str(error) == "Unknown dependency action type":
+            elif raw_error == "Unknown dependency action type":
                 return await ctx.send(await self.bot._(ctx.channel, "errors.invalid-dependency"))
-            elif str(error) == "Unknown dependency trigger type":
+            elif raw_error == "Unknown dependency trigger type":
                 return await ctx.send(await self.bot._(ctx.channel, "errors.invalid-trigger"))
             # Could not convert "limit" into int. OR Converting to "int" failed for parameter "number".
             r = re.search(
@@ -89,6 +89,10 @@ class Errors(commands.Cog):
             r = re.search(r'Message \"([^\"]+)\" not found', raw_error)
             if r is not None:
                 return await ctx.send(await self.bot._(ctx.channel, "errors.unknown-message", m=r.group(1)))
+            # Group "twitter" not found.
+            r = re.search(r'Group \"([^\"]+)\" not found', raw_error)
+            if r is not None:
+                return await ctx.send(await self.bot._(ctx.channel, "errors.unknown-group", g=r.group(1)))
             # Too many text channels
             if raw_error == 'Too many text channels':
                 return await ctx.send(await self.bot._(ctx.channel, "errors.too-many-text-channels"))
@@ -125,8 +129,8 @@ class Errors(commands.Cog):
         else:
             await ctx.send(await self.bot._(ctx.channel, "errors.error-unknown"))
         # All other Errors not returned come here... And we can just print the default TraceBack.
-        self.bot.log.warning(
-            'Ignoring exception in command {}:'.format(ctx.message.content))
+        self.bot.log.warning('Ignoring exception in command {}:'.format(
+            ctx.message.content), exc_info=(type(error), error, error.__traceback__))
         await self.on_error(error, ctx)
 
     @commands.Cog.listener()
@@ -147,11 +151,6 @@ class Errors(commands.Cog):
                 await self.senf_err_msg(ctx.guild.name+" | "+ctx.channel.name+"\n"+msg)
         except Exception as e:
             self.bot.log.warn(f"[on_error] {e}", exc_info=True)
-        try:
-            traceback.print_exception(
-                type(error), error, error.__traceback__, file=sys.stderr)
-        except Exception as e:
-            self.bot.log.warning(f"[on_error] {e}", exc_info=True)
 
     async def senf_err_msg(self, msg):
         """Sends a message to the error channel"""

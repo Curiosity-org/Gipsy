@@ -1,7 +1,6 @@
-from utils import Gunibot
 import discord
 from discord.ext import commands
-import checks
+from utils import Gunibot
 
 
 class Welcome(commands.Cog):

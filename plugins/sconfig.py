@@ -1,14 +1,15 @@
-import discord
-from discord.ext import commands
-from typing import Any, List, Union
-import emoji
-import re
+import asyncio
 import io
 import json
-import asyncio
-import checks
+import re
+from typing import Any, List, Union
+
 import args
-from utils import Gunibot, MyContext, CONFIG_OPTIONS
+import checks
+import discord
+import emoji
+from discord.ext import commands
+from utils import CONFIG_OPTIONS, Gunibot, MyContext
 
 
 class Sconfig(commands.Cog):
@@ -133,6 +134,8 @@ class Sconfig(commands.Cog):
             cog = self.bot.get_cog("Languages")
             if cog:
                 return cog.languages[value]
+            return value
+        if config['type'] == 'int':
             return value
         return value
 
@@ -439,6 +442,48 @@ class Sconfig(commands.Cog):
         Set to None to reset it"""
         await ctx.send(await self.edit_config(ctx.guild.id, "levelup_message", message))
 
+    @main_config.command(name="levelup_reaction")
+    async def config_levelup_reaction(self, ctx: MyContext, *, bool: bool=None):
+        """If the bot add a reaction to the message or send a message
+        Set to True for the reaction, False for the message"""
+        await ctx.send(await self.edit_config(ctx.guild.id, "levelup_reaction", bool))
+
+    @main_config.command(name="reaction_emoji")
+    async def config_levelup_reaction_emoji(self, ctx: MyContext, emote: discord.Emoji=None):
+        """Set the emoji wich one the bot will react to message when levelup"""
+        # check if emoji is valid
+        unicode_re = emoji.get_emoji_regexp()
+        emote = emote if isinstance(emote, discord.Emoji) or re.fullmatch(unicode_re, emote) else False
+        # if emojis was invalid (couldn't be converted)
+        if not emote:
+            await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-emoji"))
+            return
+        # convert discord emoji to ID if needed
+        emote = str(emote.id) if isinstance(emote, discord.Emoji) else emote
+        # save result
+        await ctx.send(await self.edit_config(ctx.guild.id, "reaction_emoji", emote))
+
+    @main_config.command(name="group_allowed_role")
+    async def config_group_allowed_role(self, ctx: MyContext, *, role: discord.Role=None):
+        """Role allowed to create groups"""
+        role = role.id if isinstance(role, discord.Role) else None
+        await ctx.send(await self.edit_config(ctx.guild.id, "group_allowed_role", role))
+
+    @main_config.command(name="group_channel_category")
+    async def config_group_channel_category(self, ctx: MyContext, *, category: discord.CategoryChannel):
+        """Category were group channel will be created"""
+        await ctx.send(await self.edit_config(ctx.guild.id, "group_channel_category", category.id))
+
+    @main_config.command(name="group_over_role")
+    async def config_group_over_role(self, ctx: MyContext, *, role: discord.Role = None):
+        """Role under the groups roles will be created"""
+        role = role.id if isinstance(role, discord.Role) else None
+        await ctx.send(await self.edit_config(ctx.guild.id, "group_over_role", role))
+
+    @main_config.command(name="max_group")
+    async def config_max_group(self, ctx: MyContext, *, number: int = None):
+        """Max groups by user"""
+        await ctx.send(await self.edit_config(ctx.guild.id, "max_group", number))
 
     @commands.group(name="config-backup", aliases=["config-bkp"])
     @commands.guild_only()

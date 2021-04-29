@@ -1,14 +1,14 @@
-import discord
-from discord.ext import commands
 import asyncio
-import time
-import sys
-import psutil
 import os
+import sys
+import time
 from platform import system as system_name  # Returns the system/OS name
 from subprocess import call as system_call  # Execute a shell command
-from git import Repo
 
+import discord
+import psutil
+from discord.ext import commands
+from git import Repo
 from utils import Gunibot, MyContext
 
 
@@ -95,8 +95,12 @@ class General(commands.Cog):
         v = sys.version_info
         version = str(v.major)+"."+str(v.minor)+"."+str(v.micro)
         pid = os.getpid()
-        py = psutil.Process(pid)
-        ram_usage = round(py.memory_info()[0]/2.**30, 3) #, py.cpu_percent()]
+        try:
+            py = psutil.Process(pid)
+            ram_usage = round(py.memory_info()[0]/2.**30, 3) #, py.cpu_percent()]
+        except OSError:
+            ram_usage = latency = "?"
+            py = None
         latency = round(self.bot.latency*1000, 3)
         CPU_INTERVAL = 3.0
         try:
@@ -120,18 +124,24 @@ class General(commands.Cog):
                 embed = discord.Embed(title=title, color=8311585, timestamp=ctx.message.created_at, description=d)
                 embed.set_thumbnail(url=self.bot.user.avatar_url)
                 msg: discord.Message = await ctx.send(embed=embed)
-                cpu_usage = py.cpu_percent(CPU_INTERVAL)
+                if py is None: # PSUtil can't be used
+                    cpu_usage = "?"
+                else:
+                    cpu_usage = py.cpu_percent(CPU_INTERVAL)
                 cpu_ended = await self.bot._(ctx.channel, "general.stats.cpu-ended", c=cpu_usage)
                 embed.description = embed.description.replace(cpu_txt, cpu_ended)
                 await msg.edit(embed=embed)
             else:
                 msg = await ctx.send(d)
-                cpu_usage = py.cpu_percent(CPU_INTERVAL)
+                if py is None: # PSUtil can't be used
+                    cpu_usage = "?"
+                else:
+                    cpu_usage = py.cpu_percent(CPU_INTERVAL)
                 cpu_ended = await self.bot._(ctx.channel, "general.stats.cpu-ended", c=cpu_usage)
                 d = d.replace(cpu_txt, cpu_ended)
                 await msg.edit(content=d)
         except Exception as e:
-            await ctx.bot.get_cog("Errors").on_cmd_error(ctx, e)
+            await ctx.bot.get_cog("Errors").on_command_error(ctx, e)
 
     @commands.command(name="halp", enabled=False)
     async def halp(self, ctx):

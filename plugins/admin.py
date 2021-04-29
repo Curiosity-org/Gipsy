@@ -1,14 +1,15 @@
-from utils import Gunibot
-import discord
-from discord.ext import commands
+import io
 import os
 import sys
-import io
 import textwrap
 import traceback
 from contextlib import redirect_stdout
+
 import checks
+import discord
+from discord.ext import commands
 from git import Repo, exc
+from utils import Gunibot
 
 
 def cleanup_code(content):

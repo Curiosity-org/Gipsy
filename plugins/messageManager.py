@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from utils import Gunibot
 
+
 # Moves a message from its original channel to a parameterized channel using a given webhook
 async def moveMessage(msg: discord.Message, webhook: discord.Webhook):
     files = [await x.to_file() for x in msg.attachments]
@@ -11,12 +12,12 @@ async def moveMessage(msg: discord.Message, webhook: discord.Webhook):
         users=msg.mentions,
         roles=msg.role_mentions)
     new_msg: discord.WebhookMessage = await webhook.send(content=msg.content,
-                                 files=files,
-                                 embeds=msg.embeds,
-                                 avatar_url=msg.author.avatar_url,
-                                 username=msg.author.name,
-                                 allowed_mentions=discord.AllowedMentions.none(),
-                                 wait=True)
+                                                         files=files,
+                                                         embeds=msg.embeds,
+                                                         avatar_url=msg.author.avatar_url,
+                                                         username=msg.author.name,
+                                                         allowed_mentions=discord.AllowedMentions.none(),
+                                                         wait=True)
     # edit the message to include mentions without notifications
     if mentions.roles or mentions.users or mentions.everyone:
         await new_msg.edit(allowed_mentions=mentions)
@@ -53,7 +54,7 @@ class MessageManager(commands.Cog):
 
     @commands.command(names="move", aliases=['mv'])
     @commands.guild_only()
-    async def move(self, ctx: commands.Context, msg: discord.Message, channel: discord.TextChannel, *, confirm = True):
+    async def move(self, ctx: commands.Context, msg: discord.Message, channel: discord.TextChannel, *, confirm=True):
         """Move a message in another channel"""
 
         # Creates a webhook to resend the message to another channel
@@ -64,8 +65,8 @@ class MessageManager(commands.Cog):
         if confirm:
             # Creates an embed to notify that the message has been moved
             embed = discord.Embed(
-                description = await self.bot._(ctx.guild.id, 'message_manager.move.confirm', user=msg.author.mention, channel=channel.mention),
-                colour = discord.Colour(51711)
+                description=await self.bot._(ctx.guild.id, 'message_manager.move.confirm', user=msg.author.mention, channel=channel.mention),
+                colour=discord.Colour(51711)
             )
             embed.set_footer(text=await self.bot._(ctx.guild.id, 'message_manager.move.footer', user=ctx.author.name))
             await ctx.send(embed=embed)
@@ -79,7 +80,7 @@ class MessageManager(commands.Cog):
 
     @commands.command(names="moveall", aliases=['mva'])
     @commands.guild_only()
-    async def moveall(self, ctx: commands.Context, msg1: discord.Message, msg2: discord.Message, channel: discord.TextChannel, *, confirm = True):
+    async def moveall(self, ctx: commands.Context, msg1: discord.Message, msg2: discord.Message, channel: discord.TextChannel, *, confirm=True):
         """Move several messages in another channel
 
         msg1 and msg2 need to be from the same channel"""
@@ -128,14 +129,15 @@ class MessageManager(commands.Cog):
         if confirm:
             # Creates an embed to notify that the messages have been moved
             embed = discord.Embed(
-                description = await self.bot._(ctx.guild.id, 'message_manager.moveall.confirm', channel=channel.mention),
-                colour = discord.Colour(51711)
+                description=await self.bot._(ctx.guild.id, 'message_manager.moveall.confirm', channel=channel.mention),
+                colour=discord.Colour(51711)
             )
             embed.set_footer(text=await self.bot._(ctx.guild.id, 'message_manager.moveall.footer', user=ctx.author.name))
             await ctx.send(embed=embed)
             await ctx.message.delete()
 
         await webhook.delete()
+
 
 # The End.
 def setup(bot):

@@ -1,7 +1,7 @@
-import i18n
 import discord
+import i18n
 from discord.ext import commands
-from utils import Gunibot, MyContext
+from utils import Gunibot
 
 i18n.translations.container.clear()  # invalidate old cache
 i18n.set('filename_format', '{locale}.{format}')
@@ -37,8 +37,14 @@ class Languages(commands.Cog):
                 lang = self.languages[0]
         return i18n.t(key, locale=lang, **kwargs)
 
-    async def get_lang(self, guildID: int) -> int:
-        return self.bot.server_configs[guildID]['language']
+    async def get_lang(self, guildID: int, use_str: bool=False) -> int:
+        if guildID is None:
+            as_int = 0
+        else:
+            as_int = self.bot.server_configs[guildID]['language']
+        if use_str:
+            return self.languages[as_int]
+        return as_int
 
 
 def setup(bot):
