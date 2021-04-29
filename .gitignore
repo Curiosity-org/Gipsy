@@ -9,3 +9,4 @@ config.json
 .cache
 .bash*
 .profile
+.idea/

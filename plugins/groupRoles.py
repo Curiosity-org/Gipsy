@@ -1,11 +1,12 @@
+import asyncio
+from marshal import dumps, loads
+from typing import List, Union
+
+import args
+import checks
 import discord
 from discord.ext import commands
-from marshal import loads, dumps
-from typing import List, Union
-import checks
-import args
-import asyncio
-
+from utils import Gunibot
 
 # /rolelink <grant/revoke> <role> when <get/loose> <one/all> <roles>
 
@@ -70,48 +71,38 @@ class ConflictingCyclicDependencyError(Exception):
 
 class GroupRoles(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "groupRoles"
 
     def db_get_config(self, guildID: int) -> List[Dependency]:
         """Get every dependencies of a specific guild"""
-        c = self.bot.database.cursor()
-        c.execute('SELECT rowid, * FROM group_roles WHERE guild=?', (guildID,))
-        # comes as: (row, guild, action, target, trigger, trigger-roles)
+        query = 'SELECT rowid, * FROM group_roles WHERE guild=?'
+        # comes as: (rowid, guild, action, target, trigger, trigger-roles)
         res = list()
-        for row in list(c):
-            #       Action            target_role  trigger           trigger_roles  guild
-            temp = (ActionType(row[2]), row[3], TriggerType(
-                row[4]), loads(row[5]), row[1])
+        liste = self.bot.db_query(query, (guildID,))
+        for row in liste:
+            temp = (ActionType(row['action']), row['target'], TriggerType(
+                row['trigger']), loads(row['trigger-roles']), row['guild'])
             res.append(Dependency(*temp))
-            res[-1].id = row[0]
-        c.close()
+            res[-1].id = row['rowid']
         return res if len(res) > 0 else None
 
     def db_add_action(self, action: Dependency) -> int:
         """Add an action into a guild
         Return the inserted row ID"""
-        c = self.bot.database.cursor()
         data = (action.guild, action.action.type, action.target_role,
                 action.trigger.type, action.b_trigger_roles)
-        c.execute(
-            "INSERT INTO group_roles (guild, action, target, trigger, `trigger-roles`) VALUES (?, ?, ?, ?, ?)", data)
-        self.bot.database.commit()
-        rowid = c.lastrowid
-        c.close()
-        return rowid
+        query = "INSERT INTO group_roles (guild, action, target, trigger, `trigger-roles`) VALUES (?, ?, ?, ?, ?)"
+        lastrowid = self.bot.db_query(query, data)
+        return lastrowid
 
     def db_delete_action(self, guildID: int, actionID: int) -> bool:
         """Delete an action from a guild, based on its row ID
         Return True if a row was deleted, False else"""
-        c = self.bot.database.cursor()
-        c.execute("DELETE FROM group_roles WHERE guild=? AND rowid=?",
-                  (guildID, actionID))
-        self.bot.database.commit()
-        deleted = c.rowcount == 1
-        c.close()
-        return deleted
+        query = "DELETE FROM group_roles WHERE guild=? AND rowid=?"
+        rowcount = self.bot.db_query(query, (guildID, actionID))
+        return rowcount == 1
 
     async def filter_allowed_roles(self, guild: discord.Guild, roles: List[discord.Role]) -> List[discord.Role]:
         """Return every role that the bot is allowed to give/remove
@@ -152,6 +143,8 @@ class GroupRoles(commands.Cog):
     async def check_got_roles(self, member: discord.Member, roles: List[discord.Role]):
         """Trigger dependencies based on granted roles"""
         actions = self.db_get_config(member.guild.id)
+        if actions == None:
+            return
         for action in actions:
             if action.trigger.type == 0:  # if trigger is 'get-one'
                 for r in roles:
@@ -171,6 +164,8 @@ class GroupRoles(commands.Cog):
     async def check_lost_roles(self, member: discord.Member, roles: List[discord.Role]):
         """Trigger dependencies based on revoked roles"""
         actions = self.db_get_config(member.guild.id)
+        if actions == None:
+            return
         for action in actions:
             if action.trigger.type == 2:  # if trigger is 'loose-one'
                 for r in roles:
@@ -222,7 +217,7 @@ class GroupRoles(commands.Cog):
         if ctx.subcommand_passed is None:
             await ctx.send_help('rolelink')
 
-    @rolelink_main.command(name="create")
+    @rolelink_main.command(name="add")
     @commands.check(checks.is_server_manager)
     async def rolelink_create(self, ctx: commands.Context, action: ActionType, target_role: discord.Role, when: args.constant('when'), trigger: TriggerType, trigger_roles: commands.Greedy[discord.Role]):
         """Create a new roles-link
@@ -263,7 +258,7 @@ class GroupRoles(commands.Cog):
             txt += action.to_str() + "\n"
         await ctx.send(txt)
 
-    @rolelink_main.command(name="delete")
+    @rolelink_main.command(name="remove")
     @commands.check(checks.is_server_manager)
     async def rolelink_delete(self, ctx: commands.Context, id: int):
         """Delete one of your roles-links"""

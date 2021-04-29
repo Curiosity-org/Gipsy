@@ -1,10 +1,11 @@
-from typing import Dict, List, Tuple
-from utils import Gunibot, MyContext
-import discord
-import datetime
 import asyncio
-from discord.ext import commands
+import datetime
+from typing import Dict, List, Optional, Tuple
+
 import checks
+import discord
+from discord.ext import commands
+from utils import Gunibot, MyContext
 
 
 class Thanks(commands.Cog):
@@ -23,10 +24,7 @@ class Thanks(commands.Cog):
         self.schedule_tasks()
 
     def schedule_tasks(self):
-        c = self.bot.database.cursor()
-        c.execute('SELECT guild, user, timestamp FROM thanks')
-        res = list(c)
-        c.close()
+        res = self.bot.db_query('SELECT guild, user, timestamp FROM thanks', (), astuple=True)
         now = datetime.datetime.now()
         for task in res:
             task = list(task)
@@ -57,83 +55,59 @@ class Thanks(commands.Cog):
             result.append((f"{k} remerciements", " ".join(subroles)))
         return result
 
-    def db_get_user(self, guildID: int, userID: int):
-        c = self.bot.database.cursor()
-        c.execute('SELECT * FROM thanks WHERE guild=? AND user=?',
-                  (guildID, userID))
-        res = list(c)
-        c.close()
+    def db_get_user(self, guildID: int, userID: int) -> Optional[dict]:
+        query = 'SELECT * FROM thanks WHERE guild=? AND user=?'
+        res = self.bot.db_query(query, (guildID, userID))
         return res if len(res) > 0 else None
 
-    def db_get_last(self, guildID: int, userID: int, authorID: int = None):
+    def db_get_last(self, guildID: int, userID: int, authorID: int = None) -> Optional[dict]:
         if authorID is None:
             res = self.db_get_user(guildID, userID)
         else:
-            c = self.bot.database.cursor()
-            c.execute('SELECT * FROM thanks WHERE guild=? AND user=? AND author=?',
-                      (guildID, userID, authorID))
-            res = list(c)
-            c.close()
+            query = 'SELECT * FROM thanks WHERE guild=? AND user=? AND author=?'
+            res = self.bot.db_query(query, (guildID, userID, authorID))
         return res[-1] if len(res) > 0 else None
 
     def db_get_amount(self, guildID: int, userID: int, duration: int = None) -> int:
-        c = self.bot.database.cursor()
-        q = f" AND timestamp >= datetime('now','-{duration} seconds')" if duration else ""
-        c.execute(
-            'SELECT COUNT(*) FROM thanks WHERE guild=? AND user=?'+q, (guildID, userID))
-        res = c.fetchone()
-        c.close()
-        return res[0]
+        query = 'SELECT COUNT(*) as count FROM thanks WHERE guild=? AND user=?'
+        if duration:
+            query += f" AND timestamp >= datetime('now','-{duration} seconds')"
+        res = self.bot.db_query(query, (guildID, userID), fetchone=True)
+        return res['count']
 
     def db_add_thanks(self, guildID: int, userID: int, authorID: int):
-        c = self.bot.database.cursor()
-        c.execute("INSERT INTO thanks (guild,user,author) VALUES (?, ?, ?)",
-                  (guildID, userID, authorID))
-        self.bot.database.commit()
-        c.close()
+        query = "INSERT INTO thanks (guild,user,author) VALUES (?, ?, ?)"
+        self.bot.db_query(query, (guildID, userID, authorID))
 
     def db_cleanup_thanks(self, guildID: int, duration: int):
         if not isinstance(duration, (int, float)):
             return
-        c = self.bot.database.cursor()
-        c.execute(
-            f"DELETE FROM thanks WHERE guild=? AND timestamp < datetime('now','-{duration} seconds')", (guildID,))
-        self.bot.database.commit()
-        c.close()
+        query = f"DELETE FROM thanks WHERE guild=? AND timestamp < datetime('now','-{duration} seconds')"
+        self.bot.db_query(query, (guildID,))
 
     def db_set_role(self, guildID: int, roleID: int, level: int):
-        c = self.bot.database.cursor()
-        c.execute("INSERT INTO thanks_levels (guild, role, level) VALUES (?, ?, ?)",
-                  (guildID, roleID, level))
-        self.bot.database.commit()
-        c.close()
+        query = "INSERT INTO thanks_levels (guild, role, level) VALUES (?, ?, ?)"
+        self.bot.db_query(query, (guildID, roleID, level))
 
     def db_get_roles(self, guildID: int, level: int = None):
-        c = self.bot.database.cursor()
         if level:
-            c.execute(
-                "SELECT * FROM thanks_levels WHERE guild=? AND level=?", (guildID, level))
+            query = "SELECT role, level FROM thanks_levels WHERE guild=? AND level=?"
+            liste = self.bot.db_query(query, (guildID, level))
         else:
-            c.execute("SELECT * FROM thanks_levels WHERE guild=?", (guildID,))
+            query = "SELECT role, level FROM thanks_levels WHERE guild=?"
+            liste = self.bot.db_query(query, (guildID,))
         res = dict()
-        for lvl in list(c):
-            res[lvl[2]] = res.get(lvl[2], list()) + [lvl[1]]
-        c.close()
+        for lvl in liste:
+            res[lvl['level']] = res.get(lvl['level'], list()) + [lvl['role']]
         return res
 
     def db_remove_level(self, guildID: int, level: int):
-        c = self.bot.database.cursor()
-        c.execute(
-            "DELETE FROM thanks_levels WHERE guild=? AND level=?", (guildID, level))
-        self.bot.database.commit()
-        c.close()
+        query = "DELETE FROM thanks_levels WHERE guild=? AND level=?"
+        self.bot.db_query(query, (guildID, level))
 
     def db_reset_level(self, guildID: int):
-        c = self.bot.database.cursor()
-        c.execute(
-            "DELETE FROM thanks_levels WHERE guild=?", (guildID,))
-        self.bot.database.commit()
-        c.close()
+        query = "DELETE FROM thanks_levels WHERE guild=?"
+        self.bot.db_query(query, (guildID,))
 
     async def has_allowed_roles(self, guild: discord.Guild, member: discord.Member) -> bool:
         config = self.bot.server_configs[guild.id]['thanks_allowed_roles']
@@ -152,8 +126,8 @@ class Thanks(commands.Cog):
             self.bot.log.info(
                 f"Module - Thanks: Missing \"manage_roles\" permission on guild \"{member.guild.name}\"")
             return False
-        g = member.guild
-        pos = g.me.top_role.position
+        g: discord.Guild = member.guild
+        pos: int = g.me.top_role.position
         if roles_conf is None:
             roles_conf = self.db_get_roles(g.id)
         for k, v in roles_conf.items():
@@ -173,11 +147,13 @@ class Thanks(commands.Cog):
                 roles = list(filter(lambda x: x not in member.roles, roles))
                 if len(roles) > 0:
                     await member.add_roles(*roles, reason="Thanks system")
+                    self.bot.log.debug("[Thanks] Rôles {0} ajoutés à {1} ({1.id})".format(roles, member))
                     gave_anything = True
             else:  # should remove roles
                 roles = list(filter(lambda x: x in member.roles, roles))
                 if len(roles) > 0:
                     await member.remove_roles(*roles, reason="Thanks system")
+                    self.bot.log.debug("[Thanks] Rôles {0} enlevés à {1} ({1.id})".format(roles, member))
                     gave_anything = True
         return gave_anything
 
@@ -186,7 +162,7 @@ class Thanks(commands.Cog):
         delta = self.bot.server_configs[guildID]['thanks_duration']
         if (datetime.datetime.now() - date).total_seconds() < delta:
             return
-        guild = self.bot.get_guild(guildID)
+        guild: discord.Guild = self.bot.get_guild(guildID)
         if guild is None:
             return
         member = guild.get_member(memberID)
@@ -211,7 +187,7 @@ class Thanks(commands.Cog):
         last = self.db_get_last(ctx.guild.id, user.id, ctx.author.id)
         if last:
             last_date = datetime.datetime.strptime(
-                last[3], "%Y-%m-%d %H:%M:%S")
+                last['timestamp'], "%Y-%m-%d %H:%M:%S")
             delta = datetime.datetime.utcnow() - last_date
             if delta.days < 1:
                 await ctx.send(await self.bot._(ctx.guild.id, "thanks.add.too-soon"))
@@ -243,23 +219,23 @@ class Thanks(commands.Cog):
             await ctx.send(txt)
             return
         for e, l in enumerate(liste):
-            liste[e] = [self.bot.get_guild(l[0]), self.bot.get_user(l[1]), self.bot.get_user(
-                l[2]), datetime.datetime.strptime(l[3], "%Y-%m-%d %H:%M:%S")]
+            liste[e] = [self.bot.get_guild(l['guild']), self.bot.get_user(l['user']), self.bot.get_user(l['author']), datetime.datetime.strptime(l['timestamp'], "%Y-%m-%d %H:%M:%S")]
         duration = self.bot.server_configs[ctx.guild.id]['thanks_duration']
         current = [x for x in liste if (datetime.datetime.utcnow() -
                                         x[3]).total_seconds() < duration]
         if ctx.can_send_embed:
             _title = await self.bot._(ctx.guild.id, "thanks.list.title", user=user)
             emb = discord.Embed(title=_title)
+            _active = await self.bot._(ctx.guild.id, "thanks.list.active", count=len(current))
             if len(current) > 0:
                 t = ["• {} ({})".format(x[2].mention, x[3].strftime("%d/%m/%y %HH%M"))
                      for x in current]
-                _active = await self.bot._(ctx.guild.id, "thanks.list.active", count=len(current))
-                emb.add_field(
-                    name=_active, value="\n".join(t))
+                emb.add_field(name=_active, value="\n".join(t))
+            else:
+                emb.add_field(name=_active, value="0")
             old = len(liste) - len(current)
             if old > 0:
-                _inactive = await self.bot._(ctx.guild.id, "thanks.list.inactive", count=len(current))
+                _inactive = await self.bot._(ctx.guild.id, "thanks.list.inactive", count=old)
                 emb.add_field(name="\u200b", value=_inactive, inline=False)
             await ctx.send(embed=emb)
         else:

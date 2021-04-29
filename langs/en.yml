@@ -41,6 +41,7 @@ en:
     unknown-role: "Unable to find the role %{r} :confused:"
     unknown-server: Unknown server
     unknown-user: "Unable to find user %{u} :confused:"
+    unknown-group: "Unable to find group %{u} :confused:"
   general:
     stats:
       title: "Bot statistics"
@@ -110,7 +111,49 @@ en:
     dep-notfound: Cannot find a role-link with this identifier. You can get the identifier of a link with the `%{p}rolelink list` command
     infinite: "Oops, it seems that this dependency can lead to an infinite loop with at least the following dependency: \"%{dep}\"\nIf you're sure you want to continue, enter 'yes' in the next %{t} seconds..."
     list: "List of your roles-links:"
-    no-dep: You do not have any dependencies configured at the moment. Use the `%{p}rolelink create` command to add more dependencies
+    no-dep: "You do not have any dependencies configured at the moment.\nUse the `%{p}rolelink create` command to add more dependencies"
+  groups:
+    list: "List of server groups:"
+    created: "You have succefuly created the group %{name}"
+    delete: "You have succefuly deleted the group %{name}"
+    registred: "You have succefuly registred the group %{name}"
+    unregistred: "You have succefuly unregistred the group %{name}"
+    update_owner: "You have succefuly gived the group %{group} to ${owner}"
+    update_name: "You have succefuly renamed the group %{group} to %{name}"
+    update_privacy: "You have succefuly passed the group's privacy of %{group} to %{privacy}"
+    join: "You have succefuly joined the group %{name}"
+    leave: "You have succefuly leaved the group %{name}"
+    joinbyforce: "You have succefuly forced %{user} to join %{name}"
+    leavebyforce: "You have succefuly kicked %{user} of %{name}"
+    give: "%{user}, %{owner} want to give you the group %{group}"
+    channel_delete: "You have succefuly deleted the channel for the group %{group}"
+    channel-create: "You have succefuly created the channel for the group %{name}"
+    channel-registred: "You have succefuly registred the channel for the group %{name}"
+    channel_unregister: "You have succefuly unregistred the channel for the group %{group}"
+    userlist: "List of the members of the group"
+    error:
+      no-group: "You do not have any group created at the moment.\nUse the `%{p}group add` command to add groups"
+      no-delete: "Cannot find a group with this identifier or name"
+      no-unregistred: "Cannot find a group with this identifier or name"
+      no-update: "Cannot find a group with this identifier or name. Check also if you are owner of this group or if you have the ADMINISTRATOR permission"
+      exist: "A group with the name %{name} already exist"
+      tomanygroup: "You own too many groups"
+      not-owner: "You have to be owner of this group or ot have the ADMINISTRATOR permission"
+      not-admin: "You have to have the ADMINISTRATOR permission"
+      tomanygroupuser: "{user} got too many groups"
+      timeout: "%{user} didn't reply so the owner update was canceled"
+      badarg: "You have to provide \"public\" or \"private\""
+      no-exist: "This group doesn't exist"
+      private: "This group is private"
+      already-in: "You're already in this group"
+      not-in: "You're not in this group"
+      owner: "You're owner of this group so you can't leave it"
+      already-in-user: "This user is already in your group"
+      not-in-user: "This user is not in your group"
+      no-channel: "This group don't have a channel"
+      no-delete-channel: "Cannot find a group with this identifier or name"
+      channel-exist: "This group already have a channel"
+      no-category: "You have to config a category for groups channels : `%{p}config group_channel_category`"
   hypesquad:
     no-role: You don't have any house roles configured!
     forbidden: Oops, an error occurred. Please check my permissions!
@@ -184,7 +227,7 @@ en:
       title: Role deleted
       desc: The role %{name} has just been deleted
       members: "Member count:"
-    role_update:
+    role_updated:
       title: Role updated
       desc: The role %{mention} (%{name}) has just been modified
       name: "Name:"
@@ -224,10 +267,37 @@ en:
     cookie:
       give: "Here is for you %{to}: :cookie:\nFrom %{giver}"
       self: "Here is for you %{to}: :cookie:"
+    hoster:
+      info: ":speech_balloon: Discord server: <https://discord.gg/RUPKTmC>\n:globe_with_meridians: Website: <https://clients.inovaperf.fr/aff.php?aff=514>\n:money_with_wings: 20% discount on the first purchase with the code `GUNIVERS`"
     flipacoin:
       heads: "Heads!"
       tails: "Tails!"
       side: "Side!"
+    kills:
+      "0": "{2}.exe *has stopped working*"
+      "1": "Oh you, you gonna to die!"
+      "2": "***BOUM!*** {1} fell into a trap posed by {0}!"
+      "3": "Luckily, the ground has cushioned the fall of {1}!"
+      "4": "{0} shouted \"Fus Roh Dah\" while {1} was next to a cliff..."
+      "5": "No, you can't stop bullets with your hands {1} :shrug:"
+      "6": "You have to be __in__ the elevator {1}, not __above__..."
+      "7": "{1} stayed too close to the speakers during a heavy metal concert."
+      "8": "Staying within 10 meters of an atomic explosion wasn't a good idea {1}..."
+      "9": "No! Double jumps are not possible {1}!"
+      "10": "{1} imitated Icare... splash."
+      "11": "It's nice to have a portal gun {1}, but don't open portals above spades..."
+      "12": "{1} died. Peace to their soul... :sneezing_face:"
+      "13": "{0} killed {1}"
+      "14": "{1} was shot by {0}"
+      "15": "Bye {1}! :ghost:"
+      "16": "{1} saw a flying anvil fall... on their head :head_bandage:"
+      "17": "{1} commit suicide after {0} has cut their connection"
+      "18": "Caution {1}! Fire burns :fire:"
+      "19": "{1} fought zombies without shovel"
+      "20": "{1} tried to hug a creeper"
+      "21": "{1}, lava baths are hot, but lava burns..."
+      "22": "{1} tried a rocket jump"
+      "23": "You shouldn't listen to the pretty melody of the Lullaby, {1} :musical_note:"
     dataja: "https://zrunner.me/d-a-t-a/en.html"
   perms:
     list:
@@ -255,10 +325,12 @@ en:
       priority_speaker: Priority speaker
       read_message_history: Read message history
       read_messages: View channel
+      request_to_speak: Request to speak
       send_messages: Send messages
       send_tts_messages: Send Text-to-Speech messages
       speak: Speak
       stream: Video
+      use_slash_commands: Use slash commands
       use_voice_activation: Use voice activity
       view_audit_log: View audit log
       view_guild_insights: View server insights
@@ -301,6 +373,7 @@ en:
       VoiceChannels: Voice channels
       Welcome: Welcome
       XP: XP levels
+      Groups: Groups
   thanks:
     add:
       done: "%{user} has received your thanks. They now have %{amount} active thanks!"
@@ -350,6 +423,61 @@ en:
     result:
       one: Deleted 1 channel
       many: Deleted %{count} channels
+  rss:
+    change-txt: "The current message contain \n```\n{text}\n```\nPlease enter the text to be used in a new post. You can use several variables, there is the list:\n- `{author}`: post author\n- `{channel}`: channel name (usually the same as the author)\n- `{date}`: post date (UTC)\n- `{link}` or `{url}`: a link to the post\n- `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)\n- `{mentions}`: list of mentionned roles\n- `{title}`: post title"
+    choose-delete: "Chose a feed to delete"
+    choose-mentions-1: "Chose a feed to edit"
+    choose-roles: "Wich role do you want to mention?"
+    delete-success: "The feed has been successfully deleted!"
+    deviant: "DeviantArt"
+    deviant-default-flow: "{logo}  | New creation of {author}: **{title}**\nPublished on {date}\nLink: {link}\n{mentions}"
+    deviant-form-last: "{logo}  | There is the last creation of {author}:\n{title}\nPublished on {date}\nLink: {url}"
+    embed-json-changed: "The feed's embed has been successfully edited"
+    fail-add: "An error occurred while processing your response. Please try again later, or contact bot support (enter the command `about` for the server link)"
+    flow-limit: "For performance reasons, you cannot track more than {} rss feeds per server."
+    guild-complete: "{} rss feeds were correctly reloaded, in {} seconds!"
+    guild-error: "An error occurred during the procedure: `{}`\nIf you think this error is not your fault, you can notify support"
+    guild-loading: "Reloading {}"
+    invalid-flow: "This url is invalid (empty rss feed or inaccessible) :confused:"
+    invalid-link: "Oops, this url address is invalid or incomplete :confused:"
+    list: "*Enter the number of the stream to be modified*\n\n**Link - Type - Channel - Roles**\n"
+    list-title: "List of active feeds on the server {server}"
+    list-result: "Type: {}\nChannel: {}\nLink/ID: {}\nMentionned roles: {}\nIdentifier: {}\nLast post: {}"
+    list2: "*Enter the number of the feed to be deleted*\n\n**Link - Type - Channel**\n"
+    mc: "Minecraft"
+    move-success: "The rss feed n°{} has been moved to the channel {} !"
+    no-feed: "Oops, you have no rss feed to manage!"
+    no-feed2: "This server has no rss feeds!"
+    no-roles: "No roles have been configured yet."
+    not-a-role: "This role cannot be found. Try again."
+    nothing: "I couldn't find anything on this search :confused:"
+    research-timeout: "The web page took too long to respond, I had to abort the process :eyes:"
+    roles-0: "This feed has been modified to mention roles {}"
+    roles-1: "This feed has been modified to not mention any roles"
+    roles-list: "Here is the list of roles already mentioned: {}"
+    success-add: "The rss feed of type '{}' with the link <{}> has been added to the {} channel!"
+    text-success: "The text of the feed n°{} has been modified! New text: \n```\n{}\n```"
+    too-long: "You waited too long, sorry :hourglass:"
+    tw: "Twitter"
+    tw-default-flow: "{logo}  | New tweet of {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}"
+    tw-form-last: "{logo}  | Here is the latest tweet from {author}:\nWritten on {date}\n\n{title}\n\nLink: {url}\n"
+    tw-help: "To search for a twitter channel, you have to enter the id of this channel. You will find it at the end of the url of the channel, it usually corresponds to the name of the user. For example, for *https://twitter.com/Gunivers_*, you have to enter `Gunivers_`"
+    twitch: "Twitch"
+    twitch-default-flow: "{logo}  | {author} is live! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}"
+    twitch-form-last: "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}\n"
+    use_embed-same: "The use of embeds for this feed has not changed"
+    use_embed-success: "The value has been changed to {v} for stream n°{f} !"
+    use_embed_false: "This feed does not use embeds to be sent. Do you want to use embeds for this feed? (true/false)"
+    use_embed_true: "This feed currently uses embeds to be sent. Do you still want to use embeds for this feed? (true/false)"
+    web: "Web"
+    web-default-flow: "{logo}  | Now post on {author} ({date}) :\n    {title}\n\n{link}\n\n{mentions}"
+    web-form-last: "{logo}  | Here is the last post of {author}:\n**{title}**\n*Written on {date}*\nLink: {link}"
+    web-help: "To search for an rss feed from any website, just enter the url of the rss/atom feed as a parameter. If the feed is valid, I will return the last article posted on this site"
+    web-invalid: "Oops, this url address is invalid :confused:"
+    yt: "YouTube"
+    yt-default-flow: "{logo}  | New vidéo from {author}: **{title}**\nPublished on {date}\nLink: {link}\n{mentions}"
+    yt-form-last: "{logo}  | ere is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}"
+    yt-help: "To search for a youtube channel, you need to enter the id of this channel. You will find it at the end of the url of the channel, it can be either the name or a random sequence of characters"
   xp:
     card:
       level: Level

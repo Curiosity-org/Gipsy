@@ -41,6 +41,7 @@ fr:
     unknown-role: "Impossible de trouver le rôle %{r} :confused:"
     unknown-server: Serveur introuvable
     unknown-user: "Impossible de trouver l'utilisateur %{u} :confused:"
+    unknown-group: "Impossible de trouver le groupe %{g} :confused:"
   general:
     stats:
       title: "Statistiques du bot"
@@ -110,7 +111,49 @@ fr:
     dep-notfound: Impossible de trouver une rôle-liaison avec cet identifiant.\nVous pouvez obtenir l'identifiant d'une liaison avec la commande `%{p}rolelink list`
     infinite: "Oups, il semble que cette dépendance puisse entraîner une boucle infinie avec au moins la dépendance suivante : \"%{dep}\"\nSi vous êtes sûr de vouloir continuer, entrez 'oui' dans les %{t} prochaines secondes"
     list: "Liste de vos rôles-liaisons :"
-    no-dep: Vous n'avez aucune dépendance de configurée pour le moment.\nUtilisez la commande `%{p}rolelink create` pour en ajouter
+    no-dep: "Vous n'avez aucune dépendance de configurée pour le moment.\nUtilisez la commande `%{p}rolelink create` pour en ajouter"
+  groups:
+    list: "Liste des groupes du serveur :"
+    created: "Vous avez créé le groupe %{name}"
+    delete: "Vous avez supprimé le groupe %{name}"
+    registred: "Vous avez enregistré le groupe %{name}"
+    unregistred: "Vous avez supprimé le groupe %{name} du système (le role n'a pas été supprimé)"
+    update_owner: "Vous avez donné le groupe %{group} à %{owner}"
+    update_name: "Vous avez renommé le groupe %{group} en %{name}"
+    update_privacy: "Vous avez passé le groupe %{group} %{privacy}"
+    join: "Vous avez rejoint le groupe %{name}"
+    leave: "Vous avez quitté le groupe %{name}"
+    joinbyforce: "Vous avez forcé %{user} à rejoindre %{name}"
+    leavebyforce: "Vous avez expulsé %{user} de %{name}"
+    give: "%{user}, %{owner} veut vous donner le groupe %{group}"
+    channel_delete: "Vous avez supprimé le salon pour le groupe %{group}"
+    channel-create: "Vous avez créé le salon pour le groupe %{name}"
+    channel-registred: "Vous avez enregistré le salon pour le groupe %{name}"
+    channel_unregister: "Vous avez supprimé le salon du système pour le groupe %{group} (le salon n'a pas été supprimé)"
+    userlist: "Liste des membres du groupes"
+    error:
+      no-group: "Vous n'avez aucun groupe créé pour le moment.\nUtilisez la commande `%{p}group add` pour en créer"
+      no-delete: "Impossible de trouver un groupe avec cet identifiant ou ce nom"
+      no-unregistred: "Impossible de trouver un groupe avec cet identifiant ou ce nom"
+      no-update: "Impossible de trouver un groupe avec cet identifiant ou ce nom. Vérifier aussi si vous êtes bien propriétaire de ce groupe ou bien que vous avez la permission ADMINISTRATEUR"
+      exist: "Un groupe avec le nom %{name} existe déja"
+      tomanygroup: "Vous possédez trop de groupes"
+      not-owner: "Vous devez être propriétaire de ce groupe ou avoir la permission ADMINISTRATEUR"
+      not-admin: "Vous devez avoir la permission ADMINISTRATEUR"
+      tomanygroupuser: "{user} possède trop de groupes"
+      timeout: "{user} n'as pas répondu donc la modification de propriétaire a été annulé"
+      badarg: "Vous devez indiquez \"public\" ou \"private\""
+      no-exist: "Ce groupe n'existe pas"
+      private: "Ce groupe est privé"
+      already-in: "Vous êtes déja dans ce groupe"
+      not-in: "Vous n'êtes pas dans ce groupe"
+      owner: "Vous êtes propriétaire de ce groupe et donc ne pouvez pas quitter ce groupe"
+      already-in-user: "Ce membre est déja dans ce groupe"
+      not-in-user: "Ce membre n'est pas dans ce groupe"
+      no-channel: "Ce group ne possède pas de salon"
+      no-delete-channel: "Impossible de trouver un groupe avec cet identifiant ou ce nom"
+      channel-exist: "Ce groupe possède déja un salon"
+      no-category: "Vous devez d'abord configuré une catégorie pour les salons de groupes : `%{p}config group_channel_category`"
   hypesquad:
     no-role: Vous n'avez aucun rôle de maison configuré !
     forbidden: Oups, une erreur est survenue. Veuillez vérifier mes permissions !
@@ -184,7 +227,7 @@ fr:
       title: Rôle supprimé
       desc: Le rôle %{name} vient d'être supprimé
       members: "Nombre de membres :"
-    role_update:
+    role_updated:
       title: Rôle édité
       desc: Le rôle %{mention} (%{name}) vient d'être modifié
       name: "Nom :"
@@ -223,11 +266,38 @@ fr:
   misc:
     cookie:
       give: "Voilà pour vous %{to}: :cookie:\nDe la part de %{giver}"
-      selfcookie: "Voilà pour vous %{to}: :cookie:"
+      self: "Voilà pour vous %{to}: :cookie:"
+    hoster:
+      info: ":speech_balloon: Serveur Discord : <https://discord.gg/RUPKTmC>\n:globe_with_meridians: Site web : <https://clients.inovaperf.fr/aff.php?aff=514>\n:money_with_wings: -20% sur le premier achat avec le code `GUNIVERS`"
     flipacoin:
       heads: "Face !"
       tails: "Pile !"
       side: "Coté !"
+    kills:
+      "0": "Oh toi, tu vas mourir !"
+      "1": "***BOUM !*** {1} est tombé dans un piège posé par {0} !"
+      "2": "Heureusement que le sol a amorti la chute de {1} !"
+      "3": "{0} a crié \"Fus Roh Dah\" alors que {1} était à coté d'une falaise..."
+      "4": "Eh non, tu ne peux pas arreter les balles avec tes mains {1} :shrug:"
+      "5": "Il faut être __dans__ l’ascenseur {1}, pas __au-dessus__..."
+      "6": "{1} est resté trop près des enceintes lors d'un concert de heavy metal."
+      "7": "Rester à moins de 10m d'une explosion atomique, ce n'était pas une bonne idée {1}..."
+      "8": "Non ! Les doubles sauts ne sont pas possibles {1} !"
+      "9": "{1} a imité Icare... splash."
+      "10": "C'est bien d'avoir un pistolet à portails {1}, encore faut il ne pas en ouvrir un au dessus des piques...."
+      "11": "{1} est mort. Paix à son âme... :sneezing_face:"
+      "12": "{0} a tué {1}"
+      "13": "{1} a été shot par {0}"
+      "14": "Bye {1} ! :ghost:"
+      "15": "{1} a vu tomber une enclume volante... sur sa tête :head_bandage:"
+      "16": "{1} part se suicider après que {0} ai coupé sa connexion"
+      "17": "Attention {1} ! Le feu, ça brûle :fire:"
+      "18": "{1} est parti sans pelle lors d'une attaque zombie"
+      "19": "{1} a tenté de faire un calin à un creeper"
+      "20": "{1}, les bains de lave sont chauds, mais la lave, ça brûle..."
+      "21": "{1} a tenté un rocket jump"
+      "22": "Il ne fallait pas écouter la jolie mélodie de la Lullaby, {1} :musical_note:"
+      "23": "{2}.exe *a cessé de fonctionner*"
     dataja: "https://zrunner.me/d-a-t-a/fr.html"
   perms:
     list:
@@ -255,10 +325,12 @@ fr:
       priority_speaker: Voix prioritaire
       read_message_history: Voir les anciens messages
       read_messages: Voir le salon
+      request_to_speak: Demander la parole
       send_messages: Envoyer des messages
       send_tts_messages: Envoyer des messages TTS
       speak: Parler
       stream: Utiliser la vidéo
+      use_slash_commands: Utiliser les commandes slash
       use_voice_activation: Utiliser la Détection de la voix
       view_audit_log: Voir les logs du serveur
       view_guild_insights: Voir les analyses de serveur
@@ -301,6 +373,7 @@ fr:
       VoiceChannels: Salons vocaux
       Welcome: Bienvenue
       XP: Niveaux d'XP
+      Groups: Groupes
   thanks:
     add:
       done: "%{user} a bien reçu votre remerciement. Il a maintenant %{amount} remerciements actifs !"
@@ -350,6 +423,61 @@ fr:
     result:
       one: Supprimé 1 salon
       many: Supprimé %{count} salons
+  rss:
+    change-txt: "Le message actuel contient \n```\n{text}\n```\nVeuillez entrer le texte à utiliser lors d'un nouveau post. Vous pouvez utiliser plusieurs variables, dont voici la liste :\n- `{author}` : l'auteur du post\n- `{channel}` : le nom de la chaîne (généralement le même que l'auteur)\n- `{date}` : la date du post (UTC)\n- `{link}` ou `{url}` : un lien vers le post\n- `{logo}` : un emoji représentant le type de post (web, Twitter, YouTube...)\n- `{mentions}` : la liste des rôles mentionnés\n- `{title}` : le titre du post"
+    choose-delete: "Veuillez choisir le flux à supprimer"
+    choose-mentions-1: "Veuillez choisir le flux à modifier"
+    choose-roles: "Quels seront les rôles à mentionner ?"
+    delete-success: "Le flux a été supprimé avec succès !"
+    deviant: "DeviantArt"
+    deviant-default-flow: "{logo}  | Nouvelle création de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}"
+    deviant-form-last: "{logo}  | Voici la dernière création de {author}:\n{title}\nPubliée le {date}\nLien : {url}"
+    embed-json-changed: "L'embed de ce flux a bien été modifié"
+    fail-add: "Une erreur s'est produite lors du traitement de votre réponse. Merci de réessayer plus tard, ou de contacter le support du bot (entrez la commande `about` pour le lien du serveur)"
+    flow-limit: "Pour des raisons de performances, vous ne pouvez pas suivre plus de {} flux rss par serveur."
+    guild-complete: "{} flux rss ont correctement été rechargés, en {} secondes !"
+    guild-error: "Une erreur est survenue pendant la procédure : `{}`\nSi vous pensez que cette erreur ne vient pas de vous, vous pouvez en avertir le support"
+    guild-loading: "Rechargement en cours {}"
+    invalid-flow: "Cet url est invalide (flux rss vide ou inaccessible) :confused:"
+    invalid-link: "Oups, cette adresse url est invalide ou incomplète :confused:"
+    list: "*Entrez le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n"
+    list-title: "Liste des flux rss du serveur {server}"
+    list-result: "Type : {}\nSalon : {}\nLien/chaine : {}\nRôle mentionné : {}\nIdentifiant : {}\nDernier post : {}"
+    list2: "*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n"
+    mc: "Minecraft"
+    move-success: "Le flux rss n°{} a bien été bougé dans le salon {} !"
+    no-feed: "Oups, vous n'avez aucun flux rss à gérer !"
+    no-feed2: "Ce serveur ne possède aucun flux rss !"
+    no-roles: "Aucun rôle n'a été configuré pour l'instant."
+    not-a-role: "Ce rôle est introuvable. Réessayez :"
+    nothing: "Je n'ai rien trouvé sur cette recherche :confused:"
+    research-timeout: "La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:"
+    roles-0: "Ce flux a bien été modifié pour mentionner les rôles {}"
+    roles-1: "Ce flux a bien été modifié pour ne mentionner aucun rôle"
+    roles-list: "Voici la liste des rôles déjà mentionnés : {}"
+    success-add: "Le flux rss de type '{}' avec le lien <{}> a bien été ajouté dans le salon {} !"
+    text-success: "Le texte du flux n°{} a bien été modifié ! Nouveau texte : \n```\n{}\n```"
+    too-long: "Vous avez trop attendu, désolé :hourglass:"
+    tw: "Twitter"
+    tw-default-flow: "{logo}  | Nouveau tweet de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}"
+    tw-form-last: "{logo}  | Voici le dernier tweet de {author}:\nÉcrit le {date}\n\n{title}\n\nLien : {url}\n"
+    tw-help: "Pour rechercher une chaîne twitter, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaîne, elle correspond généralement au nom de l'utilisateur. Par exemple, pour *https://twitter.com/Gunivers_*, il faut rentrer `Gunivers_`"
+    twitch: "Twitch"
+    twitch-default-flow: "{logo}  | Nouveau live de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}"
+    twitch-form-last: "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}\n"
+    use_embed-same: "L'utilisation d'embeds pour ce flux n'a pas changé"
+    use_embed-success: "La valeur a bien été modifiée à {v} pour le flux n°{f} !"
+    use_embed_false: "Ce flux n'utilise pas d'embed pour être envoyé. Voulez-vous utiliser les embeds pour ce flux ? (true/false)"
+    use_embed_true: "Ce flux utilise actuellement les embeds pour être envoyé. Voulez-vous toujours utiliser les embeds pour ce flux ? (true/false)"
+    web: "Web"
+    web-default-flow: "{logo}  | Nouveau post sur {author} ({date}) :\n    {title}\n\n{link}\n\n{mentions}"
+    web-form-last: "{logo}  | Voici le dernier post de {author}:\n**{title}**\n*Ecrit le {date}*\nLien : {link}"
+    web-help: "Pour rechercher un flux rss à partir de n'importe quel site web, il suffit d'entrer l'url du flux rss/atom en paramètre. Si le flux est valide, je vous renverrai le dernier article posté sur ce site"
+    web-invalid: "Oups, cette adresse url est invalide :confused:"
+    yt: "YouTube"
+    yt-default-flow: "{logo}  | Nouvelle vidéo de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}"
+    yt-form-last: "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}"
+    yt-help: "Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires"
   xp:
     card:
       level: Niveau

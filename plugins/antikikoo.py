@@ -1,8 +1,8 @@
-from discord.channel import TextChannel
-from utils import Gunibot, MyContext
-import discord
-from discord.ext import commands
 import checks
+import discord
+from discord.channel import TextChannel
+from discord.ext import commands
+from utils import Gunibot, MyContext
 
 WELCOME_MESSAGE = """(FR) Bienvenue sur {server} {user} !
 Vous n'avez accès qu'au salon Lobby pour le moment. Pour débloquer l'accès au reste du Discord, lisez les instructions présentes dans le salon {channel} :wink:

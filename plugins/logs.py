@@ -1,9 +1,9 @@
-from utils import Gunibot
-import discord
-from discord.ext import commands
-import checks
 import datetime
 from typing import List
+
+import discord
+from discord.ext import commands
+from utils import Gunibot
 
 
 class Logs(commands.Cog):
@@ -367,7 +367,7 @@ class Logs(commands.Cog):
             _color = await self.bot._(after.guild.id, "logs.role_created.color")
             data.append(_color + f" {before.color} -> {after.color}")
         if before.name != after.name:
-            _name = await self.bot._(after.guild.id, "logs.role_update.name")
+            _name = await self.bot._(after.guild.id, "logs.role_updated.name")
             data.append(_name + f" {before.name} -> {after.name}")
         if before.permissions.administrator != after.permissions.administrator:
             b1 = _yes if before.permissions.administrator else _no
@@ -386,7 +386,7 @@ class Logs(commands.Cog):
             data.append(_hoist + f": {b1} -> {b2}")
         if len(data) == 0:
             return
-        _changes = await self.bot._(after.guild.id, "logs.role_update.changes")
+        _changes = await self.bot._(after.guild.id, "logs.role_updated.changes")
         embed.add_field(name=_changes, value="\n".join(data))
         embed.color = discord.Color.orange()
         await self.send_embed(before.guild, embed)

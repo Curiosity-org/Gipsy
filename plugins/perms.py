@@ -1,7 +1,9 @@
-from utils import Gunibot, MyContext
-import discord
 import typing
+
+import discord
 from discord.ext import commands
+from utils import Gunibot, MyContext
+
 
 class Perms(commands.Cog):
     """Cog with a single command, allowing you to see the permissions of a member or a role in a channel."""
