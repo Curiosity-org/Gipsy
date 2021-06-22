@@ -60,7 +60,7 @@ def main():
             client.run(conf["token_beta"])
     else:
         log.debug("Pas d'arguments trouvés!")
-        instance_type = input("Lancer la version stable ? (y/n) ").lower()
+        instance_type = "y"
         if instance_type == "y":
             client.run(conf["token"])
         elif instance_type == 'n':
