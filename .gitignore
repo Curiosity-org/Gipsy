@@ -10,3 +10,4 @@ config.json
 .bash*
 .profile
 .idea/
+.venv/
