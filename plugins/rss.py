@@ -26,7 +26,7 @@ class Rss(commands.Cog):
         self.bot = bot
         self.time_loop = 15 # min minutes between two rss loops
         self.time_between_flows_check = 0.15 # seconds between two rss checks within a loop
-        self.max_feeds_per_guild = 20
+        self.max_feeds_per_guild = 100
         
         self.file = "rss"
         self.embed_color = discord.Color(6017876)
