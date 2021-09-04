@@ -1,0 +1,4 @@
+en:
+  antikikoo:
+    channel-edited: The verification channel is now %{channel}!
+    msg-edited: The information message has been successfully modified!

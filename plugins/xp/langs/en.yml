@@ -1,0 +1,26 @@
+en:
+  xp:
+    card:
+      level: Level
+      rank: Rank
+    rr:
+      added: The role %{name} has successfully been added to the level %{level}
+      already-exist: A role-level already exists for this level
+      list-title: Server Roles-Levels (%{nbr})
+      no-rr: You do not have any roles configured for this level
+      no-rr-2: You do not have any role configured in this server!
+      reload: "%{count} roles have been assigned or removed on the %{members} members of the server"
+      removed: No more roles will be given for the level %{level}
+    top:
+      title: Server leaderboard
+      name: "Top %{min}-%{max} (page %{page}/%{pmax})"
+      your: Your score
+      low-page: You cannot enter a negative or zero page number
+      high-page: There are not so many pages!
+    bot-rank: Bots can't have xp!
+    cant-manage-roles: Oops, I can't give the roles! Please give me permission to "manage roles" and check that my role is higher than the ones to be given
+    cant-send-embed: Oops, I can't send the result! Please grant me permission to "embed links"
+    default_levelup: Hey, {user} goes to level {level}! GG!
+    no-xp-author: You don't have any xp yet
+    no-xp-user: This user has no xp yet
+    xp-disabled: The xp system is disabled here!

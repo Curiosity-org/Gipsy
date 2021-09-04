@@ -7,11 +7,27 @@ import asyncio
 import logging
 import json
 import sys
-import sqlite3
-from discord.ext import commands
+import os
+import argparse
+
+# check python version
+py_version = sys.version_info
+if py_version.major != 3 or py_version.minor < 9:
+    print("Vous devez utiliser au moins Python 3.9 !", file=sys.stderr)
+    sys.exit(1)
+
 from utils import Gunibot, setup_logger
 
-initial_extensions = ["admin", "timeclass", "antikikoo", "contact", "errors", "general", "sconfig", "configManager", "voices", "logs", "perms", "welcome", "thanks", "groupRoles", "misc", "messageManager", "giveaways", "languages", "hypesquad", "xp", "rss", "groups"]
+
+# Loaded plugins
+initial_extensions = []
+for plugin in os.listdir('./plugins/'):
+    if plugin[0] != '_':
+        if os.path.isdir('./plugins/' + plugin):
+            initial_extensions.append(plugin + '.main')
+        if os.path.isfile('./plugins/' + plugin) and plugin[-3:] == '.py':
+            initial_extensions.append(plugin[0:-3])
+
 
 
 def main():
@@ -52,12 +68,13 @@ def main():
 
     client.add_listener(on_ready)
 
-    if (not len(sys.argv) < 2):
-        if (sys.argv[1].lower() == "stable"):
-            client.run(conf["token"])
-        elif (sys.argv[1].lower() == "beta"):
-            client.beta = True
-            client.run(conf["token_beta"])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-b", "--beta", help="Run with the beta bot token", action='store_true')
+    args = parser.parse_args()
+
+    if args.beta:
+        client.beta = True
+        client.run(conf["token_beta"])
     else:
         log.debug("Pas d'arguments trouvés!")
         instance_type = "y"

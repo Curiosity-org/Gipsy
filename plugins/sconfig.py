@@ -167,7 +167,10 @@ class Sconfig(commands.Cog):
                     for extra in await self.bot.get_cog(module)._create_config(ctx):
                         temp += (f"[{extra[0]}]").ljust(max_length+1) + f" {extra[1]}\n"
                 res.append(temp)
-            await ctx.send("```ini\n" + "\n".join(res) + "```")
+
+            for category in res:
+                await ctx.send("```ini\n" + "\n" + category + "```")
+
         elif ctx.invoked_subcommand is None:
             await ctx.send(await self.bot._(ctx.guild.id, 'sconfig.option-notfound'))
 
@@ -179,10 +182,6 @@ class Sconfig(commands.Cog):
             return
         await ctx.send(await self.edit_config(ctx.guild.id, "prefix", new_prefix))
 
-    @main_config.command(name="verification_channel")
-    async def config_verification_channel_id(self, ctx: MyContext, *, channel: discord.TextChannel):
-        await ctx.send(await self.edit_config(ctx.guild.id, "verification_channel", channel.id))
-
     @main_config.command(name="logs_channel")
     async def config_logs_channel(self, ctx: MyContext, *, channel: discord.TextChannel):
         await ctx.send(await self.edit_config(ctx.guild.id, "logs_channel", channel.id))
@@ -192,29 +191,9 @@ class Sconfig(commands.Cog):
                                 color=16098851)
             await logs_cog.send_embed(ctx.guild, emb)
 
-    @main_config.command(name="info_channel")
-    async def config_info_channel(self, ctx: MyContext, *, channel: discord.TextChannel):
-        await ctx.send(await self.edit_config(ctx.guild.id, "info_channel", channel.id))
-
-    @main_config.command(name="verification_role")
-    async def config_verification_role(self, ctx: MyContext, *, role: discord.Role):
-        await ctx.send(await self.edit_config(ctx.guild.id, "verification_role", role.id))
-
-    @main_config.command(name="verification_add_role")
-    async def config_verification_add_role(self, ctx: MyContext, value: bool):
-        await ctx.send(await self.edit_config(ctx.guild.id, "verification_add_role", value))
-    
-    @main_config.command(name="verification_info_message")
-    async def config_verification_add_role(self, ctx: MyContext, *, value: str = None):
-        """Informative message sent in the verification channel when someone joins your message
-        Put nothing to reset it, or "None" for no message"""
-        if value.lower() == "none":
-            value = "None" # no message
-        await ctx.send(await self.edit_config(ctx.guild.id, "verification_info_message", value))
-
-    @main_config.command(name="pass_message")
-    async def config_pass_message(self, ctx: MyContext, *, message):
-        await ctx.send(await self.edit_config(ctx.guild.id, "pass_message", message))
+    #--------------------------------------------------
+    # Contact
+    #--------------------------------------------------
 
     @main_config.command(name="contact_channel")
     async def config_contact_channel(self, ctx: MyContext, *, channel: discord.TextChannel):
@@ -232,6 +211,17 @@ class Sconfig(commands.Cog):
             roles = [role.id for role in roles]
         await ctx.send(await self.edit_config(ctx.guild.id, "contact_roles", roles))
 
+    @main_config.command(name="contact_title")
+    async def config_contact_title(self, ctx: MyContext, *, title):
+        if title == "author" or title == "object":
+            await ctx.send(await self.edit_config(ctx.guild.id, "contact_title", title))
+        else:
+            await ctx.send(await self.bot._(ctx.guild.id, "contact.invalid-title"))
+
+    #--------------------------------------------------
+    # Welcome
+    #--------------------------------------------------
+
     @main_config.command(name="welcome_roles")
     async def config_welcome_roles(self, ctx: MyContext, roles: commands.Greedy[discord.Role]):
         if len(roles) == 0:
@@ -240,6 +230,52 @@ class Sconfig(commands.Cog):
             roles = [role.id for role in roles]
         await ctx.send(await self.edit_config(ctx.guild.id, "welcome_roles", roles))
 
+    @main_config.command(name="info_channel")
+    async def config_info_channel(self, ctx: MyContext, *, channel: discord.TextChannel):
+        await ctx.send(await self.edit_config(ctx.guild.id, "info_channel", channel.id))
+
+    @main_config.command(name="verification_role")
+    async def config_verification_role(self, ctx: MyContext, *, role: discord.Role):
+        await ctx.send(await self.edit_config(ctx.guild.id, "verification_role", role.id))
+
+    @main_config.command(name="verification_add_role")
+    async def config_verification_add_role(self, ctx: MyContext, value: bool):
+        await ctx.send(await self.edit_config(ctx.guild.id, "verification_add_role", value))
+
+    @main_config.command(name="verification_info_message")
+    async def config_verification_add_role(self, ctx: MyContext, *, value: str = None):
+        """Informative message sent in the verification channel when someone joins your message
+        Put nothing to reset it, or "None" for no message"""
+        if value.lower() == "none":
+            value = "None"  # no message
+        await ctx.send(await self.edit_config(ctx.guild.id, "verification_info_message", value))
+
+    @main_config.command(name="pass_message")
+    async def config_pass_message(self, ctx: MyContext, *, message):
+        await ctx.send(await self.edit_config(ctx.guild.id, "pass_message", message))
+
+    @main_config.command(name="verification_channel")
+    async def config_verification_channel_id(self, ctx: MyContext, *, channel: discord.TextChannel):
+        await ctx.send(await self.edit_config(ctx.guild.id, "verification_channel", channel.id))
+
+    #--------------------------------------------------
+    # Voice Channel
+    #--------------------------------------------------
+
+    @main_config.command(name="voice_channel_format")
+    async def config_voice_channel_format(self, ctx: MyContext, *, text: str):
+        """Format of voice channels names
+        Use {random} for any random name, {asterix} for any asterix name"""
+        await ctx.send(await self.edit_config(ctx.guild.id, "voice_channel_format", text[:40]))
+
+    @main_config.command(name="voice_roles")
+    async def config_voice_roles(self, ctx: MyContext, roles: commands.Greedy[discord.Role]):
+        if len(roles) == 0:
+            roles = None
+        else:
+            roles = [role.id for role in roles]
+        await ctx.send(await self.edit_config(ctx.guild.id, "voice_roles", roles))
+
     @main_config.command(name="voices_category")
     async def config_voices_category(self, ctx: MyContext, *, category: discord.CategoryChannel):
         await ctx.send(await self.edit_config(ctx.guild.id, "voices_category", category.id))
@@ -247,6 +283,10 @@ class Sconfig(commands.Cog):
     @main_config.command(name="voice_channel")
     async def config_voice_channel(self, ctx: MyContext, *, channel: discord.VoiceChannel):
         await ctx.send(await self.edit_config(ctx.guild.id, "voice_channel", channel.id))
+
+    #--------------------------------------------------
+    # ModLogs
+    #--------------------------------------------------
 
     @main_config.command(name="modlogs_flags")
     async def config_modlogs_flags(self, ctx: MyContext):
@@ -292,19 +332,9 @@ class Sconfig(commands.Cog):
         f = self.bot.get_cog('ConfigCog').LogsFlags.FLAGS.values()
         await ctx.send(await self.bot._(ctx.guild.id, "sconfig.modlogs-list", list=" - ".join(f)))
 
-    @main_config.command(name="voice_channel_format")
-    async def config_voice_channel_format(self, ctx: MyContext, *, text: str):
-        """Format of voice channels names
-        Use {random} for any random name, {asterix} for any asterix name"""
-        await ctx.send(await self.edit_config(ctx.guild.id, "voice_channel_format", text[:40]))
-
-    @main_config.command(name="voice_roles")
-    async def config_voice_roles(self, ctx: MyContext, roles: commands.Greedy[discord.Role]):
-        if len(roles) == 0:
-            roles = None
-        else:
-            roles = [role.id for role in roles]
-        await ctx.send(await self.edit_config(ctx.guild.id, "voice_roles", roles))
+    #--------------------------------------------------
+    # Thanks
+    #--------------------------------------------------
 
     @main_config.command(name="thanks_allowed_roles")
     async def config_thanks_allowed_roles(self, ctx: MyContext, roles: commands.Greedy[discord.Role]):
@@ -350,6 +380,10 @@ class Sconfig(commands.Cog):
         else:
             await self.bot.get_cog("Thanks").thankslevel_remove(ctx, amount)
 
+    #--------------------------------------------------
+    # Language
+    #--------------------------------------------------
+
     @main_config.command(name="language", aliases=['lang'])
     async def language(self, ctx: MyContext, lang: str):
         """Change the bot language in your server
@@ -365,7 +399,11 @@ class Sconfig(commands.Cog):
         else:  # correct case
             selected = cog.languages.index(lang)
             await ctx.send(await self.edit_config(ctx.guild.id, "language", selected))
-    
+
+    #--------------------------------------------------
+    # Hypesquad
+    #--------------------------------------------------
+
     @main_config.group(name="hypesquad", aliases=['hs'], enabled=False)
     async def hs_main(self, ctx: MyContext):
         """Manage options about Discord ypesquads"""
@@ -388,7 +426,11 @@ class Sconfig(commands.Cog):
             await ctx.send(await self.edit_config(ctx.guild.id, "hs_balance_role", role))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, 'sconfig.hypesquad.unknown'))
-    
+
+    #--------------------------------------------------
+    # Giveaway
+    #--------------------------------------------------
+
     @main_config.command(name="giveaways_emojis")
     async def giveaways_emojis(self, ctx: MyContext, emojis: commands.Greedy[Union[discord.Emoji, str]]):
         """Set a list of usable emojis for giveaways
@@ -408,7 +450,11 @@ class Sconfig(commands.Cog):
         emojis = [str(x.id) if isinstance(x, discord.Emoji) else x for x in emojis]
         # save result
         await ctx.send(await self.edit_config(ctx.guild.id, "giveaways_emojis", emojis))
-    
+
+    #--------------------------------------------------
+    # XP
+    #--------------------------------------------------
+
     @main_config.command(name="enable_xp")
     async def config_enable_xp(self, ctx: MyContext, value: bool):
         """Enable or disable the XP system in your server"""
@@ -463,6 +509,10 @@ class Sconfig(commands.Cog):
         # save result
         await ctx.send(await self.edit_config(ctx.guild.id, "reaction_emoji", emote))
 
+    #--------------------------------------------------
+    # Groups
+    #--------------------------------------------------
+
     @main_config.command(name="group_allowed_role")
     async def config_group_allowed_role(self, ctx: MyContext, *, role: discord.Role=None):
         """Role allowed to create groups"""
@@ -492,6 +542,10 @@ class Sconfig(commands.Cog):
         """Create or load your server configuration"""
         if ctx.subcommand_passed is None:
             await ctx.send_help('config-backup')
+
+    #--------------------------------------------------
+    # Backup
+    #--------------------------------------------------
 
     @config_backup.command(name="get", aliases=["create"])
     async def backup_create(self, ctx: MyContext):
@@ -532,6 +586,24 @@ class Sconfig(commands.Cog):
             self.bot.server_configs[ctx.guild.id] = d
             await ctx.send('👍')
 
+    #--------------------------------------------------
+    # Archives
+    #--------------------------------------------------
+
+    @main_config.command(name="archive_category")
+    async def config_voice_channel(self, ctx: MyContext, *, category: discord.CategoryChannel):
+        await ctx.send(await self.edit_config(ctx.guild.id, "archive_category", category.id))
+
+    @main_config.command(name="archive_duration")
+    async def config_archive_duration(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta]):
+        duration = sum(duration)
+        if duration == 0:
+            if ctx.message.content.split(" ")[-1] != "archive_duration":
+                await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-duration"))
+                return
+            duration = None
+        x = await self.edit_config(ctx.guild.id, "archive_duration", duration)
+        await ctx.send(x)
 
 
 def setup(bot):

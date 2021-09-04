@@ -2,11 +2,18 @@ import discord
 import i18n
 from discord.ext import commands
 from utils import Gunibot
+import os
 
 i18n.translations.container.clear()  # invalidate old cache
 i18n.set('filename_format', '{locale}.{format}')
 i18n.set('fallback', 'fr')
 i18n.load_path.append('./langs')
+
+# Check all plugin lang directory
+for plugin in os.listdir('./plugins/'):
+    if os.path.isdir('./plugins/' + plugin + '/langs/') and plugin[0] != '_':
+        i18n.load_path.append('./plugins/' + plugin + '/langs/')
+
 
 
 class Languages(commands.Cog):

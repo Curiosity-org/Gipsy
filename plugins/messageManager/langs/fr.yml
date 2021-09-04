@@ -1,0 +1,15 @@
+fr:
+  message_manager:
+      move:
+        confirm: "%{user}, votre message a été déplacé dans %{channel}"
+        footer: "Message déplacé par %{user}"
+      moveall:
+        channel-conflict: Les deux messages cités doivent être dans le même salon
+        running: "Déplacement de plusieurs messages vars %{channel} en cours ..."
+        confirm: "Plusieurs messages ont été déplacés dans %{channel}. [Cliquez ici](%{link}) pour voir la conversation déplacée."
+        introduce: "La conversation suivante vient du salon %{channel}. [Cliquez ici](%{link}) pour retourner à la conversation initiale."
+        footer: "Messages déplacés par %{user}"
+        missing-perm: "Impossible de faire cela :confused: Vérifiez que je possède la permission de Lire le salon, Lire l'historique des messages, Gérer les messages dans ce salon, et Lire le salon, Gérer les webhooks dans le salon ciblé"
+        no-msg: Aucun message trouvé
+      permission: "Vous ne pouvez pas déplacer les messages. Assurez vous d'avoir les permissions pour voir les messages que vous souhtaitez déplacer, et gérer les messages dans les deux salons."
+      no-channel: "Impossible de trouver le salon. S'il s'agit d'un salon sur un autre serveur, merci d'indiquer son identifiant"
