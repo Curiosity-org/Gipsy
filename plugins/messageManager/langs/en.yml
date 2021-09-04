@@ -1,0 +1,15 @@
+en:
+  message_manager:
+      move:
+        confirm: "%{user}, your message was moved in %{channel}"
+        footer: "Message moved by %{user}"
+      moveall:
+        channel-conflict: The two mentioned messages must be in the same chat
+        running: "Moving several mesages to %{channel} ..."
+        confirm: "Several messages has been moved in %{channel}. [Click here](%{link}) to go to the conversation."
+        introduce: "The following conversation come from %{channel}. [Click here](%{link}) to go to the original conversation."
+        footer: "Messages moved by %{user}"
+        missing-perm: "Unable to do this :confused: Please check that I have permission to Read channel, Read message history, Manage messages in this channel, and Read channel, Manage webhooks in the targeted chat"
+        no-msg: No message found
+      permission: "You cannot move messages. Make sure you have the permissions to see the messages you want to move, and manage the messages in both channels."
+      no-channel: "Unable to find the channel. If it is a channel on another server, please indicate its ID"

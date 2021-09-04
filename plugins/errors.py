@@ -48,6 +48,8 @@ class Errors(commands.Cog):
                 return await ctx.send(await self.bot._(ctx.channel, "errors.invalid-dependency"))
             elif raw_error == "Unknown dependency trigger type":
                 return await ctx.send(await self.bot._(ctx.channel, "errors.invalid-trigger"))
+            elif raw_error == "Unknown permission type":
+                return await ctx.send(await self.bot._(ctx.channel, "errors.invalid-permission"))
             # Could not convert "limit" into int. OR Converting to "int" failed for parameter "number".
             r = re.search(
                 r'Could not convert \"(?P<arg>[^\"]+)\" into (?P<type>[^.\n]+)', raw_error)
