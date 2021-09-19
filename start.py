@@ -8,6 +8,7 @@ import logging
 import json
 import sys
 import os
+import argparse
 
 # check python version
 py_version = sys.version_info
@@ -78,15 +79,16 @@ def main():
 
     client.add_listener(on_ready)
 
-    if (not len(sys.argv) < 2):
-        if (sys.argv[1].lower() == "stable"):
-            client.run(conf["token"])
-        elif (sys.argv[1].lower() == "beta"):
-            client.beta = True
-            client.run(conf["token_beta"])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-b", "--beta", help="Run with the beta bot token", action='store_true')
+    args = parser.parse_args()
+
+    if args.beta:
+        client.beta = True
+        client.run(conf["token_beta"])
     else:
         log.debug("Pas d'arguments trouvés!")
-        instance_type = input("Lancer la version stable ? (y/n) ").lower()
+        instance_type = "y"
         if instance_type == "y":
             client.run(conf["token"])
         elif instance_type == 'n':
