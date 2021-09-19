@@ -591,7 +591,7 @@ class Sconfig(commands.Cog):
     #--------------------------------------------------
 
     @main_config.command(name="archive_category")
-    async def config_voice_channel(self, ctx: MyContext, *, category: discord.CategoryChannel):
+    async def config_archive_category(self, ctx: MyContext, *, category: discord.CategoryChannel):
         await ctx.send(await self.edit_config(ctx.guild.id, "archive_category", category.id))
 
     @main_config.command(name="archive_duration")
