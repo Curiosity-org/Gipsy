@@ -1,0 +1,23 @@
+# Summary
+
+* [FAQ](FAQ.md)
+* [Contribute](CONTRIBUTING.md)
+* [License](LICENSE.md)
+
+## Plugins
+* [antikikoo](plugins/antikikoo/documentation.md)
+* [channelArchive](plugins/channelArchive/documentation.md)
+* [contact](plugins/contact/documentation.md)
+* [general](plugins/general/documentation.md)
+* [giveaways](plugins/giveaways/documentation.md)
+* [groups](plugins/groups/documentation.md)
+* [hypesquad](plugins/hypesquad/documentation.md)
+* [logs](plugins/logs/documentation.md)
+* [messageManager](plugins/messageManager/documentation.md)
+* [misc](plugins/misc/documentation.md)
+* [roleLink](plugins/roleLink/documentation.md)
+* [rss](plugins/rss/documentation.md)
+* [thanks](plugins/thanks/documentation.md)
+* [voice](plugins/voice/documentation.md)
+* [welcome](plugins/welcome/documentation.md)
+* [xp](plugins/xp/documentation.md)
