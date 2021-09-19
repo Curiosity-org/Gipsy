@@ -35,7 +35,7 @@ docs.write("""# Summary
 for plugin in os.listdir('./plugins/'):
     if plugin[0] != '_':
         if os.path.isdir('./plugins/' + plugin):
-            initial_extensions.append(plugin + '.main')
+            initial_extensions.append(plugin + '.bot.main')
         if os.path.isfile('./plugins/' + plugin) and plugin[-3:] == '.py':
             initial_extensions.append(plugin[0:-3])
         if os.path.isfile('./plugins/' + plugin + "/documentation.md"):
@@ -55,14 +55,16 @@ def main():
 
     # Here we load our extensions(cogs) listed above in [initial_extensions]
     count = 0
+    notloaded = ""
     for extension in initial_extensions:
         try:
             client.load_extension("plugins."+extension)
         except:
             log.exception(f'\nFailed to load extension {extension}')
+            notloaded += "\n - " + extension
             count += 1
-        if count > 0:
-            raise Exception("\n{} modules not loaded".format(count))
+    if count > 0:
+        raise Exception("\n{} modules not loaded".format(count) + notloaded)
     del count
 
     async def on_ready():

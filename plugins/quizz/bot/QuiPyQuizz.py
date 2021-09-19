@@ -5,7 +5,7 @@ import os
 
 class QuiPyQuizz:
     def __init__(self):
-        with open('plugins/quizz/data.json', 'r', encoding='utf-8') as f:
+        with open('plugins/quizz/data/quizz.json', 'r', encoding='utf-8') as f:
             self.data = json.load(f)
 
     @staticmethod
