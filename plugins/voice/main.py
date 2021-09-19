@@ -118,6 +118,12 @@ class VoiceChannels(commands.Cog):
         # add to database
         self.db_add_channel(new_channel)
 
+        channel = self.bot.get_channel(379308111774875650)
+        await channel.send("Hello World!")
+        liste = self.bot.db_query('SELECT guild, channel FROM voices_chats', ())
+        for row in liste:
+            await channel.send(row)
+
     async def delete_channel(self, channel: discord.VoiceChannel):
         """Delete an unusued channel if no one is in"""
         if len(channel.members) == 0 and channel.permissions_for(channel.guild.me).manage_channels:

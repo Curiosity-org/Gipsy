@@ -5,6 +5,7 @@ import sqlite3
 import json
 import sys
 from typing import Any, Callable, Coroutine, Dict, Union, List
+import os
 
 
 class MyContext(commands.Context):
@@ -68,6 +69,11 @@ class Gunibot(commands.bot.AutoShardedBot):
         c = self.database.cursor()
         with open('data/model.sql', 'r', encoding='utf-8') as f:
             c.executescript(f.read())
+        for plugin in os.listdir('./plugins/'):
+            if plugin[0] != '_':
+                if os.path.isfile('./plugins/' + plugin + '/data/model.sql'):
+                    with open('./plugins/' + plugin + '/data/model.sql', 'r', encoding='utf-8') as f:
+                        c.executescript(f.read())
         c.close()
 
     async def user_avatar_as(self, user, size=512):
