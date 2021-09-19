@@ -21,6 +21,7 @@ from utils import Gunibot, setup_logger
 
 # Loaded plugins
 initial_extensions = []
+
 docs = open("SUMMARY.md","w+")
 docs.write("""# Summary
 
@@ -39,6 +40,8 @@ for plugin in os.listdir('./plugins/'):
             initial_extensions.append(plugin[0:-3])
         if os.path.isfile('./plugins/' + plugin + "/documentation.md"):
             docs.write("* [" + plugin + "](plugins/" + plugin + "/documentation.md)\n")
+
+docs.close()
         
 
 def main():
