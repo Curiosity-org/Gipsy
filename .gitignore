@@ -11,3 +11,4 @@ config.json
 .profile
 .idea/
 venv/
+.gitlab-ci.yml

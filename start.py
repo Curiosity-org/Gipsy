@@ -28,8 +28,8 @@ global_systems = []
 docs = open("SUMMARY.md","w+")
 docs.write("""# Summary
 
-* [FAQ](FAQ.md)
-* [Contribute](CONTRIBUTING.md)
+* [FAQ](docs/FAQ.md)
+* [Contribute](docs/CONTRIBUTING.md)
 * [License](LICENSE.md)
 
 ## Plugins
