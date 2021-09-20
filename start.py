@@ -9,6 +9,7 @@ import json
 import sys
 import os
 import argparse
+from shutil import copyfile
 
 # check python version
 py_version = sys.version_info
@@ -51,8 +52,17 @@ docs.close()
         
 
 def main():
-    with open('config.json') as f:
+    if not os.path.isfile('config/config.json'):
+        copyfile('config/config-example.json', 'config/config.json')
+        print("TOKEN MISSING: Please, enter your bot token in the config/config.json and restart the bot.")
+        return 1
+    with open('config/config.json') as f:
         conf = json.load(f)
+    if conf["token"] == "Discord token for main bot":
+        print("TOKEN MISSING: Please, enter your bot token in the config/config.json and restart the bot.")
+        return 1
+
+    
     client = Gunibot(case_insensitive=True, status=discord.Status(
         "online"), beta=False, config=conf)
     log = setup_logger()

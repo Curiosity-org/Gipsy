@@ -237,23 +237,11 @@ def setup_logger():
 
     return log
 
-CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {
-    # "config name": {
-    #     'default': 'default value',
-    #     'type': 'config type',
-    #     'command': 'subcommand of the config command',
-    # },
-    "prefix": {
-        'default': "&",
-        'type': 'prefix',
-        'command': 'prefix',
-    },
-    "language": {
-        'default': 0,
-        'type': 'language',
-        'command': 'language',
-    },
-}
+CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {}
+
+if os.path.isfile('./config/global_options.json'):
+    with open('./config/global_options.json') as config:
+        CONFIG_OPTIONS.update(json.load(config))
 
 for plugin in os.listdir('./plugins/'):
     if plugin[0] != '_':
