@@ -50,18 +50,34 @@ for plugin in os.listdir('./plugins/'):
         
 
 docs.close()
+
+def get_config(path, isBotConfig):
+    if not os.path.isfile(path + ".json"):
+        copyfile(path + '-example.json', path + '.json')
+        if isBotConfig:
+            print("TOKEN MISSING: Please, enter your bot token in the config/config.json and restart the bot.")
+            return None
+    with open(path + ".json") as f:
+        conf = json.load(f)
+    if isBotConfig:
+        if conf["token"] == "Discord token for main bot":
+            print("TOKEN MISSING: Please, enter your bot token in the config/config.json and restart the bot.")
+            return None
+    return conf
         
 
 def main():
-    if not os.path.isfile('config/config.json'):
-        copyfile('config/config-example.json', 'config/config.json')
-        print("TOKEN MISSING: Please, enter your bot token in the config/config.json and restart the bot.")
+    
+    conf = get_config('./config/config', isBotConfig = True)
+    if conf == None:
         return 1
-    with open('config/config.json') as f:
-        conf = json.load(f)
-    if conf["token"] == "Discord token for main bot":
-        print("TOKEN MISSING: Please, enter your bot token in the config/config.json and restart the bot.")
-        return 1
+
+    for plugin in os.listdir('./plugins/'):
+        if plugin[0] != '_':
+            if os.path.isfile('./plugins/' + plugin + '/config/require-example.json'):
+                conf.update(get_config('./plugins/' + plugin + '/config/require', isBotConfig = False))
+    
+    print(conf)
 
     
     client = Gunibot(case_insensitive=True, status=discord.Status(

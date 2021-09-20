@@ -1,0 +1,52 @@
+[20/09/2021 20:12] INFO: Lancement du bot
+[20/09/2021 20:12] ERROR: 
+Failed to load extension plugins.rss.bot.main
+Traceback (most recent call last):
+  File "c:\Users\vince\Documents\Projets\Gunibot.py\venv\lib\site-packages\discord\ext\commands\bot.py", line 618, in _load_from_module_spec
+    setup(self)
+  File "C:\Users\vince\Documents\Projets\Gunibot.py\plugins\rss\bot\main.py", line 1429, in setup
+    bot.add_cog(Rss(bot))
+  File "C:\Users\vince\Documents\Projets\Gunibot.py\plugins\rss\bot\main.py", line 37, in __init__
+    self.twitterAPI = twitter.Api(**bot.config['twitter'], tweet_mode="extended")
+KeyError: 'twitter'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "start.py", line 92, in main
+    client.load_extension(extension)
+  File "c:\Users\vince\Documents\Projets\Gunibot.py\venv\lib\site-packages\discord\ext\commands\bot.py", line 678, in load_extension
+    self._load_from_module_spec(spec, name)
+  File "c:\Users\vince\Documents\Projets\Gunibot.py\venv\lib\site-packages\discord\ext\commands\bot.py", line 623, in _load_from_module_spec
+    raise errors.ExtensionFailed(key, e) from e
+discord.ext.commands.errors.ExtensionFailed: Extension 'plugins.rss.bot.main' raised an error: KeyError: 'twitter'
+[20/09/2021 20:15] INFO: Lancement du bot
+[20/09/2021 20:15] ERROR: 
+Failed to load extension plugins.rss.bot.main
+Traceback (most recent call last):
+  File "c:\Users\vince\Documents\Projets\Gunibot.py\venv\lib\site-packages\discord\ext\commands\bot.py", line 618, in _load_from_module_spec
+    setup(self)
+  File "C:\Users\vince\Documents\Projets\Gunibot.py\plugins\rss\bot\main.py", line 1429, in setup
+    bot.add_cog(Rss(bot))
+  File "C:\Users\vince\Documents\Projets\Gunibot.py\plugins\rss\bot\main.py", line 37, in __init__
+    self.twitterAPI = twitter.Api(**bot.config['twitter'], tweet_mode="extended")
+KeyError: 'twitter'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "start.py", line 92, in main
+    client.load_extension(extension)
+  File "c:\Users\vince\Documents\Projets\Gunibot.py\venv\lib\site-packages\discord\ext\commands\bot.py", line 678, in load_extension
+    self._load_from_module_spec(spec, name)
+  File "c:\Users\vince\Documents\Projets\Gunibot.py\venv\lib\site-packages\discord\ext\commands\bot.py", line 623, in _load_from_module_spec
+    raise errors.ExtensionFailed(key, e) from e
+discord.ext.commands.errors.ExtensionFailed: Extension 'plugins.rss.bot.main' raised an error: KeyError: 'twitter'
+[20/09/2021 20:17] INFO: Lancement du bot
+[20/09/2021 20:17] DEBUG: Pas d'arguments trouvés!
+[20/09/2021 20:17] DEBUG: [hypesquad] Started roles check
+[20/09/2021 20:17] INFO: [hypesquad] Finished roles check in 0.0s with 0 editions
+[20/09/2021 20:17] INFO:  Boucle rss commencée !
+[20/09/2021 20:17] INFO: Check RSS lancé
+[20/09/2021 20:17] DEBUG: **RSS loop done** in 0.001s (0/0 flows)
+[20/09/2021 20:17] INFO:  Boucle rss terminée en 0.0s!
