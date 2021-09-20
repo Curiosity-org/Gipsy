@@ -260,5 +260,3 @@ for plugin in os.listdir('./plugins/'):
         if os.path.isfile('./plugins/' + plugin + '/config/options.json'):
             with open('./plugins/' + plugin + '/config/options.json') as config:
                 CONFIG_OPTIONS.update(json.load(config))
-
-print(CONFIG_OPTIONS)

@@ -38,8 +38,8 @@ for plugin in os.listdir('./plugins/'):
             initial_extensions.append(plugin + '.bot.main')
         if os.path.isfile('./plugins/' + plugin) and plugin[-3:] == '.py':
             initial_extensions.append(plugin[0:-3])
-        if os.path.isfile('./plugins/' + plugin + "/documentation.md"):
-            docs.write("* [" + plugin + "](plugins/" + plugin + "/documentation.md)\n")
+        if os.path.isfile('./plugins/' + plugin + "/docs/user_documentation.md"):
+            docs.write("* [" + plugin + "](plugins/" + plugin + "/docs/user_documentation.md)\n")
 
 docs.close()
         
