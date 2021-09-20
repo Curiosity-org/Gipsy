@@ -6,8 +6,12 @@ import time
 import typing
 from marshal import dumps, loads
 
+import sys
+sys.path.append("./bot")
 import args
 import async_timeout
+import sys
+sys.path.append("./bot")
 import checks
 import discord
 import feedparser

@@ -2,6 +2,8 @@ import typing
 from datetime import datetime, timedelta
 
 import aiohttp
+import sys
+sys.path.append("./bot")
 import checks
 import discord
 from discord.ext import commands

@@ -4,7 +4,11 @@ import json
 import re
 from typing import Any, List, Union
 
+import sys
+sys.path.append("./bot")
 import args
+import sys
+sys.path.append("./bot")
 import checks
 import discord
 import emoji

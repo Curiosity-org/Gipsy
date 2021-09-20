@@ -5,6 +5,7 @@ import textwrap
 import traceback
 from contextlib import redirect_stdout
 
+sys.path.append("./bot")
 import checks
 import discord
 from discord.ext import commands

@@ -2,6 +2,8 @@ import asyncio
 import datetime
 from typing import Dict, List, Optional, Tuple
 
+import sys
+sys.path.append("./bot")
 import checks
 import discord
 from discord.ext import commands

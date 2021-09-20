@@ -2,6 +2,8 @@ from typing import List, Union
 import discord
 from discord.ext import commands
 
+import sys
+sys.path.append("./bot")
 import checks
 from utils import Gunibot, MyContext
 from aiohttp import ClientSession

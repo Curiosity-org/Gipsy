@@ -2,7 +2,11 @@ import asyncio
 from marshal import dumps, loads
 from typing import List, Union
 
+import sys
+sys.path.append("./bot")
 import args
+import sys
+sys.path.append("./bot")
 import checks
 import discord
 from discord.ext import commands

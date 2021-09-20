@@ -4,7 +4,11 @@ import time
 from marshal import dumps, loads
 from typing import List, Optional, Union
 
+import sys
+sys.path.append("./bot")
 import args
+import sys
+sys.path.append("./bot")
 import checks
 import discord
 import emoji

@@ -17,6 +17,7 @@ if py_version.major != 3 or py_version.minor < 9:
     print("Vous devez utiliser au moins Python 3.9 !", file=sys.stderr)
     sys.exit(1)
 
+sys.path.append("./bot")
 from utils import Gunibot, setup_logger
 
 

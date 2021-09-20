@@ -1,6 +1,8 @@
 import re
 import traceback
 
+import sys
+sys.path.append("./bot")
 import checks
 import discord
 from discord.ext import commands

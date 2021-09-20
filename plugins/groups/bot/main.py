@@ -1,6 +1,8 @@
 import asyncio
 from typing import List
 
+import sys
+sys.path.append("./bot")
 import checks
 import discord
 from discord.ext import commands
