@@ -21,6 +21,7 @@ from utils import Gunibot, setup_logger
 
 # Loaded plugins
 initial_extensions = []
+global_systems = []
 
 docs = open("SUMMARY.md","w+")
 docs.write("""# Summary
@@ -32,14 +33,19 @@ docs.write("""# Summary
 ## Plugins
 """)
 
+# Loading global systems
+for system in os.listdir('./bot/utils/'):
+    if os.path.isfile('./bot/utils/' + system) and system[-3:] == '.py':
+        global_systems.append("bot.utils." + system[0:-3])
+
+# Loading plugins
 for plugin in os.listdir('./plugins/'):
     if plugin[0] != '_':
         if os.path.isdir('./plugins/' + plugin):
-            initial_extensions.append(plugin + '.bot.main')
-        if os.path.isfile('./plugins/' + plugin) and plugin[-3:] == '.py':
-            initial_extensions.append(plugin[0:-3])
+            initial_extensions.append("plugins." + plugin + '.bot.main')
         if os.path.isfile('./plugins/' + plugin + "/docs/user_documentation.md"):
             docs.write("* [" + plugin + "](plugins/" + plugin + "/docs/user_documentation.md)\n")
+        
 
 docs.close()
         
@@ -56,9 +62,9 @@ def main():
     # Here we load our extensions(cogs) listed above in [initial_extensions]
     count = 0
     notloaded = ""
-    for extension in initial_extensions:
+    for extension in initial_extensions + global_systems:
         try:
-            client.load_extension("plugins."+extension)
+            client.load_extension(extension)
         except:
             log.exception(f'\nFailed to load extension {extension}')
             notloaded += "\n - " + extension
