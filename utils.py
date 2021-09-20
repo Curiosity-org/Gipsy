@@ -209,7 +209,7 @@ def setup_logger():
     # ex du format : [08/11/2018 14:46] WARNING RSSCog fetch_rss_flux l.288 : Cannot get the RSS flux because of the following error: (suivi du traceback)
 
     # log vers un fichier
-    file_handler = logging.FileHandler("debug.log")
+    file_handler = logging.FileHandler("logs/debug.log")
     # tous les logs de niveau DEBUG et supérieur sont evoyés dans le fichier
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(format)
