@@ -31,4 +31,5 @@
 # For developpers
 
 ## Create a plugin
-* [Configuration variables](docs/create_plugin/Configuration_variables.md)
+* [01 - Plugin structure](docs/create_plugin/01 - Plugin structure.md)
+* [02 - Server configuration variables](docs/create_plugin/02 - Server configuration variables.md)
