@@ -1,10 +1,14 @@
 # Summary
 
+# For users
+
+## Information
+
 * [FAQ](docs/FAQ.md)
 * [Contribute](docs/CONTRIBUTING.md)
 * [License](LICENSE.md)
 
-## Plugins
+## Installed plugins
 * [antikikoo](plugins/antikikoo/docs/user_documentation.md)
 * [channelArchive](plugins/channelArchive/docs/user_documentation.md)
 * [contact](plugins/contact/docs/user_documentation.md)
@@ -23,3 +27,8 @@
 * [welcome](plugins/welcome/docs/user_documentation.md)
 * [wormhole](plugins/wormhole/docs/user_documentation.md)
 * [xp](plugins/xp/docs/user_documentation.md)
+
+# For developpers
+
+## Create a plugin
+* [Configuration variables](docs/create_plugin/Configuration_variables.md)
