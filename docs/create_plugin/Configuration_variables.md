@@ -17,12 +17,15 @@ In the `config/options.json` file, define your configuration variable like this:
 * channels
 * categories
 
+
 > __Note (2):__ by convention, the name of the configuration variable and the name of the associated command are the same.
+
 
 At the begining of your `bot/main.py` file, write this line
 ```python
 import bot.utils.sconfig as config # It will import the global extension named "sconfig" that manage configuration variables
 ```
+
 
 Then, write a commande that will edit this config:
 ```python
@@ -30,6 +33,7 @@ Then, write a commande that will edit this config:
 async def foo(self, ctx: MyContext, *, bar):
     await ctx.send(await config.edit_config(ctx.guild.id, "foo", bar)) # It will edit the config and send a confirmation message
 ```
+
 
 In the `__init__` function of you main plugin class, link your
 ```python
