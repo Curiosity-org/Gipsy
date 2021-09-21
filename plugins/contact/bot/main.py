@@ -11,7 +11,7 @@ from discord.utils import snowflake_time
 from utils import Gunibot, MyContext
 import sqlite3
 
-import bot.utils.sconfig as config
+from bot.utils.sconfig import Sconfig
 
 
 class Contact(commands.Cog):
@@ -35,11 +35,11 @@ class Contact(commands.Cog):
 
     @commands.command(name="contact_channel")
     async def config_contact_channel(self, ctx: MyContext, *, channel: discord.TextChannel):
-        await ctx.send(await config.edit_config(ctx.guild.id, "contact_channel", channel.id))
+        await ctx.send(await Sconfig.edit_config(self, ctx.guild.id, "contact_channel", channel.id))
 
     @commands.command(name="contact_category")
     async def config_contact_category(self, ctx: MyContext, *, category: discord.CategoryChannel):
-        await ctx.send(await config.edit_config(ctx.guild.id, "contact_category", category.id))
+        await ctx.send(await Sconfig.edit_config(self, ctx.guild.id, "contact_category", category.id))
 
     @commands.command(name="contact_roles")
     async def config_contact_roles(self, ctx: MyContext, roles: commands.Greedy[discord.Role]):
@@ -47,14 +47,14 @@ class Contact(commands.Cog):
             roles = None
         else:
             roles = [role.id for role in roles]
-        await ctx.send(await config.edit_config(ctx.guild.id, "contact_roles", roles))
+        await ctx.send(await Sconfig.edit_config(self, ctx.guild.id, "contact_roles", roles))
 
     @commands.command(name="contact_title")
     async def config_contact_title(self, ctx: MyContext, *, title):
         if title == "author" or title == "object":
-            await ctx.send(await config.edit_config(ctx.guild.id, "contact_title", title))
+            await ctx.send(await Sconfig.edit_config(self, ctx.guild.id, "contact_title", title))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "contact.invalid-title"))
+            await ctx.send(await self.bot._(self, ctx.guild.id, "contact.invalid-title"))
 
     async def urlToByte(self, url: str) -> typing.Optional[bytes]:
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
