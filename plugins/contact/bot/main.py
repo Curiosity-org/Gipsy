@@ -8,7 +8,7 @@ import checks
 import discord
 from discord.ext import commands
 from discord.utils import snowflake_time
-from utils import Gunibot
+from utils import Gunibot, MyContext
 
 
 class Contact(commands.Cog):
@@ -18,6 +18,36 @@ class Contact(commands.Cog):
         self.file = "contact"
         self.config_options = ['contact_channel',
                                'contact_category', 'contact_roles', 'contact_title']
+        
+        bot.get_command("config").add_command(self.config_contact_channel)
+        bot.get_command("config").add_command(self.config_contact_category)
+        bot.get_command("config").add_command(self.config_contact_roles)
+        bot.get_command("config").add_command(self.config_contact_title)
+    
+    #--------------------------------------------------
+    # Contact
+    #--------------------------------------------------
+
+    async def config_contact_channel(self, ctx: MyContext, *, channel: discord.TextChannel):
+        await ctx.send(await self.edit_config(ctx.guild.id, "contact_channel", channel.id))
+
+    async def config_contact_category(self, ctx: MyContext, *, category: discord.CategoryChannel):
+        await ctx.send(await self.edit_config(ctx.guild.id, "contact_category", category.id))
+
+    async def config_contact_roles(self, ctx: MyContext, roles: commands.Greedy[discord.Role]):
+        if len(roles) == 0:
+            roles = None
+        else:
+            roles = [role.id for role in roles]
+        await ctx.send(await self.edit_config(ctx.guild.id, "contact_roles", roles))
+
+    async def config_contact_title(self, ctx: MyContext, *, title):
+        if title == "author" or title == "object":
+            await ctx.send(await self.edit_config(ctx.guild.id, "contact_title", title))
+        else:
+            await ctx.send(await self.bot._(ctx.guild.id, "contact.invalid-title"))
+
+    
 
     async def urlToByte(self, url: str) -> typing.Optional[bytes]:
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:

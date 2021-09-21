@@ -89,7 +89,7 @@ def main():
     # Here we load our extensions(cogs) listed above in [initial_extensions]
     count = 0
     notloaded = ""
-    for extension in initial_extensions + global_systems:
+    for extension in global_systems + initial_extensions:
         try:
             client.load_extension(extension)
         except:

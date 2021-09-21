@@ -196,33 +196,6 @@ class Sconfig(commands.Cog):
             await logs_cog.send_embed(ctx.guild, emb)
 
     #--------------------------------------------------
-    # Contact
-    #--------------------------------------------------
-
-    @main_config.command(name="contact_channel")
-    async def config_contact_channel(self, ctx: MyContext, *, channel: discord.TextChannel):
-        await ctx.send(await self.edit_config(ctx.guild.id, "contact_channel", channel.id))
-
-    @main_config.command(name="contact_category")
-    async def config_contact_category(self, ctx: MyContext, *, category: discord.CategoryChannel):
-        await ctx.send(await self.edit_config(ctx.guild.id, "contact_category", category.id))
-
-    @main_config.command(name="contact_roles")
-    async def config_contact_roles(self, ctx: MyContext, roles: commands.Greedy[discord.Role]):
-        if len(roles) == 0:
-            roles = None
-        else:
-            roles = [role.id for role in roles]
-        await ctx.send(await self.edit_config(ctx.guild.id, "contact_roles", roles))
-
-    @main_config.command(name="contact_title")
-    async def config_contact_title(self, ctx: MyContext, *, title):
-        if title == "author" or title == "object":
-            await ctx.send(await self.edit_config(ctx.guild.id, "contact_title", title))
-        else:
-            await ctx.send(await self.bot._(ctx.guild.id, "contact.invalid-title"))
-
-    #--------------------------------------------------
     # Welcome
     #--------------------------------------------------
 
