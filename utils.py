@@ -82,9 +82,9 @@ class Gunibot(commands.bot.AutoShardedBot):
             raise ValueError
         try:
             if user.is_avatar_animated():
-                return user.avatar_url_as(format='gif', size=size)
+                return user.display_avatar_as(format='gif', size=size)
             else:
-                return user.avatar_url_as(format='png', size=size)
+                return user.display_avatar_as(format='png', size=size)
         except Exception as e:
             await self.cogs['Errors'].on_error(e, None)
 

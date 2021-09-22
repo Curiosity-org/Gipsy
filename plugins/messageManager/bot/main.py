@@ -15,7 +15,7 @@ async def moveMessage(msg: discord.Message, webhook: discord.Webhook):
     new_msg: discord.WebhookMessage = await webhook.send(content=msg.content,
                                                          files=files,
                                                          embeds=msg.embeds,
-                                                         avatar_url=msg.author.avatar_url,
+                                                         avatar_url=msg.author.display_avatar,
                                                          username=msg.author.name,
                                                          allowed_mentions=discord.AllowedMentions.none(),
                                                          wait=True)
@@ -39,10 +39,10 @@ class MessageManager(commands.Cog):
     async def imitate(self, ctx: commands.Context, user: discord.User = None, *, text=None):
         """Say something with someone else's appearance"""
 
-        if user and text and ctx.author.permissions_in(ctx.channel).manage_messages and ctx.author.permissions_in(ctx.channel).manage_nicknames:
+        if user and text and ctx.channel.permissions_for(ctx.author).manage_messages and ctx.channel.permissions_for(ctx.author).manage_nicknames:
             # Create a webhook in the image of the targeted member
             webhook = await ctx.channel.create_webhook(name=user.name)
-            await webhook.send(content=text, avatar_url=user.avatar_url)
+            await webhook.send(content=text, avatar_url=user.display_avatar)
 
             # Deletes the original message as well as the webhook
             await webhook.delete()
@@ -82,10 +82,10 @@ class MessageManager(commands.Cog):
             return
 
         # Check permission
-        if not ctx.author.permissions_in(ctx.channel).manage_messages \
-                or not ctx.author.permissions_in(ctx.channel).read_messages \
-                or not ctx.author.permissions_in(ctx.channel).read_message_history \
-                or not author.permissions_in(channel).manage_messages:
+        if not ctx.channel.permissions_for(ctx.author).manage_messages \
+                or not ctx.channel.permissions_for(ctx.author).read_messages \
+                or not ctx.channel.permissions_for(ctx.author).read_message_history \
+                or not channel.permissions_for(author).manage_messages:
             embed = discord.Embed(
                 description=await self.bot._(ctx.guild.id, 'message_manager.permission'),
                 colour=discord.Colour.red())
@@ -147,10 +147,10 @@ class MessageManager(commands.Cog):
             return
 
         # Check member permissions
-        if not ctx.author.permissions_in(ctx.channel).manage_messages \
-                or not ctx.author.permissions_in(ctx.channel).read_messages \
-                or not ctx.author.permissions_in(ctx.channel).read_message_history \
-                or not author.permissions_in(channel).manage_messages:
+        if not ctx.channel.permissions_for(ctx.author).manage_messages \
+                or not ctx.channel.permissions_for(ctx.author).read_messages \
+                or not ctx.channel.permissions_for(ctx.author).read_message_history \
+                or not channel.permissions_for(author).manage_messages:
             embed = discord.Embed(
                 description=await self.bot._(ctx.guild.id, 'message_manager.permission'),
                 colour=discord.Colour.red())

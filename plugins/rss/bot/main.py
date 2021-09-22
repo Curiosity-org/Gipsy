@@ -375,7 +375,7 @@ class Rss(commands.Cog):
             Type = await self.bot._(ctx.guild.id,'rss.'+x['type'])
             if len(l) > 20:
                 embed = discord.Embed(title=title, color=self.embed_color, timestamp=ctx.message.created_at)
-                embed.set_footer(text=str(ctx.author), icon_url=ctx.author.avatar_url)
+                embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar)
                 for text in l:
                     embed.add_field(name="\uFEFF", value=text, inline=False)
                 await ctx.send(embed=embed)
@@ -383,7 +383,7 @@ class Rss(commands.Cog):
             l.append(translation.format(Type,c,x['link'],r,x['ID'],x['date']))
         if len(l) > 0:
             embed = discord.Embed(title=title, color=self.embed_color, timestamp=ctx.message.created_at)
-            embed.set_footer(text=str(ctx.author), icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar)
             for x in l:
                 embed.add_field(name="\uFEFF", value=x, inline=False)
             await ctx.send(embed=embed)
@@ -457,7 +457,7 @@ class Rss(commands.Cog):
                     field['value'] += line+"\n"
                 fields.append(field)
             embed = discord.Embed(title=title, color=self.embed_color, description=desc, timestamp=ctx.message.created_at)
-            embed.set_footer(text=str(ctx.author), icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar)
             if fields is not None:
                 for f in fields:
                     embed.add_field(**f)
@@ -1366,7 +1366,7 @@ class Rss(commands.Cog):
         if len(errors) > 0:
             d.append('{} errors: {}'.format(len(errors),' '.join([str(x) for x in errors])))
         emb = discord.Embed(description='\n'.join(d), color=1655066, timestamp=datetime.datetime.utcnow())
-        emb.set_author(name=str(self.bot.user), icon_url=self.bot.user.avatar_url)
+        emb.set_author(name=str(self.bot.user), icon_url=self.bot.user.display_avatar)
         # await self.bot.get_cog("Embeds").send([emb],url="loop")
         self.bot.log.debug(d[0])
         if len(errors) > 0:

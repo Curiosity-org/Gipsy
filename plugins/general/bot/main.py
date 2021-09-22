@@ -121,7 +121,7 @@ class General(commands.Cog):
             if ctx.can_send_embed:
                 title = '**' + await self.bot._(ctx.channel, "general.stats.title") + '**'
                 embed = discord.Embed(title=title, color=8311585, timestamp=ctx.message.created_at, description=d)
-                embed.set_thumbnail(url=self.bot.user.avatar_url)
+                embed.set_thumbnail(url=self.bot.user.display_avatar)
                 msg: discord.Message = await ctx.send(embed=embed)
                 if py is None: # PSUtil can't be used
                     cpu_usage = "?"

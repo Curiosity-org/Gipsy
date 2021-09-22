@@ -29,7 +29,10 @@ class Misc(commands.Cog):
         webhook: discord.Webhook = await ctx.channel.create_webhook(name=f"Villager #{random.randint(1, 9)}")
         await webhook.send(content=message, avatar_url="https://d31sxl6qgne2yj.cloudfront.net/wordpress/wp-content/uploads/20190121140737/Minecraft-Villager-Head.jpg")
         await webhook.delete()
-        await ctx.message.delete()
+        try:
+            await ctx.message.delete()
+        except discord.errors.NotFound:
+            pass
 
     #------------------#
     # Commande /hoster #

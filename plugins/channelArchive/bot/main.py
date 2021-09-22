@@ -196,7 +196,7 @@ class ChannelArchive(commands.Cog):
             channel = ctx.channel
 
         # Check permissions
-        if ctx.author.permissions_in(channel).manage_channels is True and ctx.author.permissions_in(channel).manage_permissions is True:
+        if channel.permissions_for(ctx.author).manage_channels is True and channel.permissions_for(ctx.author).manage_permissions is True:
 
             config = self.bot.server_configs[ctx.guild.id]
             if self.bot.get_channel(config["archive_category"]) is None:

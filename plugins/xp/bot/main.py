@@ -414,7 +414,7 @@ class XP(commands.Cog):
         if levels_info is None:
             levels_info = await self.calc_level(xp)
         emb = discord.Embed(color=self.embed_color)
-        emb.set_author(name=str(user), icon_url=user.avatar_url)
+        emb.set_author(name=str(user), icon_url=user.display_avatar)
         emb.add_field(name='XP', value=f"{xp}/{levels_info[1]}")
         emb.add_field(name=LEVEL, value=levels_info[0])
         emb.add_field(name=RANK, value=f"{rank}/{ranks_nb}")
@@ -550,7 +550,7 @@ class XP(commands.Cog):
         if ctx.can_send_embed:
             emb = discord.Embed(title=t, color=self.embed_color)
             emb.set_author(name=self.bot.user.name,
-                           icon_url=self.bot.user.avatar_url)
+                           icon_url=self.bot.user.display_avatar)
             emb.add_field(name=f_name, value="\n".join(txt), inline=False)
             emb.add_field(**your_rank)
             await ctx.send(embed=emb)

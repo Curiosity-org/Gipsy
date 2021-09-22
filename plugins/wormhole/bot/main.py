@@ -18,7 +18,7 @@ async def sendMessage(msg: discord.Message, webhook: discord.Webhook, username: 
         roles=msg.role_mentions)
     username = username.replace("{user}", msg.author.name, 10).replace("{guild}", msg.guild.name, 10).replace(
         "{channel}", msg.channel.name, 10)
-    avatar_url = msg.author.avatar_url
+    avatar_url = msg.author.display_avatar
     if pp_guild:
         avatar_url = msg.guild.icon_url
     new_msg: discord.WebhookMessage = await webhook.send(content=msg.content,
@@ -151,12 +151,11 @@ class Wormholes(commands.Cog):
         wormhole = self.bot.db_query(query, (wh_name,), astuple=True, fetchone=True)
         # come as: (webhook_name, webhook_pp)
         async with ClientSession() as session:
-            async_adaptater = discord.AsyncWebhookAdapter(session)
             for row in wh_targets:
                 # We're starting to send the message in all the channels linked to that wormhole
                 channel: discord.TextChannel = self.bot.get_channel(row[1])
                 if channel:
-                    webhook = discord.Webhook.partial(row[4], row[5], adapter=async_adaptater)
+                    webhook = discord.Webhook.partial(row[4], row[5], session=session)
                     await sendMessage(message, webhook, wormhole[0], wormhole[1])
 
 
@@ -228,7 +227,7 @@ class Wormholes(commands.Cog):
             return
         query = "DELETE FROM wormhole_channel WHERE channelID = ? AND name = ?"
         async with ClientSession() as session:
-            webhook = discord.Webhook.partial(wh_channel[4], wh_channel[5], adapter=discord.AsyncWebhookAdapter(session))
+            webhook = discord.Webhook.partial(wh_channel[4], wh_channel[5], session=session)
             await webhook.delete()
         self.bot.db_query(query, (wh_channel[0], ctx.channel.id))
         await ctx.send(await self.bot._(ctx.guild.id, "wormhole.success.channel-unlinked"))

@@ -55,8 +55,6 @@ def main():
         if plugin[0] != '_':
             if os.path.isfile('./plugins/' + plugin + '/config/require-example.json'):
                 conf.update(get_config('./plugins/' + plugin + '/config/require', isBotConfig = False))
-    
-    print(conf)
 
     
     client = Gunibot(case_insensitive=True, status=discord.Status(
@@ -64,6 +62,16 @@ def main():
     log = setup_logger()
     log.setLevel(logging.DEBUG)
     log.info("Lancement du bot")
+
+    print("""
+  ________.__                     
+ /  _____/|__|_____  _________.__.
+/   \  ___|  \____ \/  ___<   |  |
+\    \_\  \  |  |_> >___ \ \___  |
+ \______  /__|   __/____  >/ ____|
+        \/   |__|       \/ \/     
+    
+    """)
 
     # Here we load our extensions(cogs) listed above in [initial_extensions]
     count = 0
@@ -81,7 +89,7 @@ def main():
 
     async def on_ready():
         """Called when the bot is connected to Discord API"""
-        print('\nBot connecté')
+        print('Bot connecté')
         print("Nom : "+client.user.name)
         print("ID : "+str(client.user.id))
         if len(client.guilds) < 200:
