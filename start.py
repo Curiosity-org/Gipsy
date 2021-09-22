@@ -1,15 +1,10 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-import discord
-import time
-import asyncio
-import logging
-import json
-import sys
-import os
-import argparse
+import discord, time, asyncio, logging, json, sys, os, argparse
 from shutil import copyfile
+sys.path.append("./bot")
+from utils import Gunibot, setup_logger
 
 # check python version
 py_version = sys.version_info
@@ -17,55 +12,23 @@ if py_version.major != 3 or py_version.minor < 9:
     print("Vous devez utiliser au moins Python 3.9 !", file=sys.stderr)
     sys.exit(1)
 
-sys.path.append("./bot")
-from utils import Gunibot, setup_logger
-
-
-# Loaded plugins
-initial_extensions = []
-global_systems = []
-
-docs = open("SUMMARY.md","w+")
-docs.write("""# Summary
-
-# For users
-
-## Information
-
-* [FAQ](docs/FAQ.md)
-* [Contribute](docs/CONTRIBUTING.md)
-* [License](LICENSE.md)
-
-## Installed plugins
-""")
-
 # Loading global systems
+global_systems = []
 for system in os.listdir('./bot/utils/'):
     if os.path.isfile('./bot/utils/' + system) and system[-3:] == '.py':
         global_systems.append("bot.utils." + system[0:-3])
 
 # Loading plugins
+initial_extensions = []
 for plugin in os.listdir('./plugins/'):
     if plugin[0] != '_':
         if os.path.isdir('./plugins/' + plugin):
             initial_extensions.append("plugins." + plugin + '.bot.main')
-        if os.path.isfile('./plugins/' + plugin + "/docs/user_documentation.md"):
-            docs.write("* [" + plugin + "](plugins/" + plugin + "/docs/user_documentation.md)\n")
+        
+# Generating docs
+from bot.docs import generate_docs
+generate_docs()
 
-
-if os.listdir('./docs/create_plugin') != []:
-    docs.write("""
-# For developpers
-
-## Create a plugin
-""")
-
-for file in os.listdir('./docs/create_plugin'):
-    if file[-3:] == ".md":
-        docs.write("* [" + file[:-3].replace("_"," ") + "](docs/create_plugin/" + file + ")\n")
-
-
-docs.close()
 
 def get_config(path, isBotConfig):
     if not os.path.isfile(path + ".json"):
