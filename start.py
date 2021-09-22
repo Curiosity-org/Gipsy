@@ -12,71 +12,61 @@ if py_version.major != 3 or py_version.minor < 9:
     print("Vous devez utiliser au moins Python 3.9 !", file=sys.stderr)
     sys.exit(1)
 
-# Loading global systems
+# Getting global system list
 global_systems = []
 for system in os.listdir('./bot/utils/'):
     if os.path.isfile('./bot/utils/' + system) and system[-3:] == '.py':
         global_systems.append("bot.utils." + system[0:-3])
 
-# Loading plugins
-initial_extensions = []
+# Getting plugin list
+plugins = []
 for plugin in os.listdir('./plugins/'):
     if plugin[0] != '_':
         if os.path.isdir('./plugins/' + plugin):
-            initial_extensions.append("plugins." + plugin + '.bot.main')
+            plugins.append("plugins." + plugin + '.bot.main')
         
 # Generating docs
 from bot.docs import generate_docs
 generate_docs()
 
-
-def get_config(path, isBotConfig):
-    if not os.path.isfile(path + ".json"):
-        copyfile(path + '-example.json', path + '.json')
-        if isBotConfig:
-            print("TOKEN MISSING: Please, enter your bot token in the config/config.json and restart the bot.")
-            return None
-    with open(path + ".json") as f:
-        conf = json.load(f)
-    if isBotConfig:
-        if conf["token"] == "Discord token for main bot":
-            print("TOKEN MISSING: Please, enter your bot token in the config/config.json and restart the bot.")
-            return None
-    return conf
-        
+#---------------#
+#    M A I N    #
+#---------------#
 
 def main():
     
+    # Getting global config
+    from bot.config import get_config
     conf = get_config('./config/config', isBotConfig = True)
     if conf == None:
         return 1
 
+    # Getting plugins configs
     for plugin in os.listdir('./plugins/'):
         if plugin[0] != '_':
             if os.path.isfile('./plugins/' + plugin + '/config/require-example.json'):
                 conf.update(get_config('./plugins/' + plugin + '/config/require', isBotConfig = False))
 
-    
-    client = Gunibot(case_insensitive=True, status=discord.Status(
-        "online"), beta=False, config=conf)
+    # Creating client
+    client = Gunibot(case_insensitive=True, status=discord.Status("online"), beta=False, config=conf)
+
+    # Writing logs + welcome message
     log = setup_logger()
     log.setLevel(logging.DEBUG)
     log.info("Lancement du bot")
 
     print("""
-  ________.__                     
- /  _____/|__|_____  _________.__.
-/   \  ___|  \____ \/  ___<   |  |
-\    \_\  \  |  |_> >___ \ \___  |
- \______  /__|   __/____  >/ ____|
-        \/   |__|       \/ \/     
+  ___  __  ____  ____  _  _         __     ____ 
+ / __)(  )(  _ \/ ___)( \/ )       /  \   ( __ \\
+( (_ \ )(  ) __/\___ \ )  /       (_/ / _  (__ (
+ \___/(__)(__)  (____/(__/         (__)(_)(____/
     
     """)
 
-    # Here we load our extensions(cogs) listed above in [initial_extensions]
+    # Loading extensions (global systems + plugins)
     count = 0
     notloaded = ""
-    for extension in global_systems + initial_extensions:
+    for extension in global_systems + plugins:
         try:
             client.load_extension(extension)
         except:
@@ -87,6 +77,7 @@ def main():
         raise Exception("\n{} modules not loaded".format(count) + notloaded)
     del count
 
+    # Printing info when the bot is started
     async def on_ready():
         """Called when the bot is connected to Discord API"""
         print('Bot connecté')
@@ -104,21 +95,17 @@ def main():
 
     client.add_listener(on_ready)
 
+    # Check if the bot must run in beta
     parser = argparse.ArgumentParser()
     parser.add_argument("-b", "--beta", help="Run with the beta bot token", action='store_true')
     args = parser.parse_args()
 
+    # Launch bot
     if args.beta:
         client.beta = True
         client.run(conf["token_beta"])
     else:
-        log.debug("Pas d'arguments trouvés!")
-        instance_type = "y"
-        if instance_type == "y":
-            client.run(conf["token"])
-        elif instance_type == 'n':
-            client.beta = True
-            client.run(conf["token_beta"])
+        client.run(conf["token"])
 
 
 if __name__ == "__main__":

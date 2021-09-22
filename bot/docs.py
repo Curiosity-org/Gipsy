@@ -4,15 +4,15 @@ def generate_docs():
     docs = open("SUMMARY.md","w+")
     docs.write("""# Summary
 
-    # For users
+# For users
 
-    ## Information
+## Information
 
-    * [FAQ](docs/FAQ.md)
-    * [Contribute](docs/CONTRIBUTING.md)
-    * [License](LICENSE.md)
+* [FAQ](docs/FAQ.md)
+* [Contribute](docs/CONTRIBUTING.md)
+* [License](LICENSE.md)
 
-    ## Installed plugins
+## Installed plugins
     """)
 
     for plugin in os.listdir('./plugins/'):
@@ -23,10 +23,10 @@ def generate_docs():
 
     if os.listdir('./docs/create_plugin') != []:
         docs.write("""
-    # For developpers
+# For developpers
 
-    ## Create a plugin
-    """)
+## Create a plugin
+""")
 
     for file in os.listdir('./docs/create_plugin'):
         if file[-3:] == ".md":
