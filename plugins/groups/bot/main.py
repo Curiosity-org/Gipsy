@@ -7,10 +7,11 @@ import checks
 import discord
 from discord.ext import commands
 from utils import Gunibot, MyContext
+from bot.utils.sconfig import Sconfig
 
 
 class Group:
-    def __init__(self, guildID: int, roleID: int, ownerID: int, channelID: int, privacy: bool):
+    def __init__(self, bot : Gunibot, guildID: int, roleID: int, ownerID: int, channelID: int, privacy: bool):
         self.roleID = roleID
         self.ownerID = ownerID
         self.channelID = channelID
@@ -19,6 +20,42 @@ class Group:
         self.id = None
         self._role = None
         self._channel = None
+        
+        bot.get_command("config").add_command(self.config_group_allowed_role)
+        bot.get_command("config").add_command(self.config_group_channel_category)
+        bot.get_command("config").add_command(self.config_group_over_role)
+        bot.get_command("config").add_command(self.config_max_group)
+        bot.get_command("config").add_command(self.config_backup)
+
+    @commands.command(name="group_allowed_role")
+    async def config_group_allowed_role(self, ctx: MyContext, *, role: discord.Role=None):
+        """Role allowed to create groups"""
+        role = role.id if isinstance(role, discord.Role) else None
+        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "group_allowed_role", role))
+
+    @commands.command(name="group_channel_category")
+    async def config_group_channel_category(self, ctx: MyContext, *, category: discord.CategoryChannel):
+        """Category were group channel will be created"""
+        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "group_channel_category", category.id))
+
+    @commands.command(name="group_over_role")
+    async def config_group_over_role(self, ctx: MyContext, *, role: discord.Role = None):
+        """Role under the groups roles will be created"""
+        role = role.id if isinstance(role, discord.Role) else None
+        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "group_over_role", role))
+
+    @commands.command(name="max_group")
+    async def config_max_group(self, ctx: MyContext, *, number: int = None):
+        """Max groups by user"""
+        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "max_group", number))
+
+    @commands.group(name="config-backup", aliases=["config-bkp"])
+    @commands.guild_only()
+    @commands.check(checks.is_admin)
+    async def config_backup(self, ctx: MyContext):
+        """Create or load your server configuration"""
+        if ctx.subcommand_passed is None:
+            await ctx.send_help('config-backup')
     
     def role(self, bot: Gunibot) -> discord.Role:
         """Get the Discord Role attached to that group"""

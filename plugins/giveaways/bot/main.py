@@ -14,6 +14,8 @@ import discord
 import emoji
 from discord.ext import commands, tasks
 from utils import Gunibot, MyContext
+from bot.utils.sconfig import Sconfig
+import re
 
 
 class Giveaways(commands.Cog):
@@ -22,6 +24,28 @@ class Giveaways(commands.Cog):
         self.bot = bot
         self.config_options = ['giveaways_emojis']
         self.internal_task.start()
+        
+        bot.get_command("config").add_command(self.giveaways_emojis)
+
+    @commands.command(name="giveaways_emojis")
+    async def giveaways_emojis(self, ctx: MyContext, emojis: commands.Greedy[Union[discord.Emoji, str]]):
+        """Set a list of usable emojis for giveaways
+        Only these emojis will be usable to participate in a giveaway
+        If no emoji is specified, every emoji will be usable"""
+        # check if every emoji is valid
+        unicode_re = emoji.get_emoji_regexp()
+        emojis = [x for x in emojis if isinstance(x, discord.Emoji) or re.fullmatch(unicode_re, x)]
+        # if one or more emojis were invalid (couldn't be converted)
+        if len(ctx.args[2]) != len(emojis):
+            await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-emoji"))
+            return
+        # if user didn't specify any emoji
+        if len(emojis) == 0:
+            emojis = None
+        # convert discord emojis to IDs if needed
+        emojis = [str(x.id) if isinstance(x, discord.Emoji) else x for x in emojis]
+        # save result
+        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "giveaways_emojis", emojis))
 
     def db_add_giveaway(self, channel: discord.TextChannel, name: str, message: int, max_entries: int, ends_at: datetime.datetime = None) -> int:
         """

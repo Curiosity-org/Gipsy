@@ -5,7 +5,7 @@ import discord
 from checks import is_roles_manager
 from discord.ext import commands, tasks
 from utils import Gunibot, MyContext
-
+from bot.utils.sconfig import Sconfig
 
 class Hypesquad(commands.Cog):
 
@@ -13,6 +13,31 @@ class Hypesquad(commands.Cog):
         self.bot = bot
         self.config_options = ['hs_bravery_role', 'hs_brilliance_role', 'hs_balance_role', 'hs_none_role']
         self.roles_loop.start()
+
+        bot.get_command("config").add_command(self.hs_main)
+
+    @commands.group(name="hypesquad", aliases=['hs'], enabled=False)
+    async def hs_main(self, ctx: MyContext):
+        """Manage options about Discord ypesquads"""
+        if ctx.subcommand_passed is None:
+            await ctx.send_help("config hypesquad")
+    
+    @hs_main.command(name="role")
+    async def hs_role(self, ctx: MyContext, house: str, *, role: discord.Role=None):
+        """Set a role to give to a hypesquad house members
+        Valid houses are: bravery, brilliance, balance and none"""
+        role = role.id if isinstance(role, discord.Role) else None
+        house = house.lower()
+        if house == 'none':
+            await ctx.send(await Sconfig.edit_config(ctx.guild.id, "hs_none_role", role))
+        elif house == 'bravery':
+            await ctx.send(await Sconfig.edit_config(ctx.guild.id, "hs_bravery_role", role))
+        elif house == 'brilliance':
+            await ctx.send(await Sconfig.edit_config(ctx.guild.id, "hs_brilliance_role", role))
+        elif house == 'balance':
+            await ctx.send(await Sconfig.edit_config(ctx.guild.id, "hs_balance_role", role))
+        else:
+            await ctx.send(await self.bot._(ctx.guild.id, 'sconfig.hypesquad.unknown'))
 
     @tasks.loop(hours=12)
     async def roles_loop(self):

@@ -2,6 +2,8 @@ import typing
 import discord
 from discord.ext import tasks, commands
 from utils import Gunibot, MyContext
+import args
+from bot.utils.sconfig import Sconfig
 
 
 class ChannelArchive(commands.Cog):
@@ -10,6 +12,24 @@ class ChannelArchive(commands.Cog):
         self.bot = bot
         self.config_options = ['archive_category','archive_duration']
         self.update_loop.start()
+
+        bot.get_command("config").add_command(self.config_archive_category)
+        bot.get_command("config").add_command(self.config_archive_duration)
+
+    @commands.command(name="archive_category")
+    async def config_archive_category(self, ctx: MyContext, *, category: discord.CategoryChannel):
+        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "archive_category", category.id))
+
+    @commands.command(name="archive_duration")
+    async def config_archive_duration(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta]):
+        duration = sum(duration)
+        if duration == 0:
+            if ctx.message.content.split(" ")[-1] != "archive_duration":
+                await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-duration"))
+                return
+            duration = None
+        x = await Sconfig.edit_config(ctx.guild.id, "archive_duration", duration)
+        await ctx.send(x)
 
     def cog_unload(self):
         self.update_loop.cancel()

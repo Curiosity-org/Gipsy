@@ -8,6 +8,8 @@ import checks
 import discord
 from discord.ext import commands
 from utils import Gunibot, MyContext
+from bot.utils.sconfig import Sconfig
+import args
 
 
 class Thanks(commands.Cog):
@@ -19,7 +21,58 @@ class Thanks(commands.Cog):
             self.schedule_tasks()
         self.config_options = ['_thanks_cmd',
                                'thanks_duration', 'thanks_allowed_roles']
+        
+        bot.get_command("config").add_command(self.config_thanks_allowed_roles)
+        bot.get_command("config").add_command(self.config_thanks_duration)
+        bot.get_command("config").add_command(self.thanks_main)
 
+    
+    @commands.command(name="thanks_allowed_roles")
+    async def config_thanks_allowed_roles(self, ctx: MyContext, roles: commands.Greedy[discord.Role]):
+        if len(roles) == 0:
+            roles = None
+        else:
+            roles = [role.id for role in roles]
+        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "thanks_allowed_roles", roles))
+
+    @commands.command(name="thanks_duration")
+    async def config_thanks_duration(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta]):
+        duration = sum(duration)
+        if duration == 0:
+            if ctx.message.content.split(" ")[-1] != "thanks_duration":
+                await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-duration"))
+                return
+            duration = None
+        x = await Sconfig.edit_config(ctx.guild.id, "thanks_duration", duration)
+        await ctx.send(x)
+    
+    @commands.group(name="thanks", aliases=['thx'], enabled=False)
+    async def thanks_main(self, ctx: MyContext):
+        """Edit your thanks-levels settings"""
+        if ctx.subcommand_passed is None:
+            await ctx.send_help("config thanks")
+    
+    @thanks_main.command(name="list")
+    async def thanks_list(self, ctx: MyContext):
+        """List your current thanks levels"""
+        await self.bot.get_cog("Thanks").thankslevels_list(ctx)
+
+    '''
+    @thanks_main.command(name="add")
+    async def thanks_add(self, ctx: MyContext, amount: int, role: discord.Role):
+        """Add a role to give when someone reaches a certain amount of thanks"""
+        #await self.bot.get_cog("Thanks").thankslevel_add(ctx, amount, role)
+        pass
+
+    @thanks_main.command(name="reset")
+    async def thanks_reset(self, ctx: MyContext, amount: int = None):
+        """Remove every role given for a certain amount of thanks
+        If no amount is specified, it will reset the whole configuration"""
+        if amount is None:
+            await self.bot.get_cog("Thanks").thankslevel_reset(ctx)
+        else:
+            await self.bot.get_cog("Thanks").thankslevel_remove(ctx, amount)
+    '''
     @commands.Cog.listener()
     async def on_ready(self):
         self.schedule_tasks()

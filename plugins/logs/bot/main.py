@@ -3,7 +3,9 @@ from typing import List
 
 import discord
 from discord.ext import commands
-from utils import Gunibot
+from utils import Gunibot, MyContext
+from bot.utils.sconfig import Sconfig
+import args
 
 
 class Logs(commands.Cog):
@@ -11,6 +13,54 @@ class Logs(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.config_options = ['logs_channel', 'modlogs_flags']
+        
+        bot.get_command("config").add_command(self.config_modlogs_flags)
+        bot.get_command("config").add_command(self.config_modlogs)
+    
+    @commands.command(name="modlogs_flags")
+    async def config_modlogs_flags(self, ctx: MyContext):
+        await ctx.send(await self.bot._(ctx.guild.id, "sconfig.modlogs-help", p=ctx.prefix))
+
+    @commands.group(name="modlogs")
+    async def config_modlogs(self, ctx: MyContext):
+        """Enable or disable logs categories in your logs channel
+        You can set your channel with the 'logs_channel' config option"""
+        if ctx.subcommand_passed is None:
+            await ctx.send_help("config modlogs")
+
+    @config_modlogs.command(name="enable")
+    async def modlogs_enable(self, ctx: MyContext, options: commands.Greedy[args.moderatorFlag]):
+        """Enable one or multiple logs categories"""
+        if not options:
+            await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-modlogs"))
+            return
+        LogsFlags = self.bot.get_cog('ConfigCog').LogsFlags()
+        flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
+        flags = LogsFlags.intToFlags(flags) + options
+        flags = list(set(flags)) # remove duplicates
+        await Sconfig.edit_config(ctx.guild.id, 'modlogs_flags',
+                         LogsFlags.flagsToInt(flags))
+        await ctx.send(await self.bot._(ctx.guild.id, "sconfig.modlogs-enabled", type=', '.join(options)))
+
+    @config_modlogs.command(name="disable")
+    async def modlogs_disable(self, ctx: MyContext, options: commands.Greedy[args.moderatorFlag]):
+        """Disable one or multiple logs categories"""
+        if not options:
+            await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-modlogs"))
+            return
+        LogsFlags = self.bot.get_cog('ConfigCog').LogsFlags()
+        flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
+        flags = LogsFlags.intToFlags(flags)
+        flags = [x for x in flags if x not in options]
+        await Sconfig.edit_config(ctx.guild.id, 'modlogs_flags', LogsFlags.flagsToInt(flags))
+        await ctx.send(await self.bot._(ctx.guild.id, "sconfig.modlogs-disabled", type=', '.join(options)))
+
+    @config_modlogs.command(name="list")
+    async def modlogs_list(self, ctx: MyContext):
+        """See available logs categories"""
+        f = self.bot.get_cog('ConfigCog').LogsFlags.FLAGS.values()
+        await ctx.send(await self.bot._(ctx.guild.id, "sconfig.modlogs-list", list=" - ".join(f)))
+
 
     async def has_logs(self, guild) -> bool:
         """Check if a Guild has a valid logs channel"""

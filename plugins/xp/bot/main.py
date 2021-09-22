@@ -10,6 +10,7 @@ import discord
 import emoji
 from discord.ext import commands
 from utils import Gunibot, MyContext
+from bot.utils.sconfig import Sconfig
 
 
 class XP(commands.Cog):
@@ -27,6 +28,67 @@ class XP(commands.Cog):
         self.embed_color = discord.Colour(0xffcf50)
         self.config_options = ['enable_xp', 'noxp_channels',
                                'levelup_channel', 'levelup_message','levelup_reaction','reaction_emoji']
+
+        bot.get_command("config").add_command(self.config_enable_xp)
+        bot.get_command("config").add_command(self.config_noxp_channels)
+        bot.get_command("config").add_command(self.config_levelup_channel)
+        bot.get_command("config").add_command(self.config_levelup_message)
+        bot.get_command("config").add_command(self.config_levelup_reaction)
+        bot.get_command("config").add_command(self.config_levelup_reaction_emoji)
+
+    @commands.command(name="enable_xp")
+    async def config_enable_xp(self, ctx: MyContext, value: bool):
+        """Enable or disable the XP system in your server"""
+        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "enable_xp", value))
+    
+    @commands.command(name="noxp_channels")
+    async def config_noxp_channels(self, ctx: MyContext, channels: commands.Greedy[discord.TextChannel]):
+        """Select in which channels your members should not get any xp"""
+        if len(channels) == 0:
+            channels = None
+        x = await Sconfig.edit_config(ctx.guild.id, "noxp_channels", channels)
+        await ctx.send(x)
+    
+    @commands.command(name="levelup_channel")
+    async def config_levelup_channel(self, ctx: MyContext, *, channel):
+        """Select in which channel the levelup messages should be sent
+        None for no levelup message, any for any channel"""
+        if channel.lower() == 'none':
+            channel = 'none'
+        elif channel.lower() == 'any':
+            channel = 'any'
+        else:
+            channel = await commands.TextChannelConverter().convert(ctx, channel)
+            channel = channel.id
+        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "levelup_channel", channel))
+    
+    @commands.command(name="levelup_message")
+    async def config_levelup_message(self, ctx: MyContext, *, message=None):
+        """Message sent when a member reaches a new level
+        Use {level} for the new level, {user} for the user mention and {username} for the user name
+        Set to None to reset it"""
+        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "levelup_message", message))
+
+    @commands.command(name="levelup_reaction")
+    async def config_levelup_reaction(self, ctx: MyContext, *, bool: bool=None):
+        """If the bot add a reaction to the message or send a message
+        Set to True for the reaction, False for the message"""
+        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "levelup_reaction", bool))
+
+    @commands.command(name="reaction_emoji")
+    async def config_levelup_reaction_emoji(self, ctx: MyContext, emote: discord.Emoji=None):
+        """Set the emoji wich one the bot will react to message when levelup"""
+        # check if emoji is valid
+        unicode_re = emoji.get_emoji_regexp()
+        emote = emote if isinstance(emote, discord.Emoji) or re.fullmatch(unicode_re, emote) else False
+        # if emojis was invalid (couldn't be converted)
+        if not emote:
+            await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-emoji"))
+            return
+        # convert discord emoji to ID if needed
+        emote = str(emote.id) if isinstance(emote, discord.Emoji) else emote
+        # save result
+        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "reaction_emoji", emote))
     
     async def _create_config(self, ctx: MyContext, mentions: bool=False) -> List[Tuple[str,str]]:
         """Create a list of (key,value) for the /config command"""
