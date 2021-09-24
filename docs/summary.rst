@@ -1,3 +1,5 @@
+Summary
+=======
 
 .. toctree::
     :maxdepth: 3
@@ -33,5 +35,5 @@
     :maxdepth: 2
     :caption: For developers
     
-    create_plugin/01 - Plugin structure.md
-    create_plugin/02 - Server configuration variables.md
+    create_plugin/01-Plugin_structure.md
+    create_plugin/02-Server_configuration_variables.md

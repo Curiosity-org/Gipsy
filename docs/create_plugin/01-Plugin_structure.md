@@ -1,6 +1,6 @@
 # Plugin Structure
 
-Th plugin must respect this structure:
+The plugin must respect this structure:
 ```
 📁 <plugin_name>
 ├─ 📁 api
