@@ -1,36 +1,44 @@
 import os
+from shutil import copyfile
 
 def generate_docs():
-    docs = open("SUMMARY.md","w+")
-    docs.write("""# Summary
+    docs = open("docs/summary.rst","w+")
+    docs.write("""
+.. toctree::
+    :maxdepth: 3
+    :caption: Info
 
-# For users
+    contributing
+    faq
 
-## Information
+.. toctree::
+    :maxdepth: 2
+    :caption: Installed plugins
 
-* [FAQ](docs/FAQ.md)
-* [Contribute](docs/CONTRIBUTING.md)
-* [License](LICENSE.md)
+""")
 
-## Installed plugins
-    """)
-
+    if not os.path.isdir("./docs/plugins"):
+        os.makedirs("./docs/plugins")
+    for file in os.listdir("./docs/plugins"):
+        os.remove("./docs/plugins/" + file)
     for plugin in os.listdir('./plugins/'):
         if plugin[0] != '_':
             if os.path.isfile('./plugins/' + plugin + "/docs/user_documentation.md"):
-                docs.write("* [" + plugin + "](plugins/" + plugin + "/docs/user_documentation.md)\n")
+                copyfile('./plugins/' + plugin + "/docs/user_documentation.md", './docs/plugins/' + plugin + ".md")
+                docs.write("    plugins/" + plugin + "\n")
 
 
     if os.listdir('./docs/create_plugin') != []:
         docs.write("""
-# For developpers
-
-## Create a plugin
+.. toctree::
+    :maxdepth: 2
+    :caption: For developers
+    
 """)
 
     for file in os.listdir('./docs/create_plugin'):
         if file[-3:] == ".md":
-            docs.write("* [" + file[:-3].replace("_"," ") + "](docs/create_plugin/" + file + ")\n")
+            docs.write("    create_plugin/" + file + "\n")
 
 
     docs.close()
