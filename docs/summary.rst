@@ -7,6 +7,7 @@ Summary
 
     contributing
     faq
+    test
 
 .. toctree::
     :maxdepth: 2
@@ -36,4 +37,5 @@ Summary
     :caption: For developers
     
     create_plugin/01-Plugin_structure.md
-    create_plugin/02-Server_configuration_variables.md
+
+create_plugin/02-Server_configuration_variables.md
