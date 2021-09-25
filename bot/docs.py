@@ -8,8 +8,8 @@ def generate_docs():
     :maxdepth: 3
     :caption: Info
 
-    contributing
-    faq
+    contributing.md
+    faq.md
 
 .. toctree::
     :maxdepth: 2
@@ -25,7 +25,7 @@ def generate_docs():
         if plugin[0] != '_':
             if os.path.isfile('./plugins/' + plugin + "/docs/user_documentation.md"):
                 copyfile('./plugins/' + plugin + "/docs/user_documentation.md", './docs/plugins/' + plugin + ".md")
-                docs.write("    plugins/" + plugin + "\n")
+                docs.write("    plugins/" + plugin + ".md\n")
 
 
     if os.listdir('./docs/create_plugin') != []:
