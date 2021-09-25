@@ -41,7 +41,7 @@ def generate_docs():
 """)
 
     for file in os.listdir('./docs/create_plugin'):
-        if file[-3:] == ".md":
+        if file[-3:] == ".md" or file[-4:] == ".rst":
             docs.write("    create_plugin/" + file + "\n")
 
 
