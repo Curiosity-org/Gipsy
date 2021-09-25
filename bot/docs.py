@@ -24,7 +24,7 @@ def generate_docs():
     for plugin in os.listdir('./plugins/'):
         if plugin[0] != '_':
             if os.path.isfile('./plugins/' + plugin + "/docs/user_documentation.rst"):
-                copyfile('./plugins/' + plugin + "/docs/user_documentation.md", './docs/plugins/' + plugin + ".rst")
+                copyfile('./plugins/' + plugin + "/docs/user_documentation.rst", './docs/plugins/' + plugin + ".rst")
                 docs.write("    plugins/" + plugin + ".rst\n")
             else:
                 if os.path.isfile('./plugins/' + plugin + "/docs/user_documentation.md"):
