@@ -1,7 +1,5 @@
-.. toctree::
-    :maxdepth: 2
-
-    
+Summary
+=======
 
 .. toctree::
     :maxdepth: 3
