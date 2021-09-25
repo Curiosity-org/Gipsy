@@ -1,5 +1,3 @@
-Summary
-=======
 
 .. toctree::
     :maxdepth: 3
