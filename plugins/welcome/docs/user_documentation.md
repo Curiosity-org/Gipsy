@@ -1,4 +1,4 @@
-# **New member management**
+# **Welcome**
 
 ## **Verification system**
 

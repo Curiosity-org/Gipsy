@@ -1,4 +1,4 @@
-# RSS feeds listener
+# RSS
 
 Gipsy offers you the possibility to follow different content sources, from social networks like Youtube or Twitter to simple blogs equipped with an RSS feed system.
 

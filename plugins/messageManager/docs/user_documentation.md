@@ -1,4 +1,4 @@
-# **Message management**
+# **Message manager**
 
 ## **Moving messages**
 
@@ -14,4 +14,4 @@ This will move all the messages copied between the two messages indicated. Make 
 
 ## **Request to change room**
 
-If a discussion is rambling and no longer appropriate for the channel, you can send a message visible to everyone with the command: /hs <Channel>. The bot will then ask all participants to continue their discussion in the indicated channel, or to find a more appropriate one if you don't indicate one.
+If a discussion is rambling and no longer appropriate for the channel, you can send a message visible to everyone with the command: /hs `<Channel>`. The bot will then ask all participants to continue their discussion in the indicated channel, or to find a more appropriate one if you don't indicate one.

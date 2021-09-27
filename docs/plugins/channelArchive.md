@@ -1,3 +1,3 @@
-# Channel archive system
+# Channel archive
 
 Nothing here...

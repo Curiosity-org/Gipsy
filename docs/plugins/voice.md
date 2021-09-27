@@ -1,4 +1,4 @@
-# **Voice room management**
+# **Voice**
 
 ## **Automatic role giving**
 

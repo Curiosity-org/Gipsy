@@ -1,3 +1,3 @@
-# Anti-kikoo system
+# Anti-kikoo
 
 Nothing here...
