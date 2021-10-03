@@ -7,7 +7,7 @@ Three configuration options exist for this module:
 
 * `contact_category` : The category in which the private room will be created
 * `contact_channel` : The channel your members can access to start the process
-* contact_roles` : The roles that will have access to the private contact rooms
+* `contact_roles` : The roles that will have access to the private contact rooms
 
 It is your duty to make sure that the bot can read the contact channel, and create the contact categories with the necessary permissions. Without this, nothing will happen.
 
