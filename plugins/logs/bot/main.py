@@ -407,7 +407,7 @@ class Logs(commands.Cog):
             return
         embed = discord.Embed(
             title=await self.bot._(after.guild.id, "logs.role_updated.title"),
-            description=await self.bot._(after.guild.id, "logs.role_created.desc", mention=after.mention, name=after.name)
+            description=await self.bot._(after.guild.id, "logs.role_updated.desc", mention=after.mention, name=after.name)
         )
         _no = await self.bot._(after.guild.id, "logs._no")
         _yes = await self.bot._(after.guild.id, "logs._yes")
