@@ -8,6 +8,8 @@ import checks
 from utils import Gunibot, MyContext
 from aiohttp import ClientSession
 
+import difflib
+
 
 async def sendMessage(msg: discord.Message, webhook: discord.Webhook, username: str, pp_guild: bool):
     files = [await x.to_file() for x in msg.attachments]
@@ -131,6 +133,18 @@ class Wormholes(commands.Cog):
         # comes as: (name, privacy, webhook_name, webhook_pp_guild)
         return len(query_res) > 0
 
+    # Check if a message is similar to another one with 80% similarity
+    def similar(msg1, msg2):
+        return difflib.SequenceMatcher(a=msg1.lower(), b=msg2.lower()).ratio > 0.8
+
+    # Get the corresponding answered message in other channels
+    async def get_corresponding_answer(self, channel: discord.TextChannel, message: discord.Message):
+        date = message.created_at
+        async for msg in channel.history(limit=20, after=date, oldest_first=True):
+            if similar(message.content, msg.content):
+                return msg
+        return None
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         """Executed every time a message is sent"""
@@ -156,6 +170,13 @@ class Wormholes(commands.Cog):
                 channel: discord.TextChannel = self.bot.get_channel(row[1])
                 if channel:
                     webhook = discord.Webhook.partial(row[4], row[5], session=session)
+                    if message.reference is not None:
+                        reply = await message.channel.fetch_message(message.reference.message_id)
+                        embed = discord.Embed(
+                            description= await self.bot._(message.guild.id, "wormhole.reply_to", link = reply.jump_url),
+                            colour=discord.Colour.gray() # I want #2F3136 but I don't know how to convert into discord colour
+                        ).set_footer(reply.message, reply.author.display_avatar)
+                        await sendMessage("", webhook, wormhole[0], wormhole[1], embed=embed)
                     await sendMessage(message, webhook, wormhole[0], wormhole[1])
 
 
