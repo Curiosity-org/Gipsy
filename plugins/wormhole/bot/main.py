@@ -187,8 +187,9 @@ class Wormholes(commands.Cog):
                                 description= await self.bot._(message.guild.id, "wormhole.reply_to", link = reply.jump_url), #"https://gunivers.net"), #
                                 colour=discord.Colour.dark_gray() # I want #2F3136 but I don't know how to convert into discord colour
                             ).set_footer(text= reply.content, icon_url=reply.author.display_avatar)
+                        username = wormhole[0].replace("{user}", message.author.name, 10).replace("{guild}", message.guild.name, 10).replace("{channel}", message.channel.name, 10)
                         await webhook.send(avatar_url = message.author.display_avatar,
-                            username = message.author.name,
+                            username = username,
                             embed=embed)
                     await sendMessage(message, webhook, wormhole[0], wormhole[1])
 
