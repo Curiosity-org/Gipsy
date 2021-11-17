@@ -1,6 +1,7 @@
 from typing import List, Union
 import discord
 from discord.ext import commands
+from itertools import chain
 
 import sys
 sys.path.append("./bot")
@@ -12,12 +13,16 @@ import difflib
 
 # Check if a message is similar to another one with 80% similarity
 def similar(msg1, msg2):
-    return difflib.SequenceMatcher(a=msg1.lower(), b=msg2.lower()).ratio > 0.8
+    return difflib.SequenceMatcher(a=msg1.lower(), b=msg2.lower()).ratio() > 0.8
+
 
 # Get the corresponding answered message in other channels
 async def get_corresponding_answer(channel: discord.TextChannel, message: discord.Message):
     date = message.created_at
     async for msg in channel.history(limit=20, after=date, oldest_first=True):
+        if similar(message.content, msg.content):
+            return msg
+    async for msg in channel.history(limit=20, before=date, oldest_first=False):
         if similar(message.content, msg.content):
             return msg
     return None
@@ -171,12 +176,20 @@ class Wormholes(commands.Cog):
                     webhook = discord.Webhook.partial(row[4], row[5], session=session)
                     if message.reference is not None:
                         reply = await message.channel.fetch_message(message.reference.message_id)
-                        reply = get_corresponding_answer(channel, reply)
-                        embed = discord.Embed(
-                            description= await self.bot._(message.guild.id, "wormhole.reply_to", link = reply.jump_url),
-                            colour=discord.Colour.gray() # I want #2F3136 but I don't know how to convert into discord colour
-                        ).set_footer(reply.message, reply.author.display_avatar)
-                        await sendMessage("", webhook, wormhole[0], wormhole[1], embed=embed)
+                        reply = await get_corresponding_answer(channel, reply)
+                        if reply is None:
+                            embed = discord.Embed(
+                                description= await self.bot._(message.guild.id, "wormhole.reply_notfound"), #"https://gunivers.net"), #
+                                colour=discord.Colour.dark_gray() # I want #2F3136 but I don't know how to convert into discord colour
+                            )
+                        else:
+                            embed = discord.Embed(
+                                description= await self.bot._(message.guild.id, "wormhole.reply_to", link = reply.jump_url), #"https://gunivers.net"), #
+                                colour=discord.Colour.dark_gray() # I want #2F3136 but I don't know how to convert into discord colour
+                            ).set_footer(text= reply.content, icon_url=reply.author.display_avatar)
+                        await webhook.send(avatar_url = message.author.display_avatar,
+                            username = message.author.name,
+                            embed=embed)
                     await sendMessage(message, webhook, wormhole[0], wormhole[1])
 
 

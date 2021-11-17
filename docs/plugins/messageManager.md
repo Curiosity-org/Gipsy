@@ -8,7 +8,7 @@ Gunibot.py offers the possibility to manage messages by moving them to other roo
 
 Where `<Message>` can be replaced by the ID or link to a message, and `<Channel>` can be replaced by the ID or mention of the destination channel. It is also possible to move multiple messages at once by doing:
 
-`/moveall <Message1> <Message2> <Channel>`
+`/move <Message1> <Message2> <Channel>`
 
 This will move all the messages copied between the two messages indicated. Make sure that these two messages are in the same channel, and that there are no more than 20 messages separating them (this limitation prevents the bot from being considered a spammer by Discord).
 

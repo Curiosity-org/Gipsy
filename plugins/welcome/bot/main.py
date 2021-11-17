@@ -11,11 +11,6 @@ class Welcome(commands.Cog):
         self.config_options = ["welcome_roles"]
 
         bot.get_command("config").add_command(self.config_welcome_roles)
-        bot.get_command("config").add_command(self.config_info_channel)
-        bot.get_command("config").add_command(self.config_verification_role)
-        bot.get_command("config").add_command(self.config_verification_add_role)
-        bot.get_command("config").add_command(self.config_pass_message)
-        bot.get_command("config").add_command(self.config_verification_channel_id)
 
     @commands.command(name="welcome_roles")
     async def config_welcome_roles(self, ctx: MyContext, roles: commands.Greedy[discord.Role]):

@@ -51,6 +51,8 @@ def main():
     client = Gunibot(case_insensitive=True, status=discord.Status("online"), beta=False, config=conf)
 
     # Writing logs + welcome message
+    if not os.path.isdir("logs"):
+        os.makedirs("logs")
     log = setup_logger()
     log.setLevel(logging.DEBUG)
     log.info("Lancement du bot")

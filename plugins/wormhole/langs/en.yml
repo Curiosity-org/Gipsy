@@ -20,3 +20,4 @@ en:
       admin-added: "Admin successfully added"
       admin-removed: "Admin successfully removed"
     reply_to: "Reply to [this message](%{link})"
+    reply_notfound: "Reply to... a message that have been edited or deleted."
