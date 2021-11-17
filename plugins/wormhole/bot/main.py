@@ -180,13 +180,17 @@ class Wormholes(commands.Cog):
                         if reply is None:
                             embed = discord.Embed(
                                 description= await self.bot._(message.guild.id, "wormhole.reply_notfound"), #"https://gunivers.net"), #
-                                colour=discord.Colour.dark_gray() # I want #2F3136 but I don't know how to convert into discord colour
+                                colour=0x2f3136 #2F3136
                             )
                         else:
+                            content = reply.content
+                            content = content.replace("\n"," ")
+                            if len(content) > 80:
+                            	content = content[:80] + "..."
                             embed = discord.Embed(
                                 description= await self.bot._(message.guild.id, "wormhole.reply_to", link = reply.jump_url), #"https://gunivers.net"), #
-                                colour=discord.Colour.dark_gray() # I want #2F3136 but I don't know how to convert into discord colour
-                            ).set_footer(text= reply.content, icon_url=reply.author.display_avatar)
+                                colour=0x2f3136 #2F3136
+                            ).set_footer(text= content, icon_url=reply.author.display_avatar)
                         username = wormhole[0].replace("{user}", message.author.name, 10).replace("{guild}", message.guild.name, 10).replace("{channel}", message.channel.name, 10)
                         await webhook.send(avatar_url = message.author.display_avatar,
                             username = username,
