@@ -27,7 +27,7 @@ async def get_corresponding_answer(channel: discord.TextChannel, message: discor
             return msg
     return None
 
-async def sendMessage(msg: discord.Message, webhook: discord.Webhook, username: str, pp_guild: bool):
+async def sendMessage(msg: discord.Message, webhook: discord.Webhook, username: str, pp_guild: bool, embed_reply: discord.Embed = None):
     files = [await x.to_file() for x in msg.attachments]
     # grab mentions from the source message
     mentions = discord.AllowedMentions(
@@ -39,9 +39,15 @@ async def sendMessage(msg: discord.Message, webhook: discord.Webhook, username: 
     avatar_url = msg.author.display_avatar
     if pp_guild:
         avatar_url = msg.guild.icon_url
+
+    embeds = msg.embeds
+    if embed_reply and embeds:
+        if len(embeds) >= 10:
+            embeds.pop()
+        embeds.append(embed_reply)
     new_msg: discord.WebhookMessage = await webhook.send(content=msg.content,
                                                          files=files,
-                                                         embeds=msg.embeds,
+                                                         embeds=embeds,
                                                          avatar_url=avatar_url,
                                                          username=username,
                                                          allowed_mentions=discord.AllowedMentions.none(),
@@ -174,6 +180,7 @@ class Wormholes(commands.Cog):
                 channel: discord.TextChannel = self.bot.get_channel(row[1])
                 if channel:
                     webhook = discord.Webhook.partial(row[4], row[5], session=session)
+                    embed_reply = None
                     if message.reference is not None:
                         reply = await message.channel.fetch_message(message.reference.message_id)
                         reply = await get_corresponding_answer(channel, reply)
@@ -192,10 +199,7 @@ class Wormholes(commands.Cog):
                                 colour=0x2f3136 #2F3136
                             ).set_footer(text= content, icon_url=reply.author.display_avatar)
                         username = wormhole[0].replace("{user}", message.author.name, 10).replace("{guild}", message.guild.name, 10).replace("{channel}", message.channel.name, 10)
-                        await webhook.send(avatar_url = message.author.display_avatar,
-                            username = username,
-                            embed=embed)
-                    await sendMessage(message, webhook, wormhole[0], wormhole[1])
+                    await sendMessage(message, webhook, wormhole[0], wormhole[1], embed_reply)
 
 
     @commands.group(name="wormhole", aliases=["wh"])
