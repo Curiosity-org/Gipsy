@@ -31,7 +31,7 @@ class General(commands.Cog):
                     continue
                 for file in files:
                     if file.endswith(".py"):
-                        with open(os.path.join(root, file), 'r', encoding='utf8') as f:
+                        with open(os.path.join(root, file), 'r') as f:
                             for line in f.read().split("\n"):
                                 if len(line.strip()) > 2 and line[0] != '#':
                                     count += 1
