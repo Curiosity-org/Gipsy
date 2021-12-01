@@ -40,7 +40,7 @@ async def sendMessage(msg: discord.Message, webhook: discord.Webhook, username: 
     if pp_guild:
         avatar_url = msg.guild.icon_url
 
-    embeds = msg.embeds
+    embeds = [embed for embed in msg.embeds if embed.type == "rich"]
     if embed_reply and embeds:
         if len(embeds) >= 10:
             embeds.pop()
