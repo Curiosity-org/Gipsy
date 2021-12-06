@@ -33,7 +33,7 @@ class Thanks(commands.Cog):
             roles = None
         else:
             roles = [role.id for role in roles]
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "thanks_allowed_roles", roles))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "thanks_allowed_roles", roles))
 
     @commands.command(name="thanks_duration")
     async def config_thanks_duration(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta]):
@@ -43,7 +43,7 @@ class Thanks(commands.Cog):
                 await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-duration"))
                 return
             duration = None
-        x = await Sconfig.edit_config(ctx.guild.id, "thanks_duration", duration)
+        x = await self.bot.sconfig.edit_config(ctx.guild.id, "thanks_duration", duration)
         await ctx.send(x)
     
     @commands.group(name="thanks", aliases=['thx'], enabled=False)

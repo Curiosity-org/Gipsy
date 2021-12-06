@@ -25,7 +25,7 @@ class VoiceChannels(commands.Cog):
     async def config_voice_channel_format(self, ctx: MyContext, *, text: str):
         """Format of voice channels names
         Use {random} for any random name, {asterix} for any asterix name"""
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "voice_channel_format", text[:40]))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "voice_channel_format", text[:40]))
 
     @commands.command(name="voice_roles")
     async def config_voice_roles(self, ctx: MyContext, roles: commands.Greedy[discord.Role]):
@@ -33,15 +33,15 @@ class VoiceChannels(commands.Cog):
             roles = None
         else:
             roles = [role.id for role in roles]
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "voice_roles", roles))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "voice_roles", roles))
 
     @commands.command(name="voices_category")
     async def config_voices_category(self, ctx: MyContext, *, category: discord.CategoryChannel):
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "voices_category", category.id))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "voices_category", category.id))
 
     @commands.command(name="voice_channel")
     async def config_voice_channel(self, ctx: MyContext, *, channel: discord.VoiceChannel):
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "voice_channel", channel.id))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "voice_channel", channel.id))
 
     def db_get_channels(self):
         liste = self.bot.db_query('SELECT guild, channel FROM voices_chats', ())

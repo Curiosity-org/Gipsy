@@ -63,6 +63,11 @@ class Gunibot(commands.bot.AutoShardedBot):
     def server_configs(self):
         """Guilds configuration manager"""
         return self.get_cog("ConfigCog").confManager
+    
+    @property
+    def sconfig(self):
+        """Return sconfig configuration manager"""
+        return self.get_cog("Sconfig")
 
     def _update_database_structure(self):
         """Create tables and indexes from 'data/model.sql' file"""

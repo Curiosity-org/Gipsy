@@ -39,14 +39,14 @@ class XP(commands.Cog):
     @commands.command(name="enable_xp")
     async def config_enable_xp(self, ctx: MyContext, value: bool):
         """Enable or disable the XP system in your server"""
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "enable_xp", value))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "enable_xp", value))
     
     @commands.command(name="noxp_channels")
     async def config_noxp_channels(self, ctx: MyContext, channels: commands.Greedy[discord.TextChannel]):
         """Select in which channels your members should not get any xp"""
         if len(channels) == 0:
             channels = None
-        x = await Sconfig.edit_config(ctx.guild.id, "noxp_channels", channels)
+        x = await self.bot.sconfig.edit_config(ctx.guild.id, "noxp_channels", channels)
         await ctx.send(x)
     
     @commands.command(name="levelup_channel")
@@ -60,20 +60,20 @@ class XP(commands.Cog):
         else:
             channel = await commands.TextChannelConverter().convert(ctx, channel)
             channel = channel.id
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "levelup_channel", channel))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "levelup_channel", channel))
     
     @commands.command(name="levelup_message")
     async def config_levelup_message(self, ctx: MyContext, *, message=None):
         """Message sent when a member reaches a new level
         Use {level} for the new level, {user} for the user mention and {username} for the user name
         Set to None to reset it"""
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "levelup_message", message))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "levelup_message", message))
 
     @commands.command(name="levelup_reaction")
     async def config_levelup_reaction(self, ctx: MyContext, *, bool: bool=None):
         """If the bot add a reaction to the message or send a message
         Set to True for the reaction, False for the message"""
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "levelup_reaction", bool))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "levelup_reaction", bool))
 
     @commands.command(name="reaction_emoji")
     async def config_levelup_reaction_emoji(self, ctx: MyContext, emote: discord.Emoji=None):
@@ -88,7 +88,7 @@ class XP(commands.Cog):
         # convert discord emoji to ID if needed
         emote = str(emote.id) if isinstance(emote, discord.Emoji) else emote
         # save result
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "reaction_emoji", emote))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "reaction_emoji", emote))
     
     async def _create_config(self, ctx: MyContext, mentions: bool=False) -> List[Tuple[str,str]]:
         """Create a list of (key,value) for the /config command"""
