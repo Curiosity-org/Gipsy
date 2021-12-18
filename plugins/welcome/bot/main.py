@@ -18,7 +18,7 @@ class Welcome(commands.Cog):
             roles = None
         else:
             roles = [role.id for role in roles]
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "welcome_roles", roles))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "welcome_roles", roles))
     
     async def give_welcome_roles(self, member: discord.Member):
         g = member.guild

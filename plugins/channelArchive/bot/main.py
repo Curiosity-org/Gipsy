@@ -18,7 +18,7 @@ class ChannelArchive(commands.Cog):
 
     @commands.command(name="archive_category")
     async def config_archive_category(self, ctx: MyContext, *, category: discord.CategoryChannel):
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "archive_category", category.id))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "archive_category", category.id))
 
     @commands.command(name="archive_duration")
     async def config_archive_duration(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta]):
@@ -28,7 +28,7 @@ class ChannelArchive(commands.Cog):
                 await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-duration"))
                 return
             duration = None
-        x = await Sconfig.edit_config(ctx.guild.id, "archive_duration", duration)
+        x = await self.bot.sconfig.edit_config(ctx.guild.id, "archive_duration", duration)
         await ctx.send(x)
 
     def cog_unload(self):

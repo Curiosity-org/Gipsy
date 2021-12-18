@@ -29,13 +29,13 @@ class Hypesquad(commands.Cog):
         role = role.id if isinstance(role, discord.Role) else None
         house = house.lower()
         if house == 'none':
-            await ctx.send(await Sconfig.edit_config(ctx.guild.id, "hs_none_role", role))
+            await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "hs_none_role", role))
         elif house == 'bravery':
-            await ctx.send(await Sconfig.edit_config(ctx.guild.id, "hs_bravery_role", role))
+            await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "hs_bravery_role", role))
         elif house == 'brilliance':
-            await ctx.send(await Sconfig.edit_config(ctx.guild.id, "hs_brilliance_role", role))
+            await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "hs_brilliance_role", role))
         elif house == 'balance':
-            await ctx.send(await Sconfig.edit_config(ctx.guild.id, "hs_balance_role", role))
+            await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "hs_balance_role", role))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, 'sconfig.hypesquad.unknown'))
 

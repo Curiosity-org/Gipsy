@@ -45,7 +45,7 @@ class Giveaways(commands.Cog):
         # convert discord emojis to IDs if needed
         emojis = [str(x.id) if isinstance(x, discord.Emoji) else x for x in emojis]
         # save result
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "giveaways_emojis", emojis))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "giveaways_emojis", emojis))
 
     def db_add_giveaway(self, channel: discord.TextChannel, name: str, message: int, max_entries: int, ends_at: datetime.datetime = None) -> int:
         """

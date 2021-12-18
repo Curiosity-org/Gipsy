@@ -31,23 +31,23 @@ class Group:
     async def config_group_allowed_role(self, ctx: MyContext, *, role: discord.Role=None):
         """Role allowed to create groups"""
         role = role.id if isinstance(role, discord.Role) else None
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "group_allowed_role", role))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "group_allowed_role", role))
 
     @commands.command(name="group_channel_category")
     async def config_group_channel_category(self, ctx: MyContext, *, category: discord.CategoryChannel):
         """Category were group channel will be created"""
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "group_channel_category", category.id))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "group_channel_category", category.id))
 
     @commands.command(name="group_over_role")
     async def config_group_over_role(self, ctx: MyContext, *, role: discord.Role = None):
         """Role under the groups roles will be created"""
         role = role.id if isinstance(role, discord.Role) else None
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "group_over_role", role))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "group_over_role", role))
 
     @commands.command(name="max_group")
     async def config_max_group(self, ctx: MyContext, *, number: int = None):
         """Max groups by user"""
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "max_group", number))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "max_group", number))
 
     @commands.group(name="config-backup", aliases=["config-bkp"])
     @commands.guild_only()
