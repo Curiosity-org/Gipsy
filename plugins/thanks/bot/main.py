@@ -8,7 +8,6 @@ import checks
 import discord
 from discord.ext import commands
 from utils import Gunibot, MyContext
-from bot.utils.sconfig import Sconfig
 import args
 
 

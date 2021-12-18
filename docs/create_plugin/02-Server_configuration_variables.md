@@ -20,18 +20,11 @@ In the `config/options.json` file, define your configuration variable like this:
 
 > __Note:__ by convention, the name of the configuration variable and the name of the associated command are the same.
 
-
-At the begining of your `bot/main.py` file, write this line
-```python
-from bot.utils.sconfig import Sconfig # It will import the global extension named "sconfig" that manage configuration variables
-```
-
-
-Then, write a commande that will edit this config:
+Just write a commande that will edit this config:
 ```python
 @commands.command(name="foo") # tell to discord.py that the next function is a discord command
 async def foo(self, ctx: MyContext, *, bar):
-    await ctx.send(await Sconfig.edit_config(self, ctx.guild.id, "foo", bar)) # It will edit the config and send a confirmation message
+    await ctx.send(await self.bot.sconfig.edit_config(self, ctx.guild.id, "foo", bar)) # It will edit the config and send a confirmation message
 ```
 
 

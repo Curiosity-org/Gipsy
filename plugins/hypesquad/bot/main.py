@@ -5,7 +5,6 @@ import discord
 from checks import is_roles_manager
 from discord.ext import commands, tasks
 from utils import Gunibot, MyContext
-from bot.utils.sconfig import Sconfig
 
 class Hypesquad(commands.Cog):
 

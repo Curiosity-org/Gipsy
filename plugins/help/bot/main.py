@@ -7,8 +7,6 @@ import discord
 from discord.ext import commands
 from utils import Gunibot, MyContext
 
-from bot.utils.sconfig import Sconfig
-
 
 class Help(commands.HelpCommand):
     ANNOTATION_TRANSLATION = {
@@ -467,7 +465,7 @@ class HelpCog(commands.Cog):
     async def help_embed_color(self, ctx: MyContext, color: discord.Color):
         """Edit the help embed color"""
         # save result
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "help_embed_color", color.value))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "help_embed_color", color.value))
     
     @commands.command(name="help_author")
     @commands.guild_only()
@@ -476,12 +474,12 @@ class HelpCog(commands.Cog):
         if len(text) > 250:
             await ctx.send("Your text can't be longer than 250 characters")
             return
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "help_author", text))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "help_author", text))
     
     @commands.command(name="help_author_icon_url")
     @commands.guild_only()
     async def help_author_icon_url(self, ctx: MyContext, url: str):
-        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "help_author_icon_url", url))
+        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "help_author_icon_url", url))
 
 
 def setup(bot: Gunibot):

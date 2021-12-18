@@ -152,7 +152,7 @@ class Invite(commands.Cog):
         if channel is not None:
             channel = channel.id
         await ctx.send(
-            await self.bot.get_cog("Sconfig").edit_config(
+            await self.bot.sconfig.edit_config(
                 ctx.guild.id,
                 "invite_log",
                 channel

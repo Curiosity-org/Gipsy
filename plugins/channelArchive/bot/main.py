@@ -3,7 +3,6 @@ import discord
 from discord.ext import tasks, commands
 from utils import Gunibot, MyContext
 import args
-from bot.utils.sconfig import Sconfig
 
 
 class ChannelArchive(commands.Cog):

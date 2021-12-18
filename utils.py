@@ -4,8 +4,11 @@ import logging
 import sqlite3
 import json
 import sys
-from typing import Any, Callable, Coroutine, Dict, Union, List
+from typing import Any, Callable, Coroutine, Dict, Union, List, TYPE_CHECKING
 import os
+
+if TYPE_CHECKING:
+    from bot.utils.sconfig import Sconfig
 
 
 class MyContext(commands.Context):
@@ -65,7 +68,7 @@ class Gunibot(commands.bot.AutoShardedBot):
         return self.get_cog("ConfigCog").confManager
     
     @property
-    def sconfig(self):
+    def sconfig(self) -> 'Sconfig':
         """Return sconfig configuration manager"""
         return self.get_cog("Sconfig")
 

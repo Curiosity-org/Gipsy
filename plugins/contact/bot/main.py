@@ -11,8 +11,6 @@ from discord.utils import snowflake_time
 from utils import Gunibot, MyContext
 import sqlite3
 
-from bot.utils.sconfig import Sconfig
-
 
 class Contact(commands.Cog):
 
