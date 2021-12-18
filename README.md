@@ -24,14 +24,14 @@ You can also invite the bot in beta version to enjoy the latest features added. 
 
 You can create a service for your gunibot instance, which will allow you to start and stop the bot using commands like `systemctl start gunibot`, or `service gunibot stop`. The bot will also reboot automatically after a crash.
 
-For this method, you need to have screen installed, which allows you to create detached shell :
+For this method, you need to have screen installed, which allows you to create detached shell:
 
 `sudo apt install screen` (debian)
 
-First, create a file in /etc/systemd/system, where `gunibot` is the name of your service :
+First, create a file in /etc/systemd/system, where `gunibot` is the name of your service:
 
 /etc/systemd/system/gunibot.service
-```
+```ini
 [Unit]
 Description=Gunibot
 After=network.target
