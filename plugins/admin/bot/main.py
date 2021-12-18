@@ -162,7 +162,7 @@ class Admin(commands.Cog):
         """Voir la liste de tout les cogs"""
         text = str()
         for k, v in self.bot.cogs.items():
-            text += "- {} ({}) \n".format(v.file, k)
+            text += "- {} ({}) \n".format(v.file if hasattr(v, "file") else '?', k)
         await ctx.send(text)
 
     @main_msg.command(name="activity")

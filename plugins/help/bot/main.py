@@ -1,11 +1,14 @@
-from typing import Any, List, Optional, Union
+import inspect
+import itertools
 import typing
+from typing import Any, List, Optional, Union
+
 import discord
-from discord.ext import tasks, commands
+from discord.ext import commands
 from utils import Gunibot, MyContext
 
-import itertools
-import inspect
+from bot.utils.sconfig import Sconfig
+
 
 class Help(commands.HelpCommand):
     ANNOTATION_TRANSLATION = {
@@ -47,9 +50,9 @@ class Help(commands.HelpCommand):
         """
 
         #load the config options
-        color = self.context.bot.config.get("help_embed_color", discord.Embed.Empty)
-        author = self.context.bot.config.get("help_author", "{user.name}").format(user=self.context.bot.user)
-        icon_url = self.context.bot.config.get("help_author_icon_url", "{user.display_avatar.url}").format(user=self.context.bot.user)
+        color = self.context.bot.config.get("help_embed_color", 0)
+        author = self.context.bot.config.get("help_author").format(user=self.context.bot.user)
+        icon_url = self.context.bot.config.get("help_author_icon_url").format(user=self.context.bot.user)
 
         embed = discord.Embed(
             *args, **kwargs,
@@ -449,8 +452,42 @@ class Help(commands.HelpCommand):
         await ctx.send(embed=self.embed)
 
 
+class HelpCog(commands.Cog):
+
+    def __init__(self, bot: Gunibot):
+        self.bot = bot
+        self.file = "help"
+        self.config_options = ["help_embed_color", "help_author", "help_author_icon_url"]
+        bot.get_command("config").add_command(self.help_embed_color)
+        bot.get_command("config").add_command(self.help_author)
+        bot.get_command("config").add_command(self.help_author_icon_url)
+    
+    @commands.command(name="help_embed_color")
+    @commands.guild_only()
+    async def help_embed_color(self, ctx: MyContext, color: discord.Color):
+        """Edit the help embed color"""
+        # save result
+        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "help_embed_color", color.value))
+    
+    @commands.command(name="help_author")
+    @commands.guild_only()
+    async def help_author(self, ctx: MyContext, *, text: str):
+        """Edit the help embed author text"""
+        if len(text) > 250:
+            await ctx.send("Your text can't be longer than 250 characters")
+            return
+        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "help_author", text))
+    
+    @commands.command(name="help_author_icon_url")
+    @commands.guild_only()
+    async def help_author_icon_url(self, ctx: MyContext, url: str):
+        await ctx.send(await Sconfig.edit_config(ctx.guild.id, "help_author_icon_url", url))
+
+
 def setup(bot: Gunibot):
     bot.help_command = Help()
+    bot.add_cog(HelpCog(bot))
 
 def teardown(bot: Gunibot):
     bot.help_command = commands.DefaultHelpCommand()
+    bot.remove_cog("HelpCog")

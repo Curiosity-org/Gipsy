@@ -26,7 +26,7 @@ class Misc(commands.Cog):
 
     def __init__(self, bot: Gunibot):
         self.bot = bot
-        self.file = ""
+        self.file = "misc"
 
     #------------------#
     # Commande /cookie #

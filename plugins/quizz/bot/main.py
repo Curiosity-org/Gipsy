@@ -49,7 +49,7 @@ def sort_dict(leaders: dict) -> list[tuple]:
 class Quizz(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
-        self.file = ""
+        self.file = "quizz"
         self.parties = {"0": None}  # Voir l'exemple de dict dans _quizz_start(ctx, quizz_id)
         self.quick_quizz_channels = []  # Utile pour réduire le nombre de requêtes envoyées, cf: on_aw_reaction_add/remove
         self.quick_quizz_messages = []  # Same

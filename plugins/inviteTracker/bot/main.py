@@ -186,6 +186,8 @@ class Invite(commands.Cog):
         member: discord.Member
             The member who join the guild
         """
+        if not member.guild.me.guild_permissions.manage_guild:
+            return
         invite = await self.check_invites(member.guild)
         if invite is not None:
             channel = self.bot.server_configs[member.guild.id]['invite_log']
@@ -223,10 +225,11 @@ class Invite(commands.Cog):
         This event refresh all the invitations in all the servers
         """
         for guild in self.bot.guilds:
-            await self.check_invites(guild)
+            if guild.me.guild_permissions.manage_guild:
+                await self.check_invites(guild)
         self.bot.log.info("Invitations successfully synced")
     
-    async def check_invites(self, guild: discord.Guild) -> Optional[discord.Invite]:
+    async def check_invites(self, guild: discord.Guild) -> Optional[DatabaseInvite]:
         """Check for all guild invite and changes
         
         Attributes
