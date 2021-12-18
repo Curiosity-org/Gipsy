@@ -1,9 +1,9 @@
 import sys
 sys.path.append("./bot")
 import checks
-import discord
-from discord.channel import TextChannel
-from discord.ext import commands
+import nextcord
+from nextcord.channel import TextChannel
+from nextcord.ext import commands
 from utils import Gunibot, MyContext
 
 WELCOME_MESSAGE = """(FR) Bienvenue sur {server} {user} !
@@ -25,7 +25,7 @@ class Antikikoo(commands.Cog):
         self.config_options = ["verification_channel", "info_channel", "pass_message", "verification_add_role", "verification_info_message", "verification_role"]
 
     @commands.Cog.listener()
-    async def on_member_join(self, member: discord.Member):
+    async def on_member_join(self, member: nextcord.Member):
         """Called when a member joins a guild
         Sends a message in the verification channel to inform new users"""
         self.bot.log.info(f"{member} ({member.id}) joined the server")
@@ -38,7 +38,7 @@ class Antikikoo(commands.Cog):
         await verif_channel.send(welcome_msg.format(user=member.mention, channel=info_channel, server=member.guild.name))
 
     @commands.Cog.listener()
-    async def on_message(self, message: discord.Message):
+    async def on_message(self, message: nextcord.Message):
         """Called for every new message
         We use it to check when someone send the verification message"""
         if message.guild is None:  # if the message is not in a server
@@ -48,7 +48,7 @@ class Antikikoo(commands.Cog):
             return
         info_channel = "<#{}>".format(config["info_channel"])
         if message.content.lower() == config["pass_message"].lower():
-            emb = discord.Embed(description=CONFIRM_MESSAGE.format(
+            emb = nextcord.Embed(description=CONFIRM_MESSAGE.format(
                 user=message.author.mention, channel=info_channel))
             await message.channel.send(embed=emb)
             try:
@@ -76,7 +76,7 @@ class Antikikoo(commands.Cog):
 
     @ak_main.command(name="channel")
     @commands.check(checks.is_admin)
-    async def ak_channel(self, ctx: MyContext, channel: discord.TextChannel):
+    async def ak_channel(self, ctx: MyContext, channel: nextcord.TextChannel):
         """Modifies the channel where members will have to check themselves"""
         self.bot.server_configs[ctx.guild.id]["verification_channel"] = channel.id
         await ctx.send(await self.bot._(ctx.guild.id, "antikikoo.channel-edited", channel=channel.mention))

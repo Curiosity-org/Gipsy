@@ -4,8 +4,8 @@ import traceback
 import sys
 sys.path.append("./bot")
 import checks
-import discord
-from discord.ext import commands
+import nextcord
+from nextcord.ext import commands
 from utils import CheckException, Gunibot, MyContext
 
 
@@ -24,7 +24,7 @@ class Errors(commands.Cog):
             return
 
         ignored = (commands.errors.CommandNotFound, commands.errors.CheckFailure,
-                   commands.errors.ConversionError, discord.errors.Forbidden)
+                   commands.errors.ConversionError, nextcord.errors.Forbidden)
         actually_not_ignored = (commands.errors.NoPrivateMessage)
 
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
@@ -140,7 +140,7 @@ class Errors(commands.Cog):
     @commands.Cog.listener()
     async def on_error(self, error, ctx=None):
         try:
-            if isinstance(ctx, discord.Message):
+            if isinstance(ctx, nextcord.Message):
                 ctx = await self.bot.get_context(ctx)
             tr = traceback.format_exception(
                 type(error), error, error.__traceback__)

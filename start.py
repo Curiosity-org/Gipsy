@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-import discord, time, asyncio, logging, json, sys, os, argparse
+import nextcord, time, asyncio, logging, json, sys, os, argparse
 from shutil import copyfile
 sys.path.append("./bot")
 from utils import Gunibot, setup_logger
@@ -48,7 +48,7 @@ def main():
                 conf.update(get_config('./plugins/' + plugin + '/config/require', isBotConfig = False))
 
     # Creating client
-    client = Gunibot(case_insensitive=True, status=discord.Status("online"), beta=False, config=conf)
+    client = Gunibot(case_insensitive=True, status=nextcord.Status("online"), beta=False, config=conf)
 
     # Writing logs + welcome message
     if not os.path.isdir("logs"):

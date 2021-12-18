@@ -3,25 +3,25 @@ import itertools
 import typing
 from typing import Any, List, Optional, Union
 
-import discord
-from discord.ext import commands
+import nextcord
+from nextcord.ext import commands
 from utils import Gunibot, MyContext
 
 
 class Help(commands.HelpCommand):
     ANNOTATION_TRANSLATION = {
-        discord.User: "annotation.user",
-        discord.Member: "annotation.user",
-        discord.TextChannel: "annotation.textchannel",
-        discord.VoiceChannel: "annotation.voicechannel",
-        discord.Role: "annotation.role",
-        discord.Guild: "annotation.guild",
+        nextcord.User: "annotation.user",
+        nextcord.Member: "annotation.user",
+        nextcord.TextChannel: "annotation.textchannel",
+        nextcord.VoiceChannel: "annotation.voicechannel",
+        nextcord.Role: "annotation.role",
+        nextcord.Guild: "annotation.guild",
         str: "annotation.string",
         int: "annotation.int",
         bool: "annotation.bool",
         False: "annotation.bool",
         True: "annotation.bool",
-        discord.Message: "annotation.message",
+        nextcord.Message: "annotation.message",
     }
 
     DEFAULT_TRANSLATION = {
@@ -29,21 +29,21 @@ class Help(commands.HelpCommand):
         False: "help_default.false_",
     }
 
-    embed: discord.Embed
+    embed: nextcord.Embed
 
     context: MyContext
 
-    async def get_help_embed(self, *args, **kwargs) -> discord.Embed:
+    async def get_help_embed(self, *args, **kwargs) -> nextcord.Embed:
         """Returns the embed formated for help message
         The color of the embed is set by default, as well as the author.
 
         Attributes
         ----------
-        You can put parameters for the :class:`discord.Embed` constructor method
+        You can put parameters for the :class:`nextcord.Embed` constructor method
 
         Returns
         -------
-        :class:`discord.Embed`
+        :class:`nextcord.Embed`
             The help embed
         """
 
@@ -52,7 +52,7 @@ class Help(commands.HelpCommand):
         author = self.context.bot.config.get("help_author").format(user=self.context.bot.user)
         icon_url = self.context.bot.config.get("help_author_icon_url").format(user=self.context.bot.user)
 
-        embed = discord.Embed(
+        embed = nextcord.Embed(
             *args, **kwargs,
             color=color
         )
@@ -72,7 +72,7 @@ class Help(commands.HelpCommand):
         
         Attributes
         ----------
-        commands_: List[:class:`discord.ext.commands.Command`]
+        commands_: List[:class:`nextcord.ext.commands.Command`]
             The commands fro which to return the string representation
         
         Returns
@@ -88,7 +88,7 @@ class Help(commands.HelpCommand):
 
     async def get_type_string(self, type: Any) -> Optional[str]:
         """Returns the string representation of a type
-        (like discord.Message, etc...)
+        (like nextcord.Message, etc...)
 
         Attributes
         ----------
@@ -162,7 +162,7 @@ class Help(commands.HelpCommand):
         
         Attributes
         ----------
-        command: :class:`discord.ext.commands.Command`
+        command: :class:`nextcord.ext.commands.Command`
             The command for which to get the parameters string representation
         sep: :class:`str`
             The separator to put between parameters
@@ -202,7 +202,7 @@ class Help(commands.HelpCommand):
         
         Attributes
         ----------
-        command: :class:`discord.ext.commands.Command`
+        command: :class:`nextcord.ext.commands.Command`
             The command for which to return the representation
         
         Returns
@@ -223,7 +223,7 @@ class Help(commands.HelpCommand):
         
         Attributes
         ----------
-        group: :class:`discord.ext.commands.Group`
+        group: :class:`nextcord.ext.commands.Group`
             The group for which to get the subcommand string representation
         sep: :class:`str`
             The separator to put between subcommands
@@ -340,7 +340,7 @@ class Help(commands.HelpCommand):
         
         Attributes
         ----------
-        command: :class:`discord.ext.commands.Command`
+        command: :class:`nextcord.ext.commands.Command`
             The command for which to send the help
         """
         ctx = self.context
@@ -369,7 +369,7 @@ class Help(commands.HelpCommand):
         
         Attributes
         ----------
-        group: :class:`discord.ext.commands.Group`
+        group: :class:`nextcord.ext.commands.Group`
             The command for which to send the help
         """
         ctx = self.context
@@ -401,7 +401,7 @@ class Help(commands.HelpCommand):
         
         Attributes
         ----------
-        cog: :class:`discord.ext.commands.Cog`
+        cog: :class:`nextcord.ext.commands.Cog`
             The cog for which to send the help
         """
         ctx = self.context
@@ -462,7 +462,7 @@ class HelpCog(commands.Cog):
     
     @commands.command(name="help_embed_color")
     @commands.guild_only()
-    async def help_embed_color(self, ctx: MyContext, color: discord.Color):
+    async def help_embed_color(self, ctx: MyContext, color: nextcord.Color):
         """Edit the help embed color"""
         # save result
         await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "help_embed_color", color.value))

@@ -8,8 +8,8 @@ import args
 import sys
 sys.path.append("./bot")
 import checks
-import discord
-from discord.ext import commands
+import nextcord
+from nextcord.ext import commands
 from utils import Gunibot
 
 # /rolelink <grant/revoke> <role> when <get/loose> <one/all> <roles>
@@ -108,7 +108,7 @@ class GroupRoles(commands.Cog):
         rowcount = self.bot.db_query(query, (guildID, actionID))
         return rowcount == 1
 
-    async def filter_allowed_roles(self, guild: discord.Guild, roles: List[discord.Role]) -> List[discord.Role]:
+    async def filter_allowed_roles(self, guild: nextcord.Guild, roles: List[nextcord.Role]) -> List[nextcord.Role]:
         """Return every role that the bot is allowed to give/remove
         IE: role exists, role is under bot's highest role
         If bot doesn't have the "manage roles" perm, list will be empty"""
@@ -121,7 +121,7 @@ class GroupRoles(commands.Cog):
         return roles
 
     @commands.Cog.listener()
-    async def on_member_update(self, before: discord.Member, after: discord.Member):
+    async def on_member_update(self, before: nextcord.Member, after: nextcord.Member):
         """Check if a member got/lost a role"""
         if before.roles == after.roles:
             # we don't care about other changes
@@ -133,7 +133,7 @@ class GroupRoles(commands.Cog):
         if lost:
             await self.check_lost_roles(after, lost)
 
-    async def give_remove_roles(self, member: discord.Member, roles: List[discord.Role], action: ActionType):
+    async def give_remove_roles(self, member: nextcord.Member, roles: List[nextcord.Role], action: ActionType):
         if not roles:  # list is empty or None
             return
         names = [x.name for x in roles]
@@ -144,7 +144,7 @@ class GroupRoles(commands.Cog):
             self.bot.log.debug(f"Removing {names} to {member}")
             await member.remove_roles(*roles, reason="Linked roles")
 
-    async def check_got_roles(self, member: discord.Member, roles: List[discord.Role]):
+    async def check_got_roles(self, member: nextcord.Member, roles: List[nextcord.Role]):
         """Trigger dependencies based on granted roles"""
         actions = self.db_get_config(member.guild.id)
         if actions == None:
@@ -165,7 +165,7 @@ class GroupRoles(commands.Cog):
                             await self.give_remove_roles(member, alwd_roles, action.action)
                             break
 
-    async def check_lost_roles(self, member: discord.Member, roles: List[discord.Role]):
+    async def check_lost_roles(self, member: nextcord.Member, roles: List[nextcord.Role]):
         """Trigger dependencies based on revoked roles"""
         actions = self.db_get_config(member.guild.id)
         if actions == None:
@@ -223,7 +223,7 @@ class GroupRoles(commands.Cog):
 
     @rolelink_main.command(name="add")
     @commands.check(checks.is_server_manager)
-    async def rolelink_create(self, ctx: commands.Context, action: ActionType, target_role: discord.Role, when: args.constant('when'), trigger: TriggerType, trigger_roles: commands.Greedy[discord.Role]):
+    async def rolelink_create(self, ctx: commands.Context, action: ActionType, target_role: nextcord.Role, when: args.constant('when'), trigger: TriggerType, trigger_roles: commands.Greedy[nextcord.Role]):
         """Create a new roles-link
         Actions can be either grant or revoke
         Trigger can be either get-one, get-all, loose-one or loose-all"""
@@ -240,7 +240,7 @@ class GroupRoles(commands.Cog):
             timeout = 20
             await ctx.send(await self.bot._(ctx.guild.id, "grouproles.infinite", dep=e.args[0].to_str(False), t=timeout))
 
-            def check(m: discord.Message):
+            def check(m: nextcord.Message):
                 return m.author == ctx.author and m.channel == ctx.channel and m.content.lower() in ("oui", "yes")
             try:
                 await self.bot.wait_for('message', check=check, timeout=timeout)

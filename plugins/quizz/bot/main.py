@@ -2,8 +2,8 @@ import random
 import time
 from typing import Optional
 
-import discord
-from discord.ext import commands, tasks
+import nextcord
+from nextcord.ext import commands, tasks
 from utils import Gunibot, MyContext
 
 from .QuiPyQuizz import QuiPyQuizz
@@ -59,7 +59,7 @@ class Quizz(commands.Cog):
     def update_timestamp(self, party_id):
         self.parties[party_id]['timestamp'] = time.time()
 
-    def ez_set_author(self, embed: discord.Embed, party_id):  # Vu que c'est gros et qu'il faut le foutre partout j'en ai fait une fonction
+    def ez_set_author(self, embed: nextcord.Embed, party_id):  # Vu que c'est gros et qu'il faut le foutre partout j'en ai fait une fonction
         quizz_id = self.parties[party_id]['quizz']['id']  # Récupère l'id du quizz
         embed.set_author(name=self.QPQ.get_name(quizz_id),
                          url=self.QPQ.get_url(quizz_id),
@@ -79,9 +79,9 @@ class Quizz(commands.Cog):
         raw_question = self.QPQ.get_question(self.parties[party_id]['quizz']['id'],
                                              curent_question_id)  # Récupère le paquet de la question
 
-        embed = discord.Embed(
+        embed = nextcord.Embed(
             title=f"Question {str(self.parties[party_id]['quizz']['current'] + 1)}/10",
-            color=discord.Colour.random(),
+            color=nextcord.Colour.random(),
             description=clean_question(raw_question['question'])
         )
 
@@ -107,9 +107,9 @@ class Quizz(commands.Cog):
         raw_question = self.QPQ.get_question(self.parties[party_id]['quizz']['id'],
                                              curent_question_id)  # Choppe le paquet de la question
 
-        embed = discord.Embed(
+        embed = nextcord.Embed(
             title=f"Question {str(self.parties[party_id]['quizz']['current'] + 1)}/10",
-            color=discord.Colour.random(),
+            color=nextcord.Colour.random(),
             description=f"{clean_answer(raw_question['question'])}\n{clean_answer(raw_answer['explanation'])}"
         )
 
@@ -133,9 +133,9 @@ class Quizz(commands.Cog):
         return embed
 
     def ez_summary_embed(self, party_id):
-        embed = discord.Embed(
+        embed = nextcord.Embed(
             title="Quizz terminé !",
-            color=discord.Colour.gold()
+            color=nextcord.Colour.gold()
         )
         embed = self.ez_set_author(embed, party_id)
         embed.set_footer(text=party_id)
@@ -164,7 +164,7 @@ class Quizz(commands.Cog):
         return verif
 
     async def send_question(self, player_id, party_id):
-        player: discord.User = await self.bot.fetch_user(player_id)  # Fetch player
+        player: nextcord.User = await self.bot.fetch_user(player_id)  # Fetch player
         embed = self.ez_question_embed(party_id)  # Generate question embed
         msg = await player.send(embed=embed)  # Send it to the player
 
@@ -182,7 +182,7 @@ class Quizz(commands.Cog):
 
     async def send_answer(self, party_id):
         for player_id in self.parties[party_id]['players']:
-            player: discord.User = await self.bot.fetch_user(player_id)  # Fetch player
+            player: nextcord.User = await self.bot.fetch_user(player_id)  # Fetch player
             msg = await player.fetch_message(self.parties[party_id]['players'][player_id]['msg_id'])
             embed = self.ez_question_embed(party_id)  # Generate question embed
 
@@ -197,7 +197,7 @@ class Quizz(commands.Cog):
             for emote in emotes: await msg.add_reaction(emote)  # Rajoute les emote sur le message
         self.update_timestamp(party_id)
 
-    async def update_main_embed(self, embed: discord.Embed, party_id, player_id):
+    async def update_main_embed(self, embed: nextcord.Embed, party_id, player_id):
         old_field = embed.fields[0]
         raw_players = old_field.value.split('\n')
         new_field_value = []
@@ -210,12 +210,12 @@ class Quizz(commands.Cog):
             new_field_value.append(raw_ligne)
         embed.clear_fields()
         embed.add_field(name=old_field.name, value="\n".join(new_field_value))
-        channel: discord.TextChannel = await self.bot.fetch_channel(self.parties[party_id]['channel_id'])
-        msg: discord.Message = await channel.fetch_message(self.parties[party_id]['msg_id'])
+        channel: nextcord.TextChannel = await self.bot.fetch_channel(self.parties[party_id]['channel_id'])
+        msg: nextcord.Message = await channel.fetch_message(self.parties[party_id]['msg_id'])
         self.update_timestamp(party_id)
         return await msg.edit(embed=embed)
 
-    async def player_leave_update(self, message: discord.Message, party_id, user):
+    async def player_leave_update(self, message: nextcord.Message, party_id, user):
         embed = message.embeds[0]  # Récupère l'embed
         raw_players = embed.fields[0].value.split('\n')  # Split tout les joueurs
 
@@ -236,9 +236,9 @@ class Quizz(commands.Cog):
         return await message.edit(embed=embed)  # Nouvel embed
 
     async def update_player_choice(self, party_id, player_id):
-        channel: discord.TextChannel = await self.bot.fetch_channel(self.parties[party_id]['channel_id'])
-        msg: discord.Message = await channel.fetch_message(self.parties[party_id]['msg_id'])
-        embed: discord.Embed = msg.embeds[0]
+        channel: nextcord.TextChannel = await self.bot.fetch_channel(self.parties[party_id]['channel_id'])
+        msg: nextcord.Message = await channel.fetch_message(self.parties[party_id]['msg_id'])
+        embed: nextcord.Embed = msg.embeds[0]
         field_name = embed.fields[0].name
         field_value = embed.fields[0].value.split('\n')
         new_value = ""
@@ -259,7 +259,7 @@ class Quizz(commands.Cog):
         for party_id in self.parties:
             if party_id != "0":
                 if self.parties[party_id]["timestamp"] < timestamp + 60 * 100000:
-                    channel: Optional[discord.TextChannel] = await self.bot.get_channel(self.parties[party_id]["channel_id"])
+                    channel: Optional[nextcord.TextChannel] = await self.bot.get_channel(self.parties[party_id]["channel_id"])
                     if channel is not None:
                         await channel.send(
                             f"<@{self.parties[party_id]['author_id']}> ton quizz sur {self.QPQ.get_name(self.parties[party_id]['quizz']['id'])} s'est arrêté car inactif !")
@@ -271,7 +271,7 @@ class Quizz(commands.Cog):
             self.parties.pop(party_id)
 
     @commands.Cog.listener()
-    async def on_raw_reaction_add(self, pauload: discord.RawReactionActionEvent):
+    async def on_raw_reaction_add(self, pauload: nextcord.RawReactionActionEvent):
         if pauload.emoji.name not in REACTIONS.all_reactions:
             return  # Si c'est pas les émojis du quizz alors on passe
         elif pauload.user_id == self.bot.user.id:
@@ -281,8 +281,8 @@ class Quizz(commands.Cog):
         elif pauload.message_id not in self.quick_quizz_messages:
             return  # Same
 
-        channel: discord.DMChannel = await self.bot.fetch_channel(pauload.channel_id)
-        message: discord.Message = await channel.fetch_message(pauload.message_id)
+        channel: nextcord.DMChannel = await self.bot.fetch_channel(pauload.channel_id)
+        message: nextcord.Message = await channel.fetch_message(pauload.message_id)
         if len(message.embeds) == 0: return  # Vu que tout passe par embeds, si y'en a pas on passe
 
         if pauload.emoji.name == REACTIONS.PREVIOUS_QUESTION:
@@ -350,7 +350,7 @@ class Quizz(commands.Cog):
                     return await self.send_party_question(party_id)  # On envoit les questions en mp
 
                 elif pauload.emoji.name == REACTIONS.STOP_QUIZ:  # ❌ => annulation du quizz
-                    embed = discord.Embed(title="Quizz annulé")
+                    embed = nextcord.Embed(title="Quizz annulé")
                     self.parties.pop(party_id)  # Supression dans le dict
                     await message.clear_reactions()  # Retire toute les réactions
                     return await message.edit(embed=embed)  # Feedback user
@@ -398,22 +398,22 @@ class Quizz(commands.Cog):
 
             if pauload.emoji.name in [REACTIONS.ANSWER_TRUE, REACTIONS.ANSWER_FALSE]:
                 if self.has_everyone_answered(party_id):
-                    main_channel: discord.TextChannel = await self.bot.fetch_channel(self.parties[party_id]['channel_id'])
-                    main_message: discord.Message = await main_channel.fetch_message(self.parties[party_id]['msg_id'])
+                    main_channel: nextcord.TextChannel = await self.bot.fetch_channel(self.parties[party_id]['channel_id'])
+                    main_message: nextcord.Message = await main_channel.fetch_message(self.parties[party_id]['msg_id'])
                     await main_message.edit(embed=self.ez_answer_embed(party_id))
                     await self.send_answer(party_id)
                     self.parties[party_id]['quizz']['current'] += 1
                     return
 
             if pauload.emoji.name == REACTIONS.ANSWER_LEAVE:  # Le joueur veut quitter le quizz
-                main_channel: discord.TextChannel = await self.bot.fetch_channel(self.parties[party_id]['channel_id'])
-                main_message: discord.Message = await main_channel.fetch_message(self.parties[party_id]['msg_id'])
+                main_channel: nextcord.TextChannel = await self.bot.fetch_channel(self.parties[party_id]['channel_id'])
+                main_message: nextcord.Message = await main_channel.fetch_message(self.parties[party_id]['msg_id'])
                 user = await self.bot.fetch_user(pauload.user_id)  # Faut optimiser ct'e merde
                 await self.player_leave_update(main_message, party_id, user)  # Retire le joueur
                 return await channel.send("Vous avez quitté le quizz")  # Feedback user
 
     @commands.Cog.listener()
-    async def on_raw_reaction_remove(self, pauload: discord.RawReactionActionEvent):
+    async def on_raw_reaction_remove(self, pauload: nextcord.RawReactionActionEvent):
         if pauload.emoji.name != REACTIONS.JOIN_QUIZ:
             return  # Si c'est pas les émojis du quizz alors on passe
         elif pauload.user_id == self.bot.user.id:
@@ -423,8 +423,8 @@ class Quizz(commands.Cog):
         elif pauload.message_id not in self.quick_quizz_messages:
             return  # Same
 
-        channel: discord.DMChannel = await self.bot.fetch_channel(pauload.channel_id)
-        message: discord.Message = await channel.fetch_message(pauload.message_id)
+        channel: nextcord.DMChannel = await self.bot.fetch_channel(pauload.channel_id)
+        message: nextcord.Message = await channel.fetch_message(pauload.message_id)
         if len(message.embeds) == 0: return  # Vu que tout passe par embeds, si y'en a pas on passe
 
         try:
@@ -438,16 +438,16 @@ class Quizz(commands.Cog):
 
         if pauload.guild_id is not None and pauload.emoji.name == REACTIONS.JOIN_QUIZ and not self.parties[party_id][
             'started']:  # Si un joueur se barre
-            user: discord.User = await self.bot.fetch_user(pauload.user_id)  # Récupère l'user
+            user: nextcord.User = await self.bot.fetch_user(pauload.user_id)  # Récupère l'user
             return await self.player_leave_update(message, party_id, user)  # Generate new player list
 
     @commands.group(name="quizz")
     async def quizz_core(self, ctx: MyContext):
         await ctx.message.delete()
         if ctx.invoked_subcommand is None:
-            embed = discord.Embed(
+            embed = nextcord.Embed(
                 title="Quizz help",
-                color=discord.Colour.orange()
+                color=nextcord.Colour.orange()
             )
             embed.add_field(name=f"`quizz`", value="Shows this message", inline=False)
             embed.add_field(name=f"`quizz start <quizz_id>`", value="Démarre un quizz", inline=False)
@@ -477,14 +477,14 @@ class Quizz(commands.Cog):
                                  'started': False
                                  }
 
-        embed = discord.Embed(
+        embed = nextcord.Embed(
             title=f'Partie de {ctx.author.display_name}',
             description=f"Sur le thème de :\n\t- **{self.QPQ.get_name(quizz_id)}**"
         )
         embed.add_field(name="1 joueur", value=f"- {ctx.author.mention}: 0/10")
         embed.set_footer(text=party_id)
         embed = self.ez_set_author(embed, party_id)
-        msg: discord.Message = await ctx.send(embed=embed)
+        msg: nextcord.Message = await ctx.send(embed=embed)
         self.parties[party_id]['msg_id'] = msg.id
         emojis = [REACTIONS.JOIN_QUIZ, REACTIONS.STOP_QUIZ, REACTIONS.START_QUIZ]
         for emoji in emojis:
@@ -494,16 +494,16 @@ class Quizz(commands.Cog):
 
     @quizz_core.command(name="themes")
     async def _quizz_themes(self, ctx: MyContext):
-        embed = discord.Embed(
+        embed = nextcord.Embed(
             title="THEMES",
-            color=discord.Colour.random()
+            color=nextcord.Colour.random()
         )
         ids = [quizz_id for quizz_id in self.QPQ.data]
         for n in range(15):
             embed.add_field(name=self.QPQ.data[ids[n]]["name"],
                             value=f"ID du quizz: `{ids[n]}`")
         embed.set_footer(text=f"1/{len(self.QPQ.data)//15}")
-        msg: discord.Message = await ctx.send(embed=embed)
+        msg: nextcord.Message = await ctx.send(embed=embed)
         emojis = ["⬅️", "➡️"]
         for emoji in emojis:
             await msg.add_reaction(emoji)

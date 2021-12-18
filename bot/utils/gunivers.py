@@ -1,5 +1,5 @@
-import discord
-from discord.ext import tasks, commands
+import nextcord
+from nextcord.ext import tasks, commands
 from utils import Gunibot, MyContext
 
 

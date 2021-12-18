@@ -1,8 +1,8 @@
 import random
 
 import aiohttp
-import discord
-from discord.ext import commands
+import nextcord
+from nextcord.ext import commands
 from utils import Gunibot, MyContext
 
 class VoiceChannels(commands.Cog):
@@ -27,7 +27,7 @@ class VoiceChannels(commands.Cog):
         await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "voice_channel_format", text[:40]))
 
     @commands.command(name="voice_roles")
-    async def config_voice_roles(self, ctx: MyContext, roles: commands.Greedy[discord.Role]):
+    async def config_voice_roles(self, ctx: MyContext, roles: commands.Greedy[nextcord.Role]):
         if len(roles) == 0:
             roles = None
         else:
@@ -35,11 +35,11 @@ class VoiceChannels(commands.Cog):
         await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "voice_roles", roles))
 
     @commands.command(name="voices_category")
-    async def config_voices_category(self, ctx: MyContext, *, category: discord.CategoryChannel):
+    async def config_voices_category(self, ctx: MyContext, *, category: nextcord.CategoryChannel):
         await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "voices_category", category.id))
 
     @commands.command(name="voice_channel")
-    async def config_voice_channel(self, ctx: MyContext, *, channel: discord.VoiceChannel):
+    async def config_voice_channel(self, ctx: MyContext, *, channel: nextcord.VoiceChannel):
         await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "voice_channel", channel.id))
 
     def db_get_channels(self):
@@ -47,13 +47,13 @@ class VoiceChannels(commands.Cog):
         for row in liste:
             self.channels[row['guild']] = self.channels.get(row['guild'], list()) + [row['channel']]
 
-    def db_add_channel(self, channel: discord.VoiceChannel):
+    def db_add_channel(self, channel: nextcord.VoiceChannel):
         query = "INSERT INTO voices_chats (guild,channel) VALUES (?, ?)"
         rowcount = self.bot.db_query(query, (channel.guild.id, channel.id), returnrowcount=True)
         if rowcount == 1:
             self.channels[channel.guild.id] = self.channels.get(channel.guild.id, list()) + [channel.id]
 
-    def db_delete_channel(self, channel: discord.VoiceChannel):
+    def db_delete_channel(self, channel: nextcord.VoiceChannel):
         query = "DELETE FROM voices_chats WHERE guild=? AND channel=?"
         rowcount = self.bot.db_query(query,  (channel.guild.id, channel.id), returnrowcount=True)
         if rowcount == 1:
@@ -63,7 +63,7 @@ class VoiceChannels(commands.Cog):
                 # we don't care about that error
                 pass
 
-    async def give_roles(self, member: discord.Member, remove=False):
+    async def give_roles(self, member: nextcord.Member, remove=False):
         if not member.guild.me.guild_permissions.manage_roles:
             self.bot.log.info(f"Module - Voice: Missing \"manage_roles\" permission on guild \"{member.guild.name}\"")
             return
@@ -80,14 +80,14 @@ class VoiceChannels(commands.Cog):
             await member.add_roles(*roles, reason="In a voice chat")
 
     @commands.Cog.listener()
-    async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel):
+    async def on_guild_channel_delete(self, channel: nextcord.abc.GuildChannel):
         """Deletes a voice channel in the database when deleted in Discord"""
-        if isinstance(channel, discord.VoiceChannel):
+        if isinstance(channel, nextcord.VoiceChannel):
             self.db_delete_channel(channel)
         # other cases are not interesting
 
     @commands.Cog.listener()
-    async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
+    async def on_voice_state_update(self, member: nextcord.Member, before: nextcord.VoiceState, after: nextcord.VoiceState):
         """Check if a member joined/left a voice channel"""
         if before.channel == after.channel:
             return
@@ -108,14 +108,14 @@ class VoiceChannels(commands.Cog):
         if before.channel is None:
             await self.give_roles(member)
 
-    async def create_channel(self, member: discord.Member, config: dict):
+    async def create_channel(self, member: nextcord.Member, config: dict):
         """Create a new voice channel
         The member will get "Manage channel" permissions automatically"""
         if config["voices_category"] is None:  # si rien n'a été configuré
             return
-        voice_category: discord.CategoryChannel = self.bot.get_channel(
+        voice_category: nextcord.CategoryChannel = self.bot.get_channel(
             config["voices_category"])
-        if not isinstance(voice_category, discord.CategoryChannel):
+        if not isinstance(voice_category, nextcord.CategoryChannel):
             return
         perms = voice_category.permissions_for(member.guild.me)
         # S'il manque des perms au bot: abort
@@ -126,7 +126,7 @@ class VoiceChannels(commands.Cog):
         # try to calculate the correct permissions
         d = member.guild.me.guild_permissions
         d = {k: v for k, v in dict(d).items() if v}
-        over = {member: discord.PermissionOverwrite(**d)}
+        over = {member: nextcord.PermissionOverwrite(**d)}
         # remove manage roles cuz DISCOOOOOOOOOOORD
         over[member].manage_roles = None
         # build channel name from config and random
@@ -150,7 +150,7 @@ class VoiceChannels(commands.Cog):
         for row in liste:
             await channel.send(row)
 
-    async def delete_channel(self, channel: discord.VoiceChannel):
+    async def delete_channel(self, channel: nextcord.VoiceChannel):
         """Delete an unusued channel if no one is in"""
         if len(channel.members) == 0 and channel.permissions_for(channel.guild.me).manage_channels:
             await channel.delete(reason="Unusued")

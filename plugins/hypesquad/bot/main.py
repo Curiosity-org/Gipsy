@@ -1,9 +1,9 @@
 import time
 from typing import Dict
 
-import discord
+import nextcord
 from checks import is_roles_manager
-from discord.ext import commands, tasks
+from nextcord.ext import commands, tasks
 from utils import Gunibot, MyContext
 
 class Hypesquad(commands.Cog):
@@ -22,10 +22,10 @@ class Hypesquad(commands.Cog):
             await ctx.send_help("config hypesquad")
     
     @hs_main.command(name="role")
-    async def hs_role(self, ctx: MyContext, house: str, *, role: discord.Role=None):
+    async def hs_role(self, ctx: MyContext, house: str, *, role: nextcord.Role=None):
         """Set a role to give to a hypesquad house members
         Valid houses are: bravery, brilliance, balance and none"""
-        role = role.id if isinstance(role, discord.Role) else None
+        role = role.id if isinstance(role, nextcord.Role) else None
         house = house.lower()
         if house == 'none':
             await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "hs_none_role", role))
@@ -50,7 +50,7 @@ class Hypesquad(commands.Cog):
                 if any(roles.values()):  # if at least a role is set
                     for member in g.members:
                         count += await self.edit_roles(member, roles)
-            except discord.Forbidden:
+            except nextcord.Forbidden:
                 # missing a perm
                 self.bot.log.warn(f'[hypesquad] Unable to give roles in guild {g.id} ({g.name})')
         delta = round(time.time()-t1, 2)
@@ -67,7 +67,7 @@ class Hypesquad(commands.Cog):
         await self.bot.get_cog("Errors").on_error(error)
 
     @commands.Cog.listener()
-    async def on_member_join(self, member: discord.Member):
+    async def on_member_join(self, member: nextcord.Member):
         """Give hypesquad houses roles upon joining a server"""
         if member.bot:
             return
@@ -75,7 +75,7 @@ class Hypesquad(commands.Cog):
         if any(roles.values()):
             await self.edit_roles(member, roles)
 
-    async def edit_roles(self, member: discord.Member, roles: Dict[str, discord.Role]) -> bool:
+    async def edit_roles(self, member: nextcord.Member, roles: Dict[str, nextcord.Role]) -> bool:
         """Add or remove roles to a member based on their hypesquad
         Returns True if a role has been given/removed"""
         if member.bot:  # we don't want bots here
@@ -124,7 +124,7 @@ class Hypesquad(commands.Cog):
             return True
         return False
 
-    async def get_roles(self, guild: discord.Guild) -> Dict[str, discord.Role]:
+    async def get_roles(self, guild: nextcord.Guild) -> Dict[str, nextcord.Role]:
         """Get the hypesquads roles according to the guild config"""
         config = self.bot.server_configs[guild.id]
         result = dict()
@@ -143,7 +143,7 @@ class Hypesquad(commands.Cog):
 
     @hs_main.command(name="reload")
     @commands.check(is_roles_manager)
-    async def hs_reload(self, ctx: MyContext, *, user: discord.Member):
+    async def hs_reload(self, ctx: MyContext, *, user: nextcord.Member):
         """Reload Hypesquad roles for a member"""
         roles = await self.get_roles(ctx.guild)
         if not any(roles.values()):
@@ -151,7 +151,7 @@ class Hypesquad(commands.Cog):
             return
         try:
             edited = await self.edit_roles(user, roles)
-        except discord.Forbidden:
+        except nextcord.Forbidden:
             await ctx.send(await self.bot._(ctx.guild.id, 'hypesquad.forbidden'))
             return
         if edited:
