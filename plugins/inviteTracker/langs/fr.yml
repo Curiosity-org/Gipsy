@@ -1,0 +1,6 @@
+fr:
+  invite-tracker:
+    join-code: "%{member} a rejoint %{guild} avec l'invitation `%{code}` créée par %{inviter}, qui a maintenant `%{uses}` utilisations !"
+    join-description: "%{member} a rejoint %{guild} avec l'invitation \"%{description}\" (`%{code}`) créée par %{inviter}, qui a maintenant `%{uses}` utilisations !"
+    not-found: J'ai cherché partout, mais l'invitation reste introuvable !
+    set-description-done: J'ai bien changé la description de `%{code}` !
