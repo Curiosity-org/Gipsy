@@ -5,8 +5,23 @@ import discord
 from discord.ext import commands
 from utils import Gunibot, MyContext
 
+from typing import Union    
+
 
 class Misc(commands.Cog):
+
+    CONTAINS_TIMESTAMP = Union[
+        int,
+        discord.User,
+        discord.TextChannel,
+        discord.VoiceChannel,
+        discord.StageChannel,
+        discord.StoreChannel,
+        discord.GroupChannel,
+        discord.Message,
+        discord.Emoji
+    ]
+
 
     def __init__(self, bot: Gunibot):
         self.bot = bot
@@ -126,6 +141,76 @@ class Misc(commands.Cog):
             tries += 1
         # and send it
         await ctx.send(msg.format(author, victime, ex), allowed_mentions=discord.AllowedMentions.none())
+    
+    @commands.group(name="timestamp")
+    async def timestamp(self, ctx: MyContext):
+        """This command helps you to use the discord timestamp feature.
+        Use the timestamp command to see more !
+        """
+        if not ctx.subcommand_passed:
+            await ctx.author.send(await self.bot._(ctx, "misc.timestamp-help"))
+
+    @timestamp.command(name="get")
+    async def get(self, ctx: MyContext, snowflake: CONTAINS_TIMESTAMP = None):
+        """If you want to know how old is a thing
+        
+        Supported args :
+        • Discord ID
+        • User mention
+        • Channel mention
+        • Message link
+        • Custom emoji
+        """
+        print(type(snowflake))
+        if type(snowflake) is int:
+            source = f"`{snowflake}`"
+        elif type(snowflake) in [
+            discord.User,
+            discord.TextChannel,
+            discord.VoiceChannel,
+            discord.StageChannel,
+            discord.StoreChannel,
+            discord.GroupChannel,
+            discord.ClientUser, #show not found message with getting the bot's timestamp
+        ]:
+            source = snowflake.mention
+            snowflake = snowflake.id
+        elif type(snowflake) is discord.Message:
+            source = snowflake.jump_url
+            snowflake = snowflake.id
+        elif type(snowflake) is discord.Emoji:
+            source = snowflake
+            snowflake = snowflake.id
+        elif snowflake is None: #we get the user id
+            source = ctx.author.mention
+            snowflake = ctx.author.id
+        else:
+            await ctx.send(await self.bot._(ctx.guild.id, "misc.timestamp_not_found", source=snowflake))
+            return
+        timestamp = ((snowflake >> 22) + 1420070400000) // 1000
+        await ctx.send(
+            await self.bot._(ctx.guild.id, "misc.timestamp", source=source, timestamp=timestamp),
+            allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False)
+        )
+
+    @timestamp.command(name="create")
+    async def create(
+            self,
+            ctx: MyContext,
+            year: int,
+            month: int=1,
+            day: int=1,
+            hour: int=0,
+            minute: int=0,
+            second: int=0,
+        ):
+        """Show the timestamp for the specified date"""
+        date = datetime(year, month, day, hour, minute, second)
+        timestamp = int(date.timestamp())
+        await ctx.send(
+            await self.bot._(ctx, "misc.show-timestamp", timestamp = timestamp)
+        )
+
 
 
 # The end.
