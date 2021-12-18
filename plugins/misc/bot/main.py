@@ -19,7 +19,8 @@ class Misc(commands.Cog):
         discord.StoreChannel,
         discord.GroupChannel,
         discord.Message,
-        discord.Emoji
+        discord.Emoji,
+        discord.Guild
     ]
 
 
@@ -148,7 +149,7 @@ class Misc(commands.Cog):
         Use the timestamp command to see more !
         """
         if not ctx.subcommand_passed:
-            await ctx.author.send(await self.bot._(ctx, "misc.timestamp-help"))
+            await ctx.author.send(await self.bot._(ctx, "misc.timestamp.help"))
 
     @timestamp.command(name="get")
     async def get(self, ctx: MyContext, snowflake: CONTAINS_TIMESTAMP = None):
@@ -161,35 +162,32 @@ class Misc(commands.Cog):
         • Message link
         • Custom emoji
         """
-        print(type(snowflake))
-        if type(snowflake) is int:
+        if isinstance(snowflake, int):
             source = f"`{snowflake}`"
-        elif type(snowflake) in [
+        elif isinstance(snowflake, (
             discord.User,
-            discord.TextChannel,
-            discord.VoiceChannel,
-            discord.StageChannel,
-            discord.StoreChannel,
-            discord.GroupChannel,
-            discord.ClientUser, #show not found message with getting the bot's timestamp
-        ]:
+            discord.abc.GuildChannel
+        )):
             source = snowflake.mention
             snowflake = snowflake.id
-        elif type(snowflake) is discord.Message:
+        elif isinstance(snowflake, discord.Message):
             source = snowflake.jump_url
             snowflake = snowflake.id
-        elif type(snowflake) is discord.Emoji:
+        elif isinstance(snowflake, discord.Emoji):
             source = snowflake
             snowflake = snowflake.id
-        elif snowflake is None: #we get the user id
+        elif isinstance(snowflake, discord.Guild):
+            source = snowflake.name
+            snowflake = snowflake.id
+        elif snowflake is None: # we get the user id
             source = ctx.author.mention
             snowflake = ctx.author.id
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "misc.timestamp_not_found", source=snowflake))
+            await ctx.send(await self.bot._(ctx.guild.id, "misc.timestamp.not-found", source=snowflake))
             return
         timestamp = ((snowflake >> 22) + 1420070400000) // 1000
         await ctx.send(
-            await self.bot._(ctx.guild.id, "misc.timestamp", source=source, timestamp=timestamp),
+            await self.bot._(ctx.guild.id, "misc.timestamp.read-result", source=source, timestamp=timestamp),
             allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False)
         )
 
@@ -208,7 +206,7 @@ class Misc(commands.Cog):
         date = datetime(year, month, day, hour, minute, second)
         timestamp = int(date.timestamp())
         await ctx.send(
-            await self.bot._(ctx, "misc.show-timestamp", timestamp = timestamp)
+            await self.bot._(ctx, "misc.timestamp.create-result", timestamp = timestamp)
         )
 
 

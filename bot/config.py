@@ -1,7 +1,7 @@
 import json, os
 from shutil import copyfile
 
-def get_config(path, isBotConfig):
+def get_config(path: str, isBotConfig: bool):
     if not os.path.isfile(path + ".json"):
         copyfile(path + '-example.json', path + '.json')
         if isBotConfig:

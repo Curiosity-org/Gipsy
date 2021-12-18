@@ -35,10 +35,11 @@ en:
       "22": "{1} tried a rocket jump"
       "23": "You shouldn't listen to the pretty melody of the Lullaby, {1} :musical_note:"
     dataja: "https://zrunner.me/d-a-t-a/en.html"
-    timestamp: "The date in %{source} is <t:%{timestamp}> (<t:%{timestamp}:R>) (timestamp: %{timestamp})"
-    timestamp_not_found: "Date not found in %{source} !"
-    show-timestamp: "The timestamp for the <t:%{timestamp}:F> is: `%{timestamp}` (discord timestamp : `<t:%{timestamp}>`)"
-    timestamp-help: |
+    timestamp:
+      read-result: "The date in %{source} is <t:%{timestamp}> (<t:%{timestamp}:R>) (timestamp: %{timestamp})"
+      not-found: "Date not found in %{source} !"
+      create-result: "The timestamp for the <t:%{timestamp}:F> is: `%{timestamp}` (Discord timestamp : `<t:%{timestamp}>`)"
+      help: |
       ***The timestamp in discord***
 
       *Example : Discord was created <t:1431468000:R>, the <t:1431468000:D>.*
