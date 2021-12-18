@@ -5,8 +5,8 @@ from typing import Dict, List, Optional, Tuple
 import sys
 sys.path.append("./bot")
 import checks
-import discord
-from discord.ext import commands
+import nextcord
+from nextcord.ext import commands
 from utils import Gunibot, MyContext
 import args
 
@@ -27,7 +27,7 @@ class Thanks(commands.Cog):
 
     
     @commands.command(name="thanks_allowed_roles")
-    async def config_thanks_allowed_roles(self, ctx: MyContext, roles: commands.Greedy[discord.Role]):
+    async def config_thanks_allowed_roles(self, ctx: MyContext, roles: commands.Greedy[nextcord.Role]):
         if len(roles) == 0:
             roles = None
         else:
@@ -58,7 +58,7 @@ class Thanks(commands.Cog):
 
     '''
     @thanks_main.command(name="add")
-    async def thanks_add(self, ctx: MyContext, amount: int, role: discord.Role):
+    async def thanks_add(self, ctx: MyContext, amount: int, role: nextcord.Role):
         """Add a role to give when someone reaches a certain amount of thanks"""
         #await self.bot.get_cog("Thanks").thankslevel_add(ctx, amount, role)
         pass
@@ -162,7 +162,7 @@ class Thanks(commands.Cog):
         query = "DELETE FROM thanks_levels WHERE guild=?"
         self.bot.db_query(query, (guildID,))
 
-    async def has_allowed_roles(self, guild: discord.Guild, member: discord.Member) -> bool:
+    async def has_allowed_roles(self, guild: nextcord.Guild, member: nextcord.Member) -> bool:
         config = self.bot.server_configs[guild.id]['thanks_allowed_roles']
         if config is None:
             return False
@@ -172,19 +172,19 @@ class Thanks(commands.Cog):
                 return True
         return False
 
-    async def give_remove_roles(self, member: discord.Member, roles_conf: Dict[int, List[discord.Role]] = None, duration: int = None) -> bool:
+    async def give_remove_roles(self, member: nextcord.Member, roles_conf: Dict[int, List[nextcord.Role]] = None, duration: int = None) -> bool:
         """Give or remove thanks roles if needed
         Return True if roles were given/removed, else False"""
         if not member.guild.me.guild_permissions.manage_roles:
             self.bot.log.info(
                 f"Module - Thanks: Missing \"manage_roles\" permission on guild \"{member.guild.name}\"")
             return False
-        g: discord.Guild = member.guild
+        g: nextcord.Guild = member.guild
         pos: int = g.me.top_role.position
         if roles_conf is None:
             roles_conf = self.db_get_roles(g.id)
         for k, v in roles_conf.items():
-            if all(isinstance(x, discord.Role) for x in v):  # roles already initialized
+            if all(isinstance(x, nextcord.Role) for x in v):  # roles already initialized
                 continue
             r = [g.get_role(x) for x in v]
             roles_conf[k] = list(
@@ -215,7 +215,7 @@ class Thanks(commands.Cog):
         delta = self.bot.server_configs[guildID]['thanks_duration']
         if (datetime.datetime.now() - date).total_seconds() < delta:
             return
-        guild: discord.Guild = self.bot.get_guild(guildID)
+        guild: nextcord.Guild = self.bot.get_guild(guildID)
         if guild is None:
             return
         member = guild.get_member(memberID)
@@ -225,7 +225,7 @@ class Thanks(commands.Cog):
 
     @commands.command(name="thanks", aliases=['thx'])
     @commands.guild_only()
-    async def thanks(self, ctx: MyContext, *, user: discord.User):
+    async def thanks(self, ctx: MyContext, *, user: nextcord.User):
         """Thanks a user for their work.
         The user may get a special role, according to your server configuration"""
         if not await self.has_allowed_roles(ctx.guild, ctx.author):
@@ -258,7 +258,7 @@ class Thanks(commands.Cog):
 
     @commands.command(name="thankslist", aliases=['thanks-list', 'thxlist'])
     @commands.guild_only()
-    async def thanks_list(self, ctx: MyContext, *, user: discord.User = None):
+    async def thanks_list(self, ctx: MyContext, *, user: nextcord.User = None):
         """Get the list of thanks given to a user (or you by default)"""
         you = user is None
         if you:
@@ -278,7 +278,7 @@ class Thanks(commands.Cog):
                                         x[3]).total_seconds() < duration]
         if ctx.can_send_embed:
             _title = await self.bot._(ctx.guild.id, "thanks.list.title", user=user)
-            emb = discord.Embed(title=_title)
+            emb = nextcord.Embed(title=_title)
             _active = await self.bot._(ctx.guild.id, "thanks.list.active", count=len(current))
             if len(current) > 0:
                 t = ["• {} ({})".format(x[2].mention, x[3].strftime("%d/%m/%y %HH%M"))
@@ -308,7 +308,7 @@ class Thanks(commands.Cog):
     @commands.command(name="thanksreload", aliases=['thanks-reload'])
     @commands.guild_only()
     @commands.check(checks.is_admin)
-    async def thanks_reload(self, ctx: commands.Context, *, user: discord.Member = None):
+    async def thanks_reload(self, ctx: commands.Context, *, user: nextcord.Member = None):
         """Reload the thanks roles for a user, or everyone"""
         users = [user] if user is not None else ctx.guild.members
         users = list(filter(lambda x: not x.bot, users))
@@ -351,13 +351,13 @@ class Thanks(commands.Cog):
             text = await self.bot._(ctx.guild.id, "thanks.no-role")
         _title = await self.bot._(ctx.guild.id, "thanks.roles-list")
         if ctx.can_send_embed:
-            embed = discord.Embed(
+            embed = nextcord.Embed(
                 title=_title, description=text)
             await ctx.send(embed=embed)
         else:
             await ctx.send("__" + _title + ":__\n" + text)
 
-    async def thankslevel_add(self, ctx: commands.Context, level: int, role: discord.Role):
+    async def thankslevel_add(self, ctx: commands.Context, level: int, role: nextcord.Role):
         self.db_set_role(ctx.guild.id, role.id, level)
         roles = self.db_get_roles(ctx.guild.id, level)
         if len(roles) == 0:
@@ -379,7 +379,7 @@ class Thanks(commands.Cog):
         if len(roles) == 0:
             await ctx.send(await self.bot._(ctx.guild.id, "thanks.reload.no-role"))
             return
-        msg: discord.Message = await ctx.send(await self.bot._(ctx.guild.id, "thanks.confirm", count=len(roles)))
+        msg: nextcord.Message = await ctx.send(await self.bot._(ctx.guild.id, "thanks.confirm", count=len(roles)))
         await msg.add_reaction("✅")
 
         def check(reaction, user):

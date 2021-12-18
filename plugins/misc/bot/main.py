@@ -1,8 +1,8 @@
 import random
 from datetime import datetime
 
-import discord
-from discord.ext import commands
+import nextcord
+from nextcord.ext import commands
 from utils import Gunibot, MyContext
 
 from typing import Union    
@@ -12,15 +12,15 @@ class Misc(commands.Cog):
 
     CONTAINS_TIMESTAMP = Union[
         int,
-        discord.User,
-        discord.TextChannel,
-        discord.VoiceChannel,
-        discord.StageChannel,
-        discord.StoreChannel,
-        discord.GroupChannel,
-        discord.Message,
-        discord.Emoji,
-        discord.Guild
+        nextcord.User,
+        nextcord.TextChannel,
+        nextcord.VoiceChannel,
+        nextcord.StageChannel,
+        nextcord.StoreChannel,
+        nextcord.GroupChannel,
+        nextcord.Message,
+        nextcord.Emoji,
+        nextcord.Guild
     ]
 
 
@@ -34,7 +34,7 @@ class Misc(commands.Cog):
 
     @commands.command(name="cookie")
     @commands.guild_only()
-    async def cookie(self, ctx: MyContext, *, user: discord.User = None):
+    async def cookie(self, ctx: MyContext, *, user: nextcord.User = None):
         """The most usefull command: give a cookie to yourself or someone else."""
         if user:
             message = await self.bot._(ctx.guild.id, 'misc.cookie.give', to=user.mention, giver=ctx.author.mention)
@@ -42,12 +42,12 @@ class Misc(commands.Cog):
             message = await self.bot._(ctx.guild.id, 'misc.cookie.self', to=ctx.author.mention)
 
         # Créer un webhook qui prend l'apparence d'un Villageois
-        webhook: discord.Webhook = await ctx.channel.create_webhook(name=f"Villager #{random.randint(1, 9)}")
+        webhook: nextcord.Webhook = await ctx.channel.create_webhook(name=f"Villager #{random.randint(1, 9)}")
         await webhook.send(content=message, avatar_url="https://d31sxl6qgne2yj.cloudfront.net/wordpress/wp-content/uploads/20190121140737/Minecraft-Villager-Head.jpg")
         await webhook.delete()
         try:
             await ctx.message.delete()
-        except discord.errors.NotFound:
+        except nextcord.errors.NotFound:
             pass
 
     #------------------#
@@ -58,12 +58,12 @@ class Misc(commands.Cog):
     @commands.guild_only()
     async def hoster(self, ctx: MyContext):
         """Give all informations about the hoster"""
-        embed = discord.Embed(colour=discord.Colour.blue())
+        embed = nextcord.Embed(colour=nextcord.Colour.blue())
         embed.add_field(name="mTx Serv", value=await self.bot._(ctx.guild.id, 'misc.hoster.info'))
         embed.set_thumbnail(url="http://gunivers.net/wp-content/uploads/2021/07/Logo-mTxServ.png")
 
         # Créer un webhook qui prend l'apparence d'Inovaperf
-        webhook: discord.Webhook = await ctx.channel.create_webhook(name="mTx Serv")
+        webhook: nextcord.Webhook = await ctx.channel.create_webhook(name="mTx Serv")
         await webhook.send(embed=embed, avatar_url="http://gunivers.net/wp-content/uploads/2021/07/Logo-mTxServ.png")
         await webhook.delete()
         await ctx.message.delete()
@@ -99,7 +99,7 @@ class Misc(commands.Cog):
     @commands.command(name="ban")
     @commands.guild_only()
     @commands.has_guild_permissions(ban_members=True)
-    async def ban(self, ctx: MyContext, *, user: discord.User):
+    async def ban(self, ctx: MyContext, *, user: nextcord.User):
         if user == ctx.author:
             await ctx.send("Tu ne peux pas te bannir toi-même !")
             return
@@ -112,7 +112,7 @@ class Misc(commands.Cog):
             return
         try:
             await ctx.guild.ban(user, delete_message_days=0, reason=f"Banned by {ctx.author} ({ctx.author.id})")
-        except discord.Forbidden:
+        except nextcord.Forbidden:
             await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
         else:
             await ctx.send(f"{user} a bien été banni !")
@@ -141,7 +141,7 @@ class Misc(commands.Cog):
             msg = await self.bot._(ctx.channel, f"misc.kills.{choice}")
             tries += 1
         # and send it
-        await ctx.send(msg.format(author, victime, ex), allowed_mentions=discord.AllowedMentions.none())
+        await ctx.send(msg.format(author, victime, ex), allowed_mentions=nextcord.AllowedMentions.none())
     
     @commands.group(name="timestamp")
     async def timestamp(self, ctx: MyContext):
@@ -165,18 +165,18 @@ class Misc(commands.Cog):
         if isinstance(snowflake, int):
             source = f"`{snowflake}`"
         elif isinstance(snowflake, (
-            discord.User,
-            discord.abc.GuildChannel
+            nextcord.User,
+            nextcord.abc.GuildChannel
         )):
             source = snowflake.mention
             snowflake = snowflake.id
-        elif isinstance(snowflake, discord.Message):
+        elif isinstance(snowflake, nextcord.Message):
             source = snowflake.jump_url
             snowflake = snowflake.id
-        elif isinstance(snowflake, discord.Emoji):
+        elif isinstance(snowflake, nextcord.Emoji):
             source = snowflake
             snowflake = snowflake.id
-        elif isinstance(snowflake, discord.Guild):
+        elif isinstance(snowflake, nextcord.Guild):
             source = snowflake.name
             snowflake = snowflake.id
         elif snowflake is None: # we get the user id
@@ -188,7 +188,7 @@ class Misc(commands.Cog):
         timestamp = ((snowflake >> 22) + 1420070400000) // 1000
         await ctx.send(
             await self.bot._(ctx.guild.id, "misc.timestamp.read-result", source=source, timestamp=timestamp),
-            allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False)
+            allowed_mentions=nextcord.AllowedMentions(everyone=False, users=False, roles=False)
         )
 
     @timestamp.command(name="create")

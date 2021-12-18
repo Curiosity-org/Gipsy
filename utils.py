@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import nextcord
+from nextcord.ext import commands
 import logging
 import sqlite3
 import json
@@ -16,7 +16,7 @@ class MyContext(commands.Context):
     It allows us to add more methods and properties in the whole bot code"""
 
     @property
-    def bot_permissions(self) -> discord.Permissions:
+    def bot_permissions(self) -> nextcord.Permissions:
         """Permissions of the bot in the current context"""
         if self.guild:
             # message in a guild
@@ -26,7 +26,7 @@ class MyContext(commands.Context):
             return self.channel.permissions_for(self.bot)
 
     @property
-    def user_permissions(self) -> discord.Permissions:
+    def user_permissions(self) -> nextcord.Permissions:
         """Permissions of the message author in the current context"""
         return self.channel.permissions_for(self.author)
 
@@ -42,9 +42,9 @@ class Gunibot(commands.bot.AutoShardedBot):
     def __init__(self, case_insensitive=None, status=None, beta=False, config: dict = None):
         self.config = config
         # defining allowed default mentions
-        ALLOWED = discord.AllowedMentions(everyone=False, roles=False)
+        ALLOWED = nextcord.AllowedMentions(everyone=False, roles=False)
         # defining intents usage
-        intents = discord.Intents.default()
+        intents = nextcord.Intents.default()
         intents.members = True
         # we now initialize the bot class
         super().__init__(command_prefix=self.get_prefix, case_insensitive=case_insensitive, status=status,
@@ -55,7 +55,7 @@ class Gunibot(commands.bot.AutoShardedBot):
         self.database.row_factory = sqlite3.Row
         self._update_database_structure()
 
-    async def get_context(self, message: discord.Message, *, cls=MyContext):
+    async def get_context(self, message: nextcord.Message, *, cls=MyContext):
         """Get a custom context class when creating one from a message"""
         # when you override this method, you pass your new Context
         # subclass to the super() method, which tells the bot to

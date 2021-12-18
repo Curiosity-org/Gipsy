@@ -10,9 +10,9 @@ import args
 import sys
 sys.path.append("./bot")
 import checks
-import discord
+import nextcord
 import emoji
-from discord.ext import commands
+from nextcord.ext import commands
 from utils import CONFIG_OPTIONS, Gunibot, MyContext
 
 
@@ -92,7 +92,7 @@ class Sconfig(commands.Cog):
         else:
             return await self.bot._(guildID, "sconfig.option-edited", opt=key)
 
-    async def format_config(self, guild: discord.Guild, key: str, value: str, mention: bool = True) -> str:
+    async def format_config(self, guild: nextcord.Guild, key: str, value: str, mention: bool = True) -> str:
         if value is None:
             return None
         config = CONFIG_OPTIONS[key]
@@ -121,9 +121,9 @@ class Sconfig(commands.Cog):
         if config['type'] == 'duration':
             return await self.bot.get_cog("TimeCog").time_delta(value, lang='fr', year=True, precision=0)
         if config['type'] == 'emojis':
-            def emojis_convert(s_emoji:str, bot_emojis:List[discord.Emoji]) -> Union[str, discord.Emoji]:
+            def emojis_convert(s_emoji:str, bot_emojis:List[nextcord.Emoji]) -> Union[str, nextcord.Emoji]:
                 if s_emoji.isnumeric():
-                    d_em = discord.utils.get(bot_emojis, id=int(s_emoji))
+                    d_em = nextcord.utils.get(bot_emojis, id=int(s_emoji))
                     if d_em is None:
                         return ":deleted_emoji:"
                     else:
@@ -187,10 +187,10 @@ class Sconfig(commands.Cog):
         await ctx.send(await self.edit_config(ctx.guild.id, "prefix", new_prefix))
 
     @main_config.command(name="logs_channel")
-    async def config_logs_channel(self, ctx: MyContext, *, channel: discord.TextChannel):
+    async def config_logs_channel(self, ctx: MyContext, *, channel: nextcord.TextChannel):
         await ctx.send(await self.edit_config(ctx.guild.id, "logs_channel", channel.id))
         if logs_cog := self.bot.get_cog("Logs"):
-            emb = discord.Embed(title=await self.bot._(ctx.guild, "sconfig.config-enabled"),
+            emb = nextcord.Embed(title=await self.bot._(ctx.guild, "sconfig.config-enabled"),
                                 description=await self.bot._(ctx.guild, "sconfig.modlogs-channel-enabled"),
                                 color=16098851)
             await logs_cog.send_embed(ctx.guild, emb)
@@ -267,7 +267,7 @@ class Sconfig(commands.Cog):
         data = json.dumps(self.bot.server_configs[ctx.guild.id])
         data = io.BytesIO(data.encode("utf8"))
         txt = await self.bot._(ctx.guild.id, "sconfig.backup.ended")
-        await ctx.send(txt, file=discord.File(data, filename="config-backup.json"))
+        await ctx.send(txt, file=nextcord.File(data, filename="config-backup.json"))
 
     @config_backup.command(name="load")
     async def backup_load(self, ctx: MyContext):

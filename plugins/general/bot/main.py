@@ -5,9 +5,9 @@ import time
 from platform import system as system_name  # Returns the system/OS name
 from subprocess import call as system_call  # Execute a shell command
 
-import discord
+import nextcord
 import psutil
-from discord.ext import commands
+from nextcord.ext import commands
 from git import Repo
 from utils import Gunibot, MyContext
 
@@ -41,13 +41,13 @@ class General(commands.Cog):
 
     
     @commands.command(name='hs')
-    async def hs(self, ctx: MyContext, channel: discord.TextChannel = None):
+    async def hs(self, ctx: MyContext, channel: nextcord.TextChannel = None):
         if channel:
             msg = await self.bot._(ctx.channel, "general.hs-1", current=ctx.channel.mention, dest=channel.mention)
         else:
             msg = await self.bot._(ctx.channel, "general.hs-2", current=ctx.channel.mention)
         if ctx.can_send_embed:
-            emb = discord.Embed(description=msg, color=discord.Color.red())
+            emb = nextcord.Embed(description=msg, color=nextcord.Color.red())
             await ctx.send(embed=emb)
         else:
             await ctx.send(msg)
@@ -112,7 +112,7 @@ class General(commands.Cog):
                 d += "\n" + await self.bot._(ctx.channel, "general.stats.members", c=users, bots=bots)
                 d += "\n" + await self.bot._(ctx.channel, "general.stats.codelines", c=self.codelines)
                 d += "\n" + await self.bot._(ctx.channel, "general.stats.pyver", v=version)
-                d += "\n" + await self.bot._(ctx.channel, "general.stats.diver", v=discord.__version__)
+                d += "\n" + await self.bot._(ctx.channel, "general.stats.diver", v=nextcord.__version__)
                 d += "\n" + await self.bot._(ctx.channel, "general.stats.git", b=branch)
                 d += "\n" + await self.bot._(ctx.channel, "general.stats.ram", c=ram_usage)
                 cpu_txt = await self.bot._(ctx.channel, "general.stats.cpu-loading")
@@ -120,9 +120,9 @@ class General(commands.Cog):
                 d += "\n" + await self.bot._(ctx.channel, "general.stats.ping", c=latency)
             if ctx.can_send_embed:
                 title = '**' + await self.bot._(ctx.channel, "general.stats.title") + '**'
-                embed = discord.Embed(title=title, color=8311585, timestamp=ctx.message.created_at, description=d)
+                embed = nextcord.Embed(title=title, color=8311585, timestamp=ctx.message.created_at, description=d)
                 embed.set_thumbnail(url=self.bot.user.display_avatar)
-                msg: discord.Message = await ctx.send(embed=embed)
+                msg: nextcord.Message = await ctx.send(embed=embed)
                 if py is None: # PSUtil can't be used
                     cpu_usage = "?"
                 else:
@@ -144,9 +144,9 @@ class General(commands.Cog):
 
     @commands.command(name="halp", enabled=False)
     async def halp(self, ctx):
-        embed = discord.Embed(
+        embed = nextcord.Embed(
             name="Help",
-            colour=discord.Colour.green()
+            colour=nextcord.Colour.green()
         )
         embed.set_author(name=f'Gunibot commands')
         embed.add_field(name="admin", value="Affiche les commandes admin disponibles")

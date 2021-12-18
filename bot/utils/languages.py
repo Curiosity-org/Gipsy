@@ -1,6 +1,6 @@
-import discord
+import nextcord
 import i18n
-from discord.ext import commands
+from nextcord.ext import commands
 from utils import Gunibot
 import os
 
@@ -31,9 +31,9 @@ class Languages(commands.Cog):
         if isinstance(ctx, commands.Context):
             if ctx.guild:
                 lang = self.languages[await self.get_lang(ctx.guild.id)]
-        elif isinstance(ctx, discord.Guild):
+        elif isinstance(ctx, nextcord.Guild):
             lang = self.languages[await self.get_lang(ctx.id)]
-        elif isinstance(ctx, discord.abc.GuildChannel):
+        elif isinstance(ctx, nextcord.abc.GuildChannel):
             lang = self.languages[await self.get_lang(ctx.guild.id)]
         elif isinstance(ctx, str) and ctx in self.languages:
             lang = ctx

@@ -34,7 +34,7 @@ The plugin must respect this structure:
 
 ## Legend
 
-* `bot/main.py` (the only required file) is the file that is used to lead the plugin as an extension of discord.py
+* `bot/main.py` (the only required file) is the file that is used to lead the plugin as an extension of nextcord.py
 * `option.json` is read by the bot to generate the configuration files (and will be used to generate a basic web UI)
 * `models.sql` is automatically called when the bot start to create all tables needed by every plugin
 * `user_documentation.md` will allow to your plugin to be listed in the auto-generated SUMMARY.md file (and so on gitlab pages if you use this feature)

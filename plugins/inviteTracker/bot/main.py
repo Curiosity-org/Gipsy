@@ -1,14 +1,14 @@
 from typing import Any, Dict, List, Optional, Tuple, Union
-import discord
-from discord.ext import tasks, commands
+import nextcord
+from nextcord.ext import tasks, commands
 from utils import Gunibot, MyContext
 import checks
 
 class DatabaseInvite:
     """Represent a database invitation object
     """
-    guild: discord.Guild
-    channel: discord.TextChannel
+    guild: nextcord.Guild
+    channel: nextcord.TextChannel
     user: int
     id: int
     code: int
@@ -60,12 +60,12 @@ class DatabaseInvite:
             (self.id,)
         )
     
-    def update(self, invite: discord.Invite) -> None:
+    def update(self, invite: nextcord.Invite) -> None:
         """Update the invite to match the given in database
         
         Attributes
         ----------
-        invite: discord.Invite
+        invite: nextcord.Invite
             The invitation to update
         """
         if invite.id != self.id:
@@ -75,12 +75,12 @@ class DatabaseInvite:
         self.parent.db_query(query, (self.uses, self.id,))
     
     @classmethod
-    def add(cls, invite: discord.Invite, parent: Gunibot):
+    def add(cls, invite: nextcord.Invite, parent: Gunibot):
         """Create a new invitation in the database from a discord invitation
         
         Attributes
         ----------
-        invite: discord.Invite
+        invite: nextcord.Invite
             The discord invitation
         parent: Gunibot
             The parent for which to add in the database
@@ -112,12 +112,12 @@ class DatabaseInvite:
         )
         return cls(data, parent)
     
-    async def fetch_inviter(self) -> discord.User:
+    async def fetch_inviter(self) -> nextcord.User:
         """Return the user that owns the invitation
         
         Returns
         -------
-        discord.User
+        nextcord.User
             The user that owns the invite
         """
         return await self.parent.fetch_user(self.user)
@@ -147,7 +147,7 @@ class Invite(commands.Cog):
     
     @commands.command(name="invite_log")
     @commands.check(checks.is_admin)
-    async def invite_log(self, ctx: MyContext, channel: discord.TextChannel = None) -> None:
+    async def invite_log(self, ctx: MyContext, channel: nextcord.TextChannel = None) -> None:
         """Change le salon où sont envoyés les messages avec les invitations utilisées"""
         if channel is not None:
             channel = channel.id
@@ -177,13 +177,13 @@ class Invite(commands.Cog):
             )
 
     @commands.Cog.listener()
-    async def on_member_join(self, member: discord.Member) -> None:
+    async def on_member_join(self, member: nextcord.Member) -> None:
         """Called when a momber join a guild.
         This event check the join invitation
         
         Attributes
         ----------
-        member: discord.Member
+        member: nextcord.Member
             The member who join the guild
         """
         if not member.guild.me.guild_permissions.manage_guild:
@@ -229,17 +229,17 @@ class Invite(commands.Cog):
                 await self.check_invites(guild)
         self.bot.log.info("Invitations successfully synced")
     
-    async def check_invites(self, guild: discord.Guild) -> Optional[DatabaseInvite]:
+    async def check_invites(self, guild: nextcord.Guild) -> Optional[DatabaseInvite]:
         """Check for all guild invite and changes
         
         Attributes
         ----------
-        guild: discord.Guild
+        guild: nextcord.Guild
             The guild for which to check the invites
         
         Returns
         -------
-        Optional[discord.Invite]
+        Optional[nextcord.Invite]
             The last discord invite with changes detected
         """
         invites = await guild.invites()
@@ -304,12 +304,12 @@ class Invite(commands.Cog):
         else:
             return None
     
-    def get_invite_by_server(self, guild: Union[int, discord.Guild]) -> List[DatabaseInvite]:
+    def get_invite_by_server(self, guild: Union[int, nextcord.Guild]) -> List[DatabaseInvite]:
         """Retrieve all invites stored in database in a guild
         
         Attributes
         ----------
-        guild: Union[int, discord.Guild]
+        guild: Union[int, nextcord.Guild]
             The guild for which to look
         
         Returns
@@ -317,7 +317,7 @@ class Invite(commands.Cog):
         List[DatabaseInvite]
             The list of invitations found
         """
-        if type(guild) == discord.Guild:
+        if type(guild) == nextcord.Guild:
             guild = guild.id
         query = f"SELECT * FROM invites WHERE guild = {guild}"
         datas = self.bot.db_query(

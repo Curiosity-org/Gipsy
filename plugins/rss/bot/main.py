@@ -13,12 +13,12 @@ import async_timeout
 import sys
 sys.path.append("./bot")
 import checks
-import discord
+import nextcord
 import feedparser
 import twitter
 from aiohttp import client_exceptions
 from aiohttp.client import ClientSession
-from discord.ext import commands, tasks
+from nextcord.ext import commands, tasks
 from feedparser.util import FeedParserDict
 from utils import Gunibot, MyContext
 
@@ -32,7 +32,7 @@ class Rss(commands.Cog):
         self.time_between_flows_check = 0.15 # seconds between two rss checks within a loop
         self.max_feeds_per_guild = 100
         
-        self.embed_color = discord.Color(6017876)
+        self.embed_color = nextcord.Color(6017876)
         self.loop_processing = False
         self.twitterAPI = twitter.Api(**bot.config['twitter'], tweet_mode="extended")
         self.twitter_over_capacity = False
@@ -85,7 +85,7 @@ class Rss(commands.Cog):
         def fill_embed_data(self, flow: dict):
             if not flow['use_embed']:
                 return
-            self.embed_data = {'color':discord.Colour(0).default(),
+            self.embed_data = {'color':nextcord.Colour(0).default(),
                 'footer':'',
                 'title':None}
             if not flow['embed_structure']:
@@ -99,7 +99,7 @@ class Rss(commands.Cog):
                 self.embed_data['color'] = color
             return
 
-        async def fill_mention(self, guild: discord.Guild, roles: typing.List[str], translate):
+        async def fill_mention(self, guild: nextcord.Guild, roles: typing.List[str], translate):
             if roles == []:
                 r = await translate(guild.id,"keywords.none")
             else:
@@ -107,7 +107,7 @@ class Rss(commands.Cog):
                 for item in roles:
                     if item=='':
                         continue
-                    role = discord.utils.get(guild.roles,id=int(item))
+                    role = nextcord.utils.get(guild.roles,id=int(item))
                     if role is not None:
                         r.append(role.mention)
                     else:
@@ -123,13 +123,13 @@ class Rss(commands.Cog):
             else:
                 d = self.date
             Format = Format.replace('\\n','\n')
-            _channel = discord.utils.escape_markdown(self.channel)
-            _author = discord.utils.escape_markdown(self.author)
+            _channel = nextcord.utils.escape_markdown(self.channel)
+            _author = nextcord.utils.escape_markdown(self.author)
             text = Format.format_map(self.bot.SafeDict(channel=_channel,title=self.title,date=d,url=self.url,link=self.url,mentions=", ".join(self.mentions),logo=self.logo,author=_author))
             if not self.embed:
                 return text
             else:
-                emb = discord.Embed(description=text,
+                emb = nextcord.Embed(description=text,
                                     timestamp=self.date,
                                     color=self.embed_data.get('color', 0))
                 if footer := self.embed_data.get('footer', None):
@@ -146,7 +146,7 @@ class Rss(commands.Cog):
                     emb.set_thumbnail(url=self.image)
                 return emb
 
-    async def get_lang(self, guild: typing.Optional[discord.Guild]) -> str:
+    async def get_lang(self, guild: typing.Optional[nextcord.Guild]) -> str:
         guildID = guild.id if guild else None
         return await self.bot.get_cog("Languages").get_lang(guildID, True)
 
@@ -174,7 +174,7 @@ class Rss(commands.Cog):
         else:
             form = await self.bot._(ctx.channel,"rss.yt-form-last")
             obj = await text[0].create_msg(await self.get_lang(ctx.guild),form)
-            if isinstance(obj,discord.Embed):
+            if isinstance(obj,nextcord.Embed):
                 await ctx.send(embed=obj)
             else:
                 await ctx.send(obj)
@@ -194,7 +194,7 @@ class Rss(commands.Cog):
         else:
             form = await self.bot._(ctx.channel,"rss.twitch-form-last")
             obj = await text[0].create_msg(await self.get_lang(ctx.guild),form)
-            if isinstance(obj,discord.Embed):
+            if isinstance(obj,nextcord.Embed):
                 await ctx.send(embed=obj)
             else:
                 await ctx.send(obj)
@@ -219,7 +219,7 @@ class Rss(commands.Cog):
             form = await self.bot._(ctx.channel,"rss.tw-form-last")
             for single in text[:5]:
                 obj = await single.create_msg(await self.get_lang(ctx.guild),form)
-                if isinstance(obj,discord.Embed):
+                if isinstance(obj,nextcord.Embed):
                     await ctx.send(embed=obj)
                 else:
                     await ctx.send(obj)
@@ -235,7 +235,7 @@ class Rss(commands.Cog):
         else:
             form = await self.bot._(ctx.channel,"rss.web-form-last")
             obj = await text[0].create_msg(await self.get_lang(ctx.guild),form)
-            if isinstance(obj,discord.Embed):
+            if isinstance(obj,nextcord.Embed):
                 await ctx.send(embed=obj)
             else:
                 await ctx.send(obj)
@@ -253,13 +253,13 @@ class Rss(commands.Cog):
         else:
             form = await self.bot._(ctx.channel,"rss.deviant-form-last")
             obj = await text[0].create_msg(await self.get_lang(ctx.guild),form)
-            if isinstance(obj,discord.Embed):
+            if isinstance(obj,nextcord.Embed):
                 await ctx.send(embed=obj)
             else:
                 await ctx.send(obj)
 
 
-    async def is_overflow(self, guild: discord.Guild) -> bool:
+    async def is_overflow(self, guild: nextcord.Guild) -> bool:
         """Check if a guild still has at least a slot
         True if max number reached, followed by the flow limit"""
         return len(await self.db_get_guild_flows(guild.id)) >= self.max_feeds_per_guild
@@ -366,7 +366,7 @@ class Rss(commands.Cog):
             else:
                 r = list()
                 for item in x['roles']:
-                    role = discord.utils.get(ctx.guild.roles,id=int(item))
+                    role = nextcord.utils.get(ctx.guild.roles,id=int(item))
                     if role is not None:
                         r.append(role.mention)
                     else:
@@ -374,7 +374,7 @@ class Rss(commands.Cog):
                 r = ", ".join(r)
             Type = await self.bot._(ctx.guild.id,'rss.'+x['type'])
             if len(l) > 20:
-                embed = discord.Embed(title=title, color=self.embed_color, timestamp=ctx.message.created_at)
+                embed = nextcord.Embed(title=title, color=self.embed_color, timestamp=ctx.message.created_at)
                 embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar)
                 for text in l:
                     embed.add_field(name="\uFEFF", value=text, inline=False)
@@ -382,7 +382,7 @@ class Rss(commands.Cog):
                 l.clear()
             l.append(translation.format(Type,c,x['link'],r,x['ID'],x['date']))
         if len(l) > 0:
-            embed = discord.Embed(title=title, color=self.embed_color, timestamp=ctx.message.created_at)
+            embed = nextcord.Embed(title=title, color=self.embed_color, timestamp=ctx.message.created_at)
             embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar)
             for x in l:
                 embed.add_field(name="\uFEFF", value=x, inline=False)
@@ -433,7 +433,7 @@ class Rss(commands.Cog):
                     else:
                         r = list()
                         for item in x['roles']:
-                            role = discord.utils.get(ctx.guild.roles,id=int(item))
+                            role = nextcord.utils.get(ctx.guild.roles,id=int(item))
                             if role is not None:
                                 r.append(role.mention)
                             else:
@@ -456,12 +456,12 @@ class Rss(commands.Cog):
                         field = {'name': text[0].split("\n")[-2], 'value': ''}
                     field['value'] += line+"\n"
                 fields.append(field)
-            embed = discord.Embed(title=title, color=self.embed_color, description=desc, timestamp=ctx.message.created_at)
+            embed = nextcord.Embed(title=title, color=self.embed_color, description=desc, timestamp=ctx.message.created_at)
             embed.set_footer(text=str(ctx.author), icon_url=ctx.author.display_avatar)
             if fields is not None:
                 for f in fields:
                     embed.add_field(**f)
-            emb_msg: discord.Message = await ctx.send(embed=embed)
+            emb_msg: nextcord.Message = await ctx.send(embed=embed)
             def check(msg):
                 if not msg.content.isnumeric():
                     return False
@@ -490,7 +490,7 @@ class Rss(commands.Cog):
     @rss_main.command(name="roles", aliases=['mentions', 'mention'])
     @commands.guild_only()
     @commands.check(checks.is_server_manager)
-    async def roles_flows(self, ctx: MyContext, ID:int=None, mentions:commands.Greedy[discord.Role]=None):
+    async def roles_flows(self, ctx: MyContext, ID:int=None, mentions:commands.Greedy[nextcord.Role]=None):
         """Configures a role to be notified when a news is posted
         If you want to use the @everyone role, please put the server ID instead of the role name.
         
@@ -520,7 +520,7 @@ class Rss(commands.Cog):
             else:
                 r = list()
                 for item in flow['roles']:
-                    role = discord.utils.get(ctx.guild.roles,id=int(item))
+                    role = nextcord.utils.get(ctx.guild.roles,id=int(item))
                     if role is not None:
                         r.append(role.mention)
                     else:
@@ -528,7 +528,7 @@ class Rss(commands.Cog):
                 r = ", ".join(r)
                 text = str(await self.bot._(ctx.guild.id,"rss.roles-list")).format(r)
             # ask for roles
-            embed = discord.Embed(title=await self.bot._(ctx.guild.id,"rss.choose-roles"), color=discord.Colour(0x77ea5c), description=text, timestamp=ctx.message.created_at)
+            embed = nextcord.Embed(title=await self.bot._(ctx.guild.id,"rss.choose-roles"), color=nextcord.Colour(0x77ea5c), description=text, timestamp=ctx.message.created_at)
             emb_msg = await ctx.send(embed=embed)
             err = await self.bot._(ctx.guild.id,'find.role-0')
             userID = ctx.author.id
@@ -594,7 +594,7 @@ class Rss(commands.Cog):
         """Reload every rss feeds from your server"""
         try:
             t = time.time()
-            msg: discord.Message = await ctx.send(str(await self.bot._(ctx.guild.id,"rss.guild-loading")).format('...'))
+            msg: nextcord.Message = await ctx.send(str(await self.bot._(ctx.guild.id,"rss.guild-loading")).format('...'))
             liste = await self.db_get_guild_flows(ctx.guild.id)
             await self.main_loop(ctx.guild.id)
             await ctx.send(str(await self.bot._(ctx.guild.id,"rss.guild-complete")).format(len(liste),round(time.time()-t,1)))
@@ -605,7 +605,7 @@ class Rss(commands.Cog):
     @rss_main.command(name="move")
     @commands.guild_only()
     @commands.check(checks.is_server_manager)
-    async def move_guild_flow(self, ctx:MyContext, ID:typing.Optional[int]=None, channel:discord.TextChannel=None):
+    async def move_guild_flow(self, ctx:MyContext, ID:typing.Optional[int]=None, channel:nextcord.TextChannel=None):
         """Move a rss feed in another channel
 
         Example:
@@ -914,7 +914,7 @@ class Rss(commands.Cog):
         return feedparser.parse(html, response_headers=headers)
 
 
-    async def rss_yt(self, channel: discord.TextChannel, identifiant: str, date=None, session: ClientSession=None):
+    async def rss_yt(self, channel: nextcord.TextChannel, identifiant: str, date=None, session: ClientSession=None):
         if identifiant=='help':
             return await self.bot._(channel,"rss.yt-help")
         url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+identifiant
@@ -950,7 +950,7 @@ class Rss(commands.Cog):
             liste.reverse()
             return liste
 
-    async def rss_tw(self, channel: discord.TextChannel, name: str, date: datetime.datetime=None):
+    async def rss_tw(self, channel: nextcord.TextChannel, name: str, date: datetime.datetime=None):
         if name == 'help':
             return await self.bot._(channel,"rss.tw-help")
         try:
@@ -1014,7 +1014,7 @@ class Rss(commands.Cog):
             liste.reverse()
             return liste
 
-    async def rss_twitch(self, channel: discord.TextChannel, nom: str, date: datetime.datetime=None, session: ClientSession=None):
+    async def rss_twitch(self, channel: nextcord.TextChannel, nom: str, date: datetime.datetime=None, session: ClientSession=None):
         url = 'https://twitchrss.appspot.com/vod/'+nom
         feeds = await self.feed_parse(url, 5, session)
         if feeds is None:
@@ -1045,7 +1045,7 @@ class Rss(commands.Cog):
             liste.reverse()
             return liste
 
-    async def rss_web(self, channel: discord.TextChannel, url: str, date: datetime.datetime=None, session: ClientSession=None):
+    async def rss_web(self, channel: nextcord.TextChannel, url: str, date: datetime.datetime=None, session: ClientSession=None):
         if url == 'help':
             return await self.bot._(channel,"rss.web-help")
         feeds = await self.feed_parse(url, 9, session)
@@ -1150,7 +1150,7 @@ class Rss(commands.Cog):
             return liste
 
 
-    async def rss_deviant(self, guild: discord.Guild, nom: str, date: datetime.datetime=None, session: ClientSession=None):
+    async def rss_deviant(self, guild: nextcord.Guild, nom: str, date: datetime.datetime=None, session: ClientSession=None):
         url = 'https://backend.deviantart.com/rss.xml?q=gallery%3A'+nom
         feeds = await self.feed_parse(url, 5, session)
         if feeds is None:
@@ -1253,21 +1253,21 @@ class Rss(commands.Cog):
         query = f"UPDATE `{self.table}` SET {temp} WHERE rowid={ID}"
         self.bot.db_query(query, values)
 
-    async def send_rss_msg(self, obj, channel: discord.TextChannel, roles: typing.List[str], send_stats):
+    async def send_rss_msg(self, obj, channel: nextcord.TextChannel, roles: typing.List[str], send_stats):
         if channel is not None:
             t = await obj.create_msg(await self.get_lang(channel.guild))
             mentions = list()
             for item in roles:
                 if item=='':
                     continue
-                role = discord.utils.get(channel.guild.roles,id=int(item))
+                role = nextcord.utils.get(channel.guild.roles,id=int(item))
                 if role is not None:
                     mentions.append(role)
             try:
-                if isinstance(t, discord.Embed):
-                    await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
+                if isinstance(t, nextcord.Embed):
+                    await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=nextcord.AllowedMentions(everyone=False, roles=True))
                 else:
-                    await channel.send(t, allowed_mentions=discord.AllowedMentions(everyone=False, roles=True))
+                    await channel.send(t, allowed_mentions=nextcord.AllowedMentions(everyone=False, roles=True))
                 if send_stats:
                     if statscog := self.bot.get_cog("BotStats"):
                         statscog.rss_stats['messages'] += 1
@@ -1365,7 +1365,7 @@ class Rss(commands.Cog):
                 statscog.rss_stats['errors'] = len(errors)
         if len(errors) > 0:
             d.append('{} errors: {}'.format(len(errors),' '.join([str(x) for x in errors])))
-        emb = discord.Embed(description='\n'.join(d), color=1655066, timestamp=datetime.datetime.utcnow())
+        emb = nextcord.Embed(description='\n'.join(d), color=1655066, timestamp=datetime.datetime.utcnow())
         emb.set_author(name=str(self.bot.user), icon_url=self.bot.user.display_avatar)
         # await self.bot.get_cog("Embeds").send([emb],url="loop")
         self.bot.log.debug(d[0])
@@ -1415,7 +1415,7 @@ class Rss(commands.Cog):
         else:
             await ctx.send("Option `new_start` invalide - choisissez start, stop ou once")
     
-    async def send_log(self, text: str, guild: discord.Guild):
+    async def send_log(self, text: str, guild: nextcord.Guild):
         """Send a log to the logging channel"""
         return
         # try:

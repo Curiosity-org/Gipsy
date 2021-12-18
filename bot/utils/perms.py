@@ -1,7 +1,7 @@
 import typing
 
-import discord
-from discord.ext import commands
+import nextcord
+from nextcord.ext import commands
 from utils import Gunibot, MyContext
 
 
@@ -11,22 +11,22 @@ class Perms(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "perms"
-        chan_perms = [key for key, value in discord.Permissions().all_channel() if value]
-        self.perms_name = {'general': [key for key, value in discord.Permissions().general() if value],
-                           'text': [key for key, value in discord.Permissions().text() if value],
-                           'voice': [key for key, value in discord.Permissions().voice() if value]}
+        chan_perms = [key for key, value in nextcord.Permissions().all_channel() if value]
+        self.perms_name = {'general': [key for key, value in nextcord.Permissions().general() if value],
+                           'text': [key for key, value in nextcord.Permissions().text() if value],
+                           'voice': [key for key, value in nextcord.Permissions().voice() if value]}
         self.perms_name['common_channel'] = [
             x for x in chan_perms if x in self.perms_name['general']]
 
     @commands.command(name='perms', aliases=['permissions'])
     @commands.guild_only()
-    async def check_permissions(self, ctx: MyContext, channel: typing.Optional[typing.Union[discord.TextChannel, discord.VoiceChannel, discord.CategoryChannel]] = None, *, target: typing.Union[discord.Member, discord.Role] = None):
+    async def check_permissions(self, ctx: MyContext, channel: typing.Optional[typing.Union[nextcord.TextChannel, nextcord.VoiceChannel, nextcord.CategoryChannel]] = None, *, target: typing.Union[nextcord.Member, nextcord.Role] = None):
         """Permissions assigned to a member/role (the user by default)
         The channel used to view permissions is the channel in which the command is entered."""
         if target == None:
             target = ctx.author
         perms = None
-        if isinstance(target, discord.Member):
+        if isinstance(target, nextcord.Member):
             if channel == None:
                 perms = target.guild_permissions
             else:
@@ -34,7 +34,7 @@ class Perms(commands.Cog):
             col = target.color
             avatar = await self.bot.user_avatar_as(target, size=256)
             name = str(target)
-        elif isinstance(target, discord.Role):
+        elif isinstance(target, nextcord.Role):
             perms = target.permissions
             if channel != None:
                 perms.update(
@@ -59,7 +59,7 @@ class Perms(commands.Cog):
         else:
             # Here we check if the value of each permission is True.
             for perm, value in perms:
-                if (perm not in self.perms_name['text']+self.perms_name['common_channel'] and isinstance(channel, discord.TextChannel)) or (perm not in self.perms_name['voice']+self.perms_name['common_channel'] and isinstance(channel, discord.VoiceChannel)):
+                if (perm not in self.perms_name['text']+self.perms_name['common_channel'] and isinstance(channel, nextcord.TextChannel)) or (perm not in self.perms_name['voice']+self.perms_name['common_channel'] and isinstance(channel, nextcord.VoiceChannel)):
                     continue
                 perm = await perms_tr(perm)
                 if 'perms.list.' in perm:
@@ -74,7 +74,7 @@ class Perms(commands.Cog):
             # \uFEFF is a Zero-Width Space, which basically allows us to have an empty field name.
             # And to make it look nice, we wrap it in an Embed.
             desc = "Permissions générales" if channel is None else channel.mention
-            embed = discord.Embed(color=col, description=desc)
+            embed = nextcord.Embed(color=col, description=desc)
             embed.set_author(name=name, icon_url=avatar)
             if len(permsl) > 10:
                 sep = int(len(permsl)/2)
