@@ -94,9 +94,9 @@ class DatabaseInvite:
         parent.db_query(
             query,
             (
-                invite.guild.id,
+                invite.guild.id if invite.guild is not None else None,
                 invite.channel.id,
-                invite.inviter.id,
+                invite.inviter.id if invite.inviter is not None else None,
                 invite.id,
                 invite.code,
                 invite.uses,
