@@ -173,10 +173,8 @@ class Sconfig(commands.Cog):
                         temp += (f"[{extra[0]}]").ljust(max_length+1) + f" {extra[1]}\n"
                 res.append(temp)
 
-            msg_res = [];
             for category in res:
-                msg_res.append("```ini\n" + "\n" + category + "```");
-            await ctx.send("\n".join(msg_res));
+                await ctx.send("```ini\n" + "\n" + category + "```")
 
         elif ctx.invoked_subcommand is None:
             await ctx.send(await self.bot._(ctx.guild.id, 'sconfig.option-notfound'))
