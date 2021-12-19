@@ -185,9 +185,11 @@ class MessageManager(commands.Cog):
         counter = 0
 
         # Retrieves the message list from msg1 to msg2
-        async for msg in msg1.channel.history(limit=200, after=msg1, before=msg2, oldest_first=True):
+        await moveMessage(msg1, webhook)
+        async for msg in msg1.channel.history(limit=200, after=msg1.created_at, before=msg2, oldest_first=True):
             await moveMessage(msg, webhook)
             counter += 1
+        await moveMessage(msg2, webhook)
 
         if counter == 0:
             await ctx.send(await self.bot._(ctx.guild.id, "message_manager.moveall.no-msg"))
