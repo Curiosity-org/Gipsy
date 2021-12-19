@@ -155,7 +155,8 @@ class Sconfig(commands.Cog):
             # get the length of the longest key
             max_length = 0
             for options in self.sorted_options.values():
-                max_length = max(max_length, *[len(k) for k in config.keys() if k in options])
+                configs_len = [len(k) for k in config.keys() if k in options]
+                max_length = max(max_length, *configs_len) if len(configs_len) > 0 else max_length
             max_length += 2
             # iterate over groups
             for module, options in sorted(self.sorted_options.items()):
