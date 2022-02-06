@@ -266,7 +266,7 @@ class Rss(commands.Cog):
 
     @rss_main.command(name="add")
     @commands.guild_only()
-    @commands.check(checks.is_server_manager)
+    @commands.check(commands.has_guild_permissions(manage_webhooks=True))
     async def system_add(self, ctx: MyContext, link):
         """Subscribe to a rss feed, displayed on this channel regularly
 
@@ -319,7 +319,7 @@ class Rss(commands.Cog):
 
     @rss_main.command(name="remove",aliases=['delete'])
     @commands.guild_only()
-    @commands.check(checks.is_server_manager)
+    @commands.check(commands.has_guild_permissions(manage_webhooks=True))
     async def systeme_rm(self, ctx: MyContext, ID:int=None):
         """Delete an rss feed from the list
 
@@ -344,7 +344,7 @@ class Rss(commands.Cog):
 
     @rss_main.command(name="list")
     @commands.guild_only()
-    @commands.check(checks.is_server_manager)
+    @commands.check(commands.has_permissions(manage_webhooks=True))
     async def list_flows(self, ctx: MyContext):
         """Get a list of every rss/Minecraft feed"""
         liste = await self.db_get_guild_flows(ctx.guild.id)
@@ -489,7 +489,7 @@ class Rss(commands.Cog):
 
     @rss_main.command(name="roles", aliases=['mentions', 'mention'])
     @commands.guild_only()
-    @commands.check(checks.is_server_manager)
+    @commands.check(commands.has_permissions(manage_webhooks=True))
     async def roles_flows(self, ctx: MyContext, ID:int=None, mentions:commands.Greedy[nextcord.Role]=None):
         """Configures a role to be notified when a news is posted
         If you want to use the @everyone role, please put the server ID instead of the role name.
@@ -588,7 +588,7 @@ class Rss(commands.Cog):
 
     @rss_main.command(name="reload")
     @commands.guild_only()
-    @commands.check(checks.is_server_manager)
+    @commands.check(commands.has_permissions(manage_webhooks=True))
     @commands.cooldown(1,600,commands.BucketType.guild)
     async def reload_guild_flows(self, ctx: MyContext):
         """Reload every rss feeds from your server"""
@@ -604,7 +604,7 @@ class Rss(commands.Cog):
 
     @rss_main.command(name="move")
     @commands.guild_only()
-    @commands.check(checks.is_server_manager)
+    @commands.check(commands.has_permissions(manage_webhooks=True))
     async def move_guild_flow(self, ctx:MyContext, ID:typing.Optional[int]=None, channel:nextcord.TextChannel=None):
         """Move a rss feed in another channel
 
@@ -639,7 +639,7 @@ class Rss(commands.Cog):
 
     @rss_main.command(name="text")
     @commands.guild_only()
-    @commands.check(checks.is_server_manager)
+    @commands.check(commands.has_permissions(manage_webhooks=True))
     async def change_text_flow(self, ctx: MyContext, ID: typing.Optional[int]=None, *, text=None):
         """Change the text of an rss feed
 
@@ -688,7 +688,7 @@ class Rss(commands.Cog):
 
     @rss_main.command(name="use_embed",aliases=['embed'])
     @commands.guild_only()
-    @commands.check(checks.is_server_manager)
+    @commands.check(commands.has_permissions(manage_webhooks=True))
     async def change_use_embed(self,ctx:MyContext,ID:typing.Optional[int]=None,value:bool=None,*,arguments:args.arguments=None):
         """Use an embed (or not) for a flow
         You can also provide arguments to change the color/text of the embed. Followed arguments are usable:
