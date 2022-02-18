@@ -135,6 +135,16 @@ class DatabaseInvite:
             query,
             (description, self.id)
         )
+    
+    def __eq__(self, object: Union[int, str, "Invite", nextcord.Invite]) -> bool:
+        if type(object) == int:
+            return self.id == object
+        elif type(object) == str:
+            return self.code == object
+        elif type(object) == Invite:
+            return self.id == object.id
+        elif type(object) == nextcord.Invite:
+            return self.id == object.id
 
 class Invite(commands.Cog):
 
@@ -165,6 +175,7 @@ class Invite(commands.Cog):
         """Change the description for a invitation (e.g. website...)
         code: the code of an invitation (e.g. RXjCkvmPXn)
         """
+        await self.check_invites(ctx.guild)
         invite = self.get_invite_by_code(code)
         if invite is not None:
             invite.set_description(' '.join(description))
@@ -248,10 +259,18 @@ class Invite(commands.Cog):
             database_invite = self.get_invite_by_id(invite.id)
             if database_invite is None:
                 database_invite = DatabaseInvite.add(invite, self.bot)
-                output_invite = database_invite
+                if invite.uses > 0:
+                    output_invite = database_invite
             else:
                 if await database_invite.check_use():
                     output_invite = database_invite
+        for invitation in self.get_invite_by_server(guild):
+            is_in = False
+            for database_invite in invites:
+                if invitation == database_invite:
+                    is_in = True
+            if not is_in:
+                invitation.delete()
         return output_invite
 
     def get_invite_by_code(self, code: str) -> Optional[DatabaseInvite]:
@@ -319,11 +338,11 @@ class Invite(commands.Cog):
         """
         if type(guild) == nextcord.Guild:
             guild = guild.id
-        query = f"SELECT * FROM invites WHERE guild = {guild}"
+        query = f"SELECT * FROM invites WHERE guild = ?;"
         datas = self.bot.db_query(
             query,
-            astuple=True,
-            fetchone=True
+            (guild,),
+            astuple=True
         )
         return [DatabaseInvite(data, self.bot) for data in datas]
 

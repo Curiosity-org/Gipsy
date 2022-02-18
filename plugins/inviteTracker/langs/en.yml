@@ -1,4 +1,4 @@
-fr:
+en:
   invite-tracker:
     join-code: "%{member} joins %{guild} with the invite `%{code}` created by %{inviter}, which has been used `%{uses}` times now !"
     join-description: "%{member} joins %{guild} with the invite \"%{description}\" (`%{code}`) created by %{inviter}, which has been used `%{uses}` times now !"
