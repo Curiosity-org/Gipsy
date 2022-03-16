@@ -17,7 +17,7 @@ def similar(msg1, msg2):
 
 
 # Get the corresponding answered message in other channels
-async def get_corresponding_answer(channel: nextcord.TextChannel, message: nextcord.Message):
+async def get_corresponding_answer(channel: nextcord.TextChannel, message: nextcord.Message) -> nextcord.Message:
     date = message.created_at
     async for msg in channel.history(limit=20, after=date, oldest_first=True):
         if similar(message.content, msg.content):
@@ -155,6 +155,34 @@ class Wormholes(commands.Cog):
         # comes as: (name, privacy, webhook_name, webhook_pp_guild)
         return len(query_res) > 0
 
+    @commands.Cog.listener(name = "on_message_edit")
+    async def on_message_edit(self, message, newmessage):
+        """Executed every time a message is edited"""
+        if message.author.bot or "wormhole unlink" in message.content or "wh unlink" in message.content:
+            return
+        query = "SELECT name, type FROM wormhole_channel WHERE channelID = ?"
+        wh_channel = self.bot.db_query(query, (message.channel.id,), astuple=True, fetchone=True)
+        # come as: (name, type)
+        if len(wh_channel) == 0: return      # Check if there is a wormhole linked to the current channel
+        if "w" not in wh_channel[1]: return  # Check if the current channel as Write permission
+        wh_name = wh_channel[0]
+        query = "SELECT * FROM wormhole_channel WHERE name = ? AND type LIKE '%r%' AND NOT channelID = ?"
+        wh_targets = self.bot.db_query(query, (wh_name, message.channel.id), astuple=True)
+        # come as: (name, channelID, guildID, type, webhookID, webhookTOKEN)
+        query = "SELECT webhook_name, webhook_pp FROM wormhole_list WHERE name = ?"
+        wormhole = self.bot.db_query(query, (wh_name,), astuple=True, fetchone=True)
+        # come as: (webhook_name, webhook_pp)
+        async with ClientSession() as session:
+            for row in wh_targets:
+                # We're starting to send the message in all the channels linked to that wormhole
+                channel: nextcord.TextChannel = self.bot.get_channel(row[1])
+                if channel:
+                    webhook = nextcord.Webhook.partial(row[4], row[5], session=session)
+                    embed_reply = None
+                    oldmessage = await get_corresponding_answer(channel, message)
+                    await webhook.edit_message(oldmessage.id, content=newmessage.content, embeds=newmessage.embeds, files=newmessage.attachments, allowed_mentions=None)
+
+
     @commands.Cog.listener()
     async def on_message(self, message: nextcord.Message):
         """Executed every time a message is sent"""
@@ -192,8 +220,7 @@ class Wormholes(commands.Cog):
                         else:
                             content = reply.content
                             content = content.replace("\n"," ")
-                            if len(content) > 80:
-                            	content = content[:80] + "..."
+                            if len(content) > 80: content = content[:80] + "..."
                             embed = nextcord.Embed(
                                 description= await self.bot._(message.guild.id, "wormhole.reply_to", link = reply.jump_url), #"https://gunivers.net"), #
                                 colour=0x2f3136 #2F3136

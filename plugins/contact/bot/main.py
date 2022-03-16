@@ -86,6 +86,7 @@ class Contact(commands.Cog):
             return
         category: nextcord.CategoryChannel = self.bot.get_channel(
             config["contact_category"])
+        if category is None: return
         try:
             perms = dict()
             if config["contact_roles"]:
