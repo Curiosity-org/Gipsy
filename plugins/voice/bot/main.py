@@ -162,8 +162,8 @@ class VoiceChannels(commands.Cog):
         async with aiohttp.ClientSession() as session:
             h = {'X-Api-Key': self.bot.config['random_api_token']}
             if source == 'asterix':
-                async with session.get('https://raw.githubusercontent.com/Gunivers/Gunibot/master/src/main/resources/other/bdd%20name', headers=h) as resp:
-                    self.names[source] = (await resp.text()).split('\n')
+                with open("plugins/voice/bot/asterix_names.txt", 'r', encoding='utf-8') as file:
+                    self.names["asterix"] = file.readlines()
                     random.shuffle(self.names[source])
             else:
                 async with session.get('https://randommer.io/api/Name?nameType=surname&quantity=20', headers=h) as resp:
