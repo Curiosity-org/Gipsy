@@ -91,13 +91,25 @@ class Misc(commands.Cog):
         if member is not None and member.roles[-1].position >= ctx.guild.me.roles[-1].position:
             await ctx.send("Mon rôle n'est pas assez haut pour bannir cet individu :confused:")
             return
-        try:
-            await ctx.guild.ban(user, delete_message_days=0, reason=f"Banned by {ctx.author} ({ctx.author.id})")
-        except discord.Forbidden:
-            await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
+        
+        # Commande spéciale Gunivers, pour éviter d'avoir à unban et envoyer le lien par MP, pour des bans plus fréquents :yeah:
+        if ctx.guild.id == 125723125685026816:
+            user.send("C'est con, tu as été banni ! Mais comme on est (à peu près) sympa, voila une invitation pour toi : https://discord.gg/E8qq6tN")
+            try:
+                await ctx.guild.kick(user, reason=f"{ctx.author} à encore frappé !")
+            except discord.Forbidden:
+                await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
+            else:
+                await ctx.send(f"{user} a bien été banni !")
+                await ctx.send("https://thumbs.gfycat.com/AllFeminineCaribou-size_restricted.gif")
         else:
-            await ctx.send(f"{user} a bien été banni !")
-        await ctx.send("https://thumbs.gfycat.com/LikelyColdBasil-small.gif")
+            try:
+                await ctx.guild.ban(user, delete_message_days=0, reason=f"Banned by {ctx.author} ({ctx.author.id})")
+            except discord.Forbidden:
+                await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
+            else:
+                await ctx.send(f"{user} a bien été banni !")
+                await ctx.send("https://thumbs.gfycat.com/AllFeminineCaribou-size_restricted.gif")
 
 
     #------------------#
