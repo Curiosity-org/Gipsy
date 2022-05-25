@@ -35,7 +35,7 @@ class Misc(commands.Cog):
     @commands.command(name="cookie")
     @commands.guild_only()
     async def cookie(self, ctx: MyContext, *, user: nextcord.User = None):
-        """The most usefull command: give a cookie to yourself or someone else."""
+        """The most useful command: give a cookie to yourself or someone else."""
         if user:
             message = await self.bot._(ctx.guild.id, 'misc.cookie.give', to=user.mention, giver=ctx.author.mention)
         else:
