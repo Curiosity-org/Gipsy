@@ -75,12 +75,12 @@ class Ban(commands.Cog):
             # 1/10th chance of banning both banned and executor, Bothban event.
             if random.randint(1, 10) == 1:
                 try:
-                    await ctx.guild.ban(user, delete_message_days=0, reason=f"Banned by himself. Reason : {user} ({user.id}) used Uno Reverse card.")
+                    await ctx.guild.ban(user, delete_message_days=0, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
                 except nextcord.Forbidden:
                     await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
                 else:
                     try:
-                        await ctx.guild.ban(user, delete_message_days=0, reason=f"Banned by himself. Reason : {user} ({user.id}) used Uno Reverse card.")
+                        await ctx.guild.ban(user, delete_message_days=0, reason=f"Banned by himself. Reason : {user} ({user.id}) banned him back.")
                     except nextcord.Forbidden:
                         # If there's an error when banning the author, we don't care and act like if a one-way ban happened.
                         choice = random.randint(0, 8)
