@@ -1,28 +1,10 @@
 import random
-from datetime import datetime
-
 import nextcord
 from nextcord.ext import commands
-from utils import Gunibot, MyContext
-
-from typing import Union    
+from utils import Gunibot, MyContext  
 
 
 class Ban(commands.Cog):
-
-    CONTAINS_TIMESTAMP = Union[
-        int,
-        nextcord.User,
-        nextcord.TextChannel,
-        nextcord.VoiceChannel,
-        nextcord.StageChannel,
-        nextcord.StoreChannel,
-        nextcord.GroupChannel,
-        nextcord.Message,
-        nextcord.Emoji,
-        nextcord.Guild
-    ]
-
 
     def __init__(self, bot: Gunibot):
         self.bot = bot
