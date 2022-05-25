@@ -36,7 +36,7 @@ class Ban(commands.Cog):
     @commands.command(name="ban")
     @commands.guild_only()
     @commands.has_guild_permissions(ban_members=True)
-    async def ban(self, ctx: MyContext, *, user: nextcord.User, reason: str = None):
+    async def ban(self, ctx: MyContext, *, user: nextcord.User, reason: str = "Aucune raison donnée"):
         if user == ctx.author:
             await ctx.send("Tu ne peux pas te bannir toi-même !")
             return
@@ -135,7 +135,7 @@ class Ban(commands.Cog):
     @commands.command(name="rban")
     @commands.guild_only()
     @commands.has_guild_permissions(ban_members=True)
-    async def rban(self, ctx: MyContext, *, user: nextcord.User):
+    async def rban(self, ctx: MyContext, *, user: nextcord.User, reason: str = "Aucune raison donnée"):
         if ctx.guild.id == "125723125685026816":
             if user == ctx.author:
                 await ctx.send("Tu ne peux pas te bannir toi-même abruti !")
@@ -148,7 +148,7 @@ class Ban(commands.Cog):
                 await ctx.send("Mon rôle n'est pas assez haut pour bannir cet individu :confused:")
                 return
             try:
-                await ctx.guild.ban(user, delete_message_days=0, reason=f"Banned by {ctx.author} ({ctx.author.id})")
+                await ctx.guild.ban(user, delete_message_days=0, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
             except nextcord.Forbidden:
                 await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
             else:
