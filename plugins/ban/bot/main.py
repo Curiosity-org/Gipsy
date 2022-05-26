@@ -28,7 +28,7 @@ class Ban(commands.Cog):
         if member is not None and member.roles[-1].position >= ctx.guild.me.roles[-1].position:
             await ctx.send("Mon rôle n'est pas assez haut pour bannir cet individu :confused:")
             return
-        if ctx.guild.id != "125723125685026816" and ctx.guild.id != "689159304049197131":
+        if ctx.guild.id != 125723125685026816 and ctx.guild.id != 689159304049197131:
             try:
                 await ctx.guild.ban(user, delete_message_days=0,
                                     reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
@@ -43,7 +43,7 @@ class Ban(commands.Cog):
 
             # 1/10th chance of banning the command executor instead, Uno Reverse event.
             if random.randint(1, 10) == 1:
-                if ctx.guild.id == "125723125685026816":
+                if ctx.guild.id == 125723125685026816:
                     await ctx.author.send("https://discord.gg/E8qq6tN")
                 else:
                     await ctx.author.send("https://discord.gg/jtntCqXz53")
@@ -61,7 +61,7 @@ class Ban(commands.Cog):
 
             # 1/10th chance of banning both banned and executor, Bothban event.
             if random.randint(1, 10) == 1:
-                if ctx.guild.id == "125723125685026816":
+                if ctx.guild.id == 125723125685026816:
                     await user.send("https://discord.gg/E8qq6tN")
                 else:
                     await user.send("https://discord.gg/jtntCqXz53")
@@ -70,7 +70,7 @@ class Ban(commands.Cog):
                 except nextcord.Forbidden:
                     await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
                 else:
-                    if ctx.guild.id == "125723125685026816":
+                    if ctx.guild.id == 125723125685026816:
                         await ctx.author.send("https://discord.gg/E8qq6tN")
                     else:
                         await ctx.author.send("https://discord.gg/jtntCqXz53")
@@ -99,8 +99,8 @@ class Ban(commands.Cog):
                 await ctx.send("https://thumbs.gfycat.com/VengefulDesertedHalibut-size_restricted.gif")
 
             # If ban is issued by Leirof, then Bald ban event.
-            if ctx.author.id == "125722240896598016":
-                if ctx.guild.id == "125723125685026816":
+            if ctx.author.id == 125722240896598016:
+                if ctx.guild.id == 125723125685026816:
                     await user.send("https://discord.gg/E8qq6tN")
                 else:
                     await user.send("https://discord.gg/jtntCqXz53")
@@ -118,7 +118,7 @@ class Ban(commands.Cog):
 
             # else, normal ban w/ random message
             else:
-                if ctx.guild.id == "125723125685026816":
+                if ctx.guild.id == 125723125685026816:
                     await user.send("https://discord.gg/E8qq6tN")
                 else:
                     await user.send("https://discord.gg/jtntCqXz53")
@@ -142,7 +142,7 @@ class Ban(commands.Cog):
     @commands.guild_only()
     @commands.has_guild_permissions(ban_members=True)
     async def rban(self, ctx: MyContext, *, user: nextcord.User, reason: str = "Aucune raison donnée"):
-        if ctx.guild.id == "125723125685026816" or ctx.guild.id == "689159304049197131":
+        if ctx.guild.id == 125723125685026816 or ctx.guild.id == 689159304049197131:
             if user == ctx.author:
                 await ctx.send("Tu ne peux pas te bannir toi-même abruti !")
                 return
