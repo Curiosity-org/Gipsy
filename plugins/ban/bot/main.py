@@ -119,6 +119,7 @@ class Ban(commands.Cog):
                     choice = random.randint(0, 8)
                     msg = await self.bot._(ctx.channel, f"ban.gunivers.ban.{choice}")
                     await ctx.send(msg.format(ctx.author.mention, user.mention))
+                    await ctx.send("https://thumbs.gfycat.com/PepperyEminentIndianspinyloach-size_restricted.gif")
                     await ctx.send(
                         "https://media.discordapp.net/attachments/791335982666481675/979052868915064862/Chauve_qui_peut_.png")
                 return
