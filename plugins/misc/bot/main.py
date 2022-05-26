@@ -92,31 +92,6 @@ class Misc(commands.Cog):
         """Don't ask to ask, just ask."""
         await ctx.send(await self.bot._(ctx.guild.id, 'misc.dataja'))
 
-    #------------------#
-    # Commande /ban #
-    #------------------#
-
-    @commands.command(name="ban")
-    @commands.guild_only()
-    @commands.has_guild_permissions(ban_members=True)
-    async def ban(self, ctx: MyContext, *, user: nextcord.User):
-        if user == ctx.author:
-            await ctx.send("Tu ne peux pas te bannir toi-même !")
-            return
-        if not ctx.guild.me.guild_permissions.ban_members:
-            await ctx.send("Permission 'Bannir des membres' manquante :confused:")
-            return
-        member = ctx.guild.get_member(user.id)
-        if member is not None and member.roles[-1].position >= ctx.guild.me.roles[-1].position:
-            await ctx.send("Mon rôle n'est pas assez haut pour bannir cet individu :confused:")
-            return
-        try:
-            await ctx.guild.ban(user, delete_message_days=0, reason=f"Banned by {ctx.author} ({ctx.author.id})")
-        except nextcord.Forbidden:
-            await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
-        else:
-            await ctx.send(f"{user} a bien été banni !")
-        await ctx.send("https://thumbs.gfycat.com/LikelyColdBasil-small.gif")
 
 
     #------------------#
