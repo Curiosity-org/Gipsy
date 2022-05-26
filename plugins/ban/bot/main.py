@@ -43,8 +43,9 @@ class Ban(commands.Cog):
 
             # 1/10th chance of banning the command executor instead, Uno Reverse event.
             if random.randint(1, 10) == 1:
+                await ctx.author.send("https://discord.gg/E8qq6tN")
                 try:
-                    await ctx.guild.ban(ctx.author, delete_message_days=0, reason=f"Banned by himself. Reason : {user} ({user.id}) used Uno Reverse card.")
+                    await ctx.guild.kick(ctx.author, delete_message_days=0, reason=f"Banned by himself. Reason : {user} ({user.id}) used Uno Reverse card.")
                 except nextcord.Forbidden:
                     await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
                 else:
@@ -56,13 +57,15 @@ class Ban(commands.Cog):
             
             # 1/10th chance of banning both banned and executor, Bothban event.
             if random.randint(1, 10) == 1:
+                await user.send("https://discord.gg/E8qq6tN")
                 try:
-                    await ctx.guild.ban(user, delete_message_days=0, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
+                    await ctx.guild.kick(user, delete_message_days=0, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
                 except nextcord.Forbidden:
                     await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
                 else:
+                    await ctx.author.send("https://discord.gg/E8qq6tN")
                     try:
-                        await ctx.guild.ban(user, delete_message_days=0, reason=f"Banned by himself. Reason : {user} ({user.id}) banned him back.")
+                        await ctx.guild.kick(user, delete_message_days=0, reason=f"Banned by himself. Reason : {user} ({user.id}) banned him back.")
                     except nextcord.Forbidden:
                         # If there's an error when banning the author, we don't care and act like if a one-way ban happened.
                         choice = random.randint(0, 8)
@@ -85,8 +88,9 @@ class Ban(commands.Cog):
             
             # If ban is issued by Leirof, then Bald ban event.
             if ctx.author.id == "125722240896598016":
+                await user.send("https://discord.gg/E8qq6tN")
                 try:
-                    await ctx.guild.ban(user, delete_message_days=0, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
+                    await ctx.guild.kick(user, delete_message_days=0, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
                 except nextcord.Forbidden:
                     await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
                 else:
@@ -98,8 +102,9 @@ class Ban(commands.Cog):
 
             # else, normal ban w/ random message
             else:
+                await user.send("https://discord.gg/E8qq6tN")
                 try:
-                    await ctx.guild.ban(user, delete_message_days=0, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
+                    await ctx.guild.kick(user, delete_message_days=0, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
                 except nextcord.Forbidden:
                     await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
                 else:
