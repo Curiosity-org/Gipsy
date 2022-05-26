@@ -11,6 +11,7 @@ fr:
         "6": "{1}, vous êtes viré !"
         "7": "{0} is letting {1} down, and {1} will never be able to run around and desert {0} again :/"
         "8": "Que se passe-t-il si je n'ai plus d'idées pour un message de ban ? {1} ne le saura jamais :)"
+        "9": "{1} left the world."
 
       bothban:
         "0": "{0} a décidé de bannir {1}, mais {1} a décidé de bannir {0} également"
@@ -23,3 +24,4 @@ fr:
         "1": "Désolé, je ne peux pas bannir {1}, mais je peux te bannir toi ;)"
         "2": "Je ne lui ai jamais dit, mais j'ai un crush sur {1}, à ton tour d'être banni {0} !"
         "3": "Pourquoi ne pas bannir {0} plutôt ?"
+        "4": "C'est celui qui dit qui l'est, à bientôt {0} !"

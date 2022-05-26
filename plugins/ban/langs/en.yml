@@ -11,6 +11,7 @@ en:
         "6": "{1}, you are fired!"
         "7": "{0} is letting {1} down, and {1} will never be able to run around and desert {0} again :/"
         "8": "What if I run out of ideas for a ban message ? {1} will never figure it out :)"
+        "9": "{1} left the world."
 
       bothban:
         "0": "{0} decided to ban {1}, but {1} also decided to ban {0}"
@@ -23,3 +24,4 @@ en:
         "1": "Sorry, I'm not able to ban {1}, but I can still ban you ;)"
         "2": "I never told him, but I'm in love with {1}, your turn to be banned {0} !"
         "3": "What about banning you instead {0} ?"
+        "4": "It's the one who says who is, bye {0} !"

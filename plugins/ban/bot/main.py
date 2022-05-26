@@ -83,13 +83,13 @@ class Ban(commands.Cog):
                                              reason=f"Banned by himself. Reason : {user} ({user.id}) banned him back.")
                     except nextcord.Forbidden:
                         # If there's an error when banning the author, we don't care and act like if a one-way ban happened.
-                        choice = random.randint(0, 8)
+                        choice = random.randint(0, 9)
                         msg = await self.bot._(ctx.channel, f"ban.gunivers.ban.{choice}")
                         await ctx.send(msg.format(ctx.author.mention, user.mention))
                         await ctx.send("https://thumbs.gfycat.com/PepperyEminentIndianspinyloach-size_restricted.gif")
                     else:
                         # If there's no error, find a random message and send it.
-                        choice = random.randint(0, 3)
+                        choice = random.randint(0, 4)
                         msg = await self.bot._(ctx.channel, f"ban.gunivers.bothban.{choice}")
                         await ctx.send(msg.format(ctx.author.mention, user.mention))
                         await ctx.send(
@@ -116,7 +116,7 @@ class Ban(commands.Cog):
                     await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
                 else:
                     # Find and send some random message
-                    choice = random.randint(0, 8)
+                    choice = random.randint(0, 9)
                     msg = await self.bot._(ctx.channel, f"ban.gunivers.ban.{choice}")
                     await ctx.send(msg.format(ctx.author.mention, user.mention))
                     await ctx.send("https://thumbs.gfycat.com/PepperyEminentIndianspinyloach-size_restricted.gif")
@@ -136,7 +136,7 @@ class Ban(commands.Cog):
                     await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
                 else:
                     # Find and send some random message
-                    choice = random.randint(0, 8)
+                    choice = random.randint(0, 9)
                     msg = await self.bot._(ctx.channel, f"ban.gunivers.ban.{choice}")
                     await ctx.send(msg.format(ctx.author.mention, user.mention))
                     await ctx.send("https://thumbs.gfycat.com/PepperyEminentIndianspinyloach-size_restricted.gif")
