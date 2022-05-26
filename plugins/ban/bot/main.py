@@ -1,4 +1,6 @@
 import random
+
+import discord.abc
 import nextcord
 from nextcord.ext import commands
 from utils import Gunibot, MyContext
@@ -37,8 +39,9 @@ class Ban(commands.Cog):
             else:
                 await ctx.send(f"{user} a bien été banni !")
             await ctx.send("https://thumbs.gfycat.com/LikelyColdBasil-small.gif")
+            return
 
-            # GUNIVERS SPECIAL CASES
+            # GUNIVERS/CURIOSITY SPECIAL CASES
         else:
 
             # 1/10th chance of banning the command executor instead, Uno Reverse event.
@@ -58,6 +61,7 @@ class Ban(commands.Cog):
                     msg = await self.bot._(ctx.channel, f"ban.gunivers.selfban.{choice}")
                     await ctx.send(msg.format(ctx.author.mention, user.mention))
                     await ctx.send("https://thumbs.gfycat.com/BackInsignificantAfricanaugurbuzzard-size_restricted.gif")
+                return
 
             # 1/10th chance of banning both banned and executor, Bothban event.
             if random.randint(1, 10) == 1:
@@ -90,13 +94,15 @@ class Ban(commands.Cog):
                         await ctx.send(msg.format(ctx.author.mention, user.mention))
                         await ctx.send(
                             "https://thumbs.gfycat.com/BackInsignificantAfricanaugurbuzzard-size_restricted.gif")
+                return
 
             # 1/10th chance of rickrolling people, Rickroll event.
             if random.randint(1, 10) == 1:
                 await self.bot._(ctx.channel, f"ban.gunivers.rickroll")
                 await ctx.send(
-                    "Never gonna give you up,\nnever gonna let you down,\nnever gonna run around and ban you :musical_notes:")
+                    "Never gonna give you up,\nnever gonna let you down,\nnever gonna run around and ban you :musical_note:")
                 await ctx.send("https://thumbs.gfycat.com/VengefulDesertedHalibut-size_restricted.gif")
+                return
 
             # If ban is issued by Leirof, then Bald ban event.
             if ctx.author.id == 125722240896598016:
@@ -115,6 +121,7 @@ class Ban(commands.Cog):
                     await ctx.send(msg.format(ctx.author.mention, user.mention))
                     await ctx.send(
                         "https://media.discordapp.net/attachments/791335982666481675/979052868915064862/Chauve_qui_peut_.png")
+                return
 
             # else, normal ban w/ random message
             else:
@@ -128,10 +135,11 @@ class Ban(commands.Cog):
                     await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
                 else:
                     # Find and send some random message
-                    choice = random.randint(0, 23)
+                    choice = random.randint(0, 8)
                     msg = await self.bot._(ctx.channel, f"ban.gunivers.ban.{choice}")
                     await ctx.send(msg.format(ctx.author.mention, user.mention))
                     await ctx.send("https://thumbs.gfycat.com/PepperyEminentIndianspinyloach-size_restricted.gif")
+                return
 
     # ------------------#
     # Commande /rban   #
