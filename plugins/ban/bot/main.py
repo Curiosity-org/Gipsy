@@ -29,7 +29,7 @@ class Ban(commands.Cog):
         if member is not None and member.roles[-1].position >= ctx.guild.me.roles[-1].position:
             await ctx.send("Mon rôle n'est pas assez haut pour bannir cet individu :confused:")
             return
-        if ctx.guild.id != "125723125685026816":
+        if ctx.guild.id != "125723125685026816" and ctx.guild.id != "689159304049197131":
             try:
                 await ctx.guild.ban(user, delete_message_days=0, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
             except nextcord.Forbidden:
@@ -118,7 +118,7 @@ class Ban(commands.Cog):
     @commands.guild_only()
     @commands.has_guild_permissions(ban_members=True)
     async def rban(self, ctx: MyContext, *, user: nextcord.User, reason: str = "Aucune raison donnée"):
-        if ctx.guild.id == "125723125685026816":
+        if ctx.guild.id == "125723125685026816" or ctx.guild.id == "689159304049197131":
             if user == ctx.author:
                 await ctx.send("Tu ne peux pas te bannir toi-même abruti !")
                 return
