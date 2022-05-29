@@ -89,7 +89,7 @@ class Ban(commands.Cog):
                         await ctx.send("https://thumbs.gfycat.com/PepperyEminentIndianspinyloach-size_restricted.gif")
                     else:
                         # If there's no error, find a random message and send it.
-                        choice = random.randint(0, 4)
+                        choice = random.randint(0, 3)
                         msg = await self.bot._(ctx.channel, f"ban.gunivers.bothban.{choice}")
                         await ctx.send(msg.format(ctx.author.mention, user.mention))
                         await ctx.send(
