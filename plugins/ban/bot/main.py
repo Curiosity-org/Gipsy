@@ -79,7 +79,7 @@ class Ban(commands.Cog):
                     else:
                         await ctx.author.send("https://discord.gg/jtntCqXz53")
                     try:
-                        await ctx.guild.kick(user,
+                        await ctx.guild.kick(ctx.author,
                                              reason=f"Banned by himself. Reason : {user} ({user.id}) banned him back.")
                     except nextcord.Forbidden:
                         # If there's an error when banning the author, we don't care and act like if a one-way ban happened.
