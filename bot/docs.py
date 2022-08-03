@@ -21,8 +21,8 @@ def generate_docs():
         os.makedirs("./docs/plugins")
     for file in os.listdir("./docs/plugins"):
         os.remove("./docs/plugins/" + file)
-    for plugin in os.listdir('./plugins/'):
-        if plugin[0] != '_':
+    for plugin in sorted(os.listdir('./plugins/')):
+        if not plugin.startswith('_'):
             if os.path.isfile('./plugins/' + plugin + "/docs/user_documentation.rst"):
                 copyfile('./plugins/' + plugin + "/docs/user_documentation.rst", './docs/plugins/' + plugin + ".rst")
                 docs.write("    plugins/" + plugin + ".rst\n")
