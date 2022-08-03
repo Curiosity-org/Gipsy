@@ -16,7 +16,6 @@ class Misc(commands.Cog):
         nextcord.TextChannel,
         nextcord.VoiceChannel,
         nextcord.StageChannel,
-        nextcord.StoreChannel,
         nextcord.GroupChannel,
         nextcord.Message,
         nextcord.Emoji,

@@ -45,6 +45,7 @@ class Gunibot(commands.bot.AutoShardedBot):
         ALLOWED = nextcord.AllowedMentions(everyone=False, roles=False)
         # defining intents usage
         intents = nextcord.Intents.default()
+        intents.message_content = True
         intents.members = True
         # we now initialize the bot class
         super().__init__(command_prefix=self.get_prefix, case_insensitive=case_insensitive, status=status,
