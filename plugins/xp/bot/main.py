@@ -81,8 +81,7 @@ class XP(commands.Cog):
     async def config_levelup_reaction_emoji(self, ctx: MyContext, emote: nextcord.Emoji=None):
         """Set the emoji wich one the bot will react to message when levelup"""
         # check if emoji is valid
-        unicode_re = emoji.get_emoji_regexp()
-        emote = emote if isinstance(emote, nextcord.Emoji) or re.fullmatch(unicode_re, emote) else False
+        emote = emote if isinstance(emote, nextcord.Emoji) or  emoji.is_emoji(emote) else False
         # if emojis was invalid (couldn't be converted)
         if not emote:
             await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-emoji"))
@@ -262,7 +261,7 @@ class XP(commands.Cog):
                         d_em = nextcord.utils.get(bot_emojis, id=int(s_emoji))
                         if d_em is not None:
                             return d_em
-                    return emoji.emojize(s_emoji, use_aliases=True)
+                    return emoji.emojize(s_emoji, language="alias")
                 await msg.add_reaction(emojis_convert(config['reaction_emoji'],self.bot.emojis))
         else:
             destination = await self.get_lvlup_chan(msg)

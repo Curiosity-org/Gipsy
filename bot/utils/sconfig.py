@@ -128,7 +128,7 @@ class Sconfig(commands.Cog):
                         return ":deleted_emoji:"
                     else:
                         return f":{d_em.name}:"
-                return emoji.emojize(s_emoji, use_aliases=True)
+                return emoji.emojize(s_emoji, language="alias")
             value = [value] if isinstance(value, str) else value
             return " ".join([emojis_convert(x, self.bot.emojis) for x in value])
         if config['type'] == 'modlogsFlags':

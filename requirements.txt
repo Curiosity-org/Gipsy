@@ -3,7 +3,7 @@ aiohttp
 GitPython>=3.1.8
 python-i18n
 PyYAML
-emoji
+emoji>=2.0
 feedparser>=6.0
 python-twitter>=3.5
 async_timeout>=3.0

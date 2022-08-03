@@ -32,8 +32,7 @@ class Giveaways(commands.Cog):
         Only these emojis will be usable to participate in a giveaway
         If no emoji is specified, every emoji will be usable"""
         # check if every emoji is valid
-        unicode_re = emoji.get_emoji_regexp()
-        emojis = [x for x in emojis if isinstance(x, nextcord.Emoji) or re.fullmatch(unicode_re, x)]
+        emojis = [x for x in emojis if isinstance(x, nextcord.Emoji) or emoji.is_emoji(x)]
         # if one or more emojis were invalid (couldn't be converted)
         if len(ctx.args[2]) != len(emojis):
             await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-emoji"))
@@ -157,7 +156,7 @@ class Giveaways(commands.Cog):
                 d_em = nextcord.utils.get(bot_emojis, id=int(s_emoji))
                 if d_em is not None:
                     return d_em
-            return emoji.emojize(s_emoji, use_aliases=True)
+            return emoji.emojize(s_emoji, language="alias")
         value = [value] if isinstance(value, str) else value
         result = list(filter(None, [emojis_convert(x, self.bot.emojis) for x in value]))
         if len(result) >= 0:
