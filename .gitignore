@@ -11,6 +11,7 @@ config.json
 .profile
 .idea/
 venv/
+env/
 docs/_*
 docs/Makefile
 docs/make.bat
