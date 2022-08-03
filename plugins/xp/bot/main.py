@@ -45,6 +45,8 @@ class XP(commands.Cog):
         """Select in which channels your members should not get any xp"""
         if len(channels) == 0:
             channels = None
+        else:
+            channels = [channel.id for channel in channels]
         x = await self.bot.sconfig.edit_config(ctx.guild.id, "noxp_channels", channels)
         await ctx.send(x)
     
@@ -60,6 +62,7 @@ class XP(commands.Cog):
             channel = await commands.TextChannelConverter().convert(ctx, channel)
             channel = channel.id
         await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "levelup_channel", channel))
+        self.xp_channels_cache.pop(ctx.guild.id, None)
     
     @commands.command(name="levelup_message")
     async def config_levelup_message(self, ctx: MyContext, *, message=None):
@@ -135,7 +138,7 @@ class XP(commands.Cog):
             if chans is not None:
                 # convert to a list even if there's only one item
                 chans = [chans] if isinstance(chans, str) else chans
-                chans = [int(x) for x in chans if x.isnumeric()]
+                chans = [int(x) for x in chans]
                 if msg.channel.id in chans:
                     return False
             else:
