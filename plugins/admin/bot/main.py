@@ -122,7 +122,7 @@ class Admin(commands.Cog):
         reloaded_cogs = list()
         for cog in cogs:
             try:
-                self.bot.reload_extension("plugins." + cog + ".main")
+                self.bot.reload_extension("plugins." + cog + ".bot.main")
             except ModuleNotFoundError:
                 await ctx.send("Cog {} can't be found".format(cog))
             except commands.errors.ExtensionNotLoaded:
