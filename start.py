@@ -1,114 +1,75 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-import nextcord, time, asyncio, logging, json, sys, os, argparse
-from shutil import copyfile
-sys.path.append("./bot")
-from utils import Gunibot, setup_logger
+import discord, time, asyncio, logging, json, sys, os, argparse
+from   shutil import copyfile
+import core.log as log
+from LRFutils.color import Color
+import yaml
+from core.i18n import I18N
+from core.bot import Sconfig
 
-# check python version
-py_version = sys.version_info
-if py_version.major != 3 or py_version.minor < 9:
-    print("Vous devez utiliser au moins Python 3.9 !", file=sys.stderr)
-    sys.exit(1)
+################################################################################
+# Checking files
+################################################################################
 
-# Getting global system list
-global_systems = []
-for system in os.listdir('./bot/utils/'):
-    if os.path.isfile('./bot/utils/' + system) and system[-3:] == '.py':
-        global_systems.append("bot.utils." + system[0:-3])
+log.info(f'🔎 Checking files...')
+if not os.path.isfile("config.py"):
+    log.error(f"🤕 Oops, I don't find the 'config.py' file.")
+    if os.path.isfile("config_example.py"):
+        copyfile("config_example.py", "config.py")
+        log.info(f"✅ I created the 'config.py' file for you, don't forget to fill the information in it 😘")
+    else: log.warn(f"🤔 Hmmm, I don't even find the 'config_example.py' file. You should re-install me 😅")
+    exit()
 
-# Getting plugin list
+from core.bot import client
+
+################################################################################
+# Loading plugins
+################################################################################
+
+log.info(f'🔄️ Loading plugins...')
 plugins = []
+discord_plugins = []
+
+# Checkin files in plugins folder
 for plugin in os.listdir('./plugins/'):
-    if plugin[0] != '_':
+    if not plugin.startswith('_'):
         if os.path.isdir('./plugins/' + plugin):
-            plugins.append("plugins." + plugin + '.bot.main')
-        
-# Generating docs
-from bot.docs import generate_docs
-generate_docs()
+            
+            # Adding plugin to the lists
+            plugins.append("plugins." + plugin)
+            discord_plugins.append("plugins." + plugin + '.discord')
 
-#---------------#
-#    M A I N    #
-#---------------#
+# Loading translations
+I18N.load()
 
-def main():
-    
-    # Getting global config
-    from bot.config import get_config
-    conf = get_config('./config/config', isBotConfig = True)
-    if conf == None:
-        return 1
+modules = map(__import__, plugins)
+for ext in discord_plugins: client.load_extension(ext)
 
-    # Getting plugins configs
-    for plugin in os.listdir('./plugins/'):
-        if plugin[0] != '_':
-            if os.path.isfile('./plugins/' + plugin + '/config/require-example.json'):
-                conf.update(get_config('./plugins/' + plugin + '/config/require', isBotConfig = False))
+################################################################################
+# Loading config
+################################################################################
 
-    # Creating client
-    client = Gunibot(case_insensitive=True, status=nextcord.Status("online"), beta=False, config=conf)
+log.info(f'📃 Reading config...')
+import config
+if config.bot_token == '<YOUR_TOKEN>':
+    log.error(f"🤕 Oops, you need to fill the 'token' variable in the 'config.py' file.")
+    exit()
 
-    # Writing logs + welcome message
-    if not os.path.isdir("logs"):
-        os.makedirs("logs")
-    log = setup_logger()
-    log.setLevel(logging.DEBUG)
-    log.info("Lancement du bot")
+################################################################################
+# Starting bot
+################################################################################
 
-    print("""
-  ___  __  ____  ____  _  _         __     ____ 
- / __)(  )(  _ \/ ___)( \/ )       /  \   ( __ \\
-( (_ \ )(  ) __/\___ \ )  /       (_/ / _  (__ (
- \___/(__)(__)  (____/(__/         (__)(_)(____/
-    
-    """)
+log.info("✅ Everything seems ok, I'm ready!")
+print(f"""{Color.Blue}
+  ___  __  ____  ____  _  _    ____     __  
+ / __)(  )(  _ \/ ___)( \/ )  (___ \   /  \ 
+( (_ \ )(  ) __/\___ \ )  /    / __/ _(  0 )
+ \___/(__)(__)  (____/(__/    (____)(_)\__/ 
+{Color.NC}\n""")
 
-    # Loading extensions (global systems + plugins)
-    count = 0
-    notloaded = ""
-    for extension in global_systems + plugins:
-        try:
-            client.load_extension(extension)
-        except:
-            log.exception(f'\nFailed to load extension {extension}')
-            notloaded += "\n - " + extension
-            count += 1
-    if count > 0:
-        raise Exception("\n{} modules not loaded".format(count) + notloaded)
-    del count
+try: client.run(config.bot_token)
+except discord.errors.LoginFailure as e:
+    log.error("🤕 Arg, discord refuse the token you gave me.")
 
-    # Printing info when the bot is started
-    async def on_ready():
-        """Called when the bot is connected to Discord API"""
-        print('Bot connecté')
-        print("Nom : "+client.user.name)
-        print("ID : "+str(client.user.id))
-        if len(client.guilds) < 200:
-            serveurs = [x.name for x in client.guilds]
-            print(
-                "Connecté sur ["+str(len(client.guilds))+"] "+", ".join(serveurs))
-        else:
-            print("Connecté sur "+str(len(client.guilds))+" serveurs")
-        print(time.strftime("%d/%m  %H:%M:%S"))
-        print('------')
-        await asyncio.sleep(2)
-
-    client.add_listener(on_ready)
-
-    # Check if the bot must run in beta
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--beta", help="Run with the beta bot token", action='store_true')
-    args = parser.parse_args()
-
-    # Launch bot
-    if args.beta:
-        client.beta = True
-        client.run(conf["token_beta"])
-    else:
-        client.run(conf["token"])
-
-
-if __name__ == "__main__":
-    main()

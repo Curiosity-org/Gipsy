@@ -8,5 +8,4 @@ feedparser>=6.0
 python-twitter>=3.5
 async_timeout>=3.0
 argparse
-discord==1.7.3
-git+https://github.com/LeiRoF/Utils
+nextcord>=2.0

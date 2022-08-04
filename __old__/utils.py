@@ -1,60 +1,60 @@
-import nextcord
-from nextcord.ext import commands
-import logging
-import sqlite3
-import json
-import sys
-from typing import Any, Callable, Coroutine, Dict, Union, List, TYPE_CHECKING
-import os
+# import nextcord
+# from nextcord.ext import commands
+# import logging
+# import sqlite3
+# import json
+# import sys
+# from typing import Any, Callable, Coroutine, Dict, Union, List, TYPE_CHECKING
+# import os
 
-if TYPE_CHECKING:
-    from bot.utils.sconfig import Sconfig
+# if TYPE_CHECKING:
+#     from bot.utils.sconfig import Sconfig
 
 
-class MyContext(commands.Context):
-    """Replacement for the official commands.Context class
-    It allows us to add more methods and properties in the whole bot code"""
+# class MyContext(commands.Context):
+#     """Replacement for the official commands.Context class
+#     It allows us to add more methods and properties in the whole bot code"""
 
-    @property
-    def bot_permissions(self) -> nextcord.Permissions:
-        """Permissions of the bot in the current context"""
-        if self.guild:
-            # message in a guild
-            return self.channel.permissions_for(self.guild.me)
-        else:
-            # message in DM
-            return self.channel.permissions_for(self.bot)
+#     @property
+#     def bot_permissions(self) -> nextcord.Permissions:
+#         """Permissions of the bot in the current context"""
+#         if self.guild:
+#             # message in a guild
+#             return self.channel.permissions_for(self.guild.me)
+#         else:
+#             # message in DM
+#             return self.channel.permissions_for(self.bot)
 
-    @property
-    def user_permissions(self) -> nextcord.Permissions:
-        """Permissions of the message author in the current context"""
-        return self.channel.permissions_for(self.author)
+#     @property
+#     def user_permissions(self) -> nextcord.Permissions:
+#         """Permissions of the message author in the current context"""
+#         return self.channel.permissions_for(self.author)
 
-    @property
-    def can_send_embed(self) -> bool:
-        """If the bot has the right permissions to send an embed in the current context"""
-        return self.bot_permissions.embed_links
+#     @property
+#     def can_send_embed(self) -> bool:
+#         """If the bot has the right permissions to send an embed in the current context"""
+#         return self.bot_permissions.embed_links
 
 
 class Gunibot(commands.bot.AutoShardedBot):
     """Bot class, with everything needed to run it"""
 
-    def __init__(self, case_insensitive=None, status=None, beta=False, config: dict = None):
-        self.config = config
-        # defining allowed default mentions
-        ALLOWED = nextcord.AllowedMentions(everyone=False, roles=False)
-        # defining intents usage
-        intents = nextcord.Intents.default()
-        intents.message_content = True
-        intents.members = True
-        # we now initialize the bot class
-        super().__init__(command_prefix=self.get_prefix, case_insensitive=case_insensitive, status=status,
-                         allowed_mentions=ALLOWED, intents=intents)
-        self.log = logging.getLogger("runner") # logs module
-        self.beta: bool = beta # if the bot is in beta mode
-        self.database = sqlite3.connect('data/database.db') # database connection
-        self.database.row_factory = sqlite3.Row
-        self._update_database_structure()
+    # def __init__(self, case_insensitive=None, status=None, beta=False, config: dict = None):
+    #     self.config = config
+    #     # defining allowed default mentions
+    #     ALLOWED = nextcord.AllowedMentions(everyone=False, roles=False)
+    #     # defining intents usage
+    #     intents = nextcord.Intents.default()
+    #     intents.message_content = True
+    #     intents.members = True
+    #     # we now initialize the bot class
+    #     super().__init__(command_prefix=self.get_prefix, case_insensitive=case_insensitive, status=status,
+    #                      allowed_mentions=ALLOWED, intents=intents)
+    #     self.log = logging.getLogger("runner") # logs module
+    #     self.beta: bool = beta # if the bot is in beta mode
+    #     self.database = sqlite3.connect('data/database.db') # database connection
+    #     self.database.row_factory = sqlite3.Row
+    #     self._update_database_structure()
 
     async def get_context(self, message: nextcord.Message, *, cls=MyContext):
         """Get a custom context class when creating one from a message"""
