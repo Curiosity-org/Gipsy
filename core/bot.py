@@ -12,10 +12,17 @@ import os, json, config
 ################################################################################
 
 class Sconfig():
+    """
+    Servers configuration.
+    It only store a dictionnary containing all server configs,
+    and methods that allow to manipulate this dictionnary.
+    """
+
     all = {}
 
     def get(guild = None, config=None):
         """Get the server config"""
+
         if guild is None:
             return Sconfig.all
         if type(guild) is discord.Guild: guild = guild.id
@@ -27,17 +34,22 @@ class Sconfig():
 
     def update(guild_config):
         """Update the server config"""
+
         Sconfig.all.update(guild_config)
         for guild, config in Sconfig.all.items():
             if not os.path.isdir(f"data/{guild}"): os.makedirs(f"data/{guild}")
             json.dump(config, open(f"data/{guild}/server_config.json", "w"))
 
     def load():
+        """Load the server config from files. Called when the bot is ready."""
+
+        # Config from files
         for item in os.listdir("data"):
             if os.path.isdir(item):
                 if os.path.isfile(f"data/{item}/server_config.json"):
                     Sconfig.update({item: json.load(open("data/server_configs.json"))})
-
+        
+        # Using default config for new guilds
         for guild in client.guilds:
             if str(guild.id) not in Sconfig.all:
                 Sconfig.update({str(guild.id):{
@@ -54,6 +66,7 @@ class Sconfig():
         return commands.when_mentioned_or(prefix)(client, msg)
 
 class Gipsy(commands.bot.AutoShardedBot):
+    """Main bot class."""
 
     def __init__(self, status=None):
         ALLOWED = discord.AllowedMentions(everyone=False, roles=False)

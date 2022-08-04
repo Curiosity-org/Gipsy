@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-import discord, time, asyncio, logging, json, sys, os, argparse
-from   shutil import copyfile
+import discord, os
 import core.log as log
+from shutil         import copyfile
 from LRFutils.color import Color
-import yaml
 
 ################################################################################
 # Checking files
 ################################################################################
 
+# Checking the config file
 log.info(f'🔎 Checking files...')
 if not os.path.isfile("config.py"):
     log.error(f"🤕 Oops, I don't find the 'config.py' file.")
@@ -20,6 +20,7 @@ if not os.path.isfile("config.py"):
     else: log.warn(f"🤔 Hmmm, I don't even find the 'config_example.py' file. You should re-install me 😅")
     exit()
 
+# Inporting modules that require the config file
 import config
 from core.i18n import I18N
 from core.bot import client, Sconfig
@@ -48,7 +49,7 @@ modules = map(__import__, plugins)
 for ext in discord_plugins: client.load_extension(ext)
 
 ################################################################################
-# Loading config
+# Reading config
 ################################################################################
 
 log.info(f'📃 Reading config...')
