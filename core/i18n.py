@@ -1,7 +1,6 @@
-import os
-from core.bot import client, Sconfig
-import yaml
-import discord
+import os, yaml, discord
+from core.bot          import client
+from core.serverConfig import ServerConfig
 
 class I18N():
     """
@@ -19,7 +18,7 @@ class I18N():
 
         # Getting translation
         try:
-            trad = I18N.translations[Sconfig.get(guild, "language")]
+            trad = I18N.translations[ServerConfig.get(guild, "language")]
             for i in key.split("."):
                 trad = trad[i]
             return trad.format(**kwargs)
@@ -28,7 +27,7 @@ class I18N():
 
     def load():
         """Load translations from plugin's translation files"""
-        
+
         for plugin in os.listdir('./plugins/'):
             if not plugin.startswith('_'):
                 if os.path.isdir('./plugins/' + plugin + '/langs'):

@@ -4,7 +4,7 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 from core.context import MyContext
-from core.bot import client, Sconfig
+from core.bot import client
 from core.i18n import I18N
 
 from typing import Union

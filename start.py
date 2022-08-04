@@ -23,7 +23,8 @@ if not os.path.isfile("config.py"):
 # Inporting modules that require the config file
 import config
 from core.i18n import I18N
-from core.bot import client, Sconfig
+from core.bot import client
+from core.serverConfig import ServerConfig
 
 ################################################################################
 # Loading plugins
