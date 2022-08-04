@@ -6,8 +6,6 @@ from   shutil import copyfile
 import core.log as log
 from LRFutils.color import Color
 import yaml
-from core.i18n import I18N
-from core.bot import Sconfig
 
 ################################################################################
 # Checking files
@@ -22,7 +20,9 @@ if not os.path.isfile("config.py"):
     else: log.warn(f"🤔 Hmmm, I don't even find the 'config_example.py' file. You should re-install me 😅")
     exit()
 
-from core.bot import client
+import config
+from core.i18n import I18N
+from core.bot import client, Sconfig
 
 ################################################################################
 # Loading plugins
@@ -52,7 +52,6 @@ for ext in discord_plugins: client.load_extension(ext)
 ################################################################################
 
 log.info(f'📃 Reading config...')
-import config
 if config.bot_token == '<YOUR_TOKEN>':
     log.error(f"🤕 Oops, you need to fill the 'token' variable in the 'config.py' file.")
     exit()

@@ -8,8 +8,10 @@
 # CORE CONFIG #
 ###############
 
-bot_token      = '<YOUR_TOKEN>' # Needed to run the bot (cf. https://discord.com/developers)
-application_id = '<YOUR_APPLICATION_ID>' # Allow to generate invitation links
+bot_token        = '<YOUR_TOKEN>' # Needed to run the bot (cf. https://discord.com/developers)
+application_id   = '<YOUR_APPLICATION_ID>' # Allow to generate invitation links
+default_prefix   = '!'
+default_language = "en"
 
 ##################
 # PLUGINS CONFIG #
