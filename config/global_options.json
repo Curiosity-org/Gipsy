@@ -1,0 +1,12 @@
+{
+    "prefix": {
+        "default": "&",
+        "type": "prefix",
+        "command": "prefix"
+    },
+    "language": {
+        "default": 0,
+        "type": "language",
+        "command": "language"
+    }
+}

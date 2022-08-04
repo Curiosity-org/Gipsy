@@ -1,0 +1,22 @@
+{
+    "group_allowed_role": {
+        "default": null,
+        "type": "roles",
+        "command": "group_allowed_role"
+    },
+    "group_channel_category": {
+        "default": null,
+        "type": "categories",
+        "command": "group_channel_category"
+    },
+    "group_over_role": {
+        "default": null,
+        "type": "roles",
+        "command": "group_over_role"
+    },
+    "max_group": {
+        "default": 5,
+        "type": "int",
+        "command": "max_group"
+    }
+}

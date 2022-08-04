@@ -35,3 +35,32 @@ fr:
       "22": "Il ne fallait pas écouter la jolie mélodie de la Lullaby, {1} :musical_note:"
       "23": "{2}.exe *a cessé de fonctionner*"
     dataja: "https://zrunner.me/d-a-t-a/fr.html"
+    timestamp:
+      read-result: "La date contenue dans %{source} est le <t:%{timestamp}> (soit <t:%{timestamp}:R>) (timestamp : %{timestamp})"
+      not-found: "Je n'ai pas trouvé de date dans %{source} !"
+      create-result: "Le timestamp du <t:%{timestamp}:F> est : `%{timestamp}` (timestamp pour Discord : `<t:%{timestamp}>`)"
+      help: |
+        ***Le timestamp dans discord***
+
+        *Exemple : Discord a été créé <t:1431468000:R>, le <t:1431468000:D>.*
+
+        __**Utiliser le timestamp**__ :
+        Il faut tout d'abord obtenir un timestamp (vous pouvez utiliser les commandes `timestamp get` et `timestamp create` du bot), puis suivre la syntaxe suivante :
+        ```
+        <t:[TIMESTAMP]>
+        ```
+        En remplaçant `[TIMESTAMP]` par le timestamp que vous souhaitez utiliser.
+
+        __**Utiliser les styles**__ :
+        On peut ajouter un style à la fin du timestamp, sous cette forme :
+        ```
+        <t:[TIMESTAMP]:[STYLE]>
+        ```
+        En remplaçant cette fois `[STYLE]` par une des options suivantes :
+        • `t` (<t:1431468000:t>)
+        • `T` (<t:1431468000:T>)
+        • `d` (<t:1431468000:d>)
+        • `D` (<t:1431468000:D>)
+        • `f` (<t:1431468000:f>, par défaut)
+        • `F` (<t:1431468000:F>)
+        • `R` (<t:1431468000:R>)

@@ -36,7 +36,7 @@ fr:
       members: "**Nombre de membres visibles :** %{c} (dont %{bots} **bots**)"
       codelines: "**Nombre de lignes de code :** %{c}"
       pyver: "**Version de Python :** %{v}"
-      diver: "**Version de la bibliothèque `discord.py` :** %{v}"
+      diver: "**Version de la bibliothèque `nextcord.py` :** %{v}"
       git: "**Branche Git actuelle :** %{b}"
       ram: "**Charge sur la mémoire vive :** %{c} GB"
       cpu-loading: "**Charge sur le CPU :** *calcul en cours*"
@@ -217,4 +217,6 @@ fr:
       Welcome: Bienvenue
       XP: Niveaux d'XP
       Groups: Groupes
-      Channel_Archive: Archives
+      ChannelArchive: Archives
+      Invite: Traqueur d'invitations
+      HelpCog: Menu d'aide

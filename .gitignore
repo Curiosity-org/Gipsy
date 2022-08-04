@@ -1,7 +1,7 @@
 .vscode
 __pycache__
 configs/*.json
-debug.log
+logs/
 .DS_Store
 data/*.db*
 config.json
@@ -11,3 +11,8 @@ config.json
 .profile
 .idea/
 venv/
+env/
+docs/_*
+docs/Makefile
+docs/make.bat
+require.json

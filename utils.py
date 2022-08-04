@@ -1,10 +1,14 @@
-import discord
-from discord.ext import commands
+import nextcord
+from nextcord.ext import commands
 import logging
 import sqlite3
 import json
 import sys
-from typing import Any, Callable, Coroutine, Dict, Union, List
+from typing import Any, Callable, Coroutine, Dict, Union, List, TYPE_CHECKING
+import os
+
+if TYPE_CHECKING:
+    from bot.utils.sconfig import Sconfig
 
 
 class MyContext(commands.Context):
@@ -12,7 +16,7 @@ class MyContext(commands.Context):
     It allows us to add more methods and properties in the whole bot code"""
 
     @property
-    def bot_permissions(self) -> discord.Permissions:
+    def bot_permissions(self) -> nextcord.Permissions:
         """Permissions of the bot in the current context"""
         if self.guild:
             # message in a guild
@@ -22,7 +26,7 @@ class MyContext(commands.Context):
             return self.channel.permissions_for(self.bot)
 
     @property
-    def user_permissions(self) -> discord.Permissions:
+    def user_permissions(self) -> nextcord.Permissions:
         """Permissions of the message author in the current context"""
         return self.channel.permissions_for(self.author)
 
@@ -38,9 +42,10 @@ class Gunibot(commands.bot.AutoShardedBot):
     def __init__(self, case_insensitive=None, status=None, beta=False, config: dict = None):
         self.config = config
         # defining allowed default mentions
-        ALLOWED = discord.AllowedMentions(everyone=False, roles=False)
+        ALLOWED = nextcord.AllowedMentions(everyone=False, roles=False)
         # defining intents usage
-        intents = discord.Intents.default()
+        intents = nextcord.Intents.default()
+        intents.message_content = True
         intents.members = True
         # we now initialize the bot class
         super().__init__(command_prefix=self.get_prefix, case_insensitive=case_insensitive, status=status,
@@ -51,7 +56,7 @@ class Gunibot(commands.bot.AutoShardedBot):
         self.database.row_factory = sqlite3.Row
         self._update_database_structure()
 
-    async def get_context(self, message: discord.Message, *, cls=MyContext):
+    async def get_context(self, message: nextcord.Message, *, cls=MyContext):
         """Get a custom context class when creating one from a message"""
         # when you override this method, you pass your new Context
         # subclass to the super() method, which tells the bot to
@@ -62,12 +67,22 @@ class Gunibot(commands.bot.AutoShardedBot):
     def server_configs(self):
         """Guilds configuration manager"""
         return self.get_cog("ConfigCog").confManager
+    
+    @property
+    def sconfig(self) -> 'Sconfig':
+        """Return sconfig configuration manager"""
+        return self.get_cog("Sconfig")
 
     def _update_database_structure(self):
         """Create tables and indexes from 'data/model.sql' file"""
         c = self.database.cursor()
         with open('data/model.sql', 'r', encoding='utf-8') as f:
             c.executescript(f.read())
+        for plugin in os.listdir('./plugins/'):
+            if plugin[0] != '_':
+                if os.path.isfile('./plugins/' + plugin + '/data/model.sql'):
+                    with open('./plugins/' + plugin + '/data/model.sql', 'r', encoding='utf-8') as f:
+                        c.executescript(f.read())
         c.close()
 
     async def user_avatar_as(self, user, size=512):
@@ -76,9 +91,9 @@ class Gunibot(commands.bot.AutoShardedBot):
             raise ValueError
         try:
             if user.is_avatar_animated():
-                return user.avatar_url_as(format='gif', size=size)
+                return user.display_avatar_as(format='gif', size=size)
             else:
-                return user.avatar_url_as(format='png', size=size)
+                return user.display_avatar_as(format='png', size=size)
         except Exception as e:
             await self.cogs['Errors'].on_error(e, None)
 
@@ -203,7 +218,7 @@ def setup_logger():
     # ex du format : [08/11/2018 14:46] WARNING RSSCog fetch_rss_flux l.288 : Cannot get the RSS flux because of the following error: (suivi du traceback)
 
     # log vers un fichier
-    file_handler = logging.FileHandler("debug.log")
+    file_handler = logging.FileHandler("logs/debug.log")
     # tous les logs de niveau DEBUG et supérieur sont evoyés dans le fichier
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(format)
@@ -231,203 +246,14 @@ def setup_logger():
 
     return log
 
-CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {
-    # "config name": {
-    #     'default': 'default value',
-    #     'type': 'config type',
-    #     'command': 'subcommand of the config command',
-    # },
-    "prefix": {
-        'default': "&",
-        'type': 'prefix',
-        'command': 'prefix',
-    },
-    "verification_channel": {
-        'default': None,
-        'type': 'channels',
-        'command': 'verification_channel',
-    },
-    "logs_channel": {
-        'default': None,
-        'type': 'channels',
-        'command': 'logs_channel',
-    },
-    "info_channel": {
-        'default': None,
-        'type': 'channels',
-        'command': 'info_channel',
-    },
-    "pass_message": {
-        'default': None,
-        'type': 'text',
-        'command': 'pass_message',
-    },
-    "verification_role": {
-        'default': None,
-        'type': 'roles',
-        'command': 'verification_role',
-    },
-    "verification_add_role": {
-        'default': True,
-        'type': 'boolean',
-        'command': 'verification_add_role',
-    },
-    "verification_info_message": {
-        'default': None,
-        'type': 'text',
-        'command': 'verification_info_message',
-    },
-    "contact_channel": {
-        'default': None,
-        'type': 'channels',
-        'command': 'contact_channel',
-    },
-    "contact_category": {
-        'default': None,
-        'type': 'categories',
-        'command': 'contact_category',
-    },
-    "contact_roles": {
-        'default': None,
-        'type': 'roles',
-        'command': 'contact_roles',
-    },
-    "contact_title": {
-        'default': "object",
-        'type': 'text',
-        'command': 'contact_title',
-    },
-    "welcome_roles": {
-        'default': None,
-        'type': 'roles',
-        'command': 'welcome_roles',
-    },
-    "voices_category": {
-        'default': None,
-        'type': 'categories',
-        'command': 'voices_category',
-    },
-    "voice_channel": {
-        'default': None,
-        'type': 'channels',
-        'command': 'voice_channels',
-    },
-    "voice_channel_format": {
-        'default': "{random}",
-        'type': 'text',
-        'command': 'voice_channel_format',
-    },
-    "voice_roles": {
-        'default': None,
-        'type': 'roles',
-        'command': 'voice_roles',
-    },
-    "modlogs_flags": {
-        'default': 0,
-        'type': 'modlogsFlags',
-        'command': 'modlogs',
-    },
-    "thanks_duration": {
-        'default': 86400*30,  # 30 days
-        'type': 'duration',
-        'command': 'thanks_duration',
-    },
-    "thanks_allowed_roles": {
-        'default': None,
-        'type': 'roles',
-        'command': 'thanks_allowed_roles',
-    },
-    "language": {
-        'default': 0,
-        'type': 'language',
-        'command': 'language',
-    },
-    "hs_bravery_role": {
-        'default': None,
-        'type': 'roles',
-        'command': 'hypesquad',
-    },
-    "hs_brilliance_role": {
-        'default': None,
-        'type': 'roles',
-        'command': 'hypesquad',
-    },
-    "hs_balance_role": {
-        'default': None,
-        'type': 'roles',
-        'command': 'hypesquad',
-    },
-    "hs_none_role": {
-        'default': None,
-        'type': 'roles',
-        'command': 'hypesquad',
-    },
-    "giveaways_emojis": {
-        'default': None,
-        'type': 'emojis',
-        'command': 'giveaways_emoji',
-    },
-    "_thanks_cmd" : {
-        'command': 'thanks',
-    },
-    "enable_xp": {
-        'default': True,
-        'type': 'boolean',
-        'command': 'enable_xp'
-    },
-    "noxp_channels": {
-        'default': None,
-        'type': 'channels',
-        'command': 'noxp_channels'
-    },
-    "levelup_channel": {
-        'default': 'any',
-        'type': 'channels',
-        'command': 'levelup_channel'
-    },
-    "levelup_message": {
-        'default': None,
-        'type': 'text',
-        'command': 'levelup_message'
-    },
-    "levelup_reaction": {
-        'default': False,
-        'type': 'boolean',
-        'command': 'levelup_reaction',
-    },
-    "reaction_emoji": {
-        'default': None,
-        'type': 'emojis',
-        'command': 'giveaways_emoji',
-    },
-    "group_allowed_role": {
-        'default': None,
-        'type': 'roles',
-        'command': 'group_allowed_role',
-    },
-    "group_channel_category": {
-        'default': None,
-        'type': 'categories',
-        'command': 'group_channel_category',
-    },
-    "group_over_role": {
-        'default': None,
-        'type': 'roles',
-        'command': 'group_over_role',
-    },
-    "max_group": {
-        'default': 5,
-        'type': 'int',
-        'command': 'max_group',
-    },
-    "archive_category": {
-        'default': None,
-        'type': 'categories',
-        'command': 'archive_category',
-    },
-    "archive_duration": {
-        'default': 86400*30,  # 30 days
-        'type': 'duration',
-        'command': 'archive_duration',
-    }
-}
+CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {}
+
+if os.path.isfile('./config/global_options.json'):
+    with open('./config/global_options.json') as config:
+        CONFIG_OPTIONS.update(json.load(config))
+
+for plugin in os.listdir('./plugins/'):
+    if plugin[0] != '_':
+        if os.path.isfile('./plugins/' + plugin + '/config/options.json'):
+            with open('./plugins/' + plugin + '/config/options.json') as config:
+                CONFIG_OPTIONS.update(json.load(config))

@@ -36,7 +36,7 @@ en:
       members: "**Visible member count:** %{c} (including %{bots} **bots**)"
       codelines: "**Number of code lines:** %{c}"
       pyver: "**Python version:** %{v}"
-      diver: "**`discord.py` library version:** %{v}"
+      diver: "**`nextcord.py` library version:** %{v}"
       git: "**Current Git branch:** %{b}"
       ram: "**Load on the RAM:** %{c} GB"
       cpu-loading: "**Load on the CPU:** *calculation in progress*"
@@ -217,4 +217,6 @@ en:
       Welcome: Welcome
       XP: XP levels
       Groups: Groups
-      Channel_Archive: Archives
+      ChannelArchive: Archives
+      Invite: Invite tracker
+      HelpCog: Help menu

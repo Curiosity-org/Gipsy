@@ -19,3 +19,5 @@ fr:
       modified: "Les modifications ont bien été appliquées"
       admin-added: "L'administrateur a bien été ajouté"
       admin-removed: "L'administrateur a été retiré"
+    reply_to: "En réponse à [ce message](%{link})"
+    reply_notfound: "En réponse à ... un message qui à été édité ou supprimé."

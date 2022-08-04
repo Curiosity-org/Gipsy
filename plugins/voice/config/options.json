@@ -1,0 +1,22 @@
+{
+    "voices_category": {
+        "default": null,
+        "type": "categories",
+        "command": "voices_category"
+    },
+    "voice_channel": {
+        "default": null,
+        "type": "channels",
+        "command": "voice_channels"
+    },
+    "voice_channel_format": {
+        "default": "{random}",
+        "type": "text",
+        "command": "voice_channel_format"
+    },
+    "voice_roles": {
+        "default": null,
+        "type": "roles",
+        "command": "voice_roles"
+    }
+}
