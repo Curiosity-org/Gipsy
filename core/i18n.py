@@ -35,3 +35,6 @@ class I18N():
                         if lang.endswith('.yml') or lang.endswith('.yaml'):
                             trad = yaml.safe_load(open('./plugins/' + plugin + '/langs/' + lang))
                             I18N.translations.update(trad)
+
+
+        I18N.get("misc.cookie.give")

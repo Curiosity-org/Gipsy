@@ -17,6 +17,8 @@ class Misc(commands.Cog):
 
     def __init__(self):
         self.bot = client
+
+        self.fromage = 2
         #self.file = "misc"
         pass
 
