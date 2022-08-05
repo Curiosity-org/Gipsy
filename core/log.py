@@ -61,7 +61,8 @@ def error(message, etype = None, value = None, tb=None):
     else: tb = ''.join(traceback.format_exception(etype, value, tb))
     logSave(f"Full traceback below.\n\n{tb}")
 
-    logPrint(message + "\n -> Look at the log file for more information.\n")
+    logPrint(message + f"\n -> Look at {filename} for more information.\n")
+
 
 # Catch unexpected crashes
 def myexcepthook(etype, value, tb):

@@ -34,4 +34,6 @@ class I18N():
                     for lang in os.listdir('./plugins/' + plugin + '/langs'):
                         if lang.endswith('.yml') or lang.endswith('.yaml'):
                             trad = yaml.safe_load(open('./plugins/' + plugin + '/langs/' + lang))
-                            I18N.translations.update(trad)
+                            I18N.translations.update({lang[:2]:
+                                {plugin:trad}
+                            })
