@@ -46,7 +46,7 @@ for plugin in os.listdir('./plugins/'):
 # Loading translations
 I18N.load()
 
-modules = map(__import__, plugins)
+# modules = map(__import__, plugins)
 for ext in discord_plugins: client.load_extension(ext)
 
 ################################################################################
