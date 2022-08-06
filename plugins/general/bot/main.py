@@ -54,8 +54,7 @@ class General(commands.Cog):
 
     @commands.command(name="ping")
     async def rep(self, ctx: MyContext):
-        """Get bot latency
-        You can also use this command to ping any other server"""
+        """Get bot latency"""
         m = await ctx.send("Ping...")
         t = (m.created_at - ctx.message.created_at).total_seconds()
         try:
