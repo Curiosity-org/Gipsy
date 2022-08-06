@@ -965,6 +965,8 @@ class Rss(commands.Cog):
                 return await self.bot._(channel,"rss.nothing")
             if 'Unknown error' in e.message:
                 return await self.bot._(channel,"rss.nothing")
+            if "The twitter.Api instance must be authenticated." in e.message:
+                return await self.bot._(channel,"rss.wrong-token")
             if e.message[0]['code'] == 34:
                 return await self.bot._(channel,"rss.nothing")
             raise e

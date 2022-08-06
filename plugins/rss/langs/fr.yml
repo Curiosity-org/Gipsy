@@ -26,6 +26,7 @@ fr:
     no-feed2: "Ce serveur ne possède aucun flux rss !"
     no-roles: "Aucun rôle n'a été configuré pour l'instant."
     not-a-role: "Ce rôle est introuvable. Réessayez :"
+    wrong-token: "Le token d'API Twitter n'est pas bon"
     nothing: "Je n'ai rien trouvé sur cette recherche :confused:"
     research-timeout: "La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:"
     roles-0: "Ce flux a bien été modifié pour mentionner les rôles {}"
