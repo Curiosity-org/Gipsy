@@ -26,6 +26,7 @@ en:
     no-feed2: "This server has no rss feeds!"
     no-roles: "No roles have been configured yet."
     not-a-role: "This role cannot be found. Try again."
+    wrong-token: "Invalid twitter API token."
     nothing: "I couldn't find anything on this search :confused:"
     research-timeout: "The web page took too long to respond, I had to abort the process :eyes:"
     roles-0: "This feed has been modified to mention roles {}"
