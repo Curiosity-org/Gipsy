@@ -53,43 +53,16 @@ class General(commands.Cog):
             await ctx.send(msg)
 
     @commands.command(name="ping")
-    async def rep(self, ctx: MyContext, ip=None):
+    async def rep(self, ctx: MyContext):
         """Get bot latency
         You can also use this command to ping any other server"""
-        if ip is None:
-            m = await ctx.send("Ping...")
-            t = (m.created_at - ctx.message.created_at).total_seconds()
-            try:
-                p = round(self.bot.latency*1000)
-            except OverflowError:
-                p = "∞"
-            await m.edit(content=":ping_pong:  Pong !\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000), p))
-        else:
-            asyncio.run_coroutine_threadsafe(
-                self.ping_adress(ctx, ip), asyncio.get_event_loop())
-
-    async def ping_adress(self, ctx: MyContext, ip: str):
-        packages = 30
-        wait = 0.3
+        m = await ctx.send("Ping...")
+        t = (m.created_at - ctx.message.created_at).total_seconds()
         try:
-            try:
-                m = await ctx.send(f"Pinging {ip}...")
-            except:
-                m = None
-            t1 = time.time()
-            param = '-n' if system_name().lower() == 'windows' else '-c'
-            command = ['ping', param, str(packages), '-i', str(wait), ip]
-            result = system_call(command) == 0
-        except Exception as e:
-            await ctx.send("`Error:` {}".format(e))
-            return
-        if result:
-            t = (time.time() - t1 - wait*(packages-1))/(packages)*1000
-            await ctx.send(await self.bot._(ctx.channel, "general.ping-success", time=round(t, 2), ip=ip))
-        else:
-            await ctx.send(await self.bot._(ctx.channel, "general.ping-failed"))
-        if m is not None:
-            await m.delete()
+            p = round(self.bot.latency*1000)
+        except OverflowError:
+            p = "∞"
+        await m.edit(content=":ping_pong:  Pong !\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000), p))
 
     @commands.command(name="stats")
     @commands.cooldown(2, 60, commands.BucketType.guild)
