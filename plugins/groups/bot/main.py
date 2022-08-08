@@ -111,7 +111,7 @@ class Groups(commands.Cog):
         # comes as: (rowid, guild, roleID, ownerID, channelID, privacy)
         res: List[Group] = list()
         for row in liste:
-            res.append(Group(*row[1:]))
+            res.append(Group(self.bot,*row[1:]))
             res[-1].id = row[0]
         return res if len(res) > 0 else None
     
@@ -121,7 +121,7 @@ class Groups(commands.Cog):
         res = self.bot.db_query(query, (guildID, roleID), fetchone=True, astuple=True)
         # comes as: (rowid, guild, roleID, ownerID, channelID, privacy)
         if res is None: return None
-        group = Group(*res[1:])
+        group = Group(self.bot, *res[1:])
         group.id = res[0]
         return group
 
