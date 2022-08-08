@@ -19,12 +19,14 @@ class Group:
         self.id = None
         self._role = None
         self._channel = None
-        
-        bot.get_command("config").add_command(self.config_group_allowed_role)
-        bot.get_command("config").add_command(self.config_group_channel_category)
-        bot.get_command("config").add_command(self.config_group_over_role)
-        bot.get_command("config").add_command(self.config_max_group)
-        bot.get_command("config").add_command(self.config_backup)
+    
+        try:
+            bot.get_command("config").add_command(self.config_group_allowed_role)
+            bot.get_command("config").add_command(self.config_group_channel_category)
+            bot.get_command("config").add_command(self.config_group_over_role)
+            bot.get_command("config").add_command(self.config_max_group)
+            bot.get_command("config").add_command(self.config_backup)
+        except:pass
 
     @commands.command(name="group_allowed_role")
     async def config_group_allowed_role(self, ctx: MyContext, *, role: nextcord.Role=None):
@@ -368,6 +370,9 @@ class Groups(commands.Cog):
         elif group.privacy and not await checks.is_admin(ctx):
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.private"))
         else:
+            print("++++++++++")
+            print(group.privacy, not await checks.is_admin(ctx))
+            print("----------")
             await ctx.author.add_roles(group.role(self.bot), reason="Joined a group")
             await ctx.send(await self.bot._(ctx.guild.id, "groups.join", name=group.role(self.bot).name))
 
