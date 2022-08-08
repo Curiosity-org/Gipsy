@@ -370,9 +370,6 @@ class Groups(commands.Cog):
         elif group.privacy and not await checks.is_admin(ctx):
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.private"))
         else:
-            print("++++++++++")
-            print(group.privacy, not await checks.is_admin(ctx))
-            print("----------")
             await ctx.author.add_roles(group.role(self.bot), reason="Joined a group")
             await ctx.send(await self.bot._(ctx.guild.id, "groups.join", name=group.role(self.bot).name))
 
