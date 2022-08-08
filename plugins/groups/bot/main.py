@@ -26,7 +26,7 @@ class Group:
             bot.get_command("config").add_command(self.config_group_over_role)
             bot.get_command("config").add_command(self.config_max_group)
             bot.get_command("config").add_command(self.config_backup)
-        except:pass
+        except commands.errors.CommandRegistrationError: pass
 
     @commands.command(name="group_allowed_role")
     async def config_group_allowed_role(self, ctx: MyContext, *, role: nextcord.Role=None):
