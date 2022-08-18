@@ -3,7 +3,7 @@ import traceback
 
 import sys
 sys.path.append("./bot")
-import bot.checks as checks
+import bot import checks
 import discord
 from discord.ext import commands
 from utils import CheckException, Gunibot, MyContext

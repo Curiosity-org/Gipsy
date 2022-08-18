@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import aiohttp
 import sys
 sys.path.append("./bot")
-import bot.checks as checks
+import bot import checks
 import discord
 from discord.ext import commands
 from discord.utils import snowflake_time

@@ -3,7 +3,6 @@
 
 import discord, time, asyncio, logging, json, sys, os, argparse
 from shutil import copyfile
-sys.path.append("./bot")
 from utils import Gunibot, setup_logger
 
 # check python version
@@ -58,10 +57,10 @@ def main():
     log.info("Lancement du bot")
 
     print("""
-  ___  __  ____  ____  _  _         __     ____ 
- / __)(  )(  _ \/ ___)( \/ )       /  \   ( __ \\
-( (_ \ )(  ) __/\___ \ )  /       (_/ / _  (__ (
- \___/(__)(__)  (____/(__/         (__)(_)(____/
+  ___  ____  ____  ___  _  _        ___     ___  
+ / __)(_  _)(  _ \/ __)( \/ )      (__ \   / _ \\ 
+( (_-. _)(_  )___/\__ \ \  /        / _/  ( (_) )
+ \___/(____)(__)  (___/ (__)       (____)()\___/ 
     
     """)
 

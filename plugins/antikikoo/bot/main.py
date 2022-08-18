@@ -1,6 +1,6 @@
 import sys
 sys.path.append("./bot")
-import bot.checks as checks
+import bot import checks
 import discord
 from discord.channel import TextChannel
 from discord.ext import commands

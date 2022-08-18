@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Tuple
 
 import sys
 sys.path.append("./bot")
-import bot.checks as checks
+import bot import checks
 import discord
 from discord.ext import commands
 from utils import Gunibot, MyContext
