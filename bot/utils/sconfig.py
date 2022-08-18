@@ -9,7 +9,7 @@ sys.path.append("./bot")
 import args
 import sys
 sys.path.append("./bot")
-import checks
+import bot.checks as checks
 import discord
 import emoji
 from discord.ext import commands

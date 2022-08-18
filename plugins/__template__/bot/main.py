@@ -1,6 +1,6 @@
 import discord
 from discord.ext import tasks, commands
-from utils import Gunibot
+from utils import Gunibot, MyContext
 
 
 class Template(commands.Cog):

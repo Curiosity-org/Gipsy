@@ -67,18 +67,20 @@ def main():
 
     # Loading extensions (global systems + plugins)
     async def load(client, global_systems, plugins):
-        count = 0
+        loaded = 0
+        failed = 0
         notloaded = ""
         for extension in global_systems + plugins:
             try:
                 await client.load_extension(extension)
+                loaded += 1
             except:
                 log.exception(f'\nFailed to load extension {extension}')
                 notloaded += "\n - " + extension
-                count += 1
-        if count > 0:
-            raise Exception("\n{} modules not loaded".format(count) + notloaded)
-        return count
+                failed += 1
+        if failed > 0:
+            raise Exception("\n{} modules not loaded".format(failed) + notloaded)
+        return loaded, failed
 
     # Printing info when the bot is started
     async def on_ready():
@@ -93,8 +95,8 @@ def main():
         else:
             print("Connecté sur "+str(len(client.guilds))+" serveurs")
         print(time.strftime("%d/%m  %H:%M:%S"))
-        count = await load(client, global_systems, plugins)
-        print(f"{count} plugins chargés")
+        loaded, failed = await load(client, global_systems, plugins)
+        print(f"{loaded} plugins chargés, {failed} plugins en erreur")
         print('------')
         await asyncio.sleep(2)
 

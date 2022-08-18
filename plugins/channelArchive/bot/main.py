@@ -2,7 +2,7 @@ import typing
 import discord
 from discord.ext import tasks, commands
 from utils import Gunibot, MyContext
-import args
+import bot.args as args
 
 
 class ChannelArchive(commands.Cog):
@@ -51,6 +51,7 @@ class ChannelArchive(commands.Cog):
         config = self.bot.server_configs[guild.id]
         duration = config["archive_duration"]
         archive_category = config["archive_category"]
+        if self.bot.get_channel(archive_category) is None: return
 
         query = f"SELECT * FROM archive WHERE guild = {guild.id}"
         records = self.bot.db_query(query, ())
