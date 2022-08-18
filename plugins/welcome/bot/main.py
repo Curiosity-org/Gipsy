@@ -1,5 +1,5 @@
-import nextcord
-from nextcord.ext import commands
+import discord
+from discord.ext import commands
 from utils import Gunibot, MyContext
 
 
@@ -12,14 +12,14 @@ class Welcome(commands.Cog):
         bot.get_command("config").add_command(self.config_welcome_roles)
 
     @commands.command(name="welcome_roles")
-    async def config_welcome_roles(self, ctx: MyContext, roles: commands.Greedy[nextcord.Role]):
+    async def config_welcome_roles(self, ctx: MyContext, roles: commands.Greedy[discord.Role]):
         if len(roles) == 0:
             roles = None
         else:
             roles = [role.id for role in roles]
         await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "welcome_roles", roles))
     
-    async def give_welcome_roles(self, member: nextcord.Member):
+    async def give_welcome_roles(self, member: discord.Member):
         g = member.guild
         config = self.bot.server_configs[g.id]
         rolesID = config["welcome_roles"]
@@ -31,7 +31,7 @@ class Welcome(commands.Cog):
         await member.add_roles(*roles, reason="New members roles")
 
     @commands.Cog.listener()
-    async def on_member_join(self, member: nextcord.Member):
+    async def on_member_join(self, member: discord.Member):
         """Called when a member joins a guild"""
         g = member.guild
         if not g.me.guild_permissions.manage_roles:  # if not allowed to manage roles
@@ -42,11 +42,11 @@ class Welcome(commands.Cog):
             await self.give_welcome_roles(member)
     
     @commands.Cog.listener()
-    async def on_member_update(self, before:nextcord.Member, after:nextcord.Member):
+    async def on_member_update(self, before:discord.Member, after:discord.Member):
         """Main function called when a member got verified in a community server"""
         if before.pending and not after.pending:
             if "MEMBER_VERIFICATION_GATE_ENABLED" in after.guild.features:
                 await self.give_welcome_roles(after)
 
-def setup(bot):
-    bot.add_cog(Welcome(bot))
+async def setup(bot):
+    await bot.add_cog(Welcome(bot))

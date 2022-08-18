@@ -10,9 +10,9 @@ import args
 import sys
 sys.path.append("./bot")
 import checks
-import nextcord
+import discord
 import emoji
-from nextcord.ext import commands, tasks
+from discord.ext import commands, tasks
 from utils import Gunibot, MyContext
 import re
 
@@ -27,12 +27,12 @@ class Giveaways(commands.Cog):
         bot.get_command("config").add_command(self.giveaways_emojis)
 
     @commands.command(name="giveaways_emojis")
-    async def giveaways_emojis(self, ctx: MyContext, emojis: commands.Greedy[Union[nextcord.Emoji, str]]):
+    async def giveaways_emojis(self, ctx: MyContext, emojis: commands.Greedy[Union[discord.Emoji, str]]):
         """Set a list of usable emojis for giveaways
         Only these emojis will be usable to participate in a giveaway
         If no emoji is specified, every emoji will be usable"""
         # check if every emoji is valid
-        emojis = [x for x in emojis if isinstance(x, nextcord.Emoji) or emoji.is_emoji(x)]
+        emojis = [x for x in emojis if isinstance(x, discord.Emoji) or emoji.is_emoji(x)]
         # if one or more emojis were invalid (couldn't be converted)
         if len(ctx.args[2]) != len(emojis):
             await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-emoji"))
@@ -41,11 +41,11 @@ class Giveaways(commands.Cog):
         if len(emojis) == 0:
             emojis = None
         # convert discord emojis to IDs if needed
-        emojis = [str(x.id) if isinstance(x, nextcord.Emoji) else x for x in emojis]
+        emojis = [str(x.id) if isinstance(x, discord.Emoji) else x for x in emojis]
         # save result
         await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "giveaways_emojis", emojis))
 
-    def db_add_giveaway(self, channel: nextcord.TextChannel, name: str, message: int, max_entries: int, ends_at: datetime.datetime = None) -> int:
+    def db_add_giveaway(self, channel: discord.TextChannel, name: str, message: int, max_entries: int, ends_at: datetime.datetime = None) -> int:
         """
         Add a giveaway into the database
         channel: the channel where the giveaway started
@@ -146,14 +146,14 @@ class Giveaways(commands.Cog):
         rowcount = self.bot.db_query(query, (rowID,), returnrowcount=True)
         return rowcount == 1
     
-    async def get_allowed_emojis(self, guildID:int) -> List[Union[nextcord.Emoji, str]]:
+    async def get_allowed_emojis(self, guildID:int) -> List[Union[discord.Emoji, str]]:
         """Get a list of allowed emojis for a specific guild"""
         value = self.bot.server_configs[guildID]['giveaways_emojis']
         if value is None:
             return None
-        def emojis_convert(s_emoji:str, bot_emojis:List[nextcord.Emoji]) -> Union[str, nextcord.Emoji]:
+        def emojis_convert(s_emoji:str, bot_emojis:List[discord.Emoji]) -> Union[str, discord.Emoji]:
             if s_emoji.isnumeric():
-                d_em = nextcord.utils.get(bot_emojis, id=int(s_emoji))
+                d_em = discord.utils.get(bot_emojis, id=int(s_emoji))
                 if d_em is not None:
                     return d_em
             return emoji.emojize(s_emoji, language="alias")
@@ -237,11 +237,11 @@ class Giveaways(commands.Cog):
         try:
             title = await self.bot._(ctx.guild.id, "giveaways.embed.title")
             ends_at = await self.bot._(ctx.guild.id, "giveaways.embed.ends-at")
-            emb = nextcord.Embed(title=title, description=settings["name"], timestamp=datetime.datetime.utcnow(
-            )+datetime.timedelta(seconds=settings['duration']), color=nextcord.Colour.random()).set_footer(text=ends_at)
-            msg: nextcord.Message = await settings['channel'].send(embed=emb)
+            emb = discord.Embed(title=title, description=settings["name"], timestamp=datetime.datetime.utcnow(
+            )+datetime.timedelta(seconds=settings['duration']), color=discord.Colour.random()).set_footer(text=ends_at)
+            msg: discord.Message = await settings['channel'].send(embed=emb)
             settings['message'] = msg.id
-        except nextcord.HTTPException as e:
+        except discord.HTTPException as e:
             await self.bot.get_cog("Errors").on_error(e, ctx) # send error logs
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.httpexception", channe=settings['channel'].mention))
             return
@@ -259,9 +259,9 @@ class Giveaways(commands.Cog):
                 for emoji in allowed_emojis:
                     try:
                         await msg.add_reaction(emoji)
-                    except nextcord.NotFound:
+                    except discord.NotFound:
                         pass
-            except nextcord.Forbidden:
+            except discord.Forbidden:
                 pass
 
     @giveaway.command()
@@ -336,7 +336,7 @@ class Giveaways(commands.Cog):
             trials = 0
             users = list(users)
             while len(winners) < amount and trials < 20:
-                w = nextcord.utils.get(
+                w = discord.utils.get(
                     ctx.guild.members, id=random.choice(users))
                 if w != None:
                     winners.append(w.mention)
@@ -474,12 +474,12 @@ class Giveaways(commands.Cog):
                     await self.bot.get_cog('Errors').on_error(e)
                     self.db_stop_giveaway(giveaway['rowid'])
 
-    async def get_users(self, channel: int, message: int, allowed_reactions: Optional[set[Union[nextcord.Emoji, str]]]):
+    async def get_users(self, channel: int, message: int, allowed_reactions: Optional[set[Union[discord.Emoji, str]]]):
         """Get users who reacted to a message"""
-        channel: nextcord.TextChannel = self.bot.get_channel(channel)
+        channel: discord.TextChannel = self.bot.get_channel(channel)
         if channel is None:
             return set()
-        message: nextcord.Message = await channel.fetch_message(message)
+        message: discord.Message = await channel.fetch_message(message)
         if message is None or message.author != self.bot.user:
             return set()
         users = set()
@@ -490,13 +490,13 @@ class Giveaways(commands.Cog):
                         users.add(user.id)
         return users
 
-    async def edit_embed(self, channel: nextcord.TextChannel, message: int, winners: List[nextcord.Member]) -> int:
+    async def edit_embed(self, channel: discord.TextChannel, message: int, winners: List[discord.Member]) -> int:
         """Edit the embed to display results
         Returns the embed color if the embed was found, None else"""
-        message: nextcord.Message = await channel.fetch_message(message)
+        message: discord.Message = await channel.fetch_message(message)
         if message is None or message.author != self.bot.user or len(message.embeds) == 0:
             return None
-        emb: nextcord.Embed = message.embeds[0]
+        emb: discord.Embed = message.embeds[0]
         emb.set_footer(text=await self.bot._(channel, "giveaways.embed.ended-at"))
         emb.description = await self.bot._(channel, "giveaways.embed.desc",
             price=emb.description,
@@ -504,7 +504,7 @@ class Giveaways(commands.Cog):
         await message.edit(embed=emb)
         return emb.color
 
-    async def pick_winners(self, guild: nextcord.Guild, giveaway: dict) -> List[nextcord.Member]:
+    async def pick_winners(self, guild: discord.Guild, giveaway: dict) -> List[discord.Member]:
         """Select the winner of a giveaway, from both participants using the command and using the message reactions
         Returns a list of members"""
         allowed_reactions = await self.get_allowed_emojis(guild.id)
@@ -517,29 +517,29 @@ class Giveaways(commands.Cog):
             trials = 0
             users = list(users)
             while len(winners) < amount and trials < 20:
-                w = nextcord.utils.get(guild.members, id=random.choice(users))
+                w = discord.utils.get(guild.members, id=random.choice(users))
                 if w != None:
                     winners.append(w)
                 else:
                     trials += 1
         return winners
 
-    async def send_results(self, giveaway: dict, winners: List[nextcord.Member]):
+    async def send_results(self, giveaway: dict, winners: List[discord.Member]):
         """Send the giveaway results in a new embed"""
         self.bot.log.info(f"Giveaway '{giveaway['name']}' has stopped")
-        channel: nextcord.TextChannel = self.bot.get_channel(giveaway['channel'])
+        channel: discord.TextChannel = self.bot.get_channel(giveaway['channel'])
         if channel is None:
             return None
         emb_color = await self.edit_embed(channel, giveaway['message'], winners)
         if emb_color is None:
             # old embed wasn't found, we select a new color
-            emb_color = nextcord.Colour.random()
+            emb_color = discord.Colour.random()
         win = await self.bot._(channel, "giveaways.embed.winners", count=len(winners), winner=" ".join([x.mention for x in winners]))
         desc = "{}: {} \n\n{}".format(await self.bot._(channel, "giveaways.embed.price"), giveaway['name'], win)
-        emb = nextcord.Embed(title="Giveaway is over!", description=desc, color=emb_color)
+        emb = discord.Embed(title="Giveaway is over!", description=desc, color=emb_color)
         await channel.send(embed=emb)
         self.db_delete_giveaway(giveaway['rowid'])
 
 
-def setup(bot):
-    bot.add_cog(Giveaways(bot))
+async def setup(bot):
+    await bot.add_cog(Giveaways(bot))

@@ -1,8 +1,8 @@
 import random
 
 import discord.abc
-import nextcord
-from nextcord.ext import commands
+import discord
+from discord.ext import commands
 from utils import Gunibot, MyContext
 
 
@@ -19,7 +19,7 @@ class Ban(commands.Cog):
     @commands.command(name="ban")
     @commands.guild_only()
     @commands.has_guild_permissions(ban_members=True)
-    async def ban(self, ctx: MyContext, *, user: nextcord.User, reason: str = "Aucune raison donnée"):
+    async def ban(self, ctx: MyContext, *, user: discord.User, reason: str = "Aucune raison donnée"):
         if user == ctx.author:
             await ctx.send("Tu ne peux pas te bannir toi-même !")
             return
@@ -34,7 +34,7 @@ class Ban(commands.Cog):
             try:
                 await ctx.guild.ban(user, delete_message_days=0,
                                     reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
-            except nextcord.Forbidden:
+            except discord.Forbidden:
                 await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
             else:
                 await ctx.send(f"{user} a bien été banni !")
@@ -53,7 +53,7 @@ class Ban(commands.Cog):
                 try:
                     await ctx.guild.kick(ctx.author,
                                          reason=f"Banned by himself. Reason : {user} ({user.id}) used Uno Reverse card.")
-                except nextcord.Forbidden:
+                except discord.Forbidden:
                     await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
                 else:
                     # Find and send some random message
@@ -71,7 +71,7 @@ class Ban(commands.Cog):
                     await user.send("https://discord.gg/jtntCqXz53")
                 try:
                     await ctx.guild.kick(user, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
-                except nextcord.Forbidden:
+                except discord.Forbidden:
                     await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
                 else:
                     if ctx.guild.id == 125723125685026816:
@@ -81,7 +81,7 @@ class Ban(commands.Cog):
                     try:
                         await ctx.guild.kick(ctx.author,
                                              reason=f"Banned by himself. Reason : {user} ({user.id}) banned him back.")
-                    except nextcord.Forbidden:
+                    except discord.Forbidden:
                         # If there's an error when banning the author, we don't care and act like if a one-way ban happened.
                         choice = random.randint(0, 9)
                         msg = await self.bot._(ctx.channel, f"ban.gunivers.ban.{choice}")
@@ -112,7 +112,7 @@ class Ban(commands.Cog):
                     await user.send("https://discord.gg/jtntCqXz53")
                 try:
                     await ctx.guild.kick(user, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
-                except nextcord.Forbidden:
+                except discord.Forbidden:
                     await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
                 else:
                     # Find and send some random message
@@ -132,7 +132,7 @@ class Ban(commands.Cog):
                     await user.send("https://discord.gg/jtntCqXz53")
                 try:
                     await ctx.guild.kick(user, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
-                except nextcord.Forbidden:
+                except discord.Forbidden:
                     await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
                 else:
                     # Find and send some random message
@@ -150,7 +150,7 @@ class Ban(commands.Cog):
     @commands.command(name="rban")
     @commands.guild_only()
     @commands.has_guild_permissions(ban_members=True)
-    async def rban(self, ctx: MyContext, *, user: nextcord.User, reason: str = "Aucune raison donnée"):
+    async def rban(self, ctx: MyContext, *, user: discord.User, reason: str = "Aucune raison donnée"):
         if ctx.guild.id == 125723125685026816 or ctx.guild.id == 689159304049197131:
             if user == ctx.author:
                 await ctx.send("Tu ne peux pas te bannir toi-même abruti !")
@@ -165,7 +165,7 @@ class Ban(commands.Cog):
             try:
                 await ctx.guild.ban(user, delete_message_days=0,
                                     reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
-            except nextcord.Forbidden:
+            except discord.Forbidden:
                 await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
             else:
                 await ctx.send(f"{user} a bien été banni !")
@@ -173,5 +173,5 @@ class Ban(commands.Cog):
 
 
 # The end.
-def setup(bot):
-    bot.add_cog(Ban(bot))
+async def setup(bot):
+    await bot.add_cog(Ban(bot))

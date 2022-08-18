@@ -4,8 +4,8 @@ from typing import List
 import sys
 sys.path.append("./bot")
 import checks
-import nextcord
-from nextcord.ext import commands
+import discord
+from discord.ext import commands
 from utils import Gunibot, MyContext
 
 
@@ -29,20 +29,20 @@ class Group:
         except commands.errors.CommandRegistrationError: pass
 
     @commands.command(name="group_allowed_role")
-    async def config_group_allowed_role(self, ctx: MyContext, *, role: nextcord.Role=None):
+    async def config_group_allowed_role(self, ctx: MyContext, *, role: discord.Role=None):
         """Role allowed to create groups"""
-        role = role.id if isinstance(role, nextcord.Role) else None
+        role = role.id if isinstance(role, discord.Role) else None
         await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "group_allowed_role", role))
 
     @commands.command(name="group_channel_category")
-    async def config_group_channel_category(self, ctx: MyContext, *, category: nextcord.CategoryChannel):
+    async def config_group_channel_category(self, ctx: MyContext, *, category: discord.CategoryChannel):
         """Category were group channel will be created"""
         await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "group_channel_category", category.id))
 
     @commands.command(name="group_over_role")
-    async def config_group_over_role(self, ctx: MyContext, *, role: nextcord.Role = None):
+    async def config_group_over_role(self, ctx: MyContext, *, role: discord.Role = None):
         """Role under the groups roles will be created"""
-        role = role.id if isinstance(role, nextcord.Role) else None
+        role = role.id if isinstance(role, discord.Role) else None
         await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "group_over_role", role))
 
     @commands.command(name="max_group")
@@ -58,13 +58,13 @@ class Group:
         if ctx.subcommand_passed is None:
             await ctx.send_help('config-backup')
     
-    def role(self, bot: Gunibot) -> nextcord.Role:
+    def role(self, bot: Gunibot) -> discord.Role:
         """Get the Discord Role attached to that group"""
         if self._role is None:
             self._role = bot.get_guild(self.guildID).get_role(self.roleID)
         return self._role
 
-    def channel(self, bot: Gunibot) -> nextcord.TextChannel:
+    def channel(self, bot: Gunibot) -> discord.TextChannel:
         """Get the Discord Text Channel attached to that group"""
         if self.channelID is None:
             return None
@@ -72,7 +72,7 @@ class Group:
             self._channel = bot.get_guild(self.guildID).get_channel(self.channelID)
         return self._channel
 
-    def member_is_in(self, member: nextcord.Member) -> bool:
+    def member_is_in(self, member: discord.Member) -> bool:
         """Check if a member is part of that group (ie has the attached role)"""
         for x in member.roles:
             if x.id == self.roleID:
@@ -188,7 +188,7 @@ class Groups(commands.Cog):
         # remove spaces if needed
         name = name.replace(' ', '-')
         # check if the role exists
-        role = nextcord.utils.get(ctx.guild.roles, name=name)
+        role = discord.utils.get(ctx.guild.roles, name=name)
         if role:
             # if the role exists, check if a group is already created with it
             check = self.db_get_group(ctx.guild.id, role.id)
@@ -242,7 +242,7 @@ class Groups(commands.Cog):
 
     @group_main.command(name='register')
     @commands.check(checks.is_admin)
-    async def group_register(self, ctx: MyContext, role: nextcord.Role):
+    async def group_register(self, ctx: MyContext, role: discord.Role):
         """Register a group from an existing role
         Use the ID, name or mention of the role you want to add to the group system"""
         roleName = role.name
@@ -272,7 +272,7 @@ class Groups(commands.Cog):
 
     @group_modify_main.command(name='leader')
     @commands.cooldown(1, 30, commands.BucketType.user)
-    async def group_modify_owner(self, ctx: MyContext, group: GroupConverter, user: nextcord.Member):
+    async def group_modify_owner(self, ctx: MyContext, group: GroupConverter, user: discord.Member):
         """Edit the owner of a group"""
         # if user is not the group owner and neither a server admin, we abort
         if group.ownerID != ctx.author.id and not ctx.author.guild_permissions.administrator:
@@ -350,11 +350,11 @@ class Groups(commands.Cog):
         for group in groups:
             txt += group.to_str() + "\n\n"
         if ctx.can_send_embed:
-            embed = nextcord.Embed(description=txt)
+            embed = discord.Embed(description=txt)
             await ctx.send(embed=embed)
         else:
             # allowed_mentions is to avoid pinging the owner each time
-            await ctx.send(txt, allowed_mentions=nextcord.AllowedMentions.none())
+            await ctx.send(txt, allowed_mentions=discord.AllowedMentions.none())
 
     @group_main.command(name="join")
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -408,15 +408,15 @@ class Groups(commands.Cog):
             txt += user.mention + "\n"
         # if we can use embeds, let's use them
         if ctx.can_send_embed:
-            embed = nextcord.Embed(description=txt)
+            embed = discord.Embed(description=txt)
             await ctx.send(embed=embed)
         else:
             # allowed_mentions is to avoid pinging everyone
-            await ctx.send(txt, allowed_mentions=nextcord.AllowedMentions.none())
+            await ctx.send(txt, allowed_mentions=discord.AllowedMentions.none())
 
     @group_admin_main.command(name="add")
     @commands.cooldown(1, 8, commands.BucketType.user)
-    async def group_admin_add(self, ctx: MyContext, group: GroupConverter, user: nextcord.Member):
+    async def group_admin_add(self, ctx: MyContext, group: GroupConverter, user: discord.Member):
         """Add a user to a group (by force)
         Use that if the group is set to private"""
         # if user is not the group owner and neither a server admin, we abort
@@ -432,7 +432,7 @@ class Groups(commands.Cog):
 
     @group_admin_main.command(name="remove")
     @commands.cooldown(1, 8, commands.BucketType.user)
-    async def group_admin_remove(self, ctx: MyContext, group: GroupConverter, user: nextcord.Member):
+    async def group_admin_remove(self, ctx: MyContext, group: GroupConverter, user: discord.Member):
         """Remove a user to a group (by force)"""
         # if user is not the group owner and neither a server admin, we abort
         if group.ownerID != ctx.author.id and not ctx.author.guild_permissions.administrator:
@@ -500,8 +500,8 @@ class Groups(commands.Cog):
             return
         # prepare channel overwrites
         overwrite = {
-            ctx.guild.default_role: nextcord.PermissionOverwrite(read_messages=False),
-            group.role(self.bot): nextcord.PermissionOverwrite(read_messages=True)
+            ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            group.role(self.bot): discord.PermissionOverwrite(read_messages=True)
         }
         # create channel, save it, say success, end of the story.
         channel = await ctx.guild.create_text_channel(name=name, overwrites=overwrite, category=categ)
@@ -511,7 +511,7 @@ class Groups(commands.Cog):
     @group_channel_main.command(name="register")
     @commands.check(checks.is_admin)
     @commands.cooldown(1, 30, commands.BucketType.guild)
-    async def group_channel_register(self, ctx: MyContext, group: GroupConverter, channel: nextcord.TextChannel):
+    async def group_channel_register(self, ctx: MyContext, group: GroupConverter, channel: discord.TextChannel):
         """Register a channel as a group channel
         You'll have to edit the permissions yourself :/"""
         # if a channel already exists for that group
@@ -538,5 +538,5 @@ class Groups(commands.Cog):
                 await ctx.send(await self.bot._(ctx.guild.id, "groups.channel_unregister", group=group.role(self.bot).name))
 
 
-def setup(bot):
-    bot.add_cog(Groups(bot))
+async def setup(bot):
+    await bot.add_cog(Groups(bot))

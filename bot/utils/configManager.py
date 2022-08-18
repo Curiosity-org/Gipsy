@@ -1,7 +1,7 @@
 import os
 from json import dump, load
 
-from nextcord.ext import commands
+from discord.ext import commands
 from utils import CONFIG_OPTIONS
 
 CONFIG_FOLDER = "configs"
@@ -132,5 +132,5 @@ class ConfigCog(commands.Cog):
             return [v for k, v in self.FLAGS.items() if i & k == k]
 
 
-def setup(bot):
-    bot.add_cog(ConfigCog(bot))
+async def setup(bot):
+    await bot.add_cog(ConfigCog(bot))
