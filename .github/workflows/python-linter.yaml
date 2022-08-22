@@ -1,0 +1,22 @@
+# © Aeris1One, aeris@aeris-one.fr (2022) 
+#
+# Ce fichier représente un programme informatique servant à vérifier que le
+# code de ce dépôt est fonctionnel et conforme à la PEP-8.
+#
+# Ce programme est régi par la licence CeCILL soumise au droit français et
+# respectant les principes de diffusion des logiciels libres. Vous pouvez
+# utiliser, modifier et/ou redistribuer ce programme sous les conditions
+# de la licence CeCILL difusée sur le site "http://www.cecill.info".
+
+
+name: python-linter
+
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: rahul-deepsource/pyaction@master
