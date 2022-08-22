@@ -6,9 +6,9 @@ import typing
 from math import ceil
 from typing import Dict, List, Tuple, Union
 
-import nextcord
+import discord
 import emoji
-from nextcord.ext import commands
+from discord.ext import commands
 from utils import Gunibot, MyContext
 
 
@@ -24,7 +24,7 @@ class XP(commands.Cog):
         self.cache: Dict[Dict[int, int]] = dict()  # xp cache
         self.levels = [0]  # xp required per level
         self.xp_channels_cache = dict()  # no-xp channels
-        self.embed_color = nextcord.Colour(0xffcf50)
+        self.embed_color = discord.Colour(0xffcf50)
         self.config_options = ['enable_xp', 'noxp_channels',
                                'levelup_channel', 'levelup_message','levelup_reaction','reaction_emoji']
 
@@ -41,7 +41,7 @@ class XP(commands.Cog):
         await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "enable_xp", value))
     
     @commands.command(name="noxp_channels")
-    async def config_noxp_channels(self, ctx: MyContext, channels: commands.Greedy[nextcord.TextChannel]):
+    async def config_noxp_channels(self, ctx: MyContext, channels: commands.Greedy[discord.TextChannel]):
         """Select in which channels your members should not get any xp"""
         if len(channels) == 0:
             channels = None
@@ -78,16 +78,16 @@ class XP(commands.Cog):
         await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "levelup_reaction", bool))
 
     @commands.command(name="reaction_emoji")
-    async def config_levelup_reaction_emoji(self, ctx: MyContext, emote: nextcord.Emoji=None):
+    async def config_levelup_reaction_emoji(self, ctx: MyContext, emote: discord.Emoji=None):
         """Set the emoji wich one the bot will react to message when levelup"""
         # check if emoji is valid
-        emote = emote if isinstance(emote, nextcord.Emoji) or  emoji.is_emoji(emote) else False
+        emote = emote if isinstance(emote, discord.Emoji) or  emoji.is_emoji(emote) else False
         # if emojis was invalid (couldn't be converted)
         if not emote:
             await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-emoji"))
             return
         # convert discord emoji to ID if needed
-        emote = str(emote.id) if isinstance(emote, nextcord.Emoji) else emote
+        emote = str(emote.id) if isinstance(emote, discord.Emoji) else emote
         # save result
         await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "reaction_emoji", emote))
     
@@ -113,7 +113,7 @@ class XP(commands.Cog):
             result.append((f"{_lvl} {k}", " ".join(subroles)))
         return result
 
-    async def get_lvlup_chan(self, msg: nextcord.Message):
+    async def get_lvlup_chan(self, msg: discord.Message):
         value = self.bot.server_configs[msg.guild.id]['levelup_channel']
         if value is None or value == "none":
             return None
@@ -122,10 +122,10 @@ class XP(commands.Cog):
         try:
             chan = msg.guild.get_channel(int(value))
             return chan
-        except nextcord.errors.NotFound:
+        except discord.errors.NotFound:
             return None
 
-    async def check_noxp(self, msg: nextcord.Message):
+    async def check_noxp(self, msg: discord.Message):
         """Check if this channel/user can get xp"""
         if msg.guild is None:
             return False
@@ -145,7 +145,7 @@ class XP(commands.Cog):
             self.xp_channels_cache[msg.guild.id] = chans
         return True
 
-    async def check_cmd(self, msg: nextcord.Message):
+    async def check_cmd(self, msg: discord.Message):
         """Checks if a message is a command"""
         pr = await self.bot.get_prefix(msg)
         return any([msg.content.startswith(p) for p in pr])
@@ -169,7 +169,7 @@ class XP(commands.Cog):
         return False
 
     @commands.Cog.listener('on_message')
-    async def add_xp(self, msg: nextcord.Message):
+    async def add_xp(self, msg: discord.Message):
         """Assigns a certain amount of xp to a message"""
         # check if it's a bot or sent in DM
         if msg.author.bot or msg.guild is None:
@@ -219,7 +219,7 @@ class XP(commands.Cog):
             # refresh roles rewards for that user
             await self.give_rr(msg.author, new_lvl[0], await self.rr_list_role(msg.guild.id))
 
-    async def calc_xp(self, msg: nextcord.Message):
+    async def calc_xp(self, msg: discord.Message):
         """Calculates the xp amount corresponding to a message"""
         content: str = msg.clean_content
         # we replace custom emojis by their names
@@ -248,7 +248,7 @@ class XP(commands.Cog):
         #     next_step += 1
         return [lvl, next_step, ceil(((lvl-1)*125/7)**(20/13))]
 
-    async def send_levelup(self, msg: nextcord.Message, lvl: int):
+    async def send_levelup(self, msg: discord.Message, lvl: int):
         """Send the levelup message or react with the reaction"""
         config = self.bot.server_configs[msg.guild.id]
         print(config['levelup_reaction'])
@@ -256,9 +256,9 @@ class XP(commands.Cog):
             if config['reaction_emoji'] is None:
                 await msg.add_reaction("💫")
             else:
-                def emojis_convert(s_emoji: str, bot_emojis: List[nextcord.Emoji]) -> Union[str, nextcord.Emoji]:
+                def emojis_convert(s_emoji: str, bot_emojis: List[discord.Emoji]) -> Union[str, discord.Emoji]:
                     if s_emoji.isnumeric():
-                        d_em = nextcord.utils.get(bot_emojis, id=int(s_emoji))
+                        d_em = discord.utils.get(bot_emojis, id=int(s_emoji))
                         if d_em is not None:
                             return d_em
                     return emoji.emojize(s_emoji, language="alias")
@@ -275,7 +275,7 @@ class XP(commands.Cog):
                                                                      level=lvl[0],
                                                                      username=msg.author.display_name)))
 
-    async def give_rr(self, member: nextcord.Member, level: int, rr_list: List[Dict[str, int]], remove: bool = False) -> int:
+    async def give_rr(self, member: discord.Member, level: int, rr_list: List[Dict[str, int]], remove: bool = False) -> int:
         """Give (and remove?) roles rewards to a member
         rr_list is a list of dictionnaries containing level and role id
         put remove as True if you want to remove unneeded roles rewards too"""
@@ -369,7 +369,7 @@ class XP(commands.Cog):
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e)
 
-    async def bdd_get_rank(self, userID: int, guild: nextcord.Guild = None):
+    async def bdd_get_rank(self, userID: int, guild: discord.Guild = None):
         """Get the rank of a user
         Set guild=None for global leaderboard"""
         try:
@@ -391,7 +391,7 @@ class XP(commands.Cog):
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e)
 
-    async def bdd_get_top(self, top: int = None, guild: nextcord.Guild = None):
+    async def bdd_get_top(self, top: int = None, guild: discord.Guild = None):
         """"""
         try:
             query = "SELECT userid, xp FROM xp WHERE guild = ? ORDER BY `xp` DESC"
@@ -401,20 +401,20 @@ class XP(commands.Cog):
         except Exception as e:
             await self.bot.get_cog('Errors').on_error(e)
 
-    async def get_xp(self, user: nextcord.User, guild_id: int = None):
+    async def get_xp(self, user: discord.User, guild_id: int = None):
         """Get the xp amount of a user in a guild"""
         xp = await self.bdd_get_xp(user.id, guild_id)
         if xp is None or (isinstance(xp, list) and len(xp) == 0):
             return
         return xp[0]['xp']
 
-    async def send_embed(self, ctx: MyContext, user: nextcord.User, xp, rank, ranks_nb, levels_info):
+    async def send_embed(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info):
         """Send the !rank command as an embed"""
         LEVEL = await self.bot._(ctx.channel, 'xp.card.level')
         RANK = await self.bot._(ctx.channel, 'xp.card.rank')
         if levels_info is None:
             levels_info = await self.calc_level(xp)
-        emb = nextcord.Embed(color=self.embed_color)
+        emb = discord.Embed(color=self.embed_color)
         emb.set_author(name=str(user), icon_url=user.display_avatar)
         emb.add_field(name='XP', value=f"{xp}/{levels_info[1]}")
         emb.add_field(name=LEVEL, value=levels_info[0])
@@ -422,7 +422,7 @@ class XP(commands.Cog):
 
         await ctx.send(embed=emb)
 
-    async def send_txt(self, ctx: MyContext, user: nextcord.User, xp, rank, ranks_nb, levels_info):
+    async def send_txt(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info):
         """Send the !rank command as a plain text"""
         LEVEL = await self.bot._(ctx.channel, 'xp.card.level')
         RANK = await self.bot._(ctx.channel, 'xp.card.rank')
@@ -438,7 +438,7 @@ class XP(commands.Cog):
     @commands.guild_only()
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(3, 10, commands.BucketType.user)
-    async def rank(self, ctx: MyContext, *, user: nextcord.User = None):
+    async def rank(self, ctx: MyContext, *, user: discord.User = None):
         """Display a user XP.
         If you don't target any user, I'll display your own XP"""
         if user is None:
@@ -483,10 +483,10 @@ class XP(commands.Cog):
             if user is None:
                 try:
                     user = await self.bot.fetch_user(u['userid'])
-                except nextcord.NotFound:
+                except discord.NotFound:
                     user = await self.bot._(ctx.channel, 'xp.del-user')
-            if isinstance(user, nextcord.User):
-                user_name = nextcord.utils.escape_markdown(user.name)
+            if isinstance(user, discord.User):
+                user_name = discord.utils.escape_markdown(user.name)
                 if len(user_name) > 18:
                     user_name = user_name[:15]+'...'
             else:
@@ -549,7 +549,7 @@ class XP(commands.Cog):
         t = await self.bot._(ctx.channel, 'xp.top.title')
         # final embed
         if ctx.can_send_embed:
-            emb = nextcord.Embed(title=t, color=self.embed_color)
+            emb = discord.Embed(title=t, color=self.embed_color)
             emb.set_author(name=self.bot.user.name,
                            icon_url=self.bot.user.display_avatar)
             emb.add_field(name=f_name, value="\n".join(txt), inline=False)
@@ -588,7 +588,7 @@ class XP(commands.Cog):
 
     @rr_main.command(name="add")
     @commands.has_permissions(manage_guild=True)
-    async def rr_add(self, ctx: MyContext, level: int, *, role: nextcord.Role):
+    async def rr_add(self, ctx: MyContext, level: int, *, role: discord.Role):
         """Add a role reward
         This role will be given to every member who reaches the specified level"""
         try:
@@ -619,7 +619,7 @@ class XP(commands.Cog):
             if len(desc) == 0:
                 desc = await self.bot._(ctx.guild.id, "xp.rr.no-rr-2")
             title = await self.bot._(ctx.guild.id, "xp.rr.list-title", nbr=len(l))
-            emb = nextcord.Embed(title=title, description=desc)
+            emb = discord.Embed(title=title, description=desc)
             await ctx.send(embed=emb)
 
     @rr_main.command(name="remove")
@@ -661,5 +661,5 @@ class XP(commands.Cog):
             await self.bot.get_cog('Errors').on_command_error(ctx, e)
 
 
-def setup(bot):
-    bot.add_cog(XP(bot))
+async def setup(bot):
+    await bot.add_cog(XP(bot))

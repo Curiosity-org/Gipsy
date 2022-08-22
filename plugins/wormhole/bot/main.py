@@ -1,11 +1,11 @@
 from typing import List, Union
-import nextcord
-from nextcord.ext import commands
+import discord
+from discord.ext import commands
 from itertools import chain
 
 import sys
 sys.path.append("./bot")
-import checks
+import bot import checks
 from utils import Gunibot, MyContext
 from aiohttp import ClientSession
 
@@ -17,7 +17,7 @@ def similar(msg1, msg2):
 
 
 # Get the corresponding answered message in other channels
-async def get_corresponding_answer(channel: nextcord.TextChannel, message: nextcord.Message) -> nextcord.Message:
+async def get_corresponding_answer(channel: discord.TextChannel, message: discord.Message) -> discord.Message:
     date = message.created_at
     async for msg in channel.history(limit=20, after=date, oldest_first=True):
         if similar(message.content, msg.content):
@@ -27,10 +27,10 @@ async def get_corresponding_answer(channel: nextcord.TextChannel, message: nextc
             return msg
     return None
 
-async def sendMessage(msg: nextcord.Message, webhook: nextcord.Webhook, username: str, pp_guild: bool, embed_reply: nextcord.Embed = None):
+async def sendMessage(msg: discord.Message, webhook: discord.Webhook, username: str, pp_guild: bool, embed_reply: discord.Embed = None):
     files = [await x.to_file() for x in msg.attachments]
     # grab mentions from the source message
-    mentions = nextcord.AllowedMentions(
+    mentions = discord.AllowedMentions(
         everyone=msg.mention_everyone,
         users=msg.mentions,
         roles=msg.role_mentions)
@@ -45,12 +45,12 @@ async def sendMessage(msg: nextcord.Message, webhook: nextcord.Webhook, username
         if len(embeds) >= 10:
             embeds.pop()
         embeds.append(embed_reply)
-    new_msg: nextcord.WebhookMessage = await webhook.send(content=msg.content,
+    new_msg: discord.WebhookMessage = await webhook.send(content=msg.content,
                                                          files=files,
                                                          embeds=embeds,
                                                          avatar_url=avatar_url,
                                                          username=username,
-                                                         allowed_mentions=nextcord.AllowedMentions.none(),
+                                                         allowed_mentions=discord.AllowedMentions.none(),
                                                          wait=True)
     # edit the message to include mentions without notifications
     if mentions.roles or mentions.users or mentions.everyone:
@@ -173,9 +173,9 @@ class Wormholes(commands.Cog):
         async with ClientSession() as session:
             for row in wh_targets:
                 # We're starting to send the message in all the channels linked to that wormhole
-                channel: nextcord.TextChannel = self.bot.get_channel(row[1])
+                channel: discord.TextChannel = self.bot.get_channel(row[1])
                 if channel:
-                    webhook = nextcord.Webhook.partial(row[4], row[5], session=session)
+                    webhook = discord.Webhook.partial(row[4], row[5], session=session)
                     oldmessage = await get_corresponding_answer(channel, message)
                     await webhook.delete_message(oldmessage.id)
 
@@ -199,16 +199,16 @@ class Wormholes(commands.Cog):
         async with ClientSession() as session:
             for row in wh_targets:
                 # We're starting to send the message in all the channels linked to that wormhole
-                channel: nextcord.TextChannel = self.bot.get_channel(row[1])
+                channel: discord.TextChannel = self.bot.get_channel(row[1])
                 if channel:
-                    webhook = nextcord.Webhook.partial(row[4], row[5], session=session)
+                    webhook = discord.Webhook.partial(row[4], row[5], session=session)
                     embed_reply = None
                     oldmessage = await get_corresponding_answer(channel, message)
                     await webhook.edit_message(oldmessage.id, content=newmessage.content, embeds=newmessage.embeds, files=newmessage.attachments, allowed_mentions=None)
 
 
     @commands.Cog.listener()
-    async def on_message(self, message: nextcord.Message):
+    async def on_message(self, message: discord.Message):
         """Executed every time a message is sent"""
         if message.author.bot or "wormhole unlink" in message.content or "wh unlink" in message.content:
             return
@@ -229,15 +229,15 @@ class Wormholes(commands.Cog):
         async with ClientSession() as session:
             for row in wh_targets:
                 # We're starting to send the message in all the channels linked to that wormhole
-                channel: nextcord.TextChannel = self.bot.get_channel(row[1])
+                channel: discord.TextChannel = self.bot.get_channel(row[1])
                 if channel:
-                    webhook = nextcord.Webhook.partial(row[4], row[5], session=session)
+                    webhook = discord.Webhook.partial(row[4], row[5], session=session)
                     embed_reply = None
                     if message.reference is not None:
                         reply = await message.channel.fetch_message(message.reference.message_id)
                         reply = await get_corresponding_answer(channel, reply)
                         if reply is None:
-                            embed = nextcord.Embed(
+                            embed = discord.Embed(
                                 description= await self.bot._(message.guild.id, "wormhole.reply_notfound"), #"https://gunivers.net"), #
                                 colour=0x2f3136 #2F3136
                             )
@@ -245,7 +245,7 @@ class Wormholes(commands.Cog):
                             content = reply.content
                             content = content.replace("\n"," ")
                             if len(content) > 80: content = content[:80] + "..."
-                            embed = nextcord.Embed(
+                            embed = discord.Embed(
                                 description= await self.bot._(message.guild.id, "wormhole.reply_to", link = reply.jump_url), #"https://gunivers.net"), #
                                 colour=0x2f3136 #2F3136
                             ).set_footer(text= content, icon_url=reply.author.display_avatar)
@@ -305,7 +305,7 @@ class Wormholes(commands.Cog):
                 await ctx.send(await self.bot._(ctx.guild.id, "wormhole.error.not-admin"))
                 return
             query = "INSERT INTO wormhole_channel (name, channelID, guildID, type, webhookID, webhookTOKEN) VALUES (?, ?, ?, ?, ?, ?)"
-            webhook: nextcord.Webhook = await ctx.channel.create_webhook(name=wormhole)
+            webhook: discord.Webhook = await ctx.channel.create_webhook(name=wormhole)
             self.bot.db_query(query, (wormhole, ctx.channel.id, ctx.guild.id, perms.name, webhook.id, webhook.token))
             await ctx.send(await self.bot._(ctx.guild.id, "wormhole.success.channel-linked"))
 
@@ -321,7 +321,7 @@ class Wormholes(commands.Cog):
             return
         query = "DELETE FROM wormhole_channel WHERE channelID = ? AND name = ?"
         async with ClientSession() as session:
-            webhook = nextcord.Webhook.partial(wh_channel[4], wh_channel[5], session=session)
+            webhook = discord.Webhook.partial(wh_channel[4], wh_channel[5], session=session)
             await webhook.delete()
         self.bot.db_query(query, (wh_channel[0], ctx.channel.id))
         await ctx.send(await self.bot._(ctx.guild.id, "wormhole.success.channel-unlinked"))
@@ -403,7 +403,7 @@ class Wormholes(commands.Cog):
             await ctx.send_help("wormhole admin")
 
     @admin.command(name="add")
-    async def admin_add(self, ctx: MyContext, wormhole: str, user: nextcord.User):
+    async def admin_add(self, ctx: MyContext, wormhole: str, user: discord.User):
         """Add a user as a wormhole admin"""
         if not self.check_wh_exists(wormhole):
             await ctx.send(await self.bot._(ctx.guild.id, "wormhole.error.not-exists", name=wormhole))
@@ -421,7 +421,7 @@ class Wormholes(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "wormhole.error.already-admin", user=user.name))
 
     @admin.command(name="remove", aliases=['revoke'])
-    async def admin_remove(self, ctx: MyContext, wormhole: str, user: nextcord.User):
+    async def admin_remove(self, ctx: MyContext, wormhole: str, user: discord.User):
         """Revoke an admin of a wormhole"""
         if not self.check_wh_exists(wormhole):
             await ctx.send(await self.bot._(ctx.guild.id, "wormhole.error.not-exists", name=wormhole))
@@ -465,5 +465,5 @@ class Wormholes(commands.Cog):
         await ctx.send(txt)
 
 
-def setup(bot):
-    bot.add_cog(Wormholes(bot))
+async def setup(bot):
+    await bot.add_cog(Wormholes(bot))

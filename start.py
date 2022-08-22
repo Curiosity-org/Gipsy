@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-import nextcord, time, asyncio, logging, json, sys, os, argparse
+import discord, time, asyncio, logging, json, sys, os, argparse
 from shutil import copyfile
-sys.path.append("./bot")
 from utils import Gunibot, setup_logger
 
 # check python version
@@ -48,7 +47,7 @@ def main():
                 conf.update(get_config('./plugins/' + plugin + '/config/require', isBotConfig = False))
 
     # Creating client
-    client = Gunibot(case_insensitive=True, status=nextcord.Status("online"), beta=False, config=conf)
+    client = Gunibot(case_insensitive=True, status=discord.Status("online"), beta=False, config=conf)
 
     # Writing logs + welcome message
     if not os.path.isdir("logs"):
@@ -58,26 +57,29 @@ def main():
     log.info("Lancement du bot")
 
     print("""
-  ___  __  ____  ____  _  _         __     ____ 
- / __)(  )(  _ \/ ___)( \/ )       /  \   ( __ \\
-( (_ \ )(  ) __/\___ \ )  /       (_/ / _  (__ (
- \___/(__)(__)  (____/(__/         (__)(_)(____/
+  ___  ____  ____  ___  _  _        ___     ___  
+ / __)(_  _)(  _ \/ __)( \/ )      (__ \   / _ \\ 
+( (_-. _)(_  )___/\__ \ \  /        / _/  ( (_) )
+ \___/(____)(__)  (___/ (__)       (____)()\___/ 
     
     """)
 
     # Loading extensions (global systems + plugins)
-    count = 0
-    notloaded = ""
-    for extension in global_systems + plugins:
-        try:
-            client.load_extension(extension)
-        except:
-            log.exception(f'\nFailed to load extension {extension}')
-            notloaded += "\n - " + extension
-            count += 1
-    if count > 0:
-        raise Exception("\n{} modules not loaded".format(count) + notloaded)
-    del count
+    async def load(client, global_systems, plugins):
+        loaded = 0
+        failed = 0
+        notloaded = ""
+        for extension in global_systems + plugins:
+            try:
+                await client.load_extension(extension)
+                loaded += 1
+            except:
+                log.exception(f'\nFailed to load extension {extension}')
+                notloaded += "\n - " + extension
+                failed += 1
+        if failed > 0:
+            raise Exception("\n{} modules not loaded".format(failed) + notloaded)
+        return loaded, failed
 
     # Printing info when the bot is started
     async def on_ready():
@@ -92,6 +94,8 @@ def main():
         else:
             print("Connecté sur "+str(len(client.guilds))+" serveurs")
         print(time.strftime("%d/%m  %H:%M:%S"))
+        loaded, failed = await load(client, global_systems, plugins)
+        print(f"{loaded} plugins chargés, {failed} plugins en erreur")
         print('------')
         await asyncio.sleep(2)
 

@@ -1,4 +1,4 @@
-import nextcord
+import discord
 from utils import MyContext, CheckException
 
 
@@ -27,6 +27,6 @@ async def can_group(ctx: MyContext):
     config = ctx.bot.server_configs[ctx.guild.id]
     if config["group_allowed_role"] is None:
         return True
-    role = nextcord.utils.get(ctx.message.guild.roles, id=config["group_allowed_role"])
+    role = discord.utils.get(ctx.message.guild.roles, id=config["group_allowed_role"])
     if role in ctx.author.roles:
         return True

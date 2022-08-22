@@ -1,8 +1,8 @@
 import typing
-import nextcord
-from nextcord.ext import tasks, commands
+import discord
+from discord.ext import tasks, commands
 from utils import Gunibot, MyContext
-import args
+import bot.args as args
 
 
 class ChannelArchive(commands.Cog):
@@ -16,7 +16,7 @@ class ChannelArchive(commands.Cog):
         bot.get_command("config").add_command(self.config_archive_duration)
 
     @commands.command(name="archive_category")
-    async def config_archive_category(self, ctx: MyContext, *, category: nextcord.CategoryChannel):
+    async def config_archive_category(self, ctx: MyContext, *, category: discord.CategoryChannel):
         await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "archive_category", category.id))
 
     @commands.command(name="archive_duration")
@@ -33,7 +33,7 @@ class ChannelArchive(commands.Cog):
     def cog_unload(self):
         self.update_loop.cancel()
 
-    async def add_to_archive(self, guild: nextcord.Guild, channel: nextcord.TextChannel):
+    async def add_to_archive(self, guild: discord.Guild, channel: discord.TextChannel):
         # Get archive category
         config = self.bot.server_configs[guild.id]
         archive = self.bot.get_channel(config["archive_category"])
@@ -45,12 +45,13 @@ class ChannelArchive(commands.Cog):
         query = "INSERT INTO archive (guild, channel) VALUES (?, ?)"
         self.bot.db_query(query, (guild.id, channel.id))
 
-    async def update(self, guild: nextcord.Guild, log_channel: typing.Optional[nextcord.TextChannel]):
+    async def update(self, guild: discord.Guild, log_channel: typing.Optional[discord.TextChannel]):
 
         # Get archive duration
         config = self.bot.server_configs[guild.id]
         duration = config["archive_duration"]
         archive_category = config["archive_category"]
+        if self.bot.get_channel(archive_category) is None: return
 
         query = f"SELECT * FROM archive WHERE guild = {guild.id}"
         records = self.bot.db_query(query, ())
@@ -109,10 +110,10 @@ class ChannelArchive(commands.Cog):
         message += "\n" + await self.bot._(guild.id, 'archive_channel.archived', count=added)
 
         if log_channel is not None:
-            await log_channel.send(embed=nextcord.Embed(
+            await log_channel.send(embed=discord.Embed(
                 description=message,
                 title=await self.bot._(guild.id, 'archive_channel.title-update'),
-                colour=nextcord.Colour.green()))
+                colour=discord.Colour.green()))
 
 
 
@@ -145,16 +146,16 @@ class ChannelArchive(commands.Cog):
                     message += self.bot.get_channel(record["channel"]).mention + " - " + record["timestamp"]
                 else:
                     message += "#deleted-channel - " + record["timestamp"]
-            await ctx.send(embed=nextcord.Embed(
+            await ctx.send(embed=discord.Embed(
                 description=message,
                 title=await self.bot._(ctx.guild.id, 'archive_channel.title-list'),
-                colour=nextcord.Colour.green()))
+                colour=discord.Colour.green()))
 
         else:
-            await ctx.send(embed=nextcord.Embed(
+            await ctx.send(embed=discord.Embed(
                 description=await self.bot._(ctx.guild.id, 'archive_channel.no-channel'),
                 title=await self.bot._(ctx.guild.id, 'archive_channel.title-list'),
-                colour=nextcord.Colour.green()))
+                colour=discord.Colour.green()))
 
 
 
@@ -187,7 +188,7 @@ class ChannelArchive(commands.Cog):
 
     @commands.command(name="archive")
     @commands.guild_only()
-    async def archive(self, ctx: MyContext, channel: nextcord.TextChannel=None):
+    async def archive(self, ctx: MyContext, channel: discord.TextChannel=None):
         """Archive a channel"""
 
         # Get target channel
@@ -205,14 +206,14 @@ class ChannelArchive(commands.Cog):
             await self.add_to_archive(ctx.guild, channel)
 
             # Success message
-            embed = nextcord.Embed(
+            embed = discord.Embed(
                 description=await self.bot._(ctx.guild.id, 'archive_channel.success', channel=channel.mention),
-                colour=nextcord.Colour(51711)
+                colour=discord.Colour(51711)
             )
         else:
 
             # Missing permission message
-            embed = nextcord.Embed(
+            embed = discord.Embed(
                 description=await self.bot._(ctx.guild.id, 'archive_channel.missing_permission'),
                 colour=0x992d22
             )
@@ -220,5 +221,5 @@ class ChannelArchive(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
-    bot.add_cog(ChannelArchive(bot))
+async def setup(bot):
+    await bot.add_cog(ChannelArchive(bot))

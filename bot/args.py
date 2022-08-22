@@ -1,6 +1,6 @@
-import nextcord
+import discord
 import re
-from nextcord.ext import commands
+from discord.ext import commands
 from utils import MyContext
 
 

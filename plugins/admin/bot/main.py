@@ -6,9 +6,9 @@ import traceback
 from contextlib import redirect_stdout
 
 sys.path.append("./bot")
-import checks
-import nextcord
-from nextcord.ext import commands
+import bot import checks
+import discord
+from discord.ext import commands
 from git import Repo, exc
 from utils import Gunibot
 
@@ -79,7 +79,7 @@ class Admin(commands.Cog):
         m = await ctx.send("Nettoyage de l'espace de travail...")
         await self.cleanup_workspace()
         await m.edit(content="Bot en voie d'extinction")
-        await self.bot.change_presence(status=nextcord.Status('offline'))
+        await self.bot.change_presence(status=discord.Status('offline'))
         self.bot.log.info("Fermeture du bot")
         await self.bot.close()
 
@@ -170,13 +170,13 @@ class Admin(commands.Cog):
         """Change l'activité du bot (play, watch, listen, stream)"""
         act = " ".join(act)
         if Type in ['game', 'play', 'playing']:
-            await self.bot.change_presence(activity=nextcord.Game(name=act))
+            await self.bot.change_presence(activity=discord.Game(name=act))
         elif Type in ['watch', 'see', 'watching']:
-            await self.bot.change_presence(activity=nextcord.Activity(type=nextcord.ActivityType.watching, name=act))
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=act))
         elif Type in ['listen', 'listening']:
-            await self.bot.change_presence(activity=nextcord.Activity(type=nextcord.ActivityType.listening, name=act))
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=act))
         elif Type in ['stream']:
-            await self.bot.change_presence(activity=nextcord.Activity(type=nextcord.ActivityType.streaming, name=act))
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.streaming, name=act))
         else:
             await ctx.send("Sélectionnez *play*, *watch*, *listen* ou *stream* suivi du nom")
         await ctx.message.delete()
@@ -227,5 +227,5 @@ class Admin(commands.Cog):
                 await ctx.send(f'```py\n{value}{ret}\n```')
 
 
-def setup(bot: Gunibot):
-    bot.add_cog(Admin(bot))
+async def setup(bot: Gunibot):
+    await bot.add_cog(Admin(bot))

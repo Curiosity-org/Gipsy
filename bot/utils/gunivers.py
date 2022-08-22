@@ -1,5 +1,5 @@
-import nextcord
-from nextcord.ext import tasks, commands
+import discord
+from discord.ext import tasks, commands
 from utils import Gunibot, MyContext
 
 
@@ -19,5 +19,5 @@ class Gunivers(commands.Cog):
         if channel is not None:
             await channel.send("Bon, qu'est-ce qu'on peut poster aujourd'hui ?")
 
-def setup(bot):
-    bot.add_cog(Gunivers(bot))
+async def setup(bot):
+    await bot.add_cog(Gunivers(bot))

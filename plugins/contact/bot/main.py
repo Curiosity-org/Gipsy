@@ -4,10 +4,10 @@ from datetime import datetime, timedelta
 import aiohttp
 import sys
 sys.path.append("./bot")
-import checks
-import nextcord
-from nextcord.ext import commands
-from nextcord.utils import snowflake_time
+import bot import checks
+import discord
+from discord.ext import commands
+from discord.utils import snowflake_time
 from utils import Gunibot, MyContext
 import sqlite3
 
@@ -26,15 +26,15 @@ class Contact(commands.Cog):
         bot.get_command("config").add_command(self.config_contact_title)
 
     @commands.command(name="contact_channel")
-    async def config_contact_channel(self, ctx: MyContext, *, channel: nextcord.TextChannel):
+    async def config_contact_channel(self, ctx: MyContext, *, channel: discord.TextChannel):
         await ctx.send(await self.bot.sconfig.edit_config(self, ctx.guild.id, "contact_channel", channel.id))
 
     @commands.command(name="contact_category")
-    async def config_contact_category(self, ctx: MyContext, *, category: nextcord.CategoryChannel):
+    async def config_contact_category(self, ctx: MyContext, *, category: discord.CategoryChannel):
         await ctx.send(await self.bot.sconfig.edit_config(self, ctx.guild.id, "contact_category", category.id))
 
     @commands.command(name="contact_roles")
-    async def config_contact_roles(self, ctx: MyContext, roles: commands.Greedy[nextcord.Role]):
+    async def config_contact_roles(self, ctx: MyContext, roles: commands.Greedy[discord.Role]):
         if len(roles) == 0:
             roles = None
         else:
@@ -62,7 +62,7 @@ class Contact(commands.Cog):
         res = self.bot.db_query(query, (guildID,))
         return res
 
-    def db_add_channel(self, channel: nextcord.TextChannel, authorID):
+    def db_add_channel(self, channel: discord.TextChannel, authorID):
         try:
             query = "INSERT INTO contact_channels (guild,channel, author) VALUES (?, ?, ?)"
             self.bot.db_query(query, (channel.guild.id, channel.id, authorID))
@@ -74,7 +74,7 @@ class Contact(commands.Cog):
         self.bot.db_query(query, (guildID, channelID))
 
     @commands.Cog.listener()
-    async def on_message(self, message: nextcord.Message):
+    async def on_message(self, message: discord.Message):
         """Called for every new message
         We use it to check when someone send a message in the contact channel"""
         if message.guild is None:  # si le message n'est pas dans un serveur
@@ -84,21 +84,21 @@ class Contact(commands.Cog):
         config = self.bot.server_configs[message.guild.id]
         if message.channel.id != config["contact_channel"]:
             return
-        category: nextcord.CategoryChannel = self.bot.get_channel(
+        category: discord.CategoryChannel = self.bot.get_channel(
             config["contact_category"])
         if category is None: return
         try:
             perms = dict()
             if config["contact_roles"]:
-                over = nextcord.PermissionOverwrite(
-                    **dict(nextcord.Permissions.all()))
+                over = discord.PermissionOverwrite(
+                    **dict(discord.Permissions.all()))
                 perms = {message.guild.get_role(
                     x): over for x in config["contact_roles"]}
                 if message.guild.default_role not in perms.keys():
-                    perms[message.guild.default_role] = nextcord.PermissionOverwrite(
+                    perms[message.guild.default_role] = discord.PermissionOverwrite(
                         read_messages=False)
                 perms.pop(None, None)
-            perms[message.author] = nextcord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True,
+            perms[message.author] = discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True,
                                                                 embed_links=True, attach_files=True, read_message_history=True, use_external_emojis=True, add_reactions=True)
             if config["contact_title"] == "author":
                 channel = await category.create_text_channel(str(message.author), topic= message.content + " | " + str(message.author.id), overwrites=perms)
@@ -106,12 +106,12 @@ class Contact(commands.Cog):
                 channel = await category.create_text_channel(message.content[:100], topic=str(message.author) + " - " + str(message.author.id), overwrites=perms)
             self.db_add_channel(channel, message.author.id)
 
-        except nextcord.errors.Forbidden as e:
+        except discord.errors.Forbidden as e:
             await self.bot.get_cog("Errors").on_error(e, await self.bot.get_context(message))
             return
         try:
             await message.delete()
-        except nextcord.errors.Forbidden:
+        except discord.errors.Forbidden:
             pass
 
     @commands.command(name="contact-clear", aliases=["ct-clear"])
@@ -144,7 +144,7 @@ class Contact(commands.Cog):
                     try:
                         await chan.delete(reason="Channel too old")
                         i += 1
-                    except nextcord.DiscordException as e:
+                    except discord.DiscordException as e:
                         errors.append(str(e))
                     else:
                         self.db_delete_channel(ctx.guild.id, data['channel'])
@@ -155,5 +155,5 @@ class Contact(commands.Cog):
         await ctx.send(answer)
 
 
-def setup(bot):
-    bot.add_cog(Contact(bot))
+async def setup(bot):
+    await bot.add_cog(Contact(bot))

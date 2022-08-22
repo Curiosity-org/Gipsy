@@ -1,6 +1,6 @@
-import nextcord
-from nextcord.ext import tasks, commands
-from utils import Gunibot
+import discord
+from discord.ext import tasks, commands
+from utils import Gunibot, MyContext
 
 
 class Template(commands.Cog):
@@ -14,5 +14,5 @@ class Template(commands.Cog):
     async def hello(self, ctx: MyContext):
         await ctx.send(self.bot._(ctx.guild.id, 'template.hello'))
 
-def setup(bot):
-    bot.add_cog(Template(bot))
+async def setup(bot):
+    await bot.add_cog(Template(bot))

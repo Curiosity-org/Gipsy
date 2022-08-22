@@ -2,8 +2,8 @@ import datetime
 import time
 from utils import Gunibot
 
-import nextcord
-from nextcord.ext import tasks
+import discord
+from discord.ext import tasks
 
 fr_months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
              "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Décembre"]
@@ -13,7 +13,7 @@ fi_months = ['tammikuu', 'helmikuu', 'maaliskuu', 'huhtikuu', 'toukokuu',
              'kesäkuu', 'heinäkuu', 'elokuu', 'syyskuu', 'lokakuu', 'marraskuu', 'joulukuu']
 
 
-class TimeCog(nextcord.ext.commands.Cog):
+class TimeCog(discord.ext.commands.Cog):
     """This cog handles all manipulations of date, time, and time interval. So cool, and so fast"""
 
     def __init__(self, bot: Gunibot):
@@ -21,7 +21,7 @@ class TimeCog(nextcord.ext.commands.Cog):
         self.file = "timeclass"
 
     def add_task(self, delay: int, coro, *args, **kwargs):
-        """Schedule a task for later, using nextcord.ext tasks manager"""
+        """Schedule a task for later, using discord.ext tasks manager"""
         delay = round(delay)
 
         async def launch(task, coro, *args, **kwargs):
@@ -210,5 +210,5 @@ class TimeCog(nextcord.ext.commands.Cog):
             return df.strip()
 
 
-def setup(bot):
-    bot.add_cog(TimeCog(bot))
+async def setup(bot):
+    await bot.add_cog(TimeCog(bot))
