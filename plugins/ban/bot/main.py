@@ -20,8 +20,8 @@ class Ban(commands.Cog):
         self.bot = bot
         self.file = "ban"
 
-    @bot.event
-    async def on_member_join(member):
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
         global banRolesDict
         # Pourquoi global ? Pour avoir un accès en écriture et pouvoir pop
 
