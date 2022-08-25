@@ -12,7 +12,7 @@ import args
 import async_timeout
 import sys
 sys.path.append("./bot")
-import bot import checks
+from bot import checks
 import discord
 import feedparser
 import twitter

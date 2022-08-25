@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import discord
 from discord.ext import tasks, commands
 from utils import Gunibot, MyContext
-import bot import checks
+from bot import checks
 
 class DatabaseInvite:
     """Represent a database invitation object
