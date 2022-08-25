@@ -53,11 +53,11 @@ class Ban(commands.Cog):
             # auto-ban, special Laizo
             if user == ctx.author:
                 if ctx.guild.id == gunivers:
-                    ctx.send(f"{guniversInvite}")
+                    ctx.author.send(f"{guniversInvite}")
                 if ctx.guild.id == curiosity:
-                    ctx.send(f"{curiosityInvite}")
+                    ctx.author.send(f"{curiosityInvite}")
                 if ctx.guild.id == altearn:
-                    ctx.send(f"{altearnInvite}")
+                    ctx.author.send(f"{altearnInvite}")
                 try:
                     await ctx.guild.kick(user, reason=f"Auto-ban!")
                 except discord.Forbidden:
@@ -73,11 +73,11 @@ class Ban(commands.Cog):
             # 1/10th chance of banning the command executor instead, Uno Reverse event.
             if random.randint(1, 10) == 1:
                 if ctx.guild.id == gunivers:
-                    ctx.send(f"{guniversInvite}")
+                    ctx.author.send(f"{guniversInvite}")
                 if ctx.guild.id == curiosity:
-                    ctx.send(f"{curiosityInvite}")
+                    ctx.author.send(f"{curiosityInvite}")
                 if ctx.guild.id == altearn:
-                    ctx.send(f"{altearnInvite}")
+                    ctx.author.send(f"{altearnInvite}")
                 try:
                     await ctx.guild.kick(ctx.author,
                                          reason=f"Banned by himself. Reason : {user} ({user.id}) used Uno Reverse card.")
@@ -94,22 +94,22 @@ class Ban(commands.Cog):
             # 1/10th chance of banning both banned and executor, Bothban event.
             if random.randint(1, 10) == 1:
                 if ctx.guild.id == gunivers:
-                    ctx.send(f"{guniversInvite}")
+                    ctx.author.send(f"{guniversInvite}")
                 if ctx.guild.id == curiosity:
-                    ctx.send(f"{curiosityInvite}")
+                    ctx.author.send(f"{curiosityInvite}")
                 if ctx.guild.id == altearn:
-                    ctx.send(f"{altearnInvite}")
+                    ctx.author.send(f"{altearnInvite}")
                 try:
                     await ctx.guild.kick(user, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
                 except discord.Forbidden:
                     await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
                 else:
                     if ctx.guild.id == gunivers:
-                        ctx.send(f"{guniversInvite}")
+                        ctx.author.send(f"{guniversInvite}")
                     if ctx.guild.id == curiosity:
-                        ctx.send(f"{curiosityInvite}")
+                        ctx.author.send(f"{curiosityInvite}")
                     if ctx.guild.id == altearn:
-                        ctx.send(f"{altearnInvite}")
+                        ctx.author.send(f"{altearnInvite}")
                     try:
                         await ctx.guild.kick(ctx.author,
                                              reason=f"Banned by himself. Reason : {user} ({user.id}) banned him back.")
@@ -139,11 +139,11 @@ class Ban(commands.Cog):
             # If ban is issued by Leirof, then Bald ban event.
             if ctx.author.id == 125722240896598016:
                 if ctx.guild.id == gunivers:
-                    ctx.send(f"{guniversInvite}")
+                    ctx.author.send(f"{guniversInvite}")
                 if ctx.guild.id == curiosity:
-                    ctx.send(f"{curiosityInvite}")
+                    ctx.author.send(f"{curiosityInvite}")
                 if ctx.guild.id == altearn:
-                    ctx.send(f"{altearnInvite}")
+                    ctx.author.send(f"{altearnInvite}")
                 try:
                     await ctx.guild.kick(user, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
                 except discord.Forbidden:
@@ -161,11 +161,11 @@ class Ban(commands.Cog):
             # else, normal ban w/ random message
             else:
                 if ctx.guild.id == gunivers:
-                    ctx.send(f"{guniversInvite}")
+                    ctx.author.send(f"{guniversInvite}")
                 if ctx.guild.id == curiosity:
-                    ctx.send(f"{curiosityInvite}")
+                    ctx.author.send(f"{curiosityInvite}")
                 if ctx.guild.id == altearn:
-                    ctx.send(f"{altearnInvite}")
+                    ctx.author.send(f"{altearnInvite}")
                 try:
                     await ctx.guild.kick(user, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
                 except discord.Forbidden:
