@@ -12,12 +12,26 @@ curiosity = 689159304049197131
 altearnInvite = "https://discord.gg/uS9cXuyeFQ"
 guniversInvite = "https://discord.gg/E8qq6tN"
 curiosityInvite = "https://discord.gg/jtntCqXz53"
+banRolesDict = {}
+
 
 class Ban(commands.Cog):
-
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "ban"
+
+    @bot.event
+    async def on_member_join(member):
+        global banRolesDict
+        # Pourquoi global ? Pour avoir un accès en écriture et pouvoir pop
+
+        if member.guild.id in specialGuilds:
+            if member.id in banRolesDict:
+                # On pop pour ne pas garder inutilement la liste des rôles dans le dictionnaire 
+                await member.add_roles(banRolesDict.pop(member.id))
+
+
+
 
     # ------------------#
     # Commande /ban    #
@@ -27,6 +41,9 @@ class Ban(commands.Cog):
     @commands.guild_only()
     @commands.has_guild_permissions(ban_members=True)
     async def ban(self, ctx: MyContext, *, user: discord.User, reason: str = "Aucune raison donnée"):
+        # On accède au dictionnaire des roles
+        global banRolesDict
+
         if user == ctx.author and not ctx.guild.id in specialGuilds:
             await ctx.send("Tu ne peux pas te bannir toi-même !")
             return
@@ -58,6 +75,7 @@ class Ban(commands.Cog):
                     ctx.author.send(f"{curiosityInvite}")
                 if ctx.guild.id == altearn:
                     ctx.author.send(f"{altearnInvite}")
+                banRolesDict[user.id] = user.roles
                 try:
                     await ctx.guild.kick(user, reason=f"Auto-ban!")
                 except discord.Forbidden:
@@ -78,6 +96,7 @@ class Ban(commands.Cog):
                     ctx.author.send(f"{curiosityInvite}")
                 if ctx.guild.id == altearn:
                     ctx.author.send(f"{altearnInvite}")
+                banRolesDict[ctx.author] = ctx.author.roles
                 try:
                     await ctx.guild.kick(ctx.author,
                                          reason=f"Banned by himself. Reason : {user} ({user.id}) used Uno Reverse card.")
@@ -99,6 +118,8 @@ class Ban(commands.Cog):
                     ctx.author.send(f"{curiosityInvite}")
                 if ctx.guild.id == altearn:
                     ctx.author.send(f"{altearnInvite}")
+                banRolesDict[user.id] = user.roles
+                banRolesDict[ctx.author.id] = ctx.author.roles
                 try:
                     await ctx.guild.kick(user, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
                 except discord.Forbidden:
@@ -144,6 +165,7 @@ class Ban(commands.Cog):
                     ctx.author.send(f"{curiosityInvite}")
                 if ctx.guild.id == altearn:
                     ctx.author.send(f"{altearnInvite}")
+                banRolesDict[user.id] = user.roles
                 try:
                     await ctx.guild.kick(user, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
                 except discord.Forbidden:
@@ -166,6 +188,7 @@ class Ban(commands.Cog):
                     ctx.author.send(f"{curiosityInvite}")
                 if ctx.guild.id == altearn:
                     ctx.author.send(f"{altearnInvite}")
+                banRolesDict[user.id] = user.roles
                 try:
                     await ctx.guild.kick(user, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
                 except discord.Forbidden:
