@@ -9,14 +9,42 @@
 # de la licence CeCILL difusée sur le site "http://www.cecill.info".
 
 
-name: python-linter
+name: Lint
 
-on: [push]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - beta
+  pull_request:
+    branches:
+      - master
+      - beta
 
 jobs:
-  lint:
+  run-linters:
+    name: Run linters
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
-      - uses: rahul-deepsource/pyaction@master
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10' 
+
+      - name: Install Python dependencies
+        run: pip install black flake8 pylint autopep8
+
+      - name: Run linters
+        uses: wearerequired/lint-action@121b69fdf77b22fa2bbb8d081b455bd31d563197
+        with:
+          black: true
+          pylint: true
+          auto_fix: true
+          git_name: "GuniLint"
+          git_email: "linter@gunivers.net"
+          commit_message: "🌟 style: fix code style issues with ${linter}"
