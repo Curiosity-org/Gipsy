@@ -8,4 +8,4 @@ feedparser>=6.0
 python-twitter>=3.5
 async_timeout>=3.0
 argparse
-git+https://github.com/Rapptz/discord.py@v2.0.0
+discord.py>=2.0
