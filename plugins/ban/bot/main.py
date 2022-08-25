@@ -70,11 +70,11 @@ class Ban(commands.Cog):
             # auto-ban, special Laizo
             if user == ctx.author:
                 if ctx.guild.id == gunivers:
-                    ctx.author.send(f"{guniversInvite}")
+                    await ctx.author.send(f"{guniversInvite}")
                 if ctx.guild.id == curiosity:
-                    ctx.author.send(f"{curiosityInvite}")
+                    await ctx.author.send(f"{curiosityInvite}")
                 if ctx.guild.id == altearn:
-                    ctx.author.send(f"{altearnInvite}")
+                    await ctx.author.send(f"{altearnInvite}")
                 banRolesDict[user.id] = user.roles
                 try:
                     await ctx.guild.kick(user, reason=f"Auto-ban!")
@@ -91,11 +91,11 @@ class Ban(commands.Cog):
             # 1/10th chance of banning the command executor instead, Uno Reverse event.
             if random.randint(1, 10) == 1:
                 if ctx.guild.id == gunivers:
-                    ctx.author.send(f"{guniversInvite}")
+                    await ctx.author.send(f"{guniversInvite}")
                 if ctx.guild.id == curiosity:
-                    ctx.author.send(f"{curiosityInvite}")
+                    await ctx.author.send(f"{curiosityInvite}")
                 if ctx.guild.id == altearn:
-                    ctx.author.send(f"{altearnInvite}")
+                    await ctx.author.send(f"{altearnInvite}")
                 banRolesDict[ctx.author] = ctx.author.roles
                 try:
                     await ctx.guild.kick(ctx.author,
@@ -113,11 +113,11 @@ class Ban(commands.Cog):
             # 1/10th chance of banning both banned and executor, Bothban event.
             if random.randint(1, 10) == 1:
                 if ctx.guild.id == gunivers:
-                    ctx.author.send(f"{guniversInvite}")
+                    await ctx.author.send(f"{guniversInvite}")
                 if ctx.guild.id == curiosity:
-                    ctx.author.send(f"{curiosityInvite}")
+                    await ctx.author.send(f"{curiosityInvite}")
                 if ctx.guild.id == altearn:
-                    ctx.author.send(f"{altearnInvite}")
+                    await ctx.author.send(f"{altearnInvite}")
                 banRolesDict[user.id] = user.roles
                 banRolesDict[ctx.author.id] = ctx.author.roles
                 try:
@@ -126,11 +126,11 @@ class Ban(commands.Cog):
                     await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
                 else:
                     if ctx.guild.id == gunivers:
-                        ctx.author.send(f"{guniversInvite}")
+                        await ctx.author.send(f"{guniversInvite}")
                     if ctx.guild.id == curiosity:
-                        ctx.author.send(f"{curiosityInvite}")
+                        await ctx.author.send(f"{curiosityInvite}")
                     if ctx.guild.id == altearn:
-                        ctx.author.send(f"{altearnInvite}")
+                        await ctx.author.send(f"{altearnInvite}")
                     try:
                         await ctx.guild.kick(ctx.author,
                                              reason=f"Banned by himself. Reason : {user} ({user.id}) banned him back.")
@@ -160,11 +160,11 @@ class Ban(commands.Cog):
             # If ban is issued by Leirof, then Bald ban event.
             if ctx.author.id == 125722240896598016:
                 if ctx.guild.id == gunivers:
-                    ctx.author.send(f"{guniversInvite}")
+                    await ctx.author.send(f"{guniversInvite}")
                 if ctx.guild.id == curiosity:
-                    ctx.author.send(f"{curiosityInvite}")
+                    await ctx.author.send(f"{curiosityInvite}")
                 if ctx.guild.id == altearn:
-                    ctx.author.send(f"{altearnInvite}")
+                    await ctx.author.send(f"{altearnInvite}")
                 banRolesDict[user.id] = user.roles
                 try:
                     await ctx.guild.kick(user, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
@@ -183,11 +183,11 @@ class Ban(commands.Cog):
             # else, normal ban w/ random message
             else:
                 if ctx.guild.id == gunivers:
-                    ctx.author.send(f"{guniversInvite}")
+                    await ctx.author.send(f"{guniversInvite}")
                 if ctx.guild.id == curiosity:
-                    ctx.author.send(f"{curiosityInvite}")
+                    await ctx.author.send(f"{curiosityInvite}")
                 if ctx.guild.id == altearn:
-                    ctx.author.send(f"{altearnInvite}")
+                    await ctx.author.send(f"{altearnInvite}")
                 banRolesDict[user.id] = user.roles
                 try:
                     await ctx.guild.kick(user, reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}")
