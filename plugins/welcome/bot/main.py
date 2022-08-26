@@ -4,7 +4,6 @@ from utils import Gunibot, MyContext
 
 
 class Welcome(commands.Cog):
-
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.config_options = ["welcome_roles"]
@@ -12,13 +11,17 @@ class Welcome(commands.Cog):
         bot.get_command("config").add_command(self.config_welcome_roles)
 
     @commands.command(name="welcome_roles")
-    async def config_welcome_roles(self, ctx: MyContext, roles: commands.Greedy[discord.Role]):
+    async def config_welcome_roles(
+        self, ctx: MyContext, roles: commands.Greedy[discord.Role]
+    ):
         if len(roles) == 0:
             roles = None
         else:
             roles = [role.id for role in roles]
-        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "welcome_roles", roles))
-    
+        await ctx.send(
+            await self.bot.sconfig.edit_config(ctx.guild.id, "welcome_roles", roles)
+        )
+
     async def give_welcome_roles(self, member: discord.Member):
         g = member.guild
         config = self.bot.server_configs[g.id]
@@ -35,18 +38,21 @@ class Welcome(commands.Cog):
         """Called when a member joins a guild"""
         g = member.guild
         if not g.me.guild_permissions.manage_roles:  # if not allowed to manage roles
-            self.bot.log.info(f"Module - Welcome: Missing \"manage_roles\" permission on guild \"{g.name}\"")
+            self.bot.log.info(
+                f'Module - Welcome: Missing "manage_roles" permission on guild "{g.name}"'
+            )
             return
         if "MEMBER_VERIFICATION_GATE_ENABLED" not in g.features:
             # we give new members roles if the verification gate is disabled
             await self.give_welcome_roles(member)
-    
+
     @commands.Cog.listener()
-    async def on_member_update(self, before:discord.Member, after:discord.Member):
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
         """Main function called when a member got verified in a community server"""
         if before.pending and not after.pending:
             if "MEMBER_VERIFICATION_GATE_ENABLED" in after.guild.features:
                 await self.give_welcome_roles(after)
+
 
 async def setup(bot):
     await bot.add_cog(Welcome(bot))

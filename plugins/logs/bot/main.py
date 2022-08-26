@@ -13,10 +13,10 @@ class Logs(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.config_options = ['logs_channel', 'modlogs_flags']
-        
+
         bot.get_command("config").add_command(self.config_modlogs_flags)
         bot.get_command("config").add_command(self.config_modlogs)
-    
+
     @commands.command(name="modlogs_flags")
     async def config_modlogs_flags(self, ctx: MyContext):
         await ctx.send(await self.bot._(ctx.guild.id, "sconfig.modlogs-help", p=ctx.prefix))
@@ -37,9 +37,9 @@ class Logs(commands.Cog):
         LogsFlags = self.bot.get_cog('ConfigCog').LogsFlags()
         flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
         flags = LogsFlags.intToFlags(flags) + options
-        flags = list(set(flags)) # remove duplicates
+        flags = list(set(flags))  # remove duplicates
         await Sconfig.edit_config(ctx.guild.id, 'modlogs_flags',
-                         LogsFlags.flagsToInt(flags))
+                                  LogsFlags.flagsToInt(flags))
         await ctx.send(await self.bot._(ctx.guild.id, "sconfig.modlogs-enabled", type=', '.join(options)))
 
     @config_modlogs.command(name="disable")
@@ -60,7 +60,6 @@ class Logs(commands.Cog):
         """See available logs categories"""
         f = self.bot.get_cog('ConfigCog').LogsFlags.FLAGS.values()
         await ctx.send(await self.bot._(ctx.guild.id, "sconfig.modlogs-list", list=" - ".join(f)))
-
 
     async def has_logs(self, guild) -> bool:
         """Check if a Guild has a valid logs channel"""
@@ -172,8 +171,10 @@ class Logs(commands.Cog):
             colour=discord.Colour.green()
         )
         if invite.inviter:  # sometimes Discord doesn't send that info
-            embed.set_author(name=f'{invite.inviter.name}#{invite.inviter.discriminator}',
-                             icon_url=invite.inviter.avatar_url_as(static_format='png'))
+            embed.set_author(
+                name=f'{invite.inviter.name}#{invite.inviter.discriminator}',
+                icon_url=invite.inviter.avatar_url_as(
+                    static_format='png'))
             _footer = await self.bot._(invite.guild.id, "logs.footer2", author=invite.inviter.id)
             embed.set_footer(text=_footer)
         _duration = await self.bot._(invite.guild.id, "logs.invite_created.duration")
@@ -181,11 +182,14 @@ class Logs(commands.Cog):
             embed.add_field(name=_duration, value="♾")
         else:
             embed.add_field(
-                name=_duration, value=f"{datetime.timedelta(seconds=invite.max_age)}")
+                name=_duration,
+                value=f"{datetime.timedelta(seconds=invite.max_age)}")
         embed.add_field(name="URL", value=invite.url)
         _max_uses = await self.bot._(invite.guild.id, "logs.invite_created.max_uses")
-        embed.add_field(name=_max_uses,
-                        value="♾" if invite.max_uses == 0 else str(invite.max_uses))
+        embed.add_field(
+            name=_max_uses,
+            value="♾" if invite.max_uses == 0 else str(
+                invite.max_uses))
         await self.send_embed(invite.guild, embed)
 
     @commands.Cog.listener()
@@ -201,8 +205,10 @@ class Logs(commands.Cog):
             colour=discord.Colour.green()
         )
         if invite.inviter:
-            embed.set_author(name=f'{invite.inviter.name}#{invite.inviter.discriminator}',
-                             icon_url=invite.inviter.avatar_url_as(static_format='png'))
+            embed.set_author(
+                name=f'{invite.inviter.name}#{invite.inviter.discriminator}',
+                icon_url=invite.inviter.avatar_url_as(
+                    static_format='png'))
             _footer = await self.bot._(invite.guild.id, "logs.footer2", author=invite.inviter.id)
             embed.set_footer(text=_footer)
         embed.add_field(name="URL", value=invite.url)
@@ -306,7 +312,7 @@ class Logs(commands.Cog):
         _title = await self.bot._(member.guild.id, "logs.voice_move.title")
         embed = discord.Embed(
             title=_title,
-            description=await self.bot._(member.guild.id, "logs.voice_move."+_desc, user=member.mention, **kw)
+            description=await self.bot._(member.guild.id, "logs.voice_move." + _desc, user=member.mention, **kw)
         )
         embed.colour = discord.Color.light_gray()
         embed.set_author(name=str(member), icon_url=member.avatar_url)
@@ -439,7 +445,7 @@ class Logs(commands.Cog):
         embed.add_field(name=_changes, value="\n".join(data))
         embed.color = discord.Color.orange()
         await self.send_embed(before.guild, embed)
-    
+
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         """https://discordpy.readthedocs.io/en/latest/api.html#discord.on_member_update"""
@@ -493,7 +499,8 @@ class Logs(commands.Cog):
                         b_roles = ' '.join([x.mention for x in b.roles])
                         restrict.append(f'{a} {b_roles} -> {a_roles}')
         if not (new or lost or renamed):
-            # can happen when Discord fetch emojis from Twitch without any change
+            # can happen when Discord fetch emojis from Twitch without any
+            # change
             return
         if new:
             n = await self.bot._(guild.id, "logs.emoji_update.added", count=len(new))
@@ -508,7 +515,6 @@ class Logs(commands.Cog):
             n = await self.bot._(guild.id, "logs.emoji_update.restrict", count=len(restrict))
             embed.add_field(name=n, value="\n".join(restrict), inline=False)
         await self.send_embed(guild, embed)
-
 
 
 async def setup(bot):
