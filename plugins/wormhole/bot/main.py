@@ -5,7 +5,7 @@ from itertools import chain
 
 import sys
 sys.path.append("./bot")
-import bot import checks
+from bot import checks
 from utils import Gunibot, MyContext
 from aiohttp import ClientSession
 

@@ -7,7 +7,7 @@ sys.path.append("./bot")
 import args
 import sys
 sys.path.append("./bot")
-import bot import checks
+from bot import checks
 import discord
 from discord.ext import commands
 from utils import Gunibot
