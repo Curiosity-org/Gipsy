@@ -5,9 +5,11 @@ from marshal import dumps, loads
 from typing import List, Optional, Union
 
 import sys
+
 sys.path.append("./bot")
 import args
 import sys
+
 sys.path.append("./bot")
 from bot import checks
 import discord
@@ -18,21 +20,24 @@ import re
 
 
 class Giveaways(commands.Cog):
-
     def __init__(self, bot: Gunibot):
         self.bot = bot
-        self.config_options = ['giveaways_emojis']
+        self.config_options = ["giveaways_emojis"]
         self.internal_task.start()
-        
+
         bot.get_command("config").add_command(self.giveaways_emojis)
 
     @commands.command(name="giveaways_emojis")
-    async def giveaways_emojis(self, ctx: MyContext, emojis: commands.Greedy[Union[discord.Emoji, str]]):
+    async def giveaways_emojis(
+        self, ctx: MyContext, emojis: commands.Greedy[Union[discord.Emoji, str]]
+    ):
         """Set a list of usable emojis for giveaways
         Only these emojis will be usable to participate in a giveaway
         If no emoji is specified, every emoji will be usable"""
         # check if every emoji is valid
-        emojis = [x for x in emojis if isinstance(x, discord.Emoji) or emoji.is_emoji(x)]
+        emojis = [
+            x for x in emojis if isinstance(x, discord.Emoji) or emoji.is_emoji(x)
+        ]
         # if one or more emojis were invalid (couldn't be converted)
         if len(ctx.args[2]) != len(emojis):
             await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-emoji"))
@@ -43,9 +48,18 @@ class Giveaways(commands.Cog):
         # convert discord emojis to IDs if needed
         emojis = [str(x.id) if isinstance(x, discord.Emoji) else x for x in emojis]
         # save result
-        await ctx.send(await self.bot.sconfig.edit_config(ctx.guild.id, "giveaways_emojis", emojis))
+        await ctx.send(
+            await self.bot.sconfig.edit_config(ctx.guild.id, "giveaways_emojis", emojis)
+        )
 
-    def db_add_giveaway(self, channel: discord.TextChannel, name: str, message: int, max_entries: int, ends_at: datetime.datetime = None) -> int:
+    def db_add_giveaway(
+        self,
+        channel: discord.TextChannel,
+        name: str,
+        message: int,
+        max_entries: int,
+        ends_at: datetime.datetime = None,
+    ) -> int:
         """
         Add a giveaway into the database
         channel: the channel where the giveaway started
@@ -54,7 +68,15 @@ class Giveaways(commands.Cog):
         ends_at: the end date of the giveaway (null for a manual end)
         Returns: the row ID of the giveaway
         """
-        data = (channel.guild.id, channel.id, name[:64], max_entries, ends_at, message, dumps(list()))
+        data = (
+            channel.guild.id,
+            channel.id,
+            name[:64],
+            max_entries,
+            ends_at,
+            message,
+            dumps(list()),
+        )
         query = "INSERT INTO giveaways (guild, channel, name, max_entries, ends_at, message, users) VALUES (?, ?, ?, ?, ?, ?, ?)"
         rowid: int = self.bot.db_query(query, data)
         return rowid
@@ -69,10 +91,10 @@ class Giveaways(commands.Cog):
         liste = self.bot.db_query(query, (guildID,))
         res = list(map(dict, liste))
         for r in res:
-            r['users'] = loads(r['users'])
-            r['ends_at'] = datetime.datetime.strptime(r['ends_at'], '%Y-%m-%d %H:%M:%S')
+            r["users"] = loads(r["users"])
+            r["ends_at"] = datetime.datetime.strptime(r["ends_at"], "%Y-%m-%d %H:%M:%S")
         return res
-    
+
     def db_get_expired_giveaways(self) -> List[dict]:
         """
         Get every running giveaway
@@ -82,8 +104,8 @@ class Giveaways(commands.Cog):
         liste = self.bot.db_query(query, (datetime.datetime.now(),))
         res = list(map(dict, liste))
         for r in res:
-            r['users'] = loads(r['users'])
-            r['ends_at'] = datetime.datetime.strptime(r['ends_at'], '%Y-%m-%d %H:%M:%S')
+            r["users"] = loads(r["users"])
+            r["ends_at"] = datetime.datetime.strptime(r["ends_at"], "%Y-%m-%d %H:%M:%S")
         return res
 
     def db_get_users(self, rowID: int) -> List[int]:
@@ -96,9 +118,9 @@ class Giveaways(commands.Cog):
         res = self.bot.db_query(query, (rowID,))
         if len(res) == 0:
             return None
-        return loads(res[0]['users'])
+        return loads(res[0]["users"])
 
-    def db_edit_participant(self, rowID: int, userID: int, add: bool=True) -> bool:
+    def db_edit_participant(self, rowID: int, userID: int, add: bool = True) -> bool:
         """
         Add a participant to a giveaway
         rowID: the ID of the giveaway to edit
@@ -114,7 +136,7 @@ class Giveaways(commands.Cog):
             if userID in current_participants:
                 # user was already participating
                 return
-            current_participants = dumps(current_participants+[userID])
+            current_participants = dumps(current_participants + [userID])
         else:
             try:
                 current_participants.remove(userID)
@@ -145,18 +167,22 @@ class Giveaways(commands.Cog):
         query = "DELETE FROM giveaways WHERE rowid=?"
         rowcount = self.bot.db_query(query, (rowID,), returnrowcount=True)
         return rowcount == 1
-    
-    async def get_allowed_emojis(self, guildID:int) -> List[Union[discord.Emoji, str]]:
+
+    async def get_allowed_emojis(self, guildID: int) -> List[Union[discord.Emoji, str]]:
         """Get a list of allowed emojis for a specific guild"""
-        value = self.bot.server_configs[guildID]['giveaways_emojis']
+        value = self.bot.server_configs[guildID]["giveaways_emojis"]
         if value is None:
             return None
-        def emojis_convert(s_emoji:str, bot_emojis:List[discord.Emoji]) -> Union[str, discord.Emoji]:
+
+        def emojis_convert(
+            s_emoji: str, bot_emojis: List[discord.Emoji]
+        ) -> Union[str, discord.Emoji]:
             if s_emoji.isnumeric():
                 d_em = discord.utils.get(bot_emojis, id=int(s_emoji))
                 if d_em is not None:
                     return d_em
             return emoji.emojize(s_emoji, language="alias")
+
         value = [value] if isinstance(value, str) else value
         result = list(filter(None, [emojis_convert(x, self.bot.emojis) for x in value]))
         if len(result) >= 0:
@@ -167,7 +193,7 @@ class Giveaways(commands.Cog):
     async def giveaway(self, ctx: MyContext):
         """Start or stop giveaways."""
         if ctx.subcommand_passed is None:
-            await ctx.send_help('giveaways')
+            await ctx.send_help("giveaways")
 
     @giveaway.command()
     @commands.check(checks.is_admin)
@@ -186,71 +212,120 @@ class Giveaways(commands.Cog):
         [p]giveaway start name: Minecraft account; duration: 5h 3min; entries: 5"""
         i_settings = settings.split("; ")
         existing_giveaways = self.db_get_giveaways(ctx.guild.id)
-        existing_giveaways = [x['name'] for x in existing_giveaways]
-
+        existing_giveaways = [x["name"] for x in existing_giveaways]
 
         # Setting all of the settings.
         settings = {"name": "", "duration": -1, "channel": ctx.channel, "entries": 1}
         for setting in i_settings:
             if setting.startswith("name: "):
                 if setting[6:] in existing_giveaways:
-                    await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.invalid-name"))
+                    await ctx.send(
+                        await self.bot._(
+                            ctx.guild.id, "giveaways.creation.invalid-name"
+                        )
+                    )
                     return
                 else:
-                    settings['name'] = setting[6:].strip()
+                    settings["name"] = setting[6:].strip()
             elif setting.startswith("entries: "):
                 entries = setting.replace("entries: ", "").strip()
                 if (not entries.isnumeric()) or (entries == "0"):
-                    await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.invalid-winners"))
+                    await ctx.send(
+                        await self.bot._(
+                            ctx.guild.id, "giveaways.creation.invalid-winners"
+                        )
+                    )
                     return
-                settings['entries'] = int(entries)
+                settings["entries"] = int(entries)
             elif setting.startswith("duration: "):
                 total = 0
                 for elem in setting[10:].split():
                     total += await args.tempdelta().convert(ctx, elem)
                 if total > 0:
-                    settings['duration'] = total
+                    settings["duration"] = total
             elif setting.startswith("channel: "):
                 try:
-                    channel = await commands.TextChannelConverter().convert(ctx, setting.replace('channel: ', ''))
+                    channel = await commands.TextChannelConverter().convert(
+                        ctx, setting.replace("channel: ", "")
+                    )
                 except:
-                    await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.invalid-channel"))
+                    await ctx.send(
+                        await self.bot._(
+                            ctx.guild.id, "giveaways.creation.invalid-channel"
+                        )
+                    )
                     return
                 perms = channel.permissions_for(ctx.guild.me)
                 if not (perms.send_messages or perms.embed_links):
-                    await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.invalid-perms"))
+                    await ctx.send(
+                        await self.bot._(
+                            ctx.guild.id, "giveaways.creation.invalid-perms"
+                        )
+                    )
                     return
-                settings['channel'] = channel
+                settings["channel"] = channel
         # Checking if mandatory settings are there.
-        if settings['name'] == "":
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.empty-name"))
+        if settings["name"] == "":
+            await ctx.send(
+                await self.bot._(ctx.guild.id, "giveaways.creation.empty-name")
+            )
             return
-        if settings['duration'] == -1:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.empty-duration"))
+        if settings["duration"] == -1:
+            await ctx.send(
+                await self.bot._(ctx.guild.id, "giveaways.creation.empty-duration")
+            )
             return
-        settings['ends_at'] = datetime.datetime.fromtimestamp(round(time.time()) + settings['duration'])
+        settings["ends_at"] = datetime.datetime.fromtimestamp(
+            round(time.time()) + settings["duration"]
+        )
         # If the channel is too big, bugs will for sure happen, so we abort
-        if len(settings['channel'].members) > 10000:
-            await ctx.send(await self.bot._(ctx.guild.id, 'giveaways.too-many-members'))
+        if len(settings["channel"].members) > 10000:
+            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.too-many-members"))
             return
         # Send embed now
         try:
             title = await self.bot._(ctx.guild.id, "giveaways.embed.title")
             ends_at = await self.bot._(ctx.guild.id, "giveaways.embed.ends-at")
-            emb = discord.Embed(title=title, description=settings["name"], timestamp=datetime.datetime.utcnow(
-            )+datetime.timedelta(seconds=settings['duration']), color=discord.Colour.random()).set_footer(text=ends_at)
-            msg: discord.Message = await settings['channel'].send(embed=emb)
-            settings['message'] = msg.id
+            emb = discord.Embed(
+                title=title,
+                description=settings["name"],
+                timestamp=datetime.datetime.utcnow()
+                + datetime.timedelta(seconds=settings["duration"]),
+                color=discord.Colour.random(),
+            ).set_footer(text=ends_at)
+            msg: discord.Message = await settings["channel"].send(embed=emb)
+            settings["message"] = msg.id
         except discord.HTTPException as e:
-            await self.bot.get_cog("Errors").on_error(e, ctx) # send error logs
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.httpexception", channe=settings['channel'].mention))
+            await self.bot.get_cog("Errors").on_error(e, ctx)  # send error logs
+            await ctx.send(
+                await self.bot._(
+                    ctx.guild.id,
+                    "giveaways.creation.httpexception",
+                    channe=settings["channel"].mention,
+                )
+            )
             return
         # Save settings in database
-        rowid = self.db_add_giveaway(settings['channel'], settings['name'], settings['message'], settings['entries'], settings['ends_at'])
+        rowid = self.db_add_giveaway(
+            settings["channel"],
+            settings["name"],
+            settings["message"],
+            settings["entries"],
+            settings["ends_at"],
+        )
         if rowid:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.creation.success", name=settings['name'], id=rowid))
+            await ctx.send(
+                await self.bot._(
+                    ctx.guild.id,
+                    "giveaways.creation.success",
+                    name=settings["name"],
+                    id=rowid,
+                )
+            )
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.something-went-wrong"))
+            await ctx.send(
+                await self.bot._(ctx.guild.id, "giveaways.something-went-wrong")
+            )
         allowed_emojis = await self.get_allowed_emojis(ctx.guild.id)
         if allowed_emojis is None:
             return
@@ -274,18 +349,23 @@ class Giveaways(commands.Cog):
         if len(giveaways) == 0:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
             return
-        giveaway = [x for x in giveaways if x['name']
-                    == giveaway or str(x['rowid']) == giveaway]
+        giveaway = [
+            x for x in giveaways if x["name"] == giveaway or str(x["rowid"]) == giveaway
+        ]
         if len(giveaway) == 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix))
+            await ctx.send(
+                await self.bot._(
+                    ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix
+                )
+            )
             return
         giveaway = giveaway[0]
-        if not giveaway['running']:
+        if not giveaway["running"]:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.already-stopped"))
             return
-        self.db_stop_giveaway(giveaway['rowid'])
+        self.db_stop_giveaway(giveaway["rowid"])
         await self.send_results(giveaway, await self.pick_winners(ctx.guild, giveaway))
-    
+
     @giveaway.command()
     @commands.check(checks.is_admin)
     async def delete(self, ctx: MyContext, *, giveaway: str):
@@ -296,15 +376,23 @@ class Giveaways(commands.Cog):
         if len(giveaways) == 0:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
             return
-        giveaway = [x for x in giveaways if x['name'] == giveaway or str(x['rowid']) == giveaway]
+        giveaway = [
+            x for x in giveaways if x["name"] == giveaway or str(x["rowid"]) == giveaway
+        ]
         if len(giveaway) == 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix))
+            await ctx.send(
+                await self.bot._(
+                    ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix
+                )
+            )
             return
         giveaway = giveaway[0]
-        if self.db_delete_giveaway(giveaway['rowid']):
+        if self.db_delete_giveaway(giveaway["rowid"]):
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.success-deleted"))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.something-went-wrong"))
+            await ctx.send(
+                await self.bot._(ctx.guild.id, "giveaways.something-went-wrong")
+            )
 
     @giveaway.command()
     @commands.check(checks.is_admin)
@@ -316,37 +404,56 @@ class Giveaways(commands.Cog):
         if len(giveaways) == 0:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
             return
-        giveaway = [x for x in giveaways if x['name'] == giveaway or str(x['rowid']) == giveaway]
+        giveaway = [
+            x for x in giveaways if x["name"] == giveaway or str(x["rowid"]) == giveaway
+        ]
         if len(giveaway) == 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix))
+            await ctx.send(
+                await self.bot._(
+                    ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix
+                )
+            )
             return
         giveaway = giveaway[0]
-        if giveaway['running']:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.not-stopped", p=ctx.prefix, id=giveaway['rowid']))
+        if giveaway["running"]:
+            await ctx.send(
+                await self.bot._(
+                    ctx.guild.id,
+                    "giveaways.not-stopped",
+                    p=ctx.prefix,
+                    id=giveaway["rowid"],
+                )
+            )
             return
         allowed_reactions = await self.get_allowed_emojis(ctx.guild.id)
-        users = set(giveaway['users']) | await self.get_users(giveaway['channel'], giveaway['message'], allowed_reactions)
+        users = set(giveaway["users"]) | await self.get_users(
+            giveaway["channel"], giveaway["message"], allowed_reactions
+        )
         if len(users) == 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.picking.no-participant"))
-            self.db_delete_giveaway(giveaway['rowid'])
+            await ctx.send(
+                await self.bot._(ctx.guild.id, "giveaways.picking.no-participant")
+            )
+            self.db_delete_giveaway(giveaway["rowid"])
         else:
-            amount = min(giveaway['max_entries'], len(users))
+            amount = min(giveaway["max_entries"], len(users))
             status = await ctx.send("Choix des gagnants...")
             winners = []
             trials = 0
             users = list(users)
             while len(winners) < amount and trials < 20:
-                w = discord.utils.get(
-                    ctx.guild.members, id=random.choice(users))
+                w = discord.utils.get(ctx.guild.members, id=random.choice(users))
                 if w != None:
                     winners.append(w.mention)
                 else:
                     trials += 1
-            self.db_delete_giveaway(giveaway['rowid'])
-            txt = await self.bot._(ctx.guild.id, "giveaways.picking.winners",
+            self.db_delete_giveaway(giveaway["rowid"])
+            txt = await self.bot._(
+                ctx.guild.id,
+                "giveaways.picking.winners",
                 count=amount,
                 users=" ".join(winners),
-                price=giveaway)
+                price=giveaway,
+            )
             await status.edit(content=txt)
 
     @giveaway.command()
@@ -364,21 +471,35 @@ class Giveaways(commands.Cog):
         if len(giveaways) == 0:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
             return
-        giveaways = [x for x in giveaways if x['name'] == giveaway or str(x['rowid']) == giveaway]
+        giveaways = [
+            x for x in giveaways if x["name"] == giveaway or str(x["rowid"]) == giveaway
+        ]
         if len(giveaways) == 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix))
+            await ctx.send(
+                await self.bot._(
+                    ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix
+                )
+            )
             return
         ga = giveaways[0]
-        if author.id in ga['users']:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.already-participant"))
-        elif not ga['running']:
+        if author.id in ga["users"]:
+            await ctx.send(
+                await self.bot._(ctx.guild.id, "giveaways.already-participant")
+            )
+        elif not ga["running"]:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.been-stopped"))
         else:
-            if self.db_edit_participant(ga['rowid'], author.id):
-                await ctx.send(await self.bot._(ctx.guild.id, "giveaways.subscribed", name=ga['name']))
+            if self.db_edit_participant(ga["rowid"], author.id):
+                await ctx.send(
+                    await self.bot._(
+                        ctx.guild.id, "giveaways.subscribed", name=ga["name"]
+                    )
+                )
             else:
-                await ctx.send(await self.bot._(ctx.guild.id, "giveaways.something-went-wrong"))
-    
+                await ctx.send(
+                    await self.bot._(ctx.guild.id, "giveaways.something-went-wrong")
+                )
+
     @giveaway.command()
     @commands.cooldown(2, 40, commands.BucketType.user)
     async def leave(self, ctx: MyContext, *, giveaway: str):
@@ -394,20 +515,32 @@ class Giveaways(commands.Cog):
         if len(giveaways) == 0:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
             return
-        giveaways = [x for x in giveaways if x['name'] == giveaway or str(x['rowid']) == giveaway]
+        giveaways = [
+            x for x in giveaways if x["name"] == giveaway or str(x["rowid"]) == giveaway
+        ]
         if len(giveaways) == 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix))
+            await ctx.send(
+                await self.bot._(
+                    ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix
+                )
+            )
             return
         ga = giveaways[0]
-        if author.id not in ga['users']:
+        if author.id not in ga["users"]:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.already-left"))
-        elif not ga['running']:
+        elif not ga["running"]:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.been-stopped"))
         else:
-            if self.db_edit_participant(ga['rowid'], author.id, add=False):
-                await ctx.send(await self.bot._(ctx.guild.id, "giveaways.success-left", name=ga['name']))
+            if self.db_edit_participant(ga["rowid"], author.id, add=False):
+                await ctx.send(
+                    await self.bot._(
+                        ctx.guild.id, "giveaways.success-left", name=ga["name"]
+                    )
+                )
             else:
-                await ctx.send(await self.bot._(ctx.guild.id, "giveaways.something-went-wrong"))
+                await ctx.send(
+                    await self.bot._(ctx.guild.id, "giveaways.something-went-wrong")
+                )
 
     @giveaway.command()
     async def list(self, ctx: MyContext):
@@ -418,8 +551,10 @@ class Giveaways(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
             return
         else:
-            running = [f"{x['rowid']}. {x['name']}" for x in giveaways if x['running']]
-            stopped = [f"{x['rowid']}. {x['name']}" for x in giveaways if not x['running']]
+            running = [f"{x['rowid']}. {x['name']}" for x in giveaways if x["running"]]
+            stopped = [
+                f"{x['rowid']}. {x['name']}" for x in giveaways if not x["running"]
+            ]
             text = ""
             if len(running) > 0:
                 text += await self.bot._(ctx.guild.id, "giveaways.list-active")
@@ -441,22 +576,44 @@ class Giveaways(commands.Cog):
         if len(giveaways) == 0:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
             return
-        giveaway = [x for x in giveaways if x['name'] == giveaway or str(x['rowid']) == giveaway]
+        giveaway = [
+            x for x in giveaways if x["name"] == giveaway or str(x["rowid"]) == giveaway
+        ]
         if len(giveaway) == 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix))
+            await ctx.send(
+                await self.bot._(
+                    ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix
+                )
+            )
             return
         giveaway = giveaway[0]
         allowed_reactions = await self.get_allowed_emojis(ctx.guild.id)
-        entries = len(set(giveaway['users']) | await self.get_users(giveaway['channel'], giveaway['message'], allowed_reactions))
-        d1, d2 = datetime.datetime.now(), giveaway['ends_at']
+        entries = len(
+            set(giveaway["users"])
+            | await self.get_users(
+                giveaway["channel"], giveaway["message"], allowed_reactions
+            )
+        )
+        d1, d2 = datetime.datetime.now(), giveaway["ends_at"]
         if d1 < d2:
-            time_left = await self.bot.get_cog("TimeCog").time_delta(d2, d1, 'fr', precision=0)
+            time_left = await self.bot.get_cog("TimeCog").time_delta(
+                d2, d1, "fr", precision=0
+            )
         elif d1 == d2:
             time_left = await self.bot._(ctx.guild.id, "giveaways.info.soon")
         else:
             time_left = await self.bot._(ctx.guild.id, "giveaways.info.ended")
-        name = giveaway['name']
-        await ctx.send(await self.bot._(ctx.guild.id, "giveaways.info.summary", name=name, time=time_left, nbr=entries, channel=giveaway['channel']))
+        name = giveaway["name"]
+        await ctx.send(
+            await self.bot._(
+                ctx.guild.id,
+                "giveaways.info.summary",
+                name=name,
+                time=time_left,
+                nbr=entries,
+                channel=giveaway["channel"],
+            )
+        )
 
     def cog_unload(self):
         self.internal_task.cancel()
@@ -464,17 +621,22 @@ class Giveaways(commands.Cog):
     @tasks.loop(seconds=2.0)
     async def internal_task(self):
         for giveaway in self.db_get_expired_giveaways():
-            if giveaway['running']:
+            if giveaway["running"]:
                 try:
-                    serv = self.bot.get_guild(giveaway['guild'])
+                    serv = self.bot.get_guild(giveaway["guild"])
                     winners = await self.pick_winners(serv, giveaway)
                     await self.send_results(giveaway, winners)
-                    self.db_stop_giveaway(giveaway['rowid'])
+                    self.db_stop_giveaway(giveaway["rowid"])
                 except Exception as e:
-                    await self.bot.get_cog('Errors').on_error(e)
-                    self.db_stop_giveaway(giveaway['rowid'])
+                    await self.bot.get_cog("Errors").on_error(e)
+                    self.db_stop_giveaway(giveaway["rowid"])
 
-    async def get_users(self, channel: int, message: int, allowed_reactions: Optional[set[Union[discord.Emoji, str]]]):
+    async def get_users(
+        self,
+        channel: int,
+        message: int,
+        allowed_reactions: Optional[set[Union[discord.Emoji, str]]],
+    ):
         """Get users who reacted to a message"""
         channel: discord.TextChannel = self.bot.get_channel(channel)
         if channel is None:
@@ -490,29 +652,42 @@ class Giveaways(commands.Cog):
                         users.add(user.id)
         return users
 
-    async def edit_embed(self, channel: discord.TextChannel, message: int, winners: List[discord.Member]) -> int:
+    async def edit_embed(
+        self, channel: discord.TextChannel, message: int, winners: List[discord.Member]
+    ) -> int:
         """Edit the embed to display results
         Returns the embed color if the embed was found, None else"""
         message: discord.Message = await channel.fetch_message(message)
-        if message is None or message.author != self.bot.user or len(message.embeds) == 0:
+        if (
+            message is None
+            or message.author != self.bot.user
+            or len(message.embeds) == 0
+        ):
             return None
         emb: discord.Embed = message.embeds[0]
         emb.set_footer(text=await self.bot._(channel, "giveaways.embed.ended-at"))
-        emb.description = await self.bot._(channel, "giveaways.embed.desc",
+        emb.description = await self.bot._(
+            channel,
+            "giveaways.embed.desc",
             price=emb.description,
-            winners=" ".join([x.mention for x in winners]))
+            winners=" ".join([x.mention for x in winners]),
+        )
         await message.edit(embed=emb)
         return emb.color
 
-    async def pick_winners(self, guild: discord.Guild, giveaway: dict) -> List[discord.Member]:
+    async def pick_winners(
+        self, guild: discord.Guild, giveaway: dict
+    ) -> List[discord.Member]:
         """Select the winner of a giveaway, from both participants using the command and using the message reactions
         Returns a list of members"""
         allowed_reactions = await self.get_allowed_emojis(guild.id)
-        users = set(giveaway['users']) | await self.get_users(giveaway['channel'], giveaway['message'], allowed_reactions)
+        users = set(giveaway["users"]) | await self.get_users(
+            giveaway["channel"], giveaway["message"], allowed_reactions
+        )
         if len(users) == 0:
             return list()
         else:
-            amount = min(giveaway['max_entries'], len(users))
+            amount = min(giveaway["max_entries"], len(users))
             winners = list()
             trials = 0
             users = list(users)
@@ -527,18 +702,27 @@ class Giveaways(commands.Cog):
     async def send_results(self, giveaway: dict, winners: List[discord.Member]):
         """Send the giveaway results in a new embed"""
         self.bot.log.info(f"Giveaway '{giveaway['name']}' has stopped")
-        channel: discord.TextChannel = self.bot.get_channel(giveaway['channel'])
+        channel: discord.TextChannel = self.bot.get_channel(giveaway["channel"])
         if channel is None:
             return None
-        emb_color = await self.edit_embed(channel, giveaway['message'], winners)
+        emb_color = await self.edit_embed(channel, giveaway["message"], winners)
         if emb_color is None:
             # old embed wasn't found, we select a new color
             emb_color = discord.Colour.random()
-        win = await self.bot._(channel, "giveaways.embed.winners", count=len(winners), winner=" ".join([x.mention for x in winners]))
-        desc = "{}: {} \n\n{}".format(await self.bot._(channel, "giveaways.embed.price"), giveaway['name'], win)
-        emb = discord.Embed(title="Giveaway is over!", description=desc, color=emb_color)
+        win = await self.bot._(
+            channel,
+            "giveaways.embed.winners",
+            count=len(winners),
+            winner=" ".join([x.mention for x in winners]),
+        )
+        desc = "{}: {} \n\n{}".format(
+            await self.bot._(channel, "giveaways.embed.price"), giveaway["name"], win
+        )
+        emb = discord.Embed(
+            title="Giveaway is over!", description=desc, color=emb_color
+        )
         await channel.send(embed=emb)
-        self.db_delete_giveaway(giveaway['rowid'])
+        self.db_delete_giveaway(giveaway["rowid"])
 
 
 async def setup(bot):

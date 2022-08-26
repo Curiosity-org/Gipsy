@@ -6,7 +6,7 @@ from utils import CONFIG_OPTIONS
 
 CONFIG_FOLDER = "configs"
 
-CONFIG_TEMPLATE = {k: v['default'] for k, v in CONFIG_OPTIONS.items() if 'default' in v}
+CONFIG_TEMPLATE = {k: v["default"] for k, v in CONFIG_OPTIONS.items() if "default" in v}
 
 
 class serverConfig(dict):
@@ -36,14 +36,12 @@ class serverConfig(dict):
 
 
 class ConfigCog(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
         self.file = "configManager"
         self.confManager = self.configManager()
 
     class configManager(dict):
-
         def __init__(self):
             super().__init__()
             self.cache = dict()
@@ -76,7 +74,9 @@ class ConfigCog(commands.Cog):
             return "<configManager>"
 
         def __len__(self):
-            return len([name for name in os.listdir(CONFIG_FOLDER) if os.path.isfile(name)])
+            return len(
+                [name for name in os.listdir(CONFIG_FOLDER) if os.path.isfile(name)]
+            )
 
         def __delitem__(self, key):
             pass
@@ -106,7 +106,7 @@ class ConfigCog(commands.Cog):
         #     return self.__dict__.pop(*args)
 
         def __contains__(self, item):
-            return self.has_key(item)
+            return item in self
 
     class LogsFlags:
         FLAGS = {
@@ -118,7 +118,7 @@ class ConfigCog(commands.Cog):
             1 << 5: "boosts",
             1 << 6: "roles",
             1 << 7: "members",
-            1 << 8: "emojis"
+            1 << 8: "emojis",
         }
 
         def flagsToInt(self, flags: list) -> int:
