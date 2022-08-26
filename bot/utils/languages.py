@@ -5,24 +5,22 @@ from utils import Gunibot
 import os
 
 i18n.translations.container.clear()  # invalidate old cache
-i18n.set('filename_format', '{locale}.{format}')
-i18n.set('fallback', 'fr')
-i18n.load_path.append('./langs')
+i18n.set("filename_format", "{locale}.{format}")
+i18n.set("fallback", "fr")
+i18n.load_path.append("./langs")
 
 # Check all plugin lang directory
-for plugin in os.listdir('./plugins/'):
-    if os.path.isdir('./plugins/' + plugin + '/langs/') and plugin[0] != '_':
-        i18n.load_path.append('./plugins/' + plugin + '/langs/')
-
+for plugin in os.listdir("./plugins/"):
+    if os.path.isdir("./plugins/" + plugin + "/langs/") and plugin[0] != "_":
+        i18n.load_path.append("./plugins/" + plugin + "/langs/")
 
 
 class Languages(commands.Cog):
-
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "languages"
-        self.languages = ['fr', 'en']
-        self.config_options = ['language']
+        self.languages = ["fr", "en"]
+        self.config_options = ["language"]
 
     async def tr(self, ctx, key: str, **kwargs):
         """Translate something
@@ -44,11 +42,11 @@ class Languages(commands.Cog):
                 lang = self.languages[0]
         return i18n.t(key, locale=lang, **kwargs)
 
-    async def get_lang(self, guildID: int, use_str: bool=False) -> int:
+    async def get_lang(self, guildID: int, use_str: bool = False) -> int:
         if guildID is None:
             as_int = 0
         else:
-            as_int = self.bot.server_configs[guildID]['language']
+            as_int = self.bot.server_configs[guildID]["language"]
         if use_str:
             return self.languages[as_int]
         return as_int
