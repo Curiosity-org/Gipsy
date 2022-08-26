@@ -6,7 +6,7 @@ import traceback
 from contextlib import redirect_stdout
 
 sys.path.append("./bot")
-import bot import checks
+from bot import checks
 import discord
 from discord.ext import commands
 from git import Repo, exc
