@@ -9,18 +9,17 @@
 # de la licence CeCILL difusée sur le site "http://www.cecill.info".
 
 
-name: Lint
+name: Python Linter for Pull Requests
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - master
-      - beta
-  pull_request:
-    branches:
-      - master
-      - beta
+  pull_request_target:
+
+# On restreint les permissions d'Action pour éviter que de potentielles PR malicieuses
+# aient un trop grand accès à notre repo, mais normalement ici il n'y a pas de problème 
+# puisqu'on n'exécute pas le code de la PR
+permissions:
+  checks: write
+  contents: write
 
 jobs:
   run-linters:
@@ -37,14 +36,16 @@ jobs:
           python-version: '3.10' 
 
       - name: Install Python dependencies
-        run: pip install black flake8 pylint autopep8
+        run: pip install black pylint
 
       - name: Run linters
         uses: wearerequired/lint-action@121b69fdf77b22fa2bbb8d081b455bd31d563197
         with:
-          black: true
+          # Sur les Pull Requests, Black est désactivé car Github Actions n'as pas les
+          # droits d'écriture sur les forks (il corrigera donc les fautes au moment du merge)
+          black: false
           pylint: true
-          auto_fix: true
-          git_name: "GuniLint"
-          git_email: "linter@gunivers.net"
-          commit_message: "🌟 style: fix code style issues with ${linter}"
+          pylint_args: "--disable=C,R,I"
+
+          # Idem, pas de droits d'écriture, pas d'auto-fix
+          auto_fix: false
