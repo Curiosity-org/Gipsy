@@ -25,3 +25,8 @@ fr:
         "2": "Je ne lui ai jamais dit, mais j'ai un crush sur {1}, à ton tour d'être banni {0} !"
         "3": "Pourquoi ne pas bannir {0} plutôt ?"
         "4": "C'est celui qui dit qui l'est, à bientôt {0} !"
+
+      autoban:
+        "0": "Tiens, tu veux te bannir toi-même ? Soit !"
+        "1": "N'en viens pas à de telles extrémites ! Tu veux qu'on en parles ? Tiens : [SOS Amitié](https://www.sos-amitie.com/)"
+        "2": "Rooh, pourquoi ?"

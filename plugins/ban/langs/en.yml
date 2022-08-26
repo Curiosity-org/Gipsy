@@ -25,3 +25,8 @@ en:
         "2": "I never told him, but I'm in love with {1}, your turn to be banned {0} !"
         "3": "What about banning you instead {0} ?"
         "4": "It's the one who says who is, bye {0} !"
+
+      autoban:
+        "0": "You want to ban yourself ? Ok :)"
+        "1": "Why are you doing that ?"
+        "2": "WHY ?"
