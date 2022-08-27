@@ -39,7 +39,9 @@ class MyContext(commands.Context):
 class Gunibot(commands.bot.AutoShardedBot):
     """Bot class, with everything needed to run it"""
 
-    def __init__(self, case_insensitive=None, status=None, beta=False, config: dict = None):
+    def __init__(
+        self, case_insensitive=None, status=None, beta=False, config: dict = None
+    ):
         self.config = config
         # defining allowed default mentions
         ALLOWED = discord.AllowedMentions(everyone=False, roles=False)
@@ -48,11 +50,16 @@ class Gunibot(commands.bot.AutoShardedBot):
         intents.message_content = True
         intents.members = True
         # we now initialize the bot class
-        super().__init__(command_prefix=self.get_prefix, case_insensitive=case_insensitive, status=status,
-                         allowed_mentions=ALLOWED, intents=intents)
-        self.log = logging.getLogger("runner") # logs module
-        self.beta: bool = beta # if the bot is in beta mode
-        self.database = sqlite3.connect('data/database.db') # database connection
+        super().__init__(
+            command_prefix=self.get_prefix,
+            case_insensitive=case_insensitive,
+            status=status,
+            allowed_mentions=ALLOWED,
+            intents=intents,
+        )
+        self.log = logging.getLogger("runner")  # logs module
+        self.beta: bool = beta  # if the bot is in beta mode
+        self.database = sqlite3.connect("data/database.db")  # database connection
         self.database.row_factory = sqlite3.Row
         self._update_database_structure()
 
@@ -67,21 +74,23 @@ class Gunibot(commands.bot.AutoShardedBot):
     def server_configs(self):
         """Guilds configuration manager"""
         return self.get_cog("ConfigCog").confManager
-    
+
     @property
-    def sconfig(self) -> 'Sconfig':
+    def sconfig(self) -> "Sconfig":
         """Return sconfig configuration manager"""
         return self.get_cog("Sconfig")
 
     def _update_database_structure(self):
         """Create tables and indexes from 'data/model.sql' file"""
         c = self.database.cursor()
-        with open('data/model.sql', 'r', encoding='utf-8') as f:
+        with open("data/model.sql", "r", encoding="utf-8") as f:
             c.executescript(f.read())
-        for plugin in os.listdir('./plugins/'):
-            if plugin[0] != '_':
-                if os.path.isfile('./plugins/' + plugin + '/data/model.sql'):
-                    with open('./plugins/' + plugin + '/data/model.sql', 'r', encoding='utf-8') as f:
+        for plugin in os.listdir("./plugins/"):
+            if plugin[0] != "_":
+                if os.path.isfile("./plugins/" + plugin + "/data/model.sql"):
+                    with open(
+                        "./plugins/" + plugin + "/data/model.sql", "r", encoding="utf-8"
+                    ) as f:
                         c.executescript(f.read())
         c.close()
 
@@ -91,15 +100,15 @@ class Gunibot(commands.bot.AutoShardedBot):
             raise ValueError
         try:
             if user.is_avatar_animated():
-                return user.display_avatar_as(format='gif', size=size)
+                return user.display_avatar_as(format="gif", size=size)
             else:
-                return user.display_avatar_as(format='png', size=size)
+                return user.display_avatar_as(format="png", size=size)
         except Exception as e:
-            await self.cogs['Errors'].on_error(e, None)
+            await self.cogs["Errors"].on_error(e, None)
 
     class SafeDict(dict):
         def __missing__(self, key):
-            return '{' + key + '}'
+            return "{" + key + "}"
 
     async def get_prefix(self, msg):
         """Get a prefix from a message... what did you expect?"""
@@ -114,10 +123,18 @@ class Gunibot(commands.bot.AutoShardedBot):
         """Change a value in the config file
         No undo can be done"""
         self.config[key] = value
-        with open("config.json", 'w', encoding='utf-8') as f:
+        with open("config.json", "w", encoding="utf-8") as f:
             json.dump(self.config, f, indent=4)
-    
-    def db_query(self, query: str, args: Union[tuple, dict], *, fetchone: bool=False, returnrowcount: bool=False, astuple: bool=False) -> Union[int, List[dict], dict]:
+
+    def db_query(
+        self,
+        query: str,
+        args: Union[tuple, dict],
+        *,
+        fetchone: bool = False,
+        returnrowcount: bool = False,
+        astuple: bool = False,
+    ) -> Union[int, List[dict], dict]:
         """Do any query to the bot database
         If SELECT, it will return a list of results, or only the first result (if fetchone)
         For any other query, it will return the affected row ID if returnrowscount, or the amount of affected rows (if returnrowscount)"""
@@ -143,20 +160,19 @@ class Gunibot(commands.bot.AutoShardedBot):
         cursor.close()
         return result
 
-    
     @property
     def _(self) -> Callable[[Any, str], Coroutine[Any, Any, str]]:
         """Translate something"""
-        cog = self.get_cog('Languages')
+        cog = self.get_cog("Languages")
         if cog is None:
             self.log.error("Unable to load Languages cog")
             return lambda *args, **kwargs: args[1]
         return cog.tr
-    
+
     async def add_cog(self, cog: commands.Cog):
         """Adds a "cog" to the bot.
         A cog is a class that has its own event listeners and commands.
-        
+
         Parameters
         -----------
         cog: :class:`Cog`
@@ -172,13 +188,13 @@ class Gunibot(commands.bot.AutoShardedBot):
         """
         await super().add_cog(cog)
         for module in self.cogs.values():
-            if type(cog) != type(module):
-                if hasattr(module, 'on_anycog_load'):
+            if not isinstance(cog, type(module)):
+                if hasattr(module, "on_anycog_load"):
                     try:
                         module.on_anycog_load(cog)
-                    except:
+                    except BaseException:
                         self.log.warning(f"[add_cog]", exc_info=True)
-    
+
     def remove_cog(self, cog: str):
         """Removes a cog from the bot.
 
@@ -194,19 +210,21 @@ class Gunibot(commands.bot.AutoShardedBot):
         """
         super().remove_cog(cog)
         for module in self.cogs.values():
-            if type(cog) != type(module):
-                if hasattr(module, 'on_anycog_unload'):
+            if not isinstance(cog, type(module)):
+                if hasattr(module, "on_anycog_unload"):
                     try:
                         module.on_anycog_unload(cog)
-                    except:
+                    except BaseException:
                         self.log.warning(f"[remove_cog]", exc_info=True)
 
 
 class CheckException(commands.CommandError):
     """Exception raised when a custom check failed, to send errors when needed"""
+
     def __init__(self, id, *args):
         super().__init__(message=f"Custom check '{id}' failed", *args)
         self.id = id
+
 
 def setup_logger():
     """Create the logger module, used for logs"""
@@ -214,8 +232,11 @@ def setup_logger():
     log = logging.getLogger("runner")
     # on défini un formatteur
     format = logging.Formatter(
-        "%(asctime)s %(levelname)s: %(message)s", datefmt="[%d/%m/%Y %H:%M]")
-    # ex du format : [08/11/2018 14:46] WARNING RSSCog fetch_rss_flux l.288 : Cannot get the RSS flux because of the following error: (suivi du traceback)
+        "%(asctime)s %(levelname)s: %(message)s", datefmt="[%d/%m/%Y %H:%M]"
+    )
+    # ex du format : [08/11/2018 14:46] WARNING RSSCog fetch_rss_flux l.288 :
+    # Cannot get the RSS flux because of the following error: (suivi du
+    # traceback)
 
     # log vers un fichier
     file_handler = logging.FileHandler("logs/debug.log")
@@ -230,7 +251,7 @@ def setup_logger():
     stream_handler.setFormatter(format)
 
     # supposons que tu veuille collecter les erreurs sur ton site d'analyse d'erreurs comme sentry
-    #sentry_handler = x
+    # sentry_handler = x
     # sentry_handler.setLevel(logging.ERROR)  # on veut voir que les erreurs et au delà, pas en dessous
     # sentry_handler.setFormatter(format)
 
@@ -246,14 +267,15 @@ def setup_logger():
 
     return log
 
+
 CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {}
 
-if os.path.isfile('./config/global_options.json'):
-    with open('./config/global_options.json') as config:
+if os.path.isfile("./config/global_options.json"):
+    with open("./config/global_options.json") as config:
         CONFIG_OPTIONS.update(json.load(config))
 
-for plugin in os.listdir('./plugins/'):
-    if plugin[0] != '_':
-        if os.path.isfile('./plugins/' + plugin + '/config/options.json'):
-            with open('./plugins/' + plugin + '/config/options.json') as config:
+for plugin in os.listdir("./plugins/"):
+    if plugin[0] != "_":
+        if os.path.isfile("./plugins/" + plugin + "/config/options.json"):
+            with open("./plugins/" + plugin + "/config/options.json") as config:
                 CONFIG_OPTIONS.update(json.load(config))
