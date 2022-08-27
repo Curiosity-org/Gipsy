@@ -9,14 +9,13 @@
 # de la licence CeCILL difusée sur le site "http://www.cecill.info".
 
 
-name: Python Linter for Push
+name: Python Linter for Push (beta)
 
 on:
   workflow_dispatch:
   push:
     branches:
       - master
-      - beta
 
 jobs:
   run-linters:
@@ -41,7 +40,7 @@ jobs:
           black: true
           pylint: true
           pylint_args: "--disable=C,R,I"
-          auto_fix: true
+          # Pas d'autofix sur master, juste du linting
+          auto_fix: false
           git_name: "GuniLint"
           git_email: "linter@gunivers.net"
-          commit_message: "🌟 style: fix code style issues with ${linter}"
