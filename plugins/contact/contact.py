@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 import aiohttp
 import sys
 
-sys.path.append("./bot")
+# sys.path.append("./bot")
 
 
 class Contact(commands.Cog):

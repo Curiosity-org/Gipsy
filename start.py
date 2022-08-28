@@ -34,7 +34,7 @@ plugins = []
 for plugin in os.listdir("./plugins/"):
     if plugin[0] != "_":
         if os.path.isdir("./plugins/" + plugin):
-            plugins.append("plugins." + plugin + ".bot.main")
+            plugins.append(f"plugins.{plugin}.{plugin}")
 
 # Generate docs
 generate_docs()

@@ -220,7 +220,7 @@ class VoiceChannels(commands.Cog):
             h = {"X-Api-Key": self.bot.config["random_api_token"]}
             if source == "asterix":
                 with open(
-                    "plugins/voice/bot/asterix_names.txt", "r", encoding="utf-8"
+                    "plugins/voice/rsrc/asterix_names.txt", "r", encoding="utf-8"
                 ) as file:
                     self.names["asterix"] = file.readlines()
                     random.shuffle(self.names[source])
