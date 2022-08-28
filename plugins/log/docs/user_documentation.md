@@ -1,4 +1,4 @@
-## **Logs**
+# Log
 
 This bot offers a log system for your server, which grows over time. So you can set up a room where you can send messages when a member leaves the server, when a message is deleted, when an invitation is created... and many other things.
 

@@ -1,6 +1,6 @@
-# **Welcome**
+# Welcome
 
-## **Verification system**
+## Verification system
 
 The bot has a member verification system, where each newcomer will have to enter a key phrase that will give him access to the rest of the server.
 
@@ -17,6 +17,6 @@ It is up to you to make sure that the unverified member can write in the verific
 
 Other options will come later, like customizing the welcome message.
 
-## **Automatic roles**
+## Automatic roles
 
 It is also possible to configure the bot to give a role to any newcomer, independently of the verification system detailed above. To do so, you just have to configure the `welcome_roles` option with the list of roles to give.

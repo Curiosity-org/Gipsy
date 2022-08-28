@@ -1,10 +1,10 @@
-# **Voice**
+# Voice
 
-## **Automatic role giving**
+## Automatic role giving
 
 It is possible to automatically give a role to any member being in a voice room, and to remove them when this member is not in any voice room. To do this, you just have to configure the option `voice_roles` with the list of roles to give. As simple as that.
 
-## **Creation of rooms on demand**
+## Creation of rooms on demand
 
 The bot also has a voice room creation feature: when a member enters a specific voice room, the bot creates a special one, gives the permissions to manage the room to that user, and then moves the user to that new room. It is possible to customize the name of this room, which by default will take a random name via an API.
 

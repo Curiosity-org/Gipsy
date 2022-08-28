@@ -1,3 +1,44 @@
+
+######################
+# TocTree generation #
+######################
+
+import os
+import shutil
+
+# Saving index.rst file content
+with open("index.rst", "r") as f:
+    before = []
+    after = []
+    started = False
+    ended = False
+    for line in f:
+        if not started: before.append(line)
+        if line.startswith(".. Start plugins documentation"): started = True
+        if line.startswith(".. End plugins documentation"): ended = True
+        if ended: after.append(line)
+
+if os.path.isdir(f"plugins"): shutil.rmtree(f"plugins")
+
+with open("index.rst","w+") as toctree:
+    for line in before: toctree.write(line)
+
+    # Generating plugin toctree and moving pugin's doc files in the global docs folder
+    toctree.write("\n.. toctree::\n   :maxdepth: 1\n   :caption: Installed plugins\n\n")
+    path = os.path.join("", os.pardir)
+    for plugin in os.listdir(f'{path}/plugins'):
+        if os.path.isdir(f'{path}/plugins/' + plugin + "/docs"):
+            for file in os.listdir(f'{path}/plugins/' + plugin + "/docs"):
+                if file[-3:] == '.md' or file[-4:] == '.rst':
+                    if not os.path.isdir(f"/plugins/{plugin}/"): os.makedirs(f"plugins/{plugin}/")
+                    shutil.copyfile(f"{path}/plugins/{plugin}/docs/{file}", f"plugins/{plugin}/{file}")
+                    toctree.write(f"   plugins/{plugin}/{file}\n")
+    
+    toctree.write("\n")
+    for line in after: toctree.write(line)
+
+
+
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
@@ -20,9 +61,6 @@
 project = 'Gipsy'
 copyright = '2021, Gunivers'
 author = 'Gunivers'
-
-# The full version, including alpha/beta/rc tags
-release = '1.3'
 
 
 # -- General configuration ---------------------------------------------------
@@ -52,7 +90,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinx_book_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

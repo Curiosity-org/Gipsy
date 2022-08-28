@@ -13,6 +13,5 @@ config.json
 venv/
 env/
 docs/_*
-docs/Makefile
-docs/make.bat
+docs/build
 require.json
