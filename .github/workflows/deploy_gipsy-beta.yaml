@@ -1,6 +1,7 @@
 name: Deploy Gipsy Beta
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - beta
