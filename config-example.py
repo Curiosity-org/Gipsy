@@ -1,9 +1,8 @@
-token          = "<YOUR_DISCORD_TOKEN>"
-default_prefix = "!"
+token            = "<YOUR_DISCORD_TOKEN>"
+default_prefix   = "!"
 default_language = "en"
-main_server_id = 125723125685026816                      # (Default: Gunivers)
-bot_admins     = [279568324260528128,125722240896598016] # (Default: Leirof & Z_runner, the project leaders of Gipsy)
-errors_channel = 823813751018487848                      # (Default: Hidden channel on Gunivers)
+bot_admins       = [279568324260528128,125722240896598016] # (Default: Leirof & Z_runner, the project leaders of Gipsy)
+errors_channel   = 823813751018487848                      # (Default: Hidden channel on Gunivers)
 
 ################################################################################
 # Plugin documentation
