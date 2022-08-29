@@ -80,9 +80,8 @@ class Ban(commands.Cog):
                     return
             
             # Pick a random event and execute it if no systematic event has been executed
-            print(len(self.random_events))
             event_n = random.randint(0, len(self.random_events) - 1)
-            print(event_n)
+            
             # random events should always run syccessfully
             await self.random_events[event_n](self, ctx, user, reason)
 
