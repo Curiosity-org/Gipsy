@@ -1,4 +1,6 @@
+import importlib
 import random
+import glob
 
 import discord.abc
 import discord
@@ -11,11 +13,11 @@ class Ban(commands.Cog):
         self.bot = bot
         self.file = "ban"
 
-        self.friendly_banned_roles: dict[int,list[discord.Role]] = {}
+        self.load_friendly_ban()
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        if member.guild.id in self.bot.config.get("friendly_ban", []):
+        if member.guild.id in self.friendly_ban_guilds:
             if member.id in self.friendly_banned_roles:
                 # Give the roles back to the users
                 for role in self.friendly_banned_roles.pop(member.id):
@@ -36,10 +38,7 @@ class Ban(commands.Cog):
         user: discord.User,
         reason: str = "Aucune raison donnée",
     ):
-        if user == ctx.author and not ctx.guild.id in self.bot.config.get(
-            "friendly_ban",
-            []
-        ):
+        if user == ctx.author and not ctx.guild.id in self.friendly_ban_guilds:
             await ctx.send("Tu ne peux pas te bannir toi-même !")
             return
         if not ctx.guild.me.guild_permissions.ban_members:
@@ -56,7 +55,7 @@ class Ban(commands.Cog):
             return
 
         # Normal ban
-        if not ctx.guild.id in self.bot.config.get("friendly_ban", []):
+        if not ctx.guild.id in self.friendly_ban_guilds:
             try:
                 await ctx.guild.ban(
                     user,
@@ -74,196 +73,18 @@ class Ban(commands.Cog):
 
         # Friendly ban if the guild is in the config
         else:
-            # auto-ban, special Laizo
-            if user == ctx.author:
-                # send the invitation to allow the user to rejoin the server
-                await user.send(
-                    await ctx.channel.create_invite(
-                        reason="Friendly ban",
-                        max_uses=1,
-                        unique=True,
-                    )
-                )
-                self.friendly_banned_roles[user.id] = ctx.guild.get_member(
-                    user.id
-                ).roles
-                try:
-                    await ctx.guild.kick(user, reason=f"Auto-ban!")
-                except discord.Forbidden:
-                    await ctx.send(
-                        "Permissions manquantes :confused: (vérifiez la hiérarchie)"
-                    )
-                else:
-                    # Find and send some random message
-                    choice = random.randint(0, 2)
-                    msg = await self.bot._(
-                        ctx.channel, f"ban.gunivers.autoban.{choice}"
-                    )
-                    await ctx.send(msg.format(ctx.author.mention, user.mention))
-                    await ctx.send(
-                        "https://thumbs.gfycat.com/CompleteLeafyAardwolf-size_restricted.gif"
-                    )
-                return
-
-            # 1/10th chance of banning the command executor instead, Uno Reverse event.
-            if random.randint(1, 10) == 1:
-                await user.send(
-                    await ctx.channel.create_invite(
-                        reason="Friendly ban",
-                        max_uses=1,
-                        unique=True,
-                    )
-                )
-                self.friendly_banned_roles[ctx.author] = ctx.author.roles
-                try:
-                    await ctx.guild.kick(
-                        ctx.author,
-                        reason=f"Banned by himself. Reason : {user} ({user.id}) used Uno Reverse card.",
-                    )
-                except discord.Forbidden:
-                    await ctx.send(
-                        "Permissions manquantes :confused: (vérifiez la hiérarchie)"
-                    )
-                else:
-                    # Find and send some random message
-                    choice = random.randint(0, 3)
-                    msg = await self.bot._(
-                        ctx.channel, f"ban.gunivers.selfban.{choice}"
-                    )
-                    await ctx.send(msg.format(ctx.author.mention, user.mention))
-                    await ctx.send(
-                        "https://thumbs.gfycat.com/BackInsignificantAfricanaugurbuzzard-size_restricted.gif"
-                    )
-                return
-
-            # 1/10th chance of banning both banned and executor, Bothban event.
-            if random.randint(1, 10) == 1:
-                await user.send(
-                    await ctx.channel.create_invite(
-                        reason="Friendly ban",
-                        max_uses=1,
-                        unique=True,
-                    )
-                )
-                self.friendly_banned_roles[user.id] = ctx.guild.get_member(user.id).roles
-                self.friendly_banned_roles[ctx.author.id] = ctx.author.roles
-                try:
-                    await ctx.guild.kick(
-                        user,
-                        reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}",
-                    )
-                except discord.Forbidden:
-                    await ctx.send(
-                        "Permissions manquantes :confused: (vérifiez la hiérarchie)"
-                    )
-                else:
-                    await user.send(
-                    await ctx.channel.create_invite(
-                        reason="Friendly ban",
-                        max_uses=1,
-                        unique=True,
-                    )
-                )
-                    try:
-                        await ctx.guild.kick(
-                            ctx.author,
-                            reason=f"Banned by himself. Reason : {user} ({user.id}) banned him back.",
-                        )
-                    except discord.Forbidden:
-                        # If there's an error when banning the author, we don't
-                        # care and act like if a one-way ban happened.
-                        choice = random.randint(0, 9)
-                        msg = await self.bot._(
-                            ctx.channel, f"ban.gunivers.ban.{choice}"
-                        )
-                        await ctx.send(msg.format(ctx.author.mention, user.mention))
-                        await ctx.send(
-                            "https://thumbs.gfycat.com/PepperyEminentIndianspinyloach-size_restricted.gif"
-                        )
-                    else:
-                        # If there's no error, find a random message and send
-                        # it.
-                        choice = random.randint(0, 3)
-                        msg = await self.bot._(
-                            ctx.channel, f"ban.gunivers.bothban.{choice}"
-                        )
-                        await ctx.send(msg.format(ctx.author.mention, user.mention))
-                        await ctx.send(
-                            "https://thumbs.gfycat.com/BackInsignificantAfricanaugurbuzzard-size_restricted.gif"
-                        )
-                return
-
-            # 1/10th chance of rickrolling people, Rickroll event.
-            if random.randint(1, 10) == 1:
-                await self.bot._(ctx.channel, f"ban.gunivers.rickroll")
-                await ctx.send(
-                    "Never gonna give you up,\nnever gonna let you down,\nnever gonna run around and ban you :musical_note:"
-                )
-                await ctx.send(
-                    "https://thumbs.gfycat.com/VengefulDesertedHalibut-size_restricted.gif"
-                )
-                return
-
-            # If ban is issued by Leirof, then Bald ban event.
-            if ctx.author.id == 125722240896598016:
-                await user.send(
-                    await ctx.channel.create_invite(
-                        reason="Friendly ban",
-                        max_uses=1,
-                        unique=True,
-                    )
-                )
-                self.friendly_banned_roles[user.id] = ctx.guild.get_member(user.id).roles
-                try:
-                    await ctx.guild.kick(
-                        user,
-                        reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}",
-                    )
-                except discord.Forbidden:
-                    await ctx.send(
-                        "Permissions manquantes :confused: (vérifiez la hiérarchie)"
-                    )
-                else:
-                    # Find and send some random message
-                    choice = random.randint(0, 9)
-                    msg = await self.bot._(ctx.channel, f"ban.gunivers.ban.{choice}")
-                    await ctx.send(msg.format(ctx.author.mention, user.mention))
-                    await ctx.send(
-                        "https://thumbs.gfycat.com/PepperyEminentIndianspinyloach-size_restricted.gif"
-                    )
-                    await ctx.send(
-                        "https://media.discordapp.net/attachments/791335982666481675/979052868915064862/Chauve_qui_peut_.png"
-                    )
-                return
-
-            # else, normal ban w/ random message
-            else:
-                await user.send(
-                    await ctx.channel.create_invite(
-                        reason="Friendly ban",
-                        max_uses=1,
-                        unique=True,
-                    )
-                )
-                self.friendly_banned_roles[user.id] = ctx.guild.get_member(user.id).roles
-                try:
-                    await ctx.guild.kick(
-                        user,
-                        reason=f"Banned by {ctx.author} ({ctx.author.id}). Reason : {reason}",
-                    )
-                except discord.Forbidden:
-                    await ctx.send(
-                        "Permissions manquantes :confused: (vérifiez la hiérarchie)"
-                    )
-                else:
-                    # Find and send some random message
-                    choice = random.randint(0, 9)
-                    msg = await self.bot._(ctx.channel, f"ban.gunivers.ban.{choice}")
-                    await ctx.send(msg.format(ctx.author.mention, user.mention))
-                    await ctx.send(
-                        "https://thumbs.gfycat.com/PepperyEminentIndianspinyloach-size_restricted.gif"
-                    )
-                return
+            for event in self.systematic_events:
+                # you should note that systematic events can return None to
+                # indicate that they should be ignored
+                if await event(self, ctx, user, reason):
+                    return
+            
+            # Pick a random event and execute it if no systematic event has been executed
+            print(len(self.random_events))
+            event_n = random.randint(0, len(self.random_events) - 1)
+            print(event_n)
+            # random events should always run syccessfully
+            await self.random_events[event_n](self, ctx, user, reason)
 
     # ------------------#
     # Commande /rban   #
@@ -312,6 +133,68 @@ class Ban(commands.Cog):
                 await ctx.send(f"{user} a bien été banni !")
             await ctx.send("https://thumbs.gfycat.com/LikelyColdBasil-small.gif")
 
+    def load_friendly_ban(self):
+        """Loads configuration and events for the friendly ban command"""
+        
+        # look for the configuration, gets an empty dict if it doesn't exist
+        self.friendly_ban_config = self.bot.config.get("friendly_ban", {})
+
+        # loads the guild ids from the configuration
+        self.friendly_ban_guilds: list[int] = self.friendly_ban_config.get(
+            "guilds",
+            []
+        )
+
+        # loads the events
+        self.friendly_ban_events = self.friendly_ban_config.get("events", [])
+        self.systematic_events: list[function] = []
+        self.random_events: list[function] = []
+
+        for event in self.friendly_ban_events:
+            chances = event.get("chances", None)
+            if chances == None:
+                self.systematic_events.append(
+                    importlib.import_module(
+                        f"plugins.ban.events.{event['module_name']}"
+                    ).execute
+                )
+                print(f"Loaded systematic event {event['name']}")
+            else:
+                for _ in range(chances):
+                    self.random_events.append(
+                        importlib.import_module(
+                            f"plugins.ban.events.{event['module_name']}"
+                        ).execute
+                    )
+        
+        # initiate the cache for the banned users roles
+        self.friendly_banned_roles: dict[int,list[discord.Role]] = {}
+    
+    async def fake_ban(self, ctx: commands.Context, user: discord.User) -> bool:
+        """Friendly ban a user
+        If the ban could not be succeded, returns False"""
+        # send the invitation to allow the user to rejoin the guild
+        await user.send(
+            await ctx.channel.create_invite(
+                reason="Friendly ban",
+                max_uses=1,
+                unique=True,
+            )
+        )
+        
+        # store the roles somewhere to give them back to the user
+        self.friendly_banned_roles[user.id] = ctx.guild.get_member(
+            user.id
+        ).roles
+        
+        try:
+            await ctx.guild.kick(user, reason=f"Auto-ban!")
+        except discord.Forbidden:
+            await ctx.send(
+                "Permissions manquantes :confused: (vérifiez la hiérarchie)"
+            )
+            return False
+        return True
 
 # The end.
 async def setup(bot):
