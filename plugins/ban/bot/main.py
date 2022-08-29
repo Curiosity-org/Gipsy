@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 from utils import Gunibot, MyContext
 
-specialGuilds = [125723125685026816,689159304049197131,835218602511958116]
+specialGuilds = [125723125685026816, 689159304049197131, 835218602511958116]
 altearn = 835218602511958116
 gunivers = 125723125685026816
 curiosity = 689159304049197131
@@ -27,13 +27,10 @@ class Ban(commands.Cog):
 
         if member.guild.id in specialGuilds:
             if member.id in banRolesDict:
-                # On pop pour ne pas garder inutilement la liste des rôles dans le dictionnaire 
+                # On pop pour ne pas garder inutilement la liste des rôles dans le dictionnaire
                 for role in banRolesDict.pop(member.id):
                     if role.name != "@everyone":
                         await member.add_roles(role)
-
-
-
 
     # ------------------#
     # Commande /ban    #
@@ -42,8 +39,13 @@ class Ban(commands.Cog):
     @commands.command(name="ban")
     @commands.guild_only()
     @commands.has_guild_permissions(ban_members=True)
-
-    async def ban(self, ctx: MyContext, *, user: discord.User, reason: str = "Aucune raison donnée"):
+    async def ban(
+        self,
+        ctx: MyContext,
+        *,
+        user: discord.User,
+        reason: str = "Aucune raison donnée",
+    ):
         # On accède au dictionnaire des roles
         global banRolesDict
 
@@ -92,15 +94,21 @@ class Ban(commands.Cog):
                 try:
                     await ctx.guild.kick(user, reason=f"Auto-ban!")
                 except discord.Forbidden:
-                    await ctx.send("Permissions manquantes :confused: (vérifiez la hiérarchie)")
+                    await ctx.send(
+                        "Permissions manquantes :confused: (vérifiez la hiérarchie)"
+                    )
                 else:
                     # Find and send some random message
                     choice = random.randint(0, 2)
-                    msg = await self.bot._(ctx.channel, f"ban.gunivers.autoban.{choice}")
+                    msg = await self.bot._(
+                        ctx.channel, f"ban.gunivers.autoban.{choice}"
+                    )
                     await ctx.send(msg.format(ctx.author.mention, user.mention))
-                    await ctx.send("https://thumbs.gfycat.com/CompleteLeafyAardwolf-size_restricted.gif")
+                    await ctx.send(
+                        "https://thumbs.gfycat.com/CompleteLeafyAardwolf-size_restricted.gif"
+                    )
                 return
-            
+
             # 1/10th chance of banning the command executor instead, Uno Reverse event.
             if random.randint(1, 10) == 1:
                 if ctx.guild.id == gunivers:
