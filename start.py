@@ -12,9 +12,8 @@ import os
 import sys
 import time
 import discord
+from LRFutils.color import Color
 
-from bot.docs import generate_docs
-from bot.config import get_config
 from utils import Gunibot, setup_logger
 
 # check python version
@@ -35,10 +34,6 @@ for plugin in os.listdir("./plugins/"):
     if plugin[0] != "_":
         if os.path.isdir("./plugins/" + plugin):
             plugins.append(f"plugins.{plugin}.{plugin}")
-
-# Generate docs
-generate_docs()
-
 
 def print_ascii_art():
     """
@@ -66,25 +61,14 @@ def main():
     Main function
     """
     # Getting global config
-    conf = get_config("./config/config", isBotConfig=True)
-    if conf is None:
-        return 1
-
-    # Getting plugins configs
-    for plugin_dir in os.listdir("./plugins/"):
-        if plugin_dir[0] != "_":
-            if os.path.isfile(
-                "./plugins/" + plugin_dir + "/config/require-example.json"
-            ):
-                conf.update(
-                    get_config(
-                        "./plugins/" + plugin_dir + "/config/require", isBotConfig=False
-                    )
-                )
+    import config
+    if config.token == "<YOUR_DISCORD_TOKEN>":
+        print(f"\n{Color.Yellow}🔥 You need to set your Discord bot token in config.py.\n{Color.NC}To do so, go on {Color.Blue}https://discord.com/developers/applications{Color.NC}, select your application, go in bot section and copy your token.\nTo create a bot application, please refere to this page: {Color.Blue}https://discord.com/developers/docs/intro{Color.NC}.\nAlso, be sure to anable all intents.\n")
+        exit()
 
     # Creating client
     client = Gunibot(
-        case_insensitive=True, status=discord.Status("online"), beta=False, config=conf
+        case_insensitive=True, status=discord.Status("online"), beta=False
     )
 
     # Writing logs + welcome message
@@ -143,11 +127,7 @@ def main():
     args = parser.parse_args()
 
     # Launch bot
-    if args.beta:
-        client.beta = True
-        client.run(conf["token_beta"])
-    else:
-        client.run(conf["token"])
+    client.run(config.token)
 
 
 if __name__ == "__main__":

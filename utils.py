@@ -40,9 +40,8 @@ class Gunibot(commands.bot.AutoShardedBot):
     """Bot class, with everything needed to run it"""
 
     def __init__(
-        self, case_insensitive=None, status=None, beta=False, config: dict = None
+        self, case_insensitive=None, status=None, beta=False
     ):
-        self.config = config
         # defining allowed default mentions
         ALLOWED = discord.AllowedMentions(everyone=False, roles=False)
         # defining intents usage
@@ -118,13 +117,6 @@ class Gunibot(commands.bot.AutoShardedBot):
         if prefix is None:
             prefix = "?"
         return commands.when_mentioned_or(prefix)(self, msg)
-
-    async def update_config(self, key: str, value):
-        """Change a value in the config file
-        No undo can be done"""
-        self.config[key] = value
-        with open("config.json", "w", encoding="utf-8") as f:
-            json.dump(self.config, f, indent=4)
 
     def db_query(
         self,
@@ -270,9 +262,8 @@ def setup_logger():
 
 CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {}
 
-if os.path.isfile("./config/global_options.json"):
-    with open("./config/global_options.json") as config:
-        CONFIG_OPTIONS.update(json.load(config))
+import config
+CONFIG_OPTIONS.update({"prefix":config.default_prefix,"language":config.default_language})
 
 for plugin in os.listdir("./plugins/"):
     if plugin[0] != "_":
