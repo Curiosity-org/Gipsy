@@ -5,31 +5,21 @@ import discord
 from discord.ext import commands
 from utils import Gunibot, MyContext
 
-specialGuilds = [125723125685026816, 689159304049197131, 835218602511958116]
-altearn = 835218602511958116
-gunivers = 125723125685026816
-curiosity = 689159304049197131
-altearnInvite = "https://discord.gg/uS9cXuyeFQ"
-guniversInvite = "https://discord.gg/E8qq6tN"
-curiosityInvite = "https://discord.gg/jtntCqXz53"
-banRolesDict = {}
-
 
 class Ban(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "ban"
 
+        self.friendly_banned_roles: dict[int,list[discord.Role]] = {}
+
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        global banRolesDict
-        # Pourquoi global ? Pour avoir un accès en écriture et pouvoir pop
-
-        if member.guild.id in specialGuilds:
-            if member.id in banRolesDict:
-                # On pop pour ne pas garder inutilement la liste des rôles dans le dictionnaire
-                for role in banRolesDict.pop(member.id):
-                    if role.name != "@everyone":
+        if member.guild.id in self.bot.config.get("friendly_ban", []):
+            if member.id in self.friendly_banned_roles:
+                # Give the roles back to the users
+                for role in self.friendly_banned_roles.pop(member.id):
+                    if role.id != role.guild.id: # We ignore the @everyone role
                         await member.add_roles(role)
 
     # ------------------#
@@ -46,10 +36,10 @@ class Ban(commands.Cog):
         user: discord.User,
         reason: str = "Aucune raison donnée",
     ):
-        # On accède au dictionnaire des roles
-        global banRolesDict
-
-        if user == ctx.author and not ctx.guild.id in specialGuilds:
+        if user == ctx.author and not ctx.guild.id in self.bot.config.get(
+            "friendly_ban",
+            []
+        ):
             await ctx.send("Tu ne peux pas te bannir toi-même !")
             return
         if not ctx.guild.me.guild_permissions.ban_members:
@@ -64,7 +54,9 @@ class Ban(commands.Cog):
                 "Mon rôle n'est pas assez haut pour bannir cet individu :confused:"
             )
             return
-        if not ctx.guild.id in specialGuilds:
+
+        # Normal ban
+        if not ctx.guild.id in self.bot.config.get("friendly_ban", []):
             try:
                 await ctx.guild.ban(
                     user,
@@ -80,17 +72,21 @@ class Ban(commands.Cog):
             await ctx.send("https://thumbs.gfycat.com/LikelyColdBasil-small.gif")
             return
 
-            # GUNIVERS/CURIOSITY SPECIAL CASES
+        # Friendly ban if the guild is in the config
         else:
             # auto-ban, special Laizo
             if user == ctx.author:
-                if ctx.guild.id == gunivers:
-                    await ctx.author.send(f"{guniversInvite}")
-                if ctx.guild.id == curiosity:
-                    await ctx.author.send(f"{curiosityInvite}")
-                if ctx.guild.id == altearn:
-                    await ctx.author.send(f"{altearnInvite}")
-                banRolesDict[user.id] = ctx.guild.get_member(user.id).roles
+                # send the invitation to allow the user to rejoin the server
+                await user.send(
+                    await ctx.channel.create_invite(
+                        reason="Friendly ban",
+                        max_uses=1,
+                        unique=True,
+                    )
+                )
+                self.friendly_banned_roles[user.id] = ctx.guild.get_member(
+                    user.id
+                ).roles
                 try:
                     await ctx.guild.kick(user, reason=f"Auto-ban!")
                 except discord.Forbidden:
@@ -111,13 +107,14 @@ class Ban(commands.Cog):
 
             # 1/10th chance of banning the command executor instead, Uno Reverse event.
             if random.randint(1, 10) == 1:
-                if ctx.guild.id == gunivers:
-                    await ctx.author.send(f"{guniversInvite}")
-                if ctx.guild.id == curiosity:
-                    await ctx.author.send(f"{curiosityInvite}")
-                if ctx.guild.id == altearn:
-                    await ctx.author.send(f"{altearnInvite}")
-                banRolesDict[ctx.author] = ctx.author.roles
+                await user.send(
+                    await ctx.channel.create_invite(
+                        reason="Friendly ban",
+                        max_uses=1,
+                        unique=True,
+                    )
+                )
+                self.friendly_banned_roles[ctx.author] = ctx.author.roles
                 try:
                     await ctx.guild.kick(
                         ctx.author,
@@ -141,14 +138,15 @@ class Ban(commands.Cog):
 
             # 1/10th chance of banning both banned and executor, Bothban event.
             if random.randint(1, 10) == 1:
-                if ctx.guild.id == gunivers:
-                    await user.send(f"{guniversInvite}")
-                if ctx.guild.id == curiosity:
-                    await user.send(f"{curiosityInvite}")
-                if ctx.guild.id == altearn:
-                    await user.send(f"{altearnInvite}")
-                banRolesDict[user.id] = ctx.guild.get_member(user.id).roles
-                banRolesDict[ctx.author.id] = ctx.author.roles
+                await user.send(
+                    await ctx.channel.create_invite(
+                        reason="Friendly ban",
+                        max_uses=1,
+                        unique=True,
+                    )
+                )
+                self.friendly_banned_roles[user.id] = ctx.guild.get_member(user.id).roles
+                self.friendly_banned_roles[ctx.author.id] = ctx.author.roles
                 try:
                     await ctx.guild.kick(
                         user,
@@ -159,12 +157,13 @@ class Ban(commands.Cog):
                         "Permissions manquantes :confused: (vérifiez la hiérarchie)"
                     )
                 else:
-                    if ctx.guild.id == gunivers:
-                        await ctx.author.send(f"{guniversInvite}")
-                    if ctx.guild.id == curiosity:
-                        await ctx.author.send(f"{curiosityInvite}")
-                    if ctx.guild.id == altearn:
-                        await ctx.author.send(f"{altearnInvite}")
+                    await user.send(
+                    await ctx.channel.create_invite(
+                        reason="Friendly ban",
+                        max_uses=1,
+                        unique=True,
+                    )
+                )
                     try:
                         await ctx.guild.kick(
                             ctx.author,
@@ -207,13 +206,14 @@ class Ban(commands.Cog):
 
             # If ban is issued by Leirof, then Bald ban event.
             if ctx.author.id == 125722240896598016:
-                if ctx.guild.id == gunivers:
-                    await user.send(f"{guniversInvite}")
-                if ctx.guild.id == curiosity:
-                    await user.send(f"{curiosityInvite}")
-                if ctx.guild.id == altearn:
-                    await user.send(f"{altearnInvite}")
-                banRolesDict[user.id] = ctx.guild.get_member(user.id).roles
+                await user.send(
+                    await ctx.channel.create_invite(
+                        reason="Friendly ban",
+                        max_uses=1,
+                        unique=True,
+                    )
+                )
+                self.friendly_banned_roles[user.id] = ctx.guild.get_member(user.id).roles
                 try:
                     await ctx.guild.kick(
                         user,
@@ -238,13 +238,14 @@ class Ban(commands.Cog):
 
             # else, normal ban w/ random message
             else:
-                if ctx.guild.id == gunivers:
-                    await user.send(f"{guniversInvite}")
-                if ctx.guild.id == curiosity:
-                    await user.send(f"{curiosityInvite}")
-                if ctx.guild.id == altearn:
-                    await user.send(f"{altearnInvite}")
-                banRolesDict[user.id] = ctx.guild.get_member(user.id).roles
+                await user.send(
+                    await ctx.channel.create_invite(
+                        reason="Friendly ban",
+                        max_uses=1,
+                        unique=True,
+                    )
+                )
+                self.friendly_banned_roles[user.id] = ctx.guild.get_member(user.id).roles
                 try:
                     await ctx.guild.kick(
                         user,
