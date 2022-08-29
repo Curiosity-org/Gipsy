@@ -263,7 +263,7 @@ def setup_logger():
 CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {}
 
 import config
-CONFIG_OPTIONS.update({"prefix":config.default_prefix,"language":config.default_language})
+CONFIG_OPTIONS.update({"prefix":config.core.default_prefix,"language":config.core.default_language})
 
 for plugin in os.listdir("./plugins/"):
     if plugin[0] != "_":

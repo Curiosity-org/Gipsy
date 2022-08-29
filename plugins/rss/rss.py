@@ -36,7 +36,7 @@ class Rss(commands.Cog):
 
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
-        self.twitterAPI = twitter.Api(**config.twitter, tweet_mode="extended")
+        self.twitterAPI = twitter.Api(**config.rss.twitter, tweet_mode="extended")
         self.twitter_over_capacity = False
         self.min_time_between_posts = {"web": 120, "tw": 15, "yt": 120}
         self.cache = dict()
@@ -1659,7 +1659,7 @@ class Rss(commands.Cog):
             return False
 
     async def main_loop(self, guildID: int = None):
-        if not config.rss_loop_enabled:
+        if not config.rss.rss_loop_enabled:
             return
         t = time.time()
         if self.loop_processing:
