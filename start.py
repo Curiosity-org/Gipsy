@@ -15,13 +15,20 @@ import discord
 from LRFutils.color import Color
 from LRFutils import log
 
-from utils import Gunibot, setup_logger
-
 # check python version
 py_version = sys.version_info
 if py_version.major != 3 or py_version.minor < 9:
     print("Vous devez utiliser au moins Python 3.9 !", file=sys.stderr)
     sys.exit(1)
+
+# Getting global config
+
+
+import setup
+if not setup.token_set(): exit()
+import config
+
+from utils import Gunibot
 
 # Getting global system list
 global_systems = []
@@ -61,11 +68,6 @@ def main():
     """
     Main function
     """
-    # Getting global config
-    import config
-    if config.token == "<YOUR_DISCORD_TOKEN>":
-        print(f"\n{Color.Yellow}🔥 You need to set your Discord bot token in config.py.\n{Color.NC}To do so, go on {Color.Blue}https://discord.com/developers/applications{Color.NC}, select your application, go in bot section and copy your token.\nTo create a bot application, please refere to this page: {Color.Blue}https://discord.com/developers/docs/intro{Color.NC}.\nAlso, be sure to anable all intents.\n")
-        exit()
 
     # Creating client
     client = Gunibot(
@@ -91,7 +93,7 @@ def main():
                 await bot_client.load_extension(extension)
                 loaded += 1
             except Exception:  # pylint: disable=broad-except
-                log.warn("Failed to load extension: %s", extension)
+                log.error(f"Failed to load extension: {extension}")
                 notloaded += "\n - " + extension
                 failed += 1
         if failed > 0:
@@ -124,8 +126,12 @@ def main():
     args = parser.parse_args()
 
     # Launch bot
-    client.run(config.token)
-
+    try: client.run(config.token)
+    except discord.errors.LoginFailure:
+        log.error("⚠️ Invalid token")
+        if not setup.token_set(force_set = True): exit()
+        os.system("python3 start.py")
+        exit()
 
 if __name__ == "__main__":
     main()

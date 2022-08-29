@@ -2,7 +2,7 @@
 __pycache__
 configs/*.json
 /config.py
-logs/
+/logs/
 .DS_Store
 data/*.db*
 config.json
