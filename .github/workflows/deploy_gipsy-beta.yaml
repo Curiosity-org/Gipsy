@@ -1,0 +1,23 @@
+name: Deploy Gipsy Beta
+
+on:
+  push:
+    branches:
+      - beta
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 10
+      - name: deploy
+        uses:  swznd/sftp-deploy@master
+        with:
+          host: ${{ secrets.BETA_SFTP_IP }}
+          port: ${{ secrets.BETA_SFTP_PORT }}
+          user: ${{ secrets.BETA_SFTP_USER }}
+          password: ${{ secrets.BETA_SFTP_PASSWORD }}
+          ignore: .github/**,.gitignore,**/.gitignore,**/.git/**
