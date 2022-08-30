@@ -25,7 +25,10 @@ if py_version.major != 3 or py_version.minor < 9:
 
 
 import setup
+
+setup.squash_config()
 if not setup.token_set(): exit()
+
 import config
 
 from utils import Gunibot

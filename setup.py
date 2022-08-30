@@ -56,9 +56,7 @@ def squash_config():
 
         for plugin in os.listdir(f'plugins'):
             if os.path.isfile(f'plugins/' + plugin + "/config.py"):
-                config.write(f"\n# {plugin}\n")
-                for line in open(f'plugins/' + plugin + "/config.py", "r"):
-                    config.write(line)
+                config.write(f"\nfrom plugins.{plugin}.config import {plugin}\n")
 
 ########################
 # INSTALL DEPENDENCIEs #
