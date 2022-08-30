@@ -1,6 +1,5 @@
 import importlib
 import random
-import glob
 
 import discord.abc
 import discord
