@@ -126,7 +126,7 @@ def main():
     args = parser.parse_args()
 
     # Launch bot
-    try: client.run(config.core.token)
+    try: client.run(config.bot.token)
     except discord.errors.LoginFailure:
         log.error("⚠️ Invalid token")
         if not setup.token_set(force_set = True): exit()
