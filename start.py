@@ -9,8 +9,8 @@ import argparse
 import asyncio
 import logging
 import os
+import yaml
 import sys
-import time
 import discord
 from LRFutils.color import Color
 from LRFutils import log
@@ -21,15 +21,10 @@ if py_version.major != 3 or py_version.minor < 9:
     print("Vous devez utiliser au moins Python 3.9 !", file=sys.stderr)
     sys.exit(1)
 
-# Getting global config
-
-
 import setup
+setup.check()
 
-setup.squash_config()
-if not setup.token_set(): exit()
-
-import config
+from core.config import global_config
 
 from utils import Gunibot
 
@@ -81,6 +76,7 @@ def main():
     if not os.path.isdir("logs"):
         os.makedirs("logs")
     
+    print(" ")
     log.info("▶️ Starting Gipsy...")
 
     # pylint: disable-next=anomalous-backslash-in-string
@@ -129,10 +125,12 @@ def main():
     args = parser.parse_args()
 
     # Launch bot
-    try: client.run(config.bot.token)
+    try: client.run(global_config["bot"]["token"])
     except discord.errors.LoginFailure:
         log.error("⚠️ Invalid token")
-        if not setup.token_set(force_set = True): exit()
+        setup.token_set(force_set=True)
+        with open("config.yaml","w") as f:
+            yaml.dump(global_config,f)
         os.system("python3 start.py")
         exit()
 
