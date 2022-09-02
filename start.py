@@ -18,7 +18,7 @@ from LRFutils import log
 # check python version
 py_version = sys.version_info
 if py_version.major != 3 or py_version.minor < 9:
-    print("Vous devez utiliser au moins Python 3.9 !", file=sys.stderr)
+    log.error("⚠️ Gipsy require Python 3.9 or more.", file=sys.stderr)
     sys.exit(1)
 
 import setup

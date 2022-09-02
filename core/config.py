@@ -8,6 +8,11 @@ import os
 global_config = {}
 
 def reload_config():
+    """This function read the core/default_config.yaml file and store it in a dictionnary.
+    Then, it update the dict' using all the plugins/<plguin>/config.yaml files.
+    Finally, it update the dict' using the config.yaml file wich is defined by the user.
+    Each step overwrite the previus one."""
+
     global global_config
 
     with open("core/default_config.yaml", "r") as f:

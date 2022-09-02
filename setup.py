@@ -39,23 +39,6 @@ def token_set(force_set = False):
             print(f"\n{Color.Red}🔑 You need to set a token.{Color.NC}")
         else:
             config.global_config["bot"]["token"] = token
-
-    if config.global_config["bot"]["token"] is None:
-        # Explain how to get a token
-        print(f"\n🔑 You need to set your Discord bot token in the config file.\n   To do so, go on {Color.Blue}https://discord.com/developers/applications{Color.NC}, select your application, go in bot section and copy your token.\n   To create a bot application, please refere to this page: {Color.Blue}https://discord.com/developers/docs/intro{Color.NC}.\n   Also, be sure to anable all intents.\n")
-        
-        # Create the config.py file if it doesn't exist
-        if not os.path.isfile("config.py"):
-            with open("config.py", "w+") as conf_file:
-                conf_file.write("from core.default_config import *\n")
-
-        # Ask for the token and save it in config.py
-        with open("config.py", "a") as conf_file:
-            token = input(f"{Color.Blue}🔑 Paste your token here (let empty and press 'enter' to ignore):{Color.NC} ")
-            if token == "":
-                print(f"\n{Color.Red}❌ Setup uncomplete 🙁{Color.NC}")
-                return False
-            conf_file.write(f"\nbot.token = '{token}'\n")
     return True
 
 ################
@@ -70,7 +53,7 @@ def plugin_setup():
 
             choice = input(f"\n{Color.Blue}🔌 Do you want to configure {plugin} plugin? [Y/n]:{Color.NC} ")
 
-            if choice not in decline:
+            if choice.lower() not in decline:
                 plugin_setup.run()
 
 ########################
@@ -99,11 +82,11 @@ if __name__ == "__main__":
 
     choice = input(f"\n{Color.Blue}Do you want to configure optional bot settings? [Y/n]:{Color.NC} ")
 
-    if choice not in decline:
+    if choice.lower() not in decline:
 
         # Language 
 
-        lang = "Baguete de fromage"
+        lang = "Baguette de fromage"
         language = config.global_config["bot"]["default_language"]
         while lang.lower() not in ["en","fr",""]:
             lang = input(f"\n{Color.Blue}🌐 Choose your language [en/fr] (current: {language}):{Color.NC} ")
@@ -123,34 +106,31 @@ if __name__ == "__main__":
 
         error = True
         while error:
-            choice = input(f"\n{Color.Blue}👑 Bot admins (User ID separated with comma. Let empty to ignore):{Color.NC} ")
-            if choice == "":
-                error = False
-                break
-            admins = choice.replace(" ","").split(",")
-            try:
-                for admin in admins:
-                    admin = int(admin)
-                error = False
-            except:
-                print(f"{Color.Red}👑 Invalid entry. Only user ID (integers), comma and space are expected.{Color.NC}")
-        if choice != "": 
-            config.global_config["bot"]["admins"] = admins
+            error = False
+            choice = input(f"\n👑 Bot admins (User ID separated with comma. Let empty to ignore): ")
+            if choice != "":
+                admins = choice.replace(" ", "").split(",")
+                try:
+                    for admin in admins:
+                        admin = int(admin)
+                    config.global_config["bot"]["admins"] = admins
+                except:
+                    print(f"👑 Invalid entry. Only user ID (integers), comma and space are expected.")
+                    error = True
 
         # Error channel
 
         error = True
         while error:
+            error = False
             choice = input(f"\n{Color.Blue}🤕 Error channel (Channel ID. Let empty to ignore):{Color.NC} ")
-            if choice == "":
-                error = False
-                break
-            try:
-                channel = int(choice)
-            except:
-                print(f"{Color.Red}👑 Invalid entry. Only channel ID (integers) are expected.{Color.NC}")
-        if choice != "":
-            config.global_config["bot"]["error_channel"] = channel
+            if choice != "":
+                try:
+                    channel = int(choice)
+                    config.global_config["bot"]["error_channel"] = channel
+                except:
+                    print(f"{Color.Red}🤕 Invalid entry. Only channel ID (integers) are expected.{Color.NC}")
+            
 
     # End optional settings
 
@@ -165,7 +145,7 @@ if __name__ == "__main__":
 
     # Start bot
 
-    choixe = input(f"\n▶️ Your config.py file is probably incomplete, which can break some features.\n\n{Color.Blue}▶️ Do you want to start the bot anyway? [Y/n]{Color.NC} ")
-    if choixe.lower() not in decline:
+    choice = input(f"\n▶️ Your config.py file is probably incomplete, which can break some features.\n\n{Color.Blue}▶️ Do you want to start the bot anyway? [Y/n]{Color.NC} ")
+    if choice.lower() not in decline:
         print("   Starting the bot...\n--------------------------------------------------------------------------------")
         os.system("python3 start.py")
