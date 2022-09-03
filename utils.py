@@ -262,8 +262,8 @@ def setup_logger():
 
 CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {}
 
-from core.config import global_config
-CONFIG_OPTIONS.update({"prefix":global_config["bot"]["default_prefix"],"language":global_config["bot"]["default_language"]})
+from core import config
+CONFIG_OPTIONS.update({"prefix":config.get("bot.default_prefix"),"language":config.get("bot.default_language")})
 
 for plugin in os.listdir("./plugins/"):
     if plugin[0] != "_":

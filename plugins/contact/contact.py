@@ -210,5 +210,10 @@ class Contact(commands.Cog):
         await ctx.send(answer)
 
 
-async def setup(bot):
-    await bot.add_cog(Contact(bot))
+config = {}
+async def setup(bot:Gunibot=None, plugin_config:dict=None):
+    if bot is not None:
+        await bot.add_cog(Contact(bot))
+    if plugin_config is not None:
+        global config
+        config.update(plugin_config)

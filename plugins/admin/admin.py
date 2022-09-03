@@ -254,6 +254,10 @@ class Admin(commands.Cog):
                 self._last_result = ret
                 await ctx.send(f"```py\n{value}{ret}\n```")
 
-
-async def setup(bot: Gunibot):
-    await bot.add_cog(Admin(bot))
+config = {}
+async def setup(bot:Gunibot=None, plugin_config:dict=None):
+    if bot is not None:
+        await bot.add_cog(Admin(bot))
+    if plugin_config is not None:
+        global config
+        config.update(plugin_config)

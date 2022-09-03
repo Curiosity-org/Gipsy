@@ -516,6 +516,10 @@ class Logs(commands.Cog):
             embed.add_field(name=n, value="\n".join(restrict), inline=False)
         await self.send_embed(guild, embed)
 
-
-async def setup(bot):
-    await bot.add_cog(Logs(bot))
+config = {}
+async def setup(bot:Gunibot=None, plugin_config:dict=None):
+    if bot is not None:
+        await bot.add_cog(Logs(bot))
+    if plugin_config is not None:
+        global config
+        config.update(plugin_config)

@@ -777,5 +777,11 @@ class XP(commands.Cog):
             await self.bot.get_cog("Errors").on_command_error(ctx, e)
 
 
-async def setup(bot):
-    await bot.add_cog(XP(bot))
+config = {}
+async def setup(bot:Gunibot=None, plugin_config:dict=None):
+    if bot is not None:
+        await bot.add_cog(XP(bot))
+    if plugin_config is not None:
+        global config
+        config.update(plugin_config)
+

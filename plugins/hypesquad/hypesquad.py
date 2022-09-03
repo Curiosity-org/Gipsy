@@ -205,6 +205,10 @@ class Hypesquad(commands.Cog):
                 await self.bot._(ctx.guild.id, "hypesquad.not-edited", user=user)
             )
 
-
-async def setup(bot):
-    await bot.add_cog(Hypesquad(bot))
+config = {}
+async def setup(bot:Gunibot=None, plugin_config:dict=None):
+    if bot is not None:
+        await bot.add_cog(Hypesquad(bot))
+    if plugin_config is not None:
+        global config
+        config.update(plugin_config)

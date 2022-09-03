@@ -52,5 +52,5 @@ class Languages(commands.Cog):
         return as_int
 
 
-async def setup(bot):
+async def setup(bot:Gunibot=None, plugin_config:dict=None):
     await bot.add_cog(Languages(bot))

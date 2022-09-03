@@ -14,6 +14,7 @@ import sys
 import discord
 from LRFutils.color import Color
 from LRFutils import log
+import setup
 
 # check python version
 py_version = sys.version_info
@@ -21,10 +22,9 @@ if py_version.major != 3 or py_version.minor < 9:
     log.error("⚠️ Gipsy require Python 3.9 or more.", file=sys.stderr)
     sys.exit(1)
 
-import setup
-setup.check()
-
-from core.config import global_config
+from core import config
+config.check()
+asyncio.run(config.dispatch())
 
 from utils import Gunibot
 
@@ -125,12 +125,11 @@ def main():
     args = parser.parse_args()
 
     # Launch bot
-    try: client.run(global_config["bot"]["token"])
+    try: client.run(config.get("bot.token"))
     except discord.errors.LoginFailure:
         log.error("⚠️ Invalid token")
         setup.token_set(force_set=True)
-        with open("config.yaml","w") as f:
-            yaml.dump(global_config,f)
+        config.save()
         os.system("python3 start.py")
         exit()
 

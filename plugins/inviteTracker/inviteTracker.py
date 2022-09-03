@@ -333,6 +333,11 @@ class Invite(commands.Cog):
         datas = self.bot.db_query(query, (guild,), astuple=True)
         return [DatabaseInvite(data, self.bot) for data in datas]
 
+config = {}
+async def setup(bot:Gunibot=None, plugin_config:dict=None):
+    if bot is not None:
+        await bot.add_cog(Invite(bot))
+    if plugin_config is not None:
+        global config
+        config.update(plugin_config)
 
-async def setup(bot: Gunibot):
-    await bot.add_cog(Invite(bot))

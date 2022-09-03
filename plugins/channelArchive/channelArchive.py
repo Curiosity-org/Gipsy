@@ -274,5 +274,10 @@ class ChannelArchive(commands.Cog):
         await ctx.send(embed=embed)
 
 
-async def setup(bot):
-    await bot.add_cog(ChannelArchive(bot))
+config = {}
+async def setup(bot:Gunibot=None, plugin_config:dict=None):
+    if bot is not None:
+        await bot.add_cog(ChannelArchive(bot))
+    if plugin_config is not None:
+        global config
+        config.update(plugin_config)

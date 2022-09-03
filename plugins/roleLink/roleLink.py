@@ -347,5 +347,11 @@ class GroupRoles(commands.Cog):
             )
 
 
-async def setup(bot):
-    await bot.add_cog(GroupRoles(bot))
+config = {}
+async def setup(bot:Gunibot=None, plugin_config:dict=None):
+    if bot is not None:
+        await bot.add_cog(GroupRoles(bot))
+    if plugin_config is not None:
+        global config
+        config.update(plugin_config)
+

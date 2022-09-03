@@ -524,12 +524,15 @@ class HelpCog(commands.Cog):
             )
         )
 
-
-async def setup(bot: Gunibot):
-    bot.help_command = Help()
-    await bot.add_cog(HelpCog(bot))
-
-
+config = {}
+async def setup(bot:Gunibot=None, plugin_config:dict=None):
+    if bot is not None:
+        bot.help_command = Help()
+        await bot.add_cog(HelpCog(bot))
+    if plugin_config is not None:
+        global config
+        config.update(plugin_config)
+        
 def teardown(bot: Gunibot):
     bot.help_command = commands.DefaultHelpCommand()
     bot.remove_cog("HelpCog")

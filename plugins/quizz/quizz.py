@@ -645,6 +645,11 @@ class Quizz(commands.Cog):
         self.quick_quizz_channels.append(ctx.channel.id)
         return
 
+config = {}
+async def setup(bot:Gunibot=None, plugin_config:dict=None):
+    if bot is not None:
+        await bot.add_cog(Quizz(bot))
+    if plugin_config is not None:
+        global config
+        config.update(plugin_config)
 
-async def setup(bot):
-    await bot.add_cog(Quizz(bot))

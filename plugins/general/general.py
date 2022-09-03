@@ -158,6 +158,10 @@ class General(commands.Cog):
         embed.add_field(name="admin", value="Affiche les commandes admin disponibles")
         await ctx.send(embed=embed)
 
-
-async def setup(bot):
-    await bot.add_cog(General(bot))
+config = {}
+async def setup(bot:Gunibot=None, plugin_config:dict=None):
+    if bot is not None:
+        await bot.add_cog(General(bot))
+    if plugin_config is not None:
+        global config
+        config.update(plugin_config)

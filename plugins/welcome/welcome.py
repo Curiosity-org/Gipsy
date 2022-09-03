@@ -54,5 +54,11 @@ class Welcome(commands.Cog):
                 await self.give_welcome_roles(after)
 
 
-async def setup(bot):
-    await bot.add_cog(Welcome(bot))
+config = {}
+async def setup(bot:Gunibot=None, plugin_config:dict=None):
+    if bot is not None:
+        await bot.add_cog(Welcome(bot))
+    if plugin_config is not None:
+        global config
+        config.update(plugin_config)
+
