@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     config.setup_plugins()
 
-    config.dispatch_config()
+    config.dispatch()
 
     # Save config
 
