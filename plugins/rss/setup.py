@@ -1,7 +1,6 @@
 import yaml
 import os
 from LRFutils.color import Color
-from core.config import global_config
 
 def run(save=False):
 
@@ -13,19 +12,19 @@ def run(save=False):
     
     if os.path.isfile("config.yaml"):
         with open("config.yaml") as f:
-            global_config.update(yaml.safe_load(f))
+            config = yaml.safe_load(f)
     
     choice = input(f"\n{blue}🔄️ Do you want to enable the RSS loop? [Y/n]:{NC} ")
     if choice not in decline:
-        global_config["rss"]["rss_loop_enabled"] = True
+        config["rss_loop_enabled"] = True
 
     # Consumer key
     
     def set_consumer_key():
         if c := input(f"\n🔑 {blue}Twitter consumer key (let empty to ignore):{NC} ") != "":
-            global_config["rss"]["twitter"]["consumer_key"] = c
+            config["twitter"]["consumer_key"] = c
 
-    if global_config["rss"]["twitter"]["consumer_key"] is not None:
+    if config["twitter"]["consumer_key"] is not None:
         choice = input(f"\n{blue}A consumer kkey is already set. Do you want to edit it? [y/N]:{NC} ")
         if choice in accept:
             set_consumer_key()
@@ -36,9 +35,9 @@ def run(save=False):
 
     def set_consumer_secret():
         if c := input(f"\n🔑 {blue}Twitter consumer secret (let empty to ignore):{NC} ") != "":
-            global_config["rss"]["twitter"]["consumer_secret"] = c
+            config["twitter"]["consumer_secret"] = c
     
-    if global_config["rss"]["twitter"]["consumer_secret"] is not None:
+    if config["twitter"]["consumer_secret"] is not None:
         choice = input(f"\n{blue}A consumer secret is already set. Do you want to edit it? [y/N]:{NC} ")
         if choice in accept:
             set_consumer_secret()
@@ -49,9 +48,9 @@ def run(save=False):
 
     def set_access_token_key():
         if c := input(f"\n🔑 {blue}Twitter access token key (let empty to ignore):{NC} ") != "":
-                global_config["rss"]["twitter"]["access_token_key"] = c
+                config["twitter"]["access_token_key"] = c
 
-    if global_config["rss"]["twitter"]["access_token_key"] is not None:
+    if config["twitter"]["access_token_key"] is not None:
         choice = input(f"\n{blue}An access token key is already set. Do you want to edit it? [y/N]:{NC} ")
         if choice in accept:
             set_access_token_key()
@@ -62,9 +61,9 @@ def run(save=False):
 
     def set_access_token_secret():  
         if c := input(f"\n🔑 {blue}Twitter access token secret (let empty to ignore):{NC} ") != "":
-            global_config["rss"]["twitter"]["access_token_secret"] = c
+            config["twitter"]["access_token_secret"] = c
     
-    if global_config["rss"]["twitter"]["access_token_secret"] is not None:   
+    if config["twitter"]["access_token_secret"] is not None:   
         choice = input(f"\n{blue}An access token secret is already set. Do you want to edit it? [y/N]:{NC} ")
         if choice in accept:
             set_access_token_secret()
@@ -73,4 +72,4 @@ def run(save=False):
 
     if save:
         with open("config.yaml", "w") as f:
-            yaml.dump(global_config, f)
+            yaml.dump(config, f)

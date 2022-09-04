@@ -69,7 +69,9 @@ def setup_plugins():
             choice = input(f"\n{Color.Blue}🔌 Do you want to configure {plugin} plugin? [Y/n]:{Color.NC} ")
 
             if choice.lower() not in decline:
-                plugin_setup.run()
+                plugin_config = plugin_setup.run()
+                if plugin_config is not None:
+                    _global_config.update({plugin:plugin_config})
 
 #####################
 # Config dispatcher #
