@@ -70,6 +70,4 @@ def run(save=False):
     else:
         set_access_token_secret()
 
-    if save:
-        with open("config.yaml", "w") as f:
-            yaml.dump(config, f)
+    return config
