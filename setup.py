@@ -1,9 +1,13 @@
+#!/usr/bin/env python
+# coding=utf-8
 import os
 import shutil
+import subprocess
 from tkinter import N
 from LRFutils.color import Color
 from LRFutils import log
 from core import config
+import sys
 import yaml
 import importlib
 
@@ -40,7 +44,7 @@ if __name__ == "__main__":
 
     config.setup_plugins()
 
-    config.dispatch_config()
+    config.dispatch()
 
     # Save config
 
@@ -53,4 +57,4 @@ if __name__ == "__main__":
     choice = input(f"\n▶️ Your config.py file is probably incomplete, which can break some features.\n\n{Color.Blue}▶️ Do you want to start the bot anyway? [Y/n]{Color.NC} ")
     if choice.lower() not in decline:
         print("   Starting the bot...\n--------------------------------------------------------------------------------")
-        os.system("python3 start.py")
+        subprocess.run([sys.executable, 'start.py'])
