@@ -23,6 +23,5 @@ async def execute(
             await ctx.send(
                 "https://media.discordapp.net/attachments/791335982666481675/979052868915064862/Chauve_qui_peut_.png"
             )
-        return True
-    else:
-        return False
+    
+    return False # allow Leirof to also get reverse ban and other fun things
