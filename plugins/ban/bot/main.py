@@ -19,9 +19,23 @@ class Ban(commands.Cog):
         if member.guild.id in self.friendly_ban_guilds:
             if member.id in self.friendly_banned_roles:
                 # Give the roles back to the users
+
+                # setup a list of the role that could not be given back
+                forbidden: list[discord.Role] = []
+
                 for role in self.friendly_banned_roles.pop(member.id):
                     if role.id != role.guild.id: # We ignore the @everyone role
-                        await member.add_roles(role)
+                        try:
+                            await member.add_roles(role)
+                        except discord.Forbidden:
+                            forbidden.append(role)
+                
+                # send a message to the user if some roles could not be given back
+                if len(forbidden) > 0:
+                    await member.send(
+                        (await self.bot._(member, "ban.gunivers.missing_roles") \
+                         + ", ".join([role.name for role in forbidden]))[:2000]
+                    )
 
     # ------------------#
     # Commande /ban    #
