@@ -95,8 +95,6 @@ def main():
                 log.error(f"Failed to load extension: {extension}")
                 notloaded += "\n - " + extension
                 failed += 1
-        if failed > 0:
-            raise Exception(f"\n{failed} modules not loaded" + notloaded)
         return loaded, failed
 
     # Printing info when the bot is started

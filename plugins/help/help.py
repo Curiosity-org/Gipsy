@@ -48,11 +48,11 @@ class Help(commands.HelpCommand):
         """
 
         # load the config options
-        color = self.context.bot.config.get("help_embed_color", 0)
-        author = self.context.bot.config.get("help_author").format(
+        color = self.context.bot.server_configs[self.context.guild.id].get("help_embed_color", 0)
+        author = self.context.bot.server_configs[self.context.guild.id].get("help_author").format(
             user=self.context.bot.user
         )
-        icon_url = self.context.bot.config.get("help_author_icon_url").format(
+        icon_url = self.context.bot.server_configs[self.context.guild.id].get("help_author_icon_url").format(
             user=self.context.bot.user
         )
 

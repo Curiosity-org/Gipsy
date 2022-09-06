@@ -242,10 +242,10 @@ class Errors(commands.Cog):
 
     async def senf_err_msg(self, msg):
         """Sends a message to the error channel"""
-        salon = self.bot.get_channel(self.bot.config["errors_channel"])
-        if salon is None:
+        channel = self.bot.get_channel(self.bot.config["errors_channel"])
+        if channel is None:
             return False
-        await salon.send(msg)
+        await channel.send(msg)
         return True
 
 

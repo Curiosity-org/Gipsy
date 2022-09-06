@@ -3,7 +3,7 @@ from utils import MyContext, CheckException
 
 
 def is_bot_admin(ctx: MyContext):
-    return ctx.author.id in ctx.bot.config["bot_admins"]
+    return ctx.author.id in ctx.bot.server_configs[ctx.guild.id]["bot_admins"]
 
 
 async def is_admin(ctx: MyContext):

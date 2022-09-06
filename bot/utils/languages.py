@@ -46,7 +46,7 @@ class Languages(commands.Cog):
         if guildID is None:
             as_int = 0
         else:
-            as_int = self.bot.server_configs[guildID]["language"]
+            as_int = self.languages.index(self.bot.server_configs[guildID]["language"])
         if use_str:
             return self.languages[as_int]
         return as_int

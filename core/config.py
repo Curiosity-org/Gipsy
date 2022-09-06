@@ -25,8 +25,8 @@ def get(config:str):
     return conf
 
 def save():
-    with open("config.yaml","w") as f:
-        yaml.dump(_global_config,f)
+    with open("config.yaml", "w") as f:
+        yaml.dump(_global_config, f)
 
 #################
 # Reload config #
@@ -34,7 +34,7 @@ def save():
 
 def reload_config():
     """This function read the core/default_config.yaml file and store it in a dictionnary.
-    Then, it update the dict' using all the plugins/<plguin>/config.yaml files.
+    Then, it update the dict' using all the plugins/<plugin>/config.yaml files.
     Finally, it update the dict' using the config.yaml file wich is defined by the user.
     Each step overwrite the previus one."""
 
