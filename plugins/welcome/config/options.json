@@ -1,7 +1,0 @@
-{
-    "welcome_roles": {
-        "default": null,
-        "type": "roles",
-        "command": "welcome_roles"
-    }
-}
