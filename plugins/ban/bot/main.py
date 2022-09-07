@@ -8,6 +8,14 @@ from utils import Gunibot, MyContext
 
 
 class Ban(commands.Cog):
+    friendly_ban_guilds: list[int]
+    friendly_ban_config: dict
+
+    friendly_ban_events: list[dict]
+    systematic_events: list[function]
+    random_events: list[function]
+    friendly_banned_roles: dict[int,list[discord.Role]]
+
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "ban"
