@@ -26,6 +26,8 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
+        with:
+          submodules: recursive
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -45,6 +47,6 @@ jobs:
           pylint: true
           pylint_args: "--disable=C,R,I"
           auto_fix: true
-          git_name: "GuniLint"
-          git_email: "linter@gunivers.net"
+          git_name: "GuniBot"
+          git_email: "gunibot@noreply.github.com"
           commit_message: "🌟 style: fix code style issues with ${linter}"

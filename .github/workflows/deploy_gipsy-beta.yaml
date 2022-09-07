@@ -14,6 +14,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 10
+          submodules: recursive
       - name: deploy
         uses:  swznd/sftp-deploy@master
         with:
