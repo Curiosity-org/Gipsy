@@ -170,7 +170,6 @@ class Ban(commands.Cog):
                         f"plugins.ban.events.{event['module_name']}"
                     ).execute
                 )
-                print(f"Loaded systematic event {event['name']}")
             else:
                 for _ in range(chances):
                     self.random_events.append(
