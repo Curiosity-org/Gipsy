@@ -101,10 +101,8 @@ class Ban(commands.Cog):
                     return
             
             # Pick a random event and execute it if no systematic event has been executed
-            event_n = random.randint(0, len(self.random_events) - 1)
-
             # random events should always run successfully
-            await self.random_events[event_n](self, ctx, user, reason)
+            await random.choice(self.random_events)(self, ctx, user, reason)
 
     # ------------------#
     # Commande /rban   #
@@ -172,7 +170,7 @@ class Ban(commands.Cog):
 
         for event in self.friendly_ban_events:
             chances = event.get("chances", None)
-            if chances == None:
+            if chances is None:
                 self.systematic_events.append(
                     importlib.import_module(
                         f"plugins.ban.events.{event['module_name']}"
@@ -192,14 +190,23 @@ class Ban(commands.Cog):
     async def fake_ban(self, ctx: commands.Context, user: discord.User) -> bool:
         """Friendly ban a user
         If the ban doesn't succeed, returns False"""
+        
         # send the invitation to allow the user to rejoin the guild
-        await user.send(
-            await ctx.channel.create_invite(
+        try:
+            invitation = await ctx.channel.create_invite(
                 reason="Friendly ban",
                 max_uses=1,
                 unique=True,
             )
-        )
+        except discord.Forbidden:
+            await ctx.send(await ctx.bot._('ban.gunivers.whoups'))
+
+        try:
+            await user.send(
+                invitation
+            )
+        except discord.Forbidden:
+            await ctx.send(await ctx.bot._('ban.gunivers.whoups'))
         
         # store the roles somewhere to give them back to the user
         self.friendly_banned_roles[user.id] = ctx.guild.get_member(
