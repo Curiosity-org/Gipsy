@@ -109,7 +109,7 @@ class Ban(commands.Cog):
     # ------------------#
     # Commande /rban   #
     # ------------------#
-    # Parce qu'il peut être pratique de bannir tout de même
+    # Because it may be useful to ban nonetheless
 
     @commands.command(name="rban")
     @commands.guild_only()
@@ -191,7 +191,7 @@ class Ban(commands.Cog):
     
     async def fake_ban(self, ctx: commands.Context, user: discord.User) -> bool:
         """Friendly ban a user
-        If the ban doesn't succeeds, returns False"""
+        If the ban doesn't succeed, returns False"""
         # send the invitation to allow the user to rejoin the guild
         await user.send(
             await ctx.channel.create_invite(
