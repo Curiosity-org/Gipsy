@@ -1,5 +1,2 @@
-discord:
-  token: "LOLTHISISATOKEN"
-
-discord2:
-  token: "LOLTHISISATOKEN V2"
+ban:
+  friendly_ban: on

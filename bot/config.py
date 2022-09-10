@@ -47,7 +47,7 @@ def append_dict(dict1: dict, dict2: dict):
         else:
             dict1[key] = value
 
-T = TypeVar("T", )
+T = TypeVar("T")
 
 class ConfigurationField(Generic[T]):
     def __init__(
@@ -159,15 +159,38 @@ class Configuration():
         self.fields[field.name] = field
 
 if __name__ == "__main__":
-    # géré par le cœur
-    config = Configuration(is_child=False)
-    config.load("test.yaml")
+    # géré par le cœur, qui charge les fichiers comme il veut
+    # le développeur de plugin doit ne pas avoir à toucher à ces initialisations
+    config1 = Configuration(is_child=False)
+    config1.load("test.yaml")
 
-    class DiscordConfiguration(Configuration):
-        token = ConfigurationField(str)
+    # si le développeur a vraiment la flemme mais une flemme paradoxale, il
+    # peut accéder à la configuration comme ceci
+    print(config1["ban"]["friendly_ban"])
+
+    # cette partie est le minimum syndicale pour le développeur
+    ban_config_1 = Configuration(namespace="ban")
+    config1.add_configuration_child(ban_config_1)
+
+    # à partir de là le développeur peut accéder à la configuration comme suit
+    print(ban_config_1['friendly_ban'])
+    # on est d'accord que c'est plus propre que ce qui est affiché plus haut
+
+    # nouvelle exemple
+
+    config2 = Configuration(is_child=False)
+    config2.load("test.yaml")
+
+    # le développeur de plugin peut aussi ajouter les champs en tant que variable
+    class BanConfiguration(Configuration):
+        friendly_ban = ConfigurationField(bool) # on pourra définir le type, avoir une conversion des données, mettre une valeur par défaut etc à terme
     
-    test = DiscordConfiguration("discord")
-    config.add_configuration_child(test)
+    # les mêmes étapes que plus haut (le *minimum syndical*)
+    ban_config_2 = BanConfiguration("ban")
+    config2.add_configuration_child(ban_config_2)
 
-    print(test.token)
+    # et pouf ça fait des chocapic
+    print(ban_config_2.friendly_ban)
+    # encore plus propre que plus haut non ?
+    # et ça supporte le typage avec par ex vscode ! (si tu spécifie un type)
 
