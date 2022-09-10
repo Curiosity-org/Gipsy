@@ -32,3 +32,4 @@ fr:
         "2": "Rooh, pourquoi ?"
 
       missing_roles: "Je n'ai pas pu vous remettre les rôles suivants : "
+      whoups: "Je n'ai pas pu inviter l'utilisateur... Il ne reviendra jamais... Adieu, donc."
