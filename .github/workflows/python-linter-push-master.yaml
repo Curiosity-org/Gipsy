@@ -32,6 +32,9 @@ jobs:
           python-version: '3.10' 
 
       - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Linters
         run: pip install black pylint
 
       - name: Run linters
