@@ -24,7 +24,6 @@ permissions:
 
 jobs:
   run-linters:
-    if: ! github.event.pull_request.draft
     name: Run linters
     runs-on: ubuntu-latest
 
