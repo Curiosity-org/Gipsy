@@ -10,7 +10,7 @@ async def execute(
     reason: str,
 ) -> bool:
     """Execute the autoban event.
-    If the event don't succeds, the function returns False.
+    If the event doest't succeed, the function returns False.
     """
 
     if ctx.author.id == user.id:
