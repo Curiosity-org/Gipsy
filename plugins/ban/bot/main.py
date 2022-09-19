@@ -12,8 +12,9 @@ class Ban(commands.Cog):
     friendly_ban_config: dict
 
     friendly_ban_events: list[dict]
-    systematic_events: list[function]
-    random_events: list[function]
+    systematic_events: list
+    random_events: list
+    friendly_ban_whitelisted_roles: list[int]
     friendly_banned_roles: dict[int,list[discord.Role]]
 
     def __init__(self, bot: Gunibot):
@@ -45,13 +46,27 @@ class Ban(commands.Cog):
                          + ", ".join([role.name for role in forbidden]))[:2000]
                     )
 
+    async def ban_perm_check(ctx: commands.Context) -> bool:
+        """Checks if the user has the permission to ban"""
+        
+        self: Ban = ctx.bot.get_cog("Ban")
+
+        if ctx.guild.id not in self.friendly_ban_guilds:
+            return await commands.has_guild_permissions(ban_members=True).predicate(ctx)
+        else:
+            for role in ctx.author.roles:
+                if role.id in self.friendly_ban_whitelisted_roles:
+                    return True
+            
+            return await commands.has_guild_permissions(ban_members=True).predicate(ctx)
+
     # ------------------#
     # Commande /ban    #
     # ------------------#
 
     @commands.command(name="ban")
     @commands.guild_only()
-    @commands.has_guild_permissions(ban_members=True)
+    @commands.check(ban_perm_check)
     async def ban(
         self,
         ctx: MyContext,
@@ -160,6 +175,11 @@ class Ban(commands.Cog):
         # loads the guild ids from the configuration
         self.friendly_ban_guilds: list[int] = self.friendly_ban_config.get(
             "guilds",
+            []
+        )
+
+        self.friendly_ban_whitelisted_roles: list[int] = self.friendly_ban_config.get(
+            "whitelisted_roles",
             []
         )
 
