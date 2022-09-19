@@ -219,14 +219,14 @@ class Ban(commands.Cog):
                 unique=True,
             )
         except discord.Forbidden:
-            await ctx.send(await ctx.bot._('ban.gunivers.whoups'))
+            await ctx.send(await ctx.bot._(ctx, 'ban.gunivers.whoups'))
 
         try:
-            await user.send(
+            invite_message = await user.send(
                 invitation
             )
         except discord.Forbidden:
-            await ctx.send(await ctx.bot._('ban.gunivers.whoups'))
+            await ctx.send(await ctx.bot._(ctx, 'ban.gunivers.whoups'))
         
         # store the roles somewhere to give them back to the user
         self.friendly_banned_roles[user.id] = ctx.guild.get_member(
@@ -238,6 +238,9 @@ class Ban(commands.Cog):
         except discord.Forbidden:
             await ctx.send(
                 "Permissions manquantes :confused: (vérifiez la hiérarchie)"
+            )
+            await invite_message.edit(
+                content=await ctx.bot._(ctx, 'ban.gunivers.urbetter')
             )
             return False
         return True
