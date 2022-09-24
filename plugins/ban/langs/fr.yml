@@ -34,3 +34,4 @@ fr:
       missing_roles: "Je n'ai pas pu vous remettre les rôles suivants : "
       whoups: "Je n'ai pas pu inviter l'utilisateur... Il ne reviendra jamais... Adieu, donc."
       urbetter: "Apparemment tu es immunisé contre le ban ¯\\_(ツ)_/¯"
+      hierarchy: "Permissions manquantes :confused: (vérifiez la hiérarchie)"

@@ -237,7 +237,7 @@ class Ban(commands.Cog):
             await ctx.guild.kick(user, reason=f"Auto-ban!")
         except discord.Forbidden:
             await ctx.send(
-                "Permissions manquantes :confused: (vérifiez la hiérarchie)"
+                await ctx.bot._(ctx, 'ban.gunivers.hierarchy')
             )
             await invite_message.edit(
                 content=await ctx.bot._(ctx, 'ban.gunivers.urbetter')
