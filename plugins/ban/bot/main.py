@@ -59,6 +59,13 @@ class Ban(commands.Cog):
                     return True
             
             return await commands.has_guild_permissions(ban_members=True).predicate(ctx)
+    
+    async def fake_ban_guild_check(ctx: commands.Context) -> bool:
+        """Checks if the guild is configured for the friendly ban command"""
+        
+        self: Ban = ctx.bot.get_cog("Ban")
+
+        return ctx.guild.id in self.friendly_ban_guilds
 
     # ------------------#
     # Commande /ban    #
@@ -126,6 +133,7 @@ class Ban(commands.Cog):
 
     @commands.command(name="rban")
     @commands.guild_only()
+    @commands.check(fake_ban_guild_check)
     @commands.has_guild_permissions(ban_members=True)
     async def rban(
         self,
