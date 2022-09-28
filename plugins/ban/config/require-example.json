@@ -35,5 +35,8 @@
             "chances": 7,
             "module_name": "just_a_message"
         }
+    ],
+    "whitelisted_roles": [
+        968203819127279626
     ]
 }
