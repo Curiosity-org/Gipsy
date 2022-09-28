@@ -80,6 +80,7 @@ class Ban(commands.Cog):
         user: discord.User,
         reason: str = "Aucune raison donnée",
     ):
+        "Banhammer. Use at your own risk."
         if user == ctx.author and not ctx.guild.id in self.friendly_ban_guilds:
             await ctx.send("Tu ne peux pas te bannir toi-même !")
             return
@@ -140,6 +141,7 @@ class Ban(commands.Cog):
         user: discord.User,
         reason: str = "Aucune raison donnée",
     ):
+        "Bans a user. If you really don't like his face."
         if ctx.guild.id == 125723125685026816 or ctx.guild.id == 689159304049197131:
             if user == ctx.author:
                 await ctx.send("Tu ne peux pas te bannir toi-même abruti !")
@@ -213,9 +215,18 @@ class Ban(commands.Cog):
         # initiate the cache for the banned users roles
         self.friendly_banned_roles: dict[int,list[discord.Role]] = {}
     
-    async def fake_ban(self, ctx: commands.Context, user: discord.User) -> bool:
+    async def fake_ban(
+        self,
+        ctx: commands.Context,
+        user: discord.User,
+        show_error: bool = True,
+    ) -> bool:
         """Friendly ban a user
-        If the ban doesn't succeed, returns False"""
+        If the ban doesn't succeed, returns False
+        ctx: the context used to send the error message if necessary
+        user: the user to ban
+        show_error: whether to show an error message if the ban fails
+        """
         
         # send the invitation to allow the user to rejoin the guild
         try:
@@ -225,14 +236,16 @@ class Ban(commands.Cog):
                 unique=True,
             )
         except discord.Forbidden:
-            await ctx.send(await ctx.bot._(ctx, 'ban.gunivers.whoups'))
+            if show_error:
+                await ctx.send(await ctx.bot._(ctx, 'ban.gunivers.whoups'))
 
         try:
             invite_message = await user.send(
                 invitation
             )
         except discord.Forbidden:
-            await ctx.send(await ctx.bot._(ctx, 'ban.gunivers.whoups'))
+            if show_error:
+                await ctx.send(await ctx.bot._(ctx, 'ban.gunivers.whoups'))
         
         # store the roles somewhere to give them back to the user
         self.friendly_banned_roles[user.id] = ctx.guild.get_member(
@@ -242,9 +255,10 @@ class Ban(commands.Cog):
         try:
             await ctx.guild.kick(user, reason=f"Auto-ban!")
         except discord.Forbidden:
-            await ctx.send(
-                await ctx.bot._(ctx, "ban.gunivers.missing_permissions")
-            )
+            if show_error:
+                await ctx.send(
+                    await ctx.bot._(ctx, "ban.gunivers.missing_permissions")
+                )
             await invite_message.edit(
                 content=await ctx.bot._(ctx, 'ban.gunivers.urbetter')
             )

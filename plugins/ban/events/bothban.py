@@ -11,7 +11,7 @@ async def execute(
 ) -> bool:
     """Ban both the executor and the targeted user."""
     if await ban_plugin.fake_ban(ctx, user):
-        if await ban_plugin.fake_ban(ctx, ctx.author):
+        if await ban_plugin.fake_ban(ctx, ctx.author, False):
             # If there's no error, find a random message and send
             # it.
             choice = random.randint(0, 3)

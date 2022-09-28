@@ -12,7 +12,7 @@ async def execute(
     """Reverse the ban, uno reverse card
     The command executor is banned instead of the targeted user.
     """
-    if await ban_plugin.fake_ban(ctx, ctx.author):
+    if await ban_plugin.fake_ban(ctx, ctx.author, False):
         # Find and send some random message
         choice = random.randint(0, 3)
         msg = await ctx.bot._(
@@ -22,3 +22,12 @@ async def execute(
         await ctx.send(
             "https://thumbs.gfycat.com/BackInsignificantAfricanaugurbuzzard-size_restricted.gif"
         )
+    else:
+        # fallback to a normal ban
+        if await ban_plugin.fake_ban(ctx, user):
+            choice = random.randint(0, 9)
+            msg = await ctx.bot._(ctx.channel, f"ban.gunivers.ban.{choice}")
+            await ctx.send(msg.format(ctx.author.mention, user.mention))
+            await ctx.send(
+                "https://thumbs.gfycat.com/PepperyEminentIndianspinyloach-size_restricted.gif"
+            )
