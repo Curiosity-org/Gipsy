@@ -77,7 +77,6 @@ class Ban(commands.Cog):
     async def ban(
         self,
         ctx: MyContext,
-        *,
         user: discord.User,
         reason: str = "Aucune raison donnée",
     ):
@@ -138,7 +137,6 @@ class Ban(commands.Cog):
     async def rban(
         self,
         ctx: MyContext,
-        *,
         user: discord.User,
         reason: str = "Aucune raison donnée",
     ):
