@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+
 async def execute(
     ban_plugin,
     ctx: commands.Context,

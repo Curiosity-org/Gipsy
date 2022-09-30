@@ -3,6 +3,7 @@ from discord.ext import commands
 
 import random
 
+
 async def execute(
     ban_plugin,
     ctx: commands.Context,
