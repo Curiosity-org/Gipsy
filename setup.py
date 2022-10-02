@@ -10,8 +10,9 @@ from core import config
 import sys
 import yaml
 import importlib
+import asyncio
 
-accept = ["y", "yes", "yeah", "ye"]
+accept = ["y", "yes", "yep", "yeah"]
 decline = ["n", "no", "nope", "nah"]
             
 if __name__ == "__main__":
@@ -44,7 +45,7 @@ if __name__ == "__main__":
 
     config.setup_plugins()
 
-    config.dispatch()
+    asyncio.run(config.dispatch())
 
     # Save config
 
