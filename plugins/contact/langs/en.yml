@@ -1,0 +1,13 @@
+en:
+  contact:
+    duration-short: You cannot select a duration of less than a day
+    no-category: You didn't setup any contact category!
+    category-notfound: Unable to find your contact category! Please check your configuration
+    deleted:
+      zero: No channel is old enough
+      one: One channel has been deleted
+      many: "%{count} channels have been deleted"
+    not-deleted:
+      one: "One channel could not be deleted:"
+      many: "%{count} channels could not be deleted:"
+    invalid-title: "Invalid contact title. The title must be either `author` or `object`"

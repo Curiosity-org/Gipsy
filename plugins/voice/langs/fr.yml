@@ -1,0 +1,6 @@
+fr:
+  voices:
+    no-channel: Il n'y a aucun salon vocal généré par moi ici
+    result:
+      one: Supprimé 1 salon
+      many: Supprimé %{count} salons

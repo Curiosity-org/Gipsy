@@ -1,0 +1,32 @@
+{
+    "enable_xp": {
+        "default": true,
+        "type": "boolean",
+        "command": "enable_xp"
+    },
+    "noxp_channels": {
+        "default": null,
+        "type": "channels",
+        "command": "noxp_channels"
+    },
+    "levelup_channel": {
+        "default": "any",
+        "type": "channels",
+        "command": "levelup_channel"
+    },
+    "levelup_message": {
+        "default": null,
+        "type": "text",
+        "command": "levelup_message"
+    },
+    "levelup_reaction": {
+        "default": false,
+        "type": "boolean",
+        "command": "levelup_reaction"
+    },
+    "reaction_emoji": {
+        "default": null,
+        "type": "emojis",
+        "command": "giveaways_emoji"
+    }
+}

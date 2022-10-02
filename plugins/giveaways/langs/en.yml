@@ -1,0 +1,45 @@
+en:
+  giveaways:
+    creation:
+      empty-name: The argument 'nom' cannot be empty!
+      empty-duration: The argument 'duration' cannot be empty!
+      invalid-name: There is already a running giveaway with this name!
+      invalid-winners: The number of winners must be a number!
+      invalid-channel: The argument 'channel' is not a valid channel
+      invalid-perms: I cannot send embeds to the specified channel
+      success: I have successfully created the giveaway **%{name}** with the ID %{id}
+      httpexception: Unable to send the message in %{channel}
+    embed:
+      desc: "Price: %{price}\nWon by: %{winners}"
+      ends-at: Ends at
+      ended-at: Ended at
+      price: Price
+      title: New giveaway!
+      winners:
+        zero: "There were no participants :confused:"
+        one: The winner is %{winner}
+        many: The winners are %{winner}
+    info:
+      soon: Imminent
+      ended: Already finished
+      summary: "Name: **%{name}**\nRemaining time: **%{time}**\nParticipants: **%{nbr}**\nChannel: <#%{channel}>"
+    picking:
+      no-participant: No one has participated in this contest! I will destroy it
+      selecting: Selection of winners...
+      winners:
+        one: "The winner is: %{users}! Congratulations, you have won %{price}!"
+        many: "The winners are : %{users}! Congratulations, you have won %{price}!"
+    already-left: You are already not participating in this giveaway!
+    already-stopped: This giveaway is already stopped
+    already-participant: You already participate in this giveaway
+    been-stopped: This giveaway has been stopped
+    list-active: "The currently active giveaways:"
+    list-inactive: "The already completed giveaways :"
+    no-giveaway: There is no giveaway in this server
+    not-stopped: This giveaway is still running, you can stop it with `%{p}giveaway stop %{id}`.
+    subscribed: You are now participating in the giveaway **%{name}**, good luck!
+    success-deleted: This giveaway has been deleted!
+    success-left: You are no longer participating in the giveaway **%{name}**!
+    something-went-wrong: Oops, something went wrong!
+    too-many-members: This channel has too many members, and the giveaway may not work there! Please use another chat
+    unknown-giveaway: "This giveaway does not exist. To see all the giveaways, you can use `%{p}giveaway list`"
