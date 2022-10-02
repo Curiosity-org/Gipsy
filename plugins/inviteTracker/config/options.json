@@ -1,0 +1,7 @@
+{
+    "invite_log": {
+        "default": null,
+        "type": "channels",
+        "command": "invite_log"
+    }
+}

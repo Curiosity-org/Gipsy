@@ -1,0 +1,17 @@
+{
+    "help_embed_color": {
+        "default": 0,
+        "type": "int",
+        "command": "help_embed_color"
+    },
+    "help_author": {
+        "default": "{user.name}",
+        "type": "string",
+        "command": "help_author"
+    },
+    "help_author_icon_url": {
+        "default": "{user.display_avatar.url}",
+        "type": "string",
+        "command": "help_author_icon_url"
+    }
+}

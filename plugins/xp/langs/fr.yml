@@ -1,0 +1,26 @@
+fr:
+  xp:
+    card:
+      level: Niveau
+      rank: Rang
+    rr:
+      added: Le rôle %{name} a bien été ajouté au niveau %{level}
+      already-exist: Un rôle-niveau existe déjà pour ce niveau
+      list-title: Rôles-niveaux du serveur (%{nbr})
+      no-rr: Vous n'avez aucun rôle configuré pour ce niveau
+      no-rr-2: Vous n'avez aucun rôle configuré dans ce serveur !
+      reload: "%{count} rôles ont été attribués ou enlevés sur les %{members} membres du serveur"
+      removed: Plus aucun rôle ne sera donné pour le niveau %{level}
+    top:
+      title: Classement du serveur
+      name: "Top %{min}-%{max} (page %{page}/%{pmax})"
+      your: Votre classement
+      low-page: Vous ne pouvez pas entrer un numéro de page négatif ou nul
+      high-page: Il n'y a pas autant de pages !
+    bot-rank: Les bots ne peuvent pas avoir de l'xp !
+    cant-manage-roles: Oups, je ne peux pas donner les rôles ! Veuillez m'attribuer la permission "gérer les rôles" et vérifier que mon rôle soit plus haut que ceux à donner
+    cant-send-embed: Oups, je ne peux pas envoyer le résultat ! Veuillez m'attribuer la permission "intégrer des liens"
+    default_levelup: Hey, {user} passe au niveau {level} ! GG !
+    no-xp-author: Vous n'avez encore aucun xp
+    no-xp-user: Cet utilisateur n'a encore aucun xp
+    xp-disabled: Le système d'xp est désactivé ici !

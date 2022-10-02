@@ -1,0 +1,45 @@
+fr:
+  giveaways:
+    creation:
+      empty-name: Le paramètre 'nom' ne peut pas être vide !
+      empty-duration: Le paramètre 'durée' ne peut pas être vide !
+      invalid-name: Il y a déjà un giveaway en cours avec ce nom !
+      invalid-winners: Le nombre de gagnants doit être un nombre entier !
+      invalid-channel: Le paramètre 'salon' n'est pas un salon valide
+      invalid-perms: Je ne peux pas envoyer d'embeds dans le salon spécifié
+      success: J'ai correctement créé le giveaway **%{name}** avec l'ID %{id}
+      httpexception: Impossible d'envoyer le message dans %{channel}
+    embed:
+      desc: "Prix: %{price}\nRemporté par: %{winners}"
+      ends-at: Finit à
+      ended-at: Terminé le
+      price: Prix
+      title: Nouveau giveaway !
+      winners:
+        zero: "Il n'y a eu aucun participant :confused:"
+        one: Le gagnant est %{winner}
+        many: Les gagnants sont %{winner}
+    info:
+      soon: Imminent
+      ended: Déjà terminé
+      summary: "Nom : **%{name}**\nTemps restant : **%{time}**\nEntrées : **%{nbr}**\nSalon : <#%{channel}>"
+    picking:
+      no-participant: Personne n'a participé à ce concours ! Je vais le détruire
+      selecting: Choix des gagnants...
+      winners:
+        one: "Le gagnant est : %{users} ! Félicitations, vous avez gagné %{price} !"
+        many: "Les gagnants sont : %{users} ! Félicitations, vous avez gagné %{price} !"
+    already-left: Vous ne participez déjà pas à ce giveaway !
+    already-stopped: Ce giveaway est déjà arrêté
+    already-participant: Vous participez déjà à ce giveaway
+    been-stopped: Ce giveaway a été arrêté
+    list-active: "Les giveaways actuellement actifs :"
+    list-inactive: "Les giveaways déjà terminés :"
+    no-giveaway: Il n'y a aucun giveaway dans ce serveur
+    not-stopped: Ce giveaway est toujours d'actualité, vous pouvez l'arrêter avec `%{p}giveaway stop %{id}`
+    subscribed: Vous participez maintenant au giveaway **%{name}**, bonne chance !
+    success-deleted: Ce giveaway a bien été supprimé !
+    success-left: Vous ne participez plus au giveaway **%{name}** !
+    something-went-wrong: Oups, quelque chose s'est mal passé !
+    too-many-members: Ce salon a trop de membres, et le giveaway risque de ne pas y fonctionner ! Veuillez utiliser un autre salon
+    unknown-giveaway: "Ce giveaway n'existe pas. Pour voir tous les giveaways vous pouvez utiliser `%{p}giveaway list`"

@@ -1,0 +1,6 @@
+fr:
+  hypesquad:
+    no-role: Vous n'avez aucun rôle de maison configuré !
+    forbidden: Oups, une erreur est survenue. Veuillez vérifier mes permissions !
+    edited: "Les rôles de %{user} ont bien été modifiés"
+    not-edited: "Les rôles de %{user} n'avaient pas besoin d'être modifiés"

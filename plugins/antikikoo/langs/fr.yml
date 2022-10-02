@@ -1,0 +1,4 @@
+fr:
+  antikikoo:
+    channel-edited: Le salon de vérification est maintenant %{channel} !
+    msg-edited: Le message d'information a bien été modifié !

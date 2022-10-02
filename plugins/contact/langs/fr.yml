@@ -1,0 +1,13 @@
+fr:
+  contact:
+    duration-short: Vous ne pouvez pas choisir une durée de moins d'un jour
+    no-category: Aucune catégorie de contact n'a été configurée !
+    category-notfound: Impossible de trouver la catégorie de contact ! Vérifiez votre configuration
+    deleted:
+      zero: Aucun salon n'est assez vieux
+      one: Un salon a été supprimé
+      many: "%{count} salons ont été supprimés"
+    not-deleted:
+      one: "Un salon n'a pas pu être supprimé :"
+      many: "%{count} salons n'ont pas pu être supprimés :"
+    invalid-title: "Titre de salon invalide. Ce paramètre doit être définit sur `author` ou `object`"

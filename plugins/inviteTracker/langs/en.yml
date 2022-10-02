@@ -1,0 +1,6 @@
+en:
+  invite-tracker:
+    join-code: "%{member} joins %{guild} with the invite `%{code}` created by %{inviter}, which has been used `%{uses}` times now !"
+    join-description: "%{member} joins %{guild} with the invite \"%{description}\" (`%{code}`) created by %{inviter}, which has been used `%{uses}` times now !"
+    not-found: Invitation not found.
+    set-description-done: "`%{code}`'s description changed."

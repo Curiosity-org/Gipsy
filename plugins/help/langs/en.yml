@@ -1,0 +1,32 @@
+en:
+  help:
+    bot-help-title: Help for Gipsy bot
+    help-tip: Use %{prefix}help [command] for more on a command !
+    command-help-title: Help for the command {0}
+    help-signature-format: "`%{signature}`"
+    group-help-title: Help for the group `%{name}`
+    cog-help-title: Help for the cog `%{name}`
+    no-category: No category
+    type: ": %{type}"
+    default: " = `%{default}`"
+    short_doc: ": *%{short_doc}*"
+    parameters: Commande parameters
+    alias: Aliases
+    subcommands: Subcommands
+    not-found: The command "%{command}" does not exist !
+    greedy: "Suite : %{type}"
+  
+  annotation:
+    user: User (mention or ID)
+    textchannel: Text channel (mention or ID)
+    voicechannel: Voice channel (mention or ID)
+    role: Role (mention or ID)
+    guild: Guild (ID)
+    string: String (use "" with space)
+    int: Integer
+    bool: True / False (y, n, 1, 0, true, false...)
+    message: Message (link or ID)
+  
+  help_default:
+    true_: "Yes"
+    false_: "No"
