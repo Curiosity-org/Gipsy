@@ -16,21 +16,15 @@ import re
 import time
 import typing
 from marshal import dumps, loads
+import core
 
-config = {"yo":"test"}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)
-        print(f"\n\n----------\n{config}\n----------\n\n")
-    if bot is not None:
-        await bot.add_cog(Rss(bot))
+async def setup(bot:Gunibot): await bot.add_cog(Rss(bot))
 
 class Rss(commands.Cog):
     """Cog which deals with everything related to rss flows. Whether it is to add automatic tracking to a stream, or just to see the latest video released by Discord, it is this cog that will be used."""
 
     def __init__(self, bot: Gunibot):
-        global config
+        self.config = core.config.get("rss")
         self.bot = bot
         self.time_loop = 15  # min minutes between two rss loops
         # seconds between two rss checks within a loop
@@ -39,8 +33,7 @@ class Rss(commands.Cog):
 
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
-        print(f"\n\n++++++++++\n{config}\n++++++++++\n\n")
-        self.twitterAPI = twitter.Api(**config["twitter"], tweet_mode="extended")
+        self.twitterAPI = twitter.Api(**self.config["twitter"], tweet_mode="extended")
         self.twitter_over_capacity = False
         self.min_time_between_posts = {"web": 120, "tw": 15, "yt": 120}
         self.cache = dict()
@@ -1663,7 +1656,7 @@ class Rss(commands.Cog):
             return False
 
     async def main_loop(self, guildID: int = None):
-        if not config["rss_loop_enabled"]:
+        if not self.config["rss_loop_enabled"]:
             return
         t = time.time()
         if self.loop_processing:
