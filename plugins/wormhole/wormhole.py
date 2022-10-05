@@ -56,9 +56,11 @@ async def sendMessage(
 
     embeds = [embed for embed in msg.embeds if embed.type == "rich"]
     if embed_reply and embeds:
-        if len(embeds) >= 10:
+        while len(embeds) >= 10:
             embeds.pop()
         embeds.append(embed_reply)
+    elif embed_reply:
+        embeds = [embed_reply]
     new_msg: discord.WebhookMessage = await webhook.send(
         content=msg.content,
         files=files,
@@ -257,12 +259,11 @@ class Wormholes(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         """Executed every time a message is sent"""
-        if (
-            message.author.bot
-            or "wormhole unlink" in message.content
+        if ("wormhole unlink" in message.content
             or "wh unlink" in message.content
         ):
             return
+
         query = "SELECT name, type FROM wormhole_channel WHERE channelID = ?"
         wh_channel = self.bot.db_query(
             query, (message.channel.id,), astuple=True, fetchone=True
@@ -275,7 +276,25 @@ class Wormholes(commands.Cog):
         # Check if the current channel as Write permissions
         if "w" not in wh_channel[1]:
             return
+
+        # Getting wormhole name
         wh_name = wh_channel[0]
+
+        # If the sender is a webhook used by the wormhole, then we don't want to send the message
+        query = "SELECT * FROM wormhole_channel WHERE name = ? AND channelID = ?"
+        wh_targets = self.bot.db_query(query, (wh_name, message.channel.id), astuple=True)
+        async with ClientSession() as session:
+            # Logically the query return only one channel
+            if len(wh_targets) > 1:
+                raise ValueError("Euh, there is more than one channel with the same ID on this wormhole... this is supposed to never happend")
+            # Get wormhole webhook associated to this channel
+            connected_channel = wh_targets[0]
+            webhook = discord.Webhook.partial(connected_channel[4], connected_channel[5], session=session)
+            # Check if the sender is this webhook
+            if message.author.id == webhook.id:
+                return
+
+        # Getting all the other channels linked to the wormhole
         query = "SELECT * FROM wormhole_channel WHERE name = ? AND type LIKE '%r%' AND NOT channelID = ?"
         wh_targets = self.bot.db_query(
             query, (wh_name, message.channel.id), astuple=True
@@ -284,13 +303,17 @@ class Wormholes(commands.Cog):
         query = "SELECT webhook_name, webhook_pp FROM wormhole_list WHERE name = ?"
         wormhole = self.bot.db_query(query, (wh_name,), astuple=True, fetchone=True)
         # come as: (webhook_name, webhook_pp)
+
         async with ClientSession() as session:
-            for row in wh_targets:
-                # We're starting to send the message in all the channels linked
-                # to that wormhole
-                channel: discord.TextChannel = self.bot.get_channel(row[1])
+
+            # We're starting to send the message in all the channels linked to that wormhole
+            for connected_channel in wh_targets:
+                channel: discord.TextChannel = self.bot.get_channel(connected_channel[1])
+
                 if channel:
-                    webhook = discord.Webhook.partial(row[4], row[5], session=session)
+                    # Get the webhook associated to the wormhole
+                    webhook = discord.Webhook.partial(connected_channel[4], connected_channel[5], session=session)
+
                     embed_reply = None
                     if message.reference is not None:
                         reply = await message.channel.fetch_message(
@@ -298,7 +321,7 @@ class Wormholes(commands.Cog):
                         )
                         reply = await get_corresponding_answer(channel, reply)
                         if reply is None:
-                            embed = discord.Embed(
+                            embed_reply = discord.Embed(
                                 # "https://gunivers.net"), #
                                 description=await self.bot._(
                                     message.guild.id, "wormhole.reply_notfound"
@@ -310,7 +333,7 @@ class Wormholes(commands.Cog):
                             content = content.replace("\n", " ")
                             if len(content) > 80:
                                 content = content[:80] + "..."
-                            embed = discord.Embed(
+                            embed_reply = discord.Embed(
                                 # "https://gunivers.net"), #
                                 description=await self.bot._(
                                     message.guild.id,
