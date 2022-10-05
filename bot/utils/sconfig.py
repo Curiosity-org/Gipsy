@@ -9,6 +9,7 @@ import io
 import json
 import re
 from typing import Any, List, Union
+import numpy as np
 
 import sys
 
@@ -164,40 +165,70 @@ class Sconfig(commands.Cog):
     async def main_config(self, ctx: MyContext):
         """Edit your server configuration"""
         if ctx.subcommand_passed is None:
-            res = list()
             # get the server config
             config = ctx.bot.server_configs[ctx.guild.id]
-            # get the length of the longest key
-            max_length = 0
+
+            # get the length of the longest key to align the values in columns
+            max_key_length = 0
+            max_value_length = 0
             for options in self.sorted_options.values():
                 configs_len = [len(k) for k in config.keys() if k in options]
-                max_length = (
-                    max(max_length, *configs_len)
+                max_key_length = (
+                    max(max_key_length, *configs_len)
                     if len(configs_len) > 0
-                    else max_length
+                    else max_key_length
                 )
-            max_length += 2
-            # iterate over groups
+                values_len = [
+                    len(str(await self.format_config(ctx.guild, k, v, mention=False)))
+                    for k, v in config.items()
+                    if k in options
+                ]
+                max_value_length = (
+                    max(max_value_length, *values_len)
+                    if len(values_len) > 0
+                    else max_value_length
+                )
+            max_key_length += 3
+            max_value_length += 1
+
+
+            # iterate over modules
+            cpt = 0
+            embeds = []
             for module, options in sorted(self.sorted_options.items()):
+
                 subconf = {k: v for k, v in config.items() if k in options}
                 if len(subconf) == 0:
                     continue
-                temp = "   # {}\n".format(
-                    await self.bot._(ctx.guild.id, "sconfig.cog-name." + module)
-                )
+
+                module_config = ""
+
                 # iterate over configs for that group
                 for k, v in subconf.items():
                     value = await self.format_config(ctx.guild, k, v, False)
-                    temp += (f"[{k}]").ljust(max_length + 1) + f" {value}\n"
+                    module_config += (f"{k}:").ljust(max_key_length) + f" {value}".ljust(max_value_length) + "\n"
+
                 if hasattr(self.bot.get_cog(module), "_create_config"):
                     for extra in await self.bot.get_cog(module)._create_config(ctx):
-                        temp += (f"[{extra[0]}]").ljust(
-                            max_length + 1
-                        ) + f" {extra[1]}\n"
-                res.append(temp)
+                        module_config += (f"[{extra[0]}]").ljust(
+                            max_key_length
+                        ) + f" {extra[1]}".ljust(max_value_length) + "\n"
 
-            for category in res:
-                await ctx.send("```ini\n" + "\n" + category + "```")
+                # Put the config in embeds and stack them to be send in group
+                embeds.append(
+                    discord.Embed(title=module, description=f"```yml\n{module_config}```", colour=0x2F3136)
+                )
+
+                cpt += 1
+
+                # Send the config by group of 10 (limit of embed number per message)
+                if cpt%10==0:
+                    await ctx.send(embeds=embeds)
+                    embeds = []
+            
+            # Send the remaining embeds
+            if cpt % 10 != 0:
+                await ctx.send(embeds=embeds)
 
         elif ctx.invoked_subcommand is None:
             await ctx.send(await self.bot._(ctx.guild.id, "sconfig.option-notfound"))
