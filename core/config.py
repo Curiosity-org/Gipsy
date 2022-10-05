@@ -24,10 +24,6 @@ def get(config:str):
         conf = conf[i]
     return conf
 
-def save():
-    with open("config.yaml", "w") as f:
-        yaml.dump(_global_config, f)
-
 #################
 # Reload config #
 #################
@@ -41,16 +37,20 @@ def reload_config():
     with open("core/default_config.yaml", "r") as f:
         _global_config.update(yaml.safe_load(f))
 
+    for plugin in os.listdir(f'plugins'):
+        if os.path.isfile(file := f'plugins/' + plugin + "/config.yaml"):
+            with open(file) as f:
+                _global_config.update({plugin:yaml.safe_load(f)})
+
     if os.path.isfile("config.yaml"):
-        with open("config.yaml") as f:
+        with open("config.yaml", "r") as f:
             _global_config.update(yaml.safe_load(f))
 
-    for plugin in os.listdir(f'plugins'):
+    # Save config
+    with open("config.yaml", "w") as f:
+        yaml.dump(_global_config, f)
 
-        if os.path.isfile(f'plugins/' + plugin + "/config.yaml"):
-            with open(f'plugins/' + plugin + "/config.yaml") as f:
-                _global_config.update(yaml.safe_load(f))
-
+# Automatically load config when the file is imported
 if _global_config == {}:
     reload_config()
 
@@ -61,6 +61,7 @@ if _global_config == {}:
 def setup_plugins():
     """Run the "run" function of each plugin's "setup.py" file in order to allow user to configure the plugins.
     Called once in the main setup script."""
+
     for plugin in os.listdir(f'plugins'):
         if os.path.isfile(f'plugins/' + plugin + "/setup.py"):
 
@@ -72,21 +73,10 @@ def setup_plugins():
                 plugin_config = plugin_setup.run()
                 if plugin_config is not None:
                     _global_config.update({plugin:plugin_config})
-
-#####################
-# Config dispatcher #
-#####################
-
-async def dispatch():
-    """Dispatch the config to each plugin in order to restrain the access.
-    Called once in the main setup script."""
-    for plugin in os.listdir(f'plugins'):
-        if os.path.isfile(f"plugins/{plugin}/{plugin}.py"):
-
-            plugin_setup = importlib.import_module(f"plugins.{plugin}.{plugin}")
-            
-            if plugin in _global_config:
-                await plugin_setup.setup(plugin_config = _global_config[plugin])
+    
+    # Save config
+    with open("config.yaml", "w") as f:
+        yaml.dump(_global_config, f)
 
 ###############
 # TOKEN CHECK #
@@ -109,6 +99,9 @@ def token_set(force_set = False):
             print(f"\n{Color.Red}🔑 You need to set a token.{Color.NC}")
         else:
             _global_config["bot"]["token"] = token
+
+    with open("config.yaml", "w") as f:
+        yaml.dump(_global_config, f)
     return True
 
 #########################
@@ -140,7 +133,7 @@ def advanced_setup():
     error = True
     while error:
         error = False
-        choice = input(f"\n👑 Bot admins (User ID separated with comma. Let empty to ignore): ")
+        choice = input(f"\n{Color.Blue}👑 Bot admins (User ID separated with comma. Let empty to ignore):{Color.NC} ")
         if choice != "":
             admins = choice.replace(" ", "").split(",")
             try:
@@ -148,7 +141,7 @@ def advanced_setup():
                     admin = int(admin)
                 _global_config["bot"]["admins"] = admins
             except:
-                print(f"👑 Invalid entry. Only user ID (integers), comma and space are expected.")
+                print(f"{Color.Red}👑 Invalid entry. Only user ID (integers), comma and space are expected.{Color.NC}")
                 error = True
 
     # Error channel
@@ -160,6 +153,9 @@ def advanced_setup():
         if choice != "":
             try:
                 channel = int(choice)
-                _global_config["bot"]["error_channel"] = channel
+                _global_config["bot"]["error_channels"] = channel
             except:
                 print(f"{Color.Red}🤕 Invalid entry. Only channel ID (integers) are expected.{Color.NC}")
+    
+    with open("config.yaml", "w") as f:
+        yaml.dump(_global_config, f)

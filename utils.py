@@ -266,7 +266,7 @@ from core import config
 CONFIG_OPTIONS.update({
         "prefix": {'default': config.get("bot.default_prefix"), 'type': 'text', 'command': None},
         "language": {'default': config.get("bot.default_language"), 'type': 'text', 'command': None},
-        "bot_admins": {'default': config.get("bot.bot_admins"), 'type': 'categories', 'command': None},
+        "admins": {'default': config.get("bot.admins"), 'type': 'categories', 'command': None},
 })
 
 for plugin in os.listdir("./plugins/"):
