@@ -210,7 +210,8 @@ class Wormholes(commands.Cog):
                 if channel:
                     webhook = discord.Webhook.partial(row[4], row[5], session=session)
                     oldmessage = await get_corresponding_answer(channel, message)
-                    await webhook.delete_message(oldmessage.id)
+                    if oldmessage:
+                        await webhook.delete_message(oldmessage.id)
 
     @commands.Cog.listener(name="on_message_edit")
     async def on_message_edit(self, message, newmessage):
