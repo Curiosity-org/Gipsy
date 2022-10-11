@@ -4,7 +4,7 @@ from typing import List
 import discord
 from discord.ext import commands
 from utils import Gunibot, MyContext
-from bot.utils.sconfig import Sconfig
+from bot.utils.sconfig import SERVER_CONFIG
 import args
 
 
@@ -38,7 +38,7 @@ class Logs(commands.Cog):
         flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
         flags = LogsFlags.intToFlags(flags) + options
         flags = list(set(flags))  # remove duplicates
-        await Sconfig.edit_config(ctx.guild.id, 'modlogs_flags',
+        await SERVER_CONFIG.edit_config(ctx.guild.id, 'modlogs_flags',
                                   LogsFlags.flagsToInt(flags))
         await ctx.send(await self.bot._(ctx.guild.id, "sconfig.modlogs-enabled", type=', '.join(options)))
 
@@ -52,7 +52,7 @@ class Logs(commands.Cog):
         flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
         flags = LogsFlags.intToFlags(flags)
         flags = [x for x in flags if x not in options]
-        await Sconfig.edit_config(ctx.guild.id, 'modlogs_flags', LogsFlags.flagsToInt(flags))
+        await SERVER_CONFIG.edit_config(ctx.guild.id, 'modlogs_flags', LogsFlags.flagsToInt(flags))
         await ctx.send(await self.bot._(ctx.guild.id, "sconfig.modlogs-disabled", type=', '.join(options)))
 
     @config_modlogs.command(name="list")
