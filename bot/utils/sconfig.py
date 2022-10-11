@@ -16,9 +16,12 @@ import sys
 sys.path.append("./bot")
 sys.path.append("./bot")
 
+SERVER_CONFIG = None
 
 class Sconfig(commands.Cog):
     def __init__(self, bot: Gunibot):
+        global SERVER_CONFIG
+        SERVER_CONFIG = self
         self.bot = bot
         self.file = "sconfig"
         self.sorted_options = dict()  # config options sorted by cog
