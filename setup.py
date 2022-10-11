@@ -1,16 +1,11 @@
 #!/usr/bin/env python
 # coding=utf-8
 import os
-import shutil
 import subprocess
-from tkinter import N
 from LRFutils.color import Color
 from LRFutils import log
 from core import config
 import sys
-import yaml
-import importlib
-import asyncio
 
 accept = ["y", "yes", "yep", "yeah"]
 decline = ["n", "no", "nope", "nah"]

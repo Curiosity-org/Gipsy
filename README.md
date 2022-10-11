@@ -1,26 +1,65 @@
-# Gipsy
+<div align=center>
+
+# 👻 Gipsy
+
+</div>
 
 Gipsy is a multifunction bot managed by the [Gunivers](https://gunivers.net) community.
 
+# 👋 Invite
+
+This bot is public and open-source. It mean that anyone can host the bot and propose you an invite link. The following link is the official one, an instance of the bot hosted by Gunivers itself.
+
+<div align=center>
+
+👋 [Invite Gipsy](http://utip.io/s/1yhs7W)
+
+</div>
+
+You can also invite the bot in beta version to enjoy the latest features added. Be careful though: the bot in beta version may contain security breaches and many bugs. It may also stop working suddenly and for long periods. If you want to invite it though, [click here](https://discordapp.com/oauth2/authorize?client_id=813836349147840513&scope=bot&permissions=8)
+
+
+# 🔌 Installation (self host)
+
+First, install [git CLI](https://git-scm.com/book/en/v2/Getting-Started-The-Command-Line)
+
 Please use at least **Python 3.9** to run this project.
 
-Use `pip install -r requirements.txt` in the directory to install dependencies.
+Open a terminal and go in the folder you want to install the bot. Then, enter
 
-## **Description**
+```bash
+git clone -recursive https://github.com/Gunivers/Gipsy
+```
+
+This command will install Gipsy and the official plugins. If you don't want these plugins, you can simply remove the `-recursive` from the command.
+
+Then, install all the dependencies by running
+
+```bash
+pip install -r requirements.txt
+```
+
+or, if you are running Gipsy 2.x, simply run `python setup.py` and say yes when it ask if you want to install the dependencies.
+
+
+> **Note**
+> 
+> If you updated Gipsy from 1.x to 2.x, you may noticed that plugin files disapeared from your installation. To fixe that, empty the `plugins` folder (it may remain `__pycache__` data) and run the command `git submodule update`
+
+
+
+# 📚 About
 
 Gipsy is a Discord bot whose first objective is to meet the expectations of the Gunivers community. However, if we want to create new features, we might as well let those who might be interested in them enjoy them !
 You can invite the bot, learn what it can do and follow its evolution.
 
-## **Invite**
+## ⚡ Features
 
-You can invite the bot by [![link](uploads/32dc3a164398f67799a6cfe7206c12ca/link.png) clicking here.](http://utip.io/s/1yhs7W)
+> TODO
 
-You can also invite the bot in beta version to enjoy the latest features added. Be careful though: the bot in beta version may contain security holes and many bugs. It may also stop working suddenly and for long periods. If you want to invite it though, [click here](https://discordapp.com/oauth2/authorize?client_id=813836349147840513&scope=bot&permissions=8)
+# ➕ Additional info
 
-## **Features**
-
-
-## **Add a Gunibot service on linux**
+## 🔄️ Add a Gunibot service on linux
 
 You can create a service for your gunibot instance, which will allow you to start and stop the bot using commands like `systemctl start gunibot`, or `service gunibot stop`. The bot will also reboot automatically after a crash.
 
