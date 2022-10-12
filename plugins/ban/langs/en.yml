@@ -30,3 +30,8 @@ en:
         "0": "You want to ban yourself ? Ok :)"
         "1": "Why are you doing that ?"
         "2": "WHY ?"
+      
+      missing_roles: "I could not give you these roles back: "
+      whoups: "I could not send an invitation to the user... So he will never go back. Goodbye - forever."
+      urbetter: "It seems like you're immune to the ban argument ¯\\_(ツ)_/¯"
+      missing_permissions: "Missing permissions :confused: (please check the hierarchy)"

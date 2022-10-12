@@ -5,4 +5,4 @@ fr:
     dep-notfound: Impossible de trouver une rôle-liaison avec cet identifiant.\nVous pouvez obtenir l'identifiant d'une liaison avec la commande `%{p}rolelink list`
     infinite: "Oups, il semble que cette dépendance puisse entraîner une boucle infinie avec au moins la dépendance suivante : \"%{dep}\"\nSi vous êtes sûr de vouloir continuer, entrez 'oui' dans les %{t} prochaines secondes"
     list: "Liste de vos rôles-liaisons :"
-    no-dep: "Vous n'avez aucune dépendance de configurée pour le moment.\nUtilisez la commande `%{p}rolelink create` pour en ajouter"
+    no-dep: "Vous n'avez aucune dépendance de configurée pour le moment.\nUtilisez la commande `%{p}rolelink add` pour en ajouter"
