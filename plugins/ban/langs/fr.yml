@@ -28,5 +28,10 @@ fr:
 
       autoban:
         "0": "Tiens, tu veux te bannir toi-même ? Soit !"
-        "1": "N'en viens pas à de telles extrémites ! Tu veux qu'on en parles ? Tiens : [SOS Amitié](https://www.sos-amitie.com/)"
+        "1": "N'en viens pas à de telles extrémités ! Tu veux qu'on en parles ? Tiens : [SOS Amitié](https://www.sos-amitie.com/)"
         "2": "Rooh, pourquoi ?"
+
+      missing_roles: "Je n'ai pas pu vous remettre les rôles suivants : "
+      whoups: "Je n'ai pas pu inviter l'utilisateur... Il ne reviendra jamais... Adieu, donc."
+      urbetter: "Apparemment tu es immunisé contre le ban ¯\\_(ツ)_/¯"
+      missing_permissions: "Permissions manquantes :confused: (vérifiez la hiérarchie)"

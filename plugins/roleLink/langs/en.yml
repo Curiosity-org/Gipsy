@@ -5,4 +5,4 @@ en:
     dep-notfound: Cannot find a role-link with this identifier. You can get the identifier of a link with the `%{p}rolelink list` command
     infinite: "Oops, it seems that this dependency can lead to an infinite loop with at least the following dependency: \"%{dep}\"\nIf you're sure you want to continue, enter 'yes' in the next %{t} seconds..."
     list: "List of your roles-links:"
-    no-dep: "You do not have any dependencies configured at the moment.\nUse the `%{p}rolelink create` command to add more dependencies"
+    no-dep: "You do not have any dependencies configured at the moment.\nUse the `%{p}rolelink add` command to add more dependencies"

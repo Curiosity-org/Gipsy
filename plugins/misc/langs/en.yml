@@ -40,27 +40,27 @@ en:
       not-found: "Date not found in %{source} !"
       create-result: "The timestamp for the <t:%{timestamp}:F> is: `%{timestamp}` (Discord timestamp : `<t:%{timestamp}>`)"
       help: |
-            ***The timestamp in discord***
-      
-            *Example : Discord was created <t:1431468000:R>, the <t:1431468000:D>.*
-      
-            __**Use the timestamp feature**__ :
-            You needs to get a UNIX timestamp (you can use the `timestamp get` and `timestamp create` commands), then you can use it with the following syntax:
-            ```
-            <t:[TIMESTAMP]>
-            ```
-            `[TIMESTAMP]` should be replaced with the timestamp you get.
-      
-            __**Utiliser les styles**__ :
-            You can also style the timestamp using this syntax :
-            ```
-            <t:[TIMESTAMP]:[STYLE]>
-            ```
-            `[STYLE]` should be replaced by one of the following values:
-            • `t` (<t:1431468000:t>)
-            • `T` (<t:1431468000:T>)
-            • `d` (<t:1431468000:d>)
-            • `D` (<t:1431468000:D>)
-            • `f` (<t:1431468000:f>, by default)
-            • `F` (<t:1431468000:F>)
-            • `R` (<t:1431468000:R>)
+        ***The timestamp in discord***
+
+        *Example : Discord was created <t:1431468000:R>, the <t:1431468000:D>.*
+
+        __**Use the timestamp feature**__ :
+        You needs to get a UNIX timestamp (you can use the `timestamp get` and `timestamp create` commands), then you can use it with the following syntax:
+        ```
+        <t:[TIMESTAMP]>
+        ```
+        `[TIMESTAMP]` should be replaced with the timestamp you get.
+
+        __**Utiliser les styles**__ :
+        You can also style the timestamp using this syntax :
+        ```
+        <t:[TIMESTAMP]:[STYLE]>
+        ```
+        `[STYLE]` should be replaced by one of the following values:
+        • `t` (<t:1431468000:t>)
+        • `T` (<t:1431468000:T>)
+        • `d` (<t:1431468000:d>)
+        • `D` (<t:1431468000:D>)
+        • `f` (<t:1431468000:f>, by default)
+        • `F` (<t:1431468000:F>)
+        • `R` (<t:1431468000:R>)
