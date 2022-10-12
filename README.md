@@ -44,7 +44,7 @@ or, if you are running Gipsy 2.x, simply run `python setup.py` and say yes when 
 
 > **Note**
 > 
-> If you updated Gipsy from 1.x to 2.x, you may noticed that plugin files disapeared from your installation. To fixe that, empty the `plugins` folder (it may remain `__pycache__` data) and run the command `git submodule update`
+> If you updated Gipsy from 1.x to 2.x, you may noticed that plugin files disapeared from your installation. To fix that, empty the `plugins` folder (it may remain `__pycache__` data) and run the command `git submodule update`
 
 
 
