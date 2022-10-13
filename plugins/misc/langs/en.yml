@@ -1,0 +1,75 @@
+en:
+  misc:
+    dice:
+      title: "The dice are thrown!"
+      description: "The result is: %{value}"
+      error:
+        not_int: "The value must be an integer"
+        not_positive: "The value must be positive"
+    cookie:
+      give: "Here is for you %{to}: :cookie:\nFrom %{giver}"
+      self: "Here is for you %{to}: :cookie:"
+    hoster:
+      info: "Game server hosting service\n:speech_balloon: [Discord server](https://mtxserv.com/discord?utm_source=altearn_website_discord&utm_medium=website&utm_campaign=altearn_to_discord)\n:globe_with_meridians: [Website](https://mtxserv.com/fr/?utm_source=altearn_website&utm_medium=website&utm_campaign=altearn)"
+    flipacoin:
+      title: Pling !
+      heads: "Heads!"
+      tails: "Tails!"
+      side: "Side!"
+    kills:
+      "0": "{2}.exe *has stopped working*"
+      "1": "Oh you, you gonna to die!"
+      "2": "***BOUM!*** {1} fell into a trap posed by {0}!"
+      "3": "Luckily, the ground has cushioned the fall of {1}!"
+      "4": "{0} shouted \"Fus Roh Dah\" while {1} was next to a cliff..."
+      "5": "No, you can't stop bullets with your hands {1} :shrug:"
+      "6": "You have to be __in__ the elevator {1}, not __above__..."
+      "7": "{1} stayed too close to the speakers during a heavy metal concert."
+      "8": "Staying within 10 meters of an atomic explosion wasn't a good idea {1}..."
+      "9": "No! Double jumps are not possible {1}!"
+      "10": "{1} imitated Icare... splash."
+      "11": "It's nice to have a portal gun {1}, but don't open portals above spades..."
+      "12": "{1} died. Peace to their soul... :sneezing_face:"
+      "13": "{0} killed {1}"
+      "14": "{1} was shot by {0}"
+      "15": "Bye {1}! :ghost:"
+      "16": "{1} saw a flying anvil fall... on their head :head_bandage:"
+      "17": "{1} commit suicide after {0} has cut their connection"
+      "18": "Caution {1}! Fire burns :fire:"
+      "19": "{1} fought zombies without shovel"
+      "20": "{1} tried to hug a creeper"
+      "21": "{1}, lava baths are hot, but lava burns..."
+      "22": "{1} tried a rocket jump"
+      "23": "You shouldn't listen to the pretty melody of the Lullaby, {1} :musical_note:"
+    dataja: 
+      title: "Don't ask to ask, just ask"
+      description: "Learn the best practices to ask question:\nhttps://zrunner.me/d-a-t-a/en.html"
+    timestamp:
+      read-result: "The date in %{source} is <t:%{timestamp}> (<t:%{timestamp}:R>) (timestamp: %{timestamp})"
+      not-found: "Date not found in %{source} !"
+      create-result: "The timestamp for the <t:%{timestamp}:F> is: `%{timestamp}` (Discord timestamp : `<t:%{timestamp}>`)"
+      help: |
+            ***The timestamp in discord***
+      
+            *Example : Discord was created <t:1431468000:R>, the <t:1431468000:D>.*
+      
+            __**Use the timestamp feature**__ :
+            You needs to get a UNIX timestamp (you can use the `timestamp get` and `timestamp create` commands), then you can use it with the following syntax:
+            ```
+            <t:[TIMESTAMP]>
+            ```
+            `[TIMESTAMP]` should be replaced with the timestamp you get.
+      
+            __**Utiliser les styles**__ :
+            You can also style the timestamp using this syntax :
+            ```
+            <t:[TIMESTAMP]:[STYLE]>
+            ```
+            `[STYLE]` should be replaced by one of the following values:
+            • `t` (<t:1431468000:t>)
+            • `T` (<t:1431468000:T>)
+            • `d` (<t:1431468000:d>)
+            • `D` (<t:1431468000:D>)
+            • `f` (<t:1431468000:f>, by default)
+            • `F` (<t:1431468000:F>)
+            • `R` (<t:1431468000:R>)
