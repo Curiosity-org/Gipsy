@@ -150,22 +150,16 @@ class XP(commands.Cog):
             result.append((f"{_lvl} {k}", " ".join(subroles)))
         return result
 
-    @tasks.loop(seconds = 10) # hours=0*24*7,
+    @tasks.loop(seconds = 20) # hours=0*24*7,
     async def xp_reduction(self):
         
         # Compute the XP to remove each week
-        xp_to_remove = await self.calc_xp("a")#Vous savez, moi je ne crois pas qu’il y ait de bonne ou de mauvaise situation. Moi, si je devais résumer ma vie aujourd’hui avec vous, je dirais que c’est d’abord des rencontres. Des gens qui m’ont tendu la main, peut-être à un moment où je ne pouvais pas, où j’étais seul chez moi. Et c’est assez curieux de se dire que les hasards, les rencontres forgent une destinée... Parce que quand on a le goût de la chose, quand on a le goût de la chose bien faite, le beau geste, parfois on ne trouve pas l’interlocuteur en face je dirais, le miroir qui vous aide à avancer. Alors ça n’est pas mon cas, comme je disais là, puisque moi au contraire, j’ai pu ; et je dis merci à la vie, je lui dis merci, je chante la vie, je danse la vie... je ne suis qu’amour ! Et finalement, quand des gens me disent « Mais comment fais-tu pour avoir cette humanité ? », je leur réponds très simplement que c’est ce goût de l’amour, ce goût donc qui m’a poussé aujourd’hui à entreprendre une construction mécanique... mais demain qui sait ? Peut-être simplement à me mettre au service de la communauté, à faire le don, le don de soi.")
-        xp_to_remove *= 3
+        xp_to_remove = await self.calc_xp(f"Vous savez, moi je ne crois pas qu’il y ait de bonne ou de mauvaise situation. Moi, si je devais résumer ma vie aujourd’hui avec vous, je dirais que c’est d’abord des rencontres. Des gens qui m’ont tendu la main, peut-être à un moment où je ne pouvais pas, où j’étais seul chez moi. Et c’est assez curieux de se dire que les hasards, les rencontres forgent une destinée... Parce que quand on a le goût de la chose, quand on a le goût de la chose bien faite, le beau geste, parfois on ne trouve pas l’interlocuteur en face je dirais, le miroir qui vous aide à avancer. Alors ça n’est pas mon cas, comme je disais là, puisque moi au contraire, j’ai pu ; et je dis merci à la vie, je lui dis merci, je chante la vie, je danse la vie... je ne suis qu’amour ! Et finalement, quand des gens me disent « Mais comment fais-tu pour avoir cette humanité ? », je leur réponds très simplement que c’est ce goût de l’amour, ce goût donc qui m’a poussé aujourd’hui à entreprendre une construction mécanique... mais demain qui sait ? Peut-être simplement à me mettre au service de la communauté, à faire le don, le don de soi.")
+        # xp_to_remove *= 1
         for guild in self.bot.guilds:
-            # NOT WORKING
-            # if await self.bot.sconfig.get_config(guild.id, "xp_reduction"):
-            for member in guild.members:
-                # NOT WORKING
-                # await self.bdd_set_xp(userID=member.id, points=xp_to_remove, Type="remove", guild=guild.id)
-                pass
-                    
-        xp = await self.get_xp(self.bot.get_user(125722240896598016), 379308111774875648)
-        await self.bot.get_channel(849945422209351690).send(f"Vous avez {xp} XP")
+            if self.bot.server_configs[guild.id]["xp_reduction"]:
+                for member in guild.members:
+                    await self.bdd_set_xp(userID=member.id, points=xp_to_remove, Type="remove", guild=guild.id)
                 
     async def get_lvlup_chan(self, msg: discord.Message):
         value = self.bot.server_configs[msg.guild.id]["levelup_channel"]
@@ -415,18 +409,20 @@ class XP(commands.Cog):
         """Add/reset xp to a user in the database
         Set guild=None for global leaderboard"""
         try:
+            xp = await self.bdd_get_xp(userID, guild)
+            xp = xp[0]["xp"]
             if points < 0:
                 raise ValueError("You cannot add nor set negative xp")
             if Type == "add":
                 query = "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p) ON CONFLICT(guild, userid) DO UPDATE SET xp = (xp + :p);"
             elif Type == "remove":
-                xp = await self.bdd_get_xp(userID, guild)
                 if xp < points:
                     query = "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p) ON CONFLICT(guild, userid) DO UPDATE SET xp = 0;"
                 else:
                     query = "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p) ON CONFLICT(guild, userid) DO UPDATE SET xp = (xp - :p);"
             else:
                 query = "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p) ON CONFLICT(guild, userid) DO UPDATE SET xp = :p;"
+                
             self.bot.db_query(query, {"g": guild, "u": userID, "p": points})
             return True
         except Exception as e:
@@ -815,6 +811,9 @@ class XP(commands.Cog):
             )
         except Exception as e:
             await self.bot.get_cog("Errors").on_command_error(ctx, e)
+    
+    def cog_unload(self):
+        self.xp_reduction.cancel()
 
 
 config = {}
