@@ -1,14 +1,21 @@
 fr:
   misc:
+    dice:
+      title: "Les dés sont jetés !"
+      description: "Le résultat est : %{value}"
+      error:
+        not_int: "La valeur doit être un entier"
+        not_positive: "La valeur doit être positive"
     cookie:
       give: "Voilà pour vous %{to}: :cookie:\nDe la part de %{giver}"
       self: "Voilà pour vous %{to}: :cookie:"
     hoster:
-      info: "Service d'hébergement de serveur de jeu\n:speech_balloon: [Serveur Discord](https://mtxserv.com/discord?utm_source=altearn_website_discord&utm_medium=website&utm_campaign=altearn_to_discord)\n:globe_with_meridians: [Site web](https://mtxserv.com/fr/?utm_source=altearn_website&utm_medium=website&utm_campaign=altearn)"
+      info: "mTx Serv proposent un service d'hébergement de serveur, en particulier destiné aux jeux. Leurs serveurs sont équipé des dernières technologies et sont extrêmement fiable. Ajoutez à celà leur SAV très réactif et sympatique et vous avez le parfait hébergeur pour vos projets !\n:speech_balloon: [Serveur Discord](https://mtxserv.com/discord?utm_source=altearn_website_discord&utm_medium=website&utm_campaign=altearn_to_discord)\n:globe_with_meridians: [Site web](https://mtxserv.com/fr/?utm_source=altearn_website&utm_medium=website&utm_campaign=altearn)"
     flipacoin:
-      heads: "Face !"
-      tails: "Pile !"
-      side: "Coté !"
+      title: Pling !
+      heads: "C'est face !"
+      tails: "C'est pile !"
+      side: "C'est ... tranche ! 😱\n(oui oui, ça peut arriver !)"
     kills:
       "0": "Oh toi, tu vas mourir !"
       "1": "***BOUM !*** {1} est tombé dans un piège posé par {0} !"
@@ -34,7 +41,9 @@ fr:
       "21": "{1} a tenté un rocket jump"
       "22": "Il ne fallait pas écouter la jolie mélodie de la Lullaby, {1} :musical_note:"
       "23": "{2}.exe *a cessé de fonctionner*"
-    dataja: "https://zrunner.me/d-a-t-a/fr.html"
+    dataja:
+      title: "Don't ask to ask, just ask"
+      description: "Demander si vous pouvez demander est une perte de temps.\nDemander si il y a une personne compétent demande un engagement aveugle de cette dernière en cas de réponse, personne ne voudra donc répondre.\n\nApprenez les bonnes pratiques pour demander quelque chose : \nhttps://zrunner.me/d-a-t-a/fr.html"
     timestamp:
       read-result: "La date contenue dans %{source} est le <t:%{timestamp}> (soit <t:%{timestamp}:R>) (timestamp : %{timestamp})"
       not-found: "Je n'ai pas trouvé de date dans %{source} !"
