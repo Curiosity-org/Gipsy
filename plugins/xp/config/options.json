@@ -9,6 +9,11 @@
         "type": "channels",
         "command": "noxp_channels"
     },
+    "xp_reduction": {
+        "default": false,
+        "type": "boolean",
+        "command": "xp_reduction"
+    },
     "levelup_channel": {
         "default": "any",
         "type": "channels",

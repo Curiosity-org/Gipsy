@@ -1,5 +1,8 @@
 fr:
   xp:
+    config:
+      enable_xp_reduction:
+        type_error: La valeur doit être un booléen ("True" ou "False")
     card:
       level: Niveau
       rank: Rang
