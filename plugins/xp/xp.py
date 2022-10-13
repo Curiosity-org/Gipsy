@@ -8,8 +8,9 @@ from typing import Dict, List, Tuple, Union
 
 import discord
 import emoji
-from discord.ext import commands
+from discord.ext import commands, tasks
 from utils import Gunibot, MyContext
+import distutils
 
 
 class XP(commands.Cog):
@@ -27,6 +28,7 @@ class XP(commands.Cog):
         self.config_options = [
             "enable_xp",
             "noxp_channels",
+            "xp_reduction",
             "levelup_channel",
             "levelup_message",
             "levelup_reaction",
@@ -35,10 +37,13 @@ class XP(commands.Cog):
 
         bot.get_command("config").add_command(self.config_enable_xp)
         bot.get_command("config").add_command(self.config_noxp_channels)
+        bot.get_command("config").add_command(self.config_xp_reduction)
         bot.get_command("config").add_command(self.config_levelup_channel)
         bot.get_command("config").add_command(self.config_levelup_message)
         bot.get_command("config").add_command(self.config_levelup_reaction)
         bot.get_command("config").add_command(self.config_levelup_reaction_emoji)
+
+        self.xp_reduction.start()
 
     @commands.command(name="enable_xp")
     async def config_enable_xp(self, ctx: MyContext, value: bool):
@@ -49,7 +54,7 @@ class XP(commands.Cog):
 
     @commands.command(name="noxp_channels")
     async def config_noxp_channels(
-        self, ctx: MyContext, channels: commands.Greedy[discord.TextChannel]
+        self, ctx: MyContext, channels: commands.Greedy[discord.abc.GuildChannel]
     ):
         """Select in which channels your members should not get any xp"""
         if len(channels) == 0:
@@ -58,6 +63,13 @@ class XP(commands.Cog):
             channels = [channel.id for channel in channels]
         x = await self.bot.sconfig.edit_config(ctx.guild.id, "noxp_channels", channels)
         await ctx.send(x)
+
+    @commands.command(name="xp_reduction")
+    async def config_xp_reduction(self, ctx: MyContext, enabled:bool = False):
+        """Enable or disable the xp reduction system"""
+        await ctx.send(
+            await self.bot.sconfig.edit_config(ctx.guild.id, "xp_reduction", enabled)
+        )
 
     @commands.command(name="levelup_channel")
     async def config_levelup_channel(self, ctx: MyContext, *, channel):
@@ -138,6 +150,23 @@ class XP(commands.Cog):
             result.append((f"{_lvl} {k}", " ".join(subroles)))
         return result
 
+    @tasks.loop(seconds = 10) # hours=0*24*7,
+    async def xp_reduction(self):
+        
+        # Compute the XP to remove each week
+        xp_to_remove = await self.calc_xp("a")#Vous savez, moi je ne crois pas qu’il y ait de bonne ou de mauvaise situation. Moi, si je devais résumer ma vie aujourd’hui avec vous, je dirais que c’est d’abord des rencontres. Des gens qui m’ont tendu la main, peut-être à un moment où je ne pouvais pas, où j’étais seul chez moi. Et c’est assez curieux de se dire que les hasards, les rencontres forgent une destinée... Parce que quand on a le goût de la chose, quand on a le goût de la chose bien faite, le beau geste, parfois on ne trouve pas l’interlocuteur en face je dirais, le miroir qui vous aide à avancer. Alors ça n’est pas mon cas, comme je disais là, puisque moi au contraire, j’ai pu ; et je dis merci à la vie, je lui dis merci, je chante la vie, je danse la vie... je ne suis qu’amour ! Et finalement, quand des gens me disent « Mais comment fais-tu pour avoir cette humanité ? », je leur réponds très simplement que c’est ce goût de l’amour, ce goût donc qui m’a poussé aujourd’hui à entreprendre une construction mécanique... mais demain qui sait ? Peut-être simplement à me mettre au service de la communauté, à faire le don, le don de soi.")
+        xp_to_remove *= 3
+        for guild in self.bot.guilds:
+            # NOT WORKING
+            # if await self.bot.sconfig.get_config(guild.id, "xp_reduction"):
+            for member in guild.members:
+                # NOT WORKING
+                # await self.bdd_set_xp(userID=member.id, points=xp_to_remove, Type="remove", guild=guild.id)
+                pass
+                    
+        xp = await self.get_xp(self.bot.get_user(125722240896598016), 379308111774875648)
+        await self.bot.get_channel(849945422209351690).send(f"Vous avez {xp} XP")
+                
     async def get_lvlup_chan(self, msg: discord.Message):
         value = self.bot.server_configs[msg.guild.id]["levelup_channel"]
         if value is None or value == "none":
@@ -156,6 +185,8 @@ class XP(commands.Cog):
             return False
         if msg.guild.id in self.xp_channels_cache.keys():
             if msg.channel.id in self.xp_channels_cache[msg.guild.id]:
+                return False
+            if msg.channel.category.id in self.xp_channels_cache[msg.guild.id]:
                 return False
         else:
             chans = self.bot.server_configs[msg.guild.id]["noxp_channels"]
@@ -257,9 +288,12 @@ class XP(commands.Cog):
                 msg.author, new_lvl[0], await self.rr_list_role(msg.guild.id)
             )
 
-    async def calc_xp(self, msg: discord.Message):
+    async def calc_xp(self, msg: discord.Message | str):
         """Calculates the xp amount corresponding to a message"""
-        content: str = msg.clean_content
+        if type(msg) == str:
+            content = msg
+        else:
+            content: str = msg.clean_content
         # we replace custom emojis by their names
         matches = re.finditer(r"<a?(:\w+:)\d+>", content, re.MULTILINE)
         for _, match in enumerate(matches, start=1):
@@ -385,6 +419,12 @@ class XP(commands.Cog):
                 raise ValueError("You cannot add nor set negative xp")
             if Type == "add":
                 query = "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p) ON CONFLICT(guild, userid) DO UPDATE SET xp = (xp + :p);"
+            elif Type == "remove":
+                xp = await self.bdd_get_xp(userID, guild)
+                if xp < points:
+                    query = "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p) ON CONFLICT(guild, userid) DO UPDATE SET xp = 0;"
+                else:
+                    query = "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p) ON CONFLICT(guild, userid) DO UPDATE SET xp = (xp - :p);"
             else:
                 query = "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p) ON CONFLICT(guild, userid) DO UPDATE SET xp = :p;"
             self.bot.db_query(query, {"g": guild, "u": userID, "p": points})
