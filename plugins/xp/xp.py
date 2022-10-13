@@ -418,8 +418,11 @@ class XP(commands.Cog):
         """Add/reset xp to a user in the database
         Set guild=None for global leaderboard"""
         try:
-            xp = await self.bdd_get_xp(userID, guild)
-            xp = xp[0]["xp"]
+            try:
+                xp = await self.bdd_get_xp(userID, guild)
+                xp = xp[0]["xp"]
+            except IndexError:
+                xp = 0
             if points < 0:
                 raise ValueError("You cannot add nor set negative xp")
             if Type == "add":
