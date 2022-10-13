@@ -150,7 +150,7 @@ class XP(commands.Cog):
             result.append((f"{_lvl} {k}", " ".join(subroles)))
         return result
 
-    @tasks.loop(seconds = 20) # hours=0*24*7,
+    @tasks.loop(hours=24*7)
     async def xp_reduction(self):
         
         # Compute the XP to remove each week
