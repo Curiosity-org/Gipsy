@@ -65,7 +65,7 @@ class XP(commands.Cog):
         await ctx.send(x)
 
     @commands.command(name="xp_reduction")
-    async def config_xp_reduction(self, ctx: MyContext, enabled:bool = False):
+    async def config_xp_reduction(self, ctx: MyContext, enabled:bool):
         """Enable or disable the xp reduction system"""
         await ctx.send(
             await self.bot.sconfig.edit_config(ctx.guild.id, "xp_reduction", enabled)
@@ -150,16 +150,25 @@ class XP(commands.Cog):
             result.append((f"{_lvl} {k}", " ".join(subroles)))
         return result
 
+
+    ################
+    # XP reduction #
+    ################
+
     @tasks.loop(hours=24*7)
     async def xp_reduction(self):
+        """Reduce the xp of all members each week"""
         
         # Compute the XP to remove each week
         xp_to_remove = await self.calc_xp(f"Vous savez, moi je ne crois pas qu’il y ait de bonne ou de mauvaise situation. Moi, si je devais résumer ma vie aujourd’hui avec vous, je dirais que c’est d’abord des rencontres. Des gens qui m’ont tendu la main, peut-être à un moment où je ne pouvais pas, où j’étais seul chez moi. Et c’est assez curieux de se dire que les hasards, les rencontres forgent une destinée... Parce que quand on a le goût de la chose, quand on a le goût de la chose bien faite, le beau geste, parfois on ne trouve pas l’interlocuteur en face je dirais, le miroir qui vous aide à avancer. Alors ça n’est pas mon cas, comme je disais là, puisque moi au contraire, j’ai pu ; et je dis merci à la vie, je lui dis merci, je chante la vie, je danse la vie... je ne suis qu’amour ! Et finalement, quand des gens me disent « Mais comment fais-tu pour avoir cette humanité ? », je leur réponds très simplement que c’est ce goût de l’amour, ce goût donc qui m’a poussé aujourd’hui à entreprendre une construction mécanique... mais demain qui sait ? Peut-être simplement à me mettre au service de la communauté, à faire le don, le don de soi.")
+        
         # xp_to_remove *= 1
         for guild in self.bot.guilds:
             if self.bot.server_configs[guild.id]["xp_reduction"]:
                 for member in guild.members:
                     await self.bdd_set_xp(userID=member.id, points=xp_to_remove, Type="remove", guild=guild.id)
+
+    
                 
     async def get_lvlup_chan(self, msg: discord.Message):
         value = self.bot.server_configs[msg.guild.id]["levelup_channel"]
@@ -284,7 +293,7 @@ class XP(commands.Cog):
 
     async def calc_xp(self, msg: discord.Message | str):
         """Calculates the xp amount corresponding to a message"""
-        if type(msg) == str:
+        if isinstance(msg, str):
             content = msg
         else:
             content: str = msg.clean_content
@@ -409,8 +418,6 @@ class XP(commands.Cog):
         """Add/reset xp to a user in the database
         Set guild=None for global leaderboard"""
         try:
-            xp = await self.bdd_get_xp(userID, guild)
-            xp = xp[0]["xp"]
             if points < 0:
                 raise ValueError("You cannot add nor set negative xp")
             if Type == "add":
