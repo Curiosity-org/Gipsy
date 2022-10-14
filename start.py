@@ -4,18 +4,23 @@
 Gipsy start functions
 """
 
-import argparse
-import asyncio
-import logging
-import os
-import yaml
-import sys
-import discord
-from LRFutils.color import Color
-from LRFutils import log
-import setup
-import time
+try:
+    import os
+    import asyncio
+    import time
+    import setup
+    from utils import Gunibot
+    import argparse
+    import logging
+    import yaml
+    import discord
+    from LRFutils.color import Color
+except ModuleNotFoundError as e:
+    print("\n⛔",str(e))
+    print("Please install all the required modules with the folliwing command:\npip3 install -r requirements.txt\n ")
 
+import sys
+from LRFutils import log
 # check python version
 py_version = sys.version_info
 if py_version.major != 3 or py_version.minor < 9:
@@ -25,8 +30,6 @@ if py_version.major != 3 or py_version.minor < 9:
 # Check and dispatch the config to all plugins
 from core import config
 config.check()
-
-from utils import Gunibot
 
 # Getting global system list
 global_systems = []
