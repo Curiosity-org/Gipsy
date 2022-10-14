@@ -23,7 +23,7 @@ You can also invite the bot in beta version to enjoy the latest features added. 
 
 First, install [git CLI](https://git-scm.com/book/en/v2/Getting-Started-The-Command-Line)
 
-Please use at least **Python 3.9** to run this project.
+Please use at least **Python 3.10** to run this project.
 
 Open a terminal and go in the folder you want to install the bot. Then, enter
 
