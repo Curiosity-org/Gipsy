@@ -18,7 +18,7 @@ import time
 
 # check python version
 py_version = sys.version_info
-if py_version.major != 3 or py_version.minor < 9:
+if py_version.major != 3 or py_version.minor < 10:
     log.error("⚠️ Gipsy require Python 3.9 or more.", file=sys.stderr)
     sys.exit(1)
 
