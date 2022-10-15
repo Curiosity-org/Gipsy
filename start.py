@@ -26,7 +26,6 @@ def check_libs():
         print(f"\n⛔ \u001b[41m\u001b[37;1m{type(e).__name__}\033[0m: \033[31m{e}\033[0m")
         print("\n⚠️ \033[33mPlease install all the required modules with the folliwing command:\033[1m\n\n      \u001b[47m\033[30mpip3 install -r requirements.txt\033[0m\n ")
         exit(1)
-
 check_libs()
 
 
@@ -42,7 +41,8 @@ import discord
 from LRFutils.color import Color
 from LRFutils import log
 
-
+if not os.path.isdir("plugins"):
+        os.mkdir("plugins")
 
 # Check and dispatch the config to all plugins
 from core import config

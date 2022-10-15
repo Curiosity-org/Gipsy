@@ -26,6 +26,9 @@ def install_dependencies():
             
 if __name__ == "__main__":
 
+    if not os.path.isdir("plugins"):
+        os.mkdir("plugins")
+
     install_dependencies()
 
     config.token_set()
