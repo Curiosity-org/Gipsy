@@ -1,6 +1,6 @@
 {
     "enable_xp": {
-        "default": true,
+        "default": false,
         "type": "boolean",
         "command": "enable_xp"
     },
