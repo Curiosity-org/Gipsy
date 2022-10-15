@@ -20,10 +20,13 @@ def check_libs():
         packages = pkg_resources.parse_requirements(file.readlines())
     try:
         pkg_resources.working_set.resolve(packages)
+    except pkg_resources.VersionConflict as e:
+        print(f"\n⚠️ \033[33m{type(e).__name__}: {e}\033[0m\n ")
     except Exception as e:
         print(f"\n⛔ \u001b[41m\u001b[37;1m{type(e).__name__}\033[0m: \033[31m{e}\033[0m")
         print("\n⚠️ \033[33mPlease install all the required modules with the folliwing command:\033[1m\n\n      \u001b[47m\033[30mpip3 install -r requirements.txt\033[0m\n ")
         exit(1)
+
 check_libs()
 
 
@@ -143,7 +146,7 @@ def main():
     try: client.run(config.get("bot.token"))
     except discord.errors.LoginFailure:
         log.error("⚠️ Invalid token")
-        setup.token_set(force_set=True)
+        config.token_set(force_set=True)
         os.system("python3 start.py")
         exit()
 
