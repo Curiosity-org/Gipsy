@@ -189,8 +189,9 @@ class XP(commands.Cog):
         if msg.guild.id in self.xp_channels_cache.keys():
             if msg.channel.id in self.xp_channels_cache[msg.guild.id]:
                 return False
-            if msg.channel.category.id in self.xp_channels_cache[msg.guild.id]:
-                return False
+            if msg.channel.category is not None:
+                if msg.channel.category.id in self.xp_channels_cache[msg.guild.id]:
+                    return False
         else:
             chans = self.bot.server_configs[msg.guild.id]["noxp_channels"]
             if chans is not None:
