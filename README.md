@@ -25,34 +25,38 @@ You need to install by yourself:
 
 - [git CLI](https://git-scm.com/book/en/v2/Getting-Started-The-Command-Line)
 - [Python 3.10](https://www.python.org/downloads/release/python-3100/)
-- [`pip` package](https://pypi.org/project/pip/).
+- [`pipenv` package](https://pypi.org/project/pipenv/).
 
 Open a terminal and go in the folder you want to install the bot. Then, enter
 
 ```bash
-git clone -recursive https://github.com/Gunivers/Gipsy
+git clone https://github.com/Gunivers/Gipsy
 ```
 
-This command will install Gipsy and the official plugins. If you don't want these plugins, you can simply remove the `-recursive` from the command.
-
-If you don't have it, install the `pipenv` package:
-
+Then go in the Gipsy directory
 ```bash
-pip install pipenv
+cd Gipsy
+```
+
+By default, you will be on the beta version which is the most recent one, but it might can contain bugs. If you want to switch on the stable version, run
+```bash
+git checkout master
 ```
 
 Then start the python environment:
-
 ```bash
 pipenv shell
 ```
 
-And finally, run the setup script:
+Install the dependencies
+```bash
+pipenv install
+```
 
+And finally, run the setup script:
 ```bash
 python3 setup.py
 ```
-
 The script will ask you if you want to run the bot at the end.
 
 The next times, to run the bot, you will only have to run
