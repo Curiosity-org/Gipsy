@@ -38,7 +38,7 @@ Then go in the Gipsy directory
 cd Gipsy
 ```
 
-By default, you will be on the beta version which is the most recent one, but it might can contain bugs. If you want to switch on the stable version, run
+(optional) By default, you will be on the beta version which is the most recent one, but it might can contain bugs. If you want to switch on the stable version, run
 ```bash
 git checkout master
 ```
@@ -53,7 +53,7 @@ Install the dependencies
 pipenv install
 ```
 
-And finally, run the setup script:
+And finally, run the setup script and follow the instructions:
 ```bash
 python3 setup.py
 ```
