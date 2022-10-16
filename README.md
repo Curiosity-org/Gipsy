@@ -47,6 +47,18 @@ or, if you are running Gipsy 2.x, simply run `python setup.py` and say yes when 
 > If you updated Gipsy from 1.x to 2.x, you may noticed that plugin files disapeared from your installation. To fix that, empty the `plugins` folder (it may remain `__pycache__` data) and run the command `git submodule update`
 
 
+> **Note**
+>
+> This branch is the rewrite of the beta version and require special steps to checkout for developers.
+> To checkout this branch, commit and push your changes to the plugins repo, and then run the command `git submodule deinit plugins`. This will remove all the files from the `plugins/` folder.
+> You can then checkout the branch safely.
+> 
+> To go back to the `beta` branch and get the submodule back, you need to follow these special steps :
+> - checkout to the beta branch
+> - run `rm -r plugins/*` to remove python cached files
+> - run `git submodule init` to reinitialize the submodule
+> - run `git submodule update` to get the submodule back
+
 
 # 📚 About
 
