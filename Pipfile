@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+psutil = "*"
+aiohttp = "*"
+gitpython = ">=3.1.8"
+python-i18n = "*"
+pyyaml = "*"
+emoji = ">=2.0"
+feedparser = ">=6.0"
+python-twitter = ">=3.5"
+async-timeout = ">=3.0"
+argparse = "*"
+numpy = "*"
+"discord.py" = "~=2.0.0"
+lrfutils = {editable = true, git = "https://github.com/LeiRoF/LRFutils"}
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"

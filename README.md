@@ -21,9 +21,11 @@ You can also invite the bot in beta version to enjoy the latest features added. 
 
 # 🔌 Installation (self host)
 
-First, install [git CLI](https://git-scm.com/book/en/v2/Getting-Started-The-Command-Line)
+You need to install by yourself:
 
-Please use at least **Python 3.10** to run this project.
+- [git CLI](https://git-scm.com/book/en/v2/Getting-Started-The-Command-Line)
+- [Python 3.10](https://www.python.org/downloads/release/python-3100/)
+- [`pip` package](https://pypi.org/project/pip/).
 
 Open a terminal and go in the folder you want to install the bot. Then, enter
 
@@ -33,20 +35,36 @@ git clone -recursive https://github.com/Gunivers/Gipsy
 
 This command will install Gipsy and the official plugins. If you don't want these plugins, you can simply remove the `-recursive` from the command.
 
-Then, install all the dependencies by running
+If you don't have it, install the `pipenv` package:
 
 ```bash
-pip install -r requirements.txt
+pip install pipenv
 ```
 
-or, if you are running Gipsy 2.x, simply run `python setup.py` and say yes when it ask if you want to install the dependencies.
+Then start the python environment:
 
+```bash
+pipenv shell
+```
+
+And finally, run the setup script:
+
+```bash
+python3 setup.py
+```
+
+The script will ask you if you want to run the bot at the end.
+
+The next times, to run the bot, you will only have to run
+```bash
+python3 start.py
+```
+
+Also, if you want to install new plugins, you can find the official plugin list [here](https://github.com/Gunivers/Gipsy-plugins)
 
 > **Note**
 > 
 > If you updated Gipsy from 1.x to 2.x, you may noticed that plugin files disapeared from your installation. To fix that, empty the `plugins` folder (it may remain `__pycache__` data) and run the command `git submodule update`
-
-
 
 # 📚 About
 
@@ -55,7 +73,22 @@ You can invite the bot, learn what it can do and follow its evolution.
 
 ## ⚡ Features
 
-> TODO
+This bot is modular, it means that features are provided by plugins. By default, it have 3 plugins:
+- Misc: containding some simple out of context commands
+- Wormhole: which allow to connect 2 text channels
+- RSS: which allow to follow the news from your favorite website, twitter account or youtube channel
+
+There is also several other plugins available here:
+
+<div align=center>
+
+🔌[Official plugins repo](https://github.com/Gunivers/Gipsy-plugins)
+
+</div>
+
+> **Note**
+> 
+> You are a plugin developer? You can create a Pull Request on the plugins repository to make your plugin officially supported by Gipsy
 
 # ➕ Additional info
 

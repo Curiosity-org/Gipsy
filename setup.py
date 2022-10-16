@@ -14,15 +14,16 @@ decline = ["n", "no", "nope", "nah"]
 # INSTALL DEPENDENCIEs #
 ########################
 
+# To remove (deprecated since added virtual environment)
 def install_dependencies():
     """Install all dependencies needed for the bot to work."""
-
-    choice = input(f"\n🏗️ You need to install the bot dependencies. The automatic script will probably upgrade (or rarely downgrade) some python modules already installed on your machine.\n{Color.Blue}\n🏗️ Do you want to install dependencies? [y/N]{Color.NC}")
-    if choice.lower() in accept:
-        print("🏗️ Installing dependencies...")
-        os.system("python3 -m pip install -r requirements.txt")
-    else:
-        print("   Dependencies not installed.")
+    return
+    # choice = input(f"\n🏗️ You need to install the bot dependencies. The automatic script will probably upgrade (or rarely downgrade) some python modules already installed on your machine.\n{Color.Blue}\n🏗️ Do you want to install dependencies? [Y/n]{Color.NC}")
+    # if choice.lower() in accept:
+    #     print("🏗️ Installing dependencies...")
+    #     os.system("pipenv install -r requirements.txt")
+    # else:
+    #     print("   Dependencies not installed.")
             
 if __name__ == "__main__":
 
