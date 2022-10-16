@@ -2,6 +2,10 @@
 
 # 👻 Gipsy
 
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Gunivers/Gipsy?color=orange&label=average%20contributions&style=for-the-badge) ![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed/Gunivers/Gipsy?color=orange&style=for-the-badge) ![GitHub Repo stars](https://img.shields.io/github/stars/Gunivers/Gipsy?color=orange&style=for-the-badge) ![GitHub Sponsors](https://img.shields.io/github/sponsors/Gunivers?color=orange&style=for-the-badge)
+
+[![Discord](https://img.shields.io/discord/125723125685026816?color=blue&label=Discord&style=for-the-badge)](https://discord.gg/E8qq6tN)
+
 </div>
 
 Gipsy is a multifunction bot managed by the [Gunivers](https://gunivers.net) community.
