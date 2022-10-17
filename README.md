@@ -2,9 +2,9 @@
 
 # 👻 Gipsy
 
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Gunivers/Gipsy?color=orange&label=average%20contributions&style=for-the-badge) ![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed/Gunivers/Gipsy?color=orange&style=for-the-badge) ![GitHub Repo stars](https://img.shields.io/github/stars/Gunivers/Gipsy?color=orange&style=for-the-badge) ![GitHub Sponsors](https://img.shields.io/github/sponsors/Gunivers?color=orange&style=for-the-badge)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Gunivers/Gipsy?color=orange&label=average%20contributions&style=for-the-badge)](#) [![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed/Gunivers/Gipsy?color=orange&style=for-the-badge)](#) [![GitHub Repo stars](https://img.shields.io/github/stars/Gunivers/Gipsy?color=orange&style=for-the-badge)](#) [![GitHub Sponsors](https://img.shields.io/github/sponsors/Gunivers?color=orange&style=for-the-badge)](#)
 
-[![Discord](https://img.shields.io/discord/125723125685026816?color=blue&label=Discord&style=for-the-badge)](https://discord.gg/E8qq6tN)
+[![Discord](https://img.shields.io/discord/125723125685026816?color=blue&label=Discord&style=for-the-badge&logo=Discord)](https://discord.gg/E8qq6tN)
 
 </div>
 
@@ -16,7 +16,7 @@ This bot is public and open-source. It mean that anyone can host the bot and pro
 
 <div align=center>
 
-👋 [Invite Gipsy](http://utip.io/s/1yhs7W)
+[![](https://img.shields.io/badge/Invite-Gipsy-blue?style=for-the-badge&logo=Discord)](http://utip.io/s/1yhs7W)
 
 </div>
 
