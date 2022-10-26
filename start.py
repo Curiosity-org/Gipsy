@@ -4,37 +4,12 @@
 Gipsy start functions
 """
 
-from multiprocessing import log_to_stderr
-import pkg_resources
 
-# check python version
-import sys
-py_version = sys.version_info
-if py_version.major != 3 or py_version.minor < 9:
-    log.error("⚠️ Gipsy require Python 3.10 or more.", file=sys.stderr)
-    sys.exit(1)
-
-# To remove (deprecated since added virtual environment)
-# 
-# # Check modules
-# def check_libs():
-#     """Check if the required libraries are installed and can be imported"""
-#     with open("requirements.txt", 'r') as file:
-#         packages = pkg_resources.parse_requirements(file.readlines())
-#     try:
-#         pkg_resources.working_set.resolve(packages)
-#     except pkg_resources.VersionConflict as e:
-#         print(f"\n⚠️ \033[33m{type(e).__name__}: {e}\033[0m\n ")
-#     except Exception as e:
-#         print(f"\n⛔ \u001b[41m\u001b[37;1m{type(e).__name__}\033[0m: \033[31m{e}\033[0m")
-#         print("\n⚠️ \033[33mPlease install all the required modules with the folliwing command:\033[1m\n\n      \u001b[47m\033[30mpip3 install -r requirements.txt\033[0m\n ")
-#         exit(1)
-# check_libs()
+import setup # do not remove this import, it also check the dependencies
 
 import os
 import asyncio
 import time
-import setup
 from utils import Gunibot
 import argparse
 import logging
