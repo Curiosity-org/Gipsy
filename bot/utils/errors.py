@@ -202,6 +202,7 @@ class Errors(commands.Cog):
             await ctx.send(
                 await self.bot._(ctx.channel, "errors.missing-arg", a=error.param.name)
             )
+            await ctx.send_help(ctx.command)
             return
         elif isinstance(error, commands.DisabledCommand):
             await ctx.send(
