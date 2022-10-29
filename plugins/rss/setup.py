@@ -1,12 +1,12 @@
 import yaml
 import os
-from LRFutils import color
+from LRFutils.color import Color
 import core
 
 def run(save=False):
 
-    blue = color.Blue
-    NC = color.NC
+    blue = Color.Blue
+    NC = Color.NC
 
     accept = ["yes", "y", "yeah","yep"]
     decline = ["no", "n", "nah", "nope"]
