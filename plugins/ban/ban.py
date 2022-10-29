@@ -316,7 +316,7 @@ class Ban(commands.Cog):
 config = {}
 async def setup(bot:Gunibot=None, plugin_config:dict=None):
     if bot is not None:
-        await bot.add_cog(Ban(bot))
+        await bot.add_cog(Ban(bot), icon="🔨")
     if plugin_config is not None:
         global config
         config.update(plugin_config)
