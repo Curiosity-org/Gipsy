@@ -200,6 +200,8 @@ class XP(commands.Cog):
                 chans = [int(x) for x in chans]
                 if msg.channel.id in chans:
                     return False
+                if msg.channel.category in chans:
+                    return False
             else:
                 chans = []
             self.xp_channels_cache[msg.guild.id] = chans
@@ -327,7 +329,6 @@ class XP(commands.Cog):
     async def send_levelup(self, msg: discord.Message, lvl: int):
         """Send the levelup message or react with the reaction"""
         config = self.bot.server_configs[msg.guild.id]
-        print(config["levelup_reaction"])
         if config["levelup_reaction"]:
             if config["reaction_emoji"] is None:
                 await msg.add_reaction("💫")
