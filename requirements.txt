@@ -8,5 +8,5 @@ feedparser>=6.0
 python-twitter>=3.5
 async_timeout>=3.0
 argparse
-discord.py~=2.2.0
-git+https://github.com/LeiRoF/LRFutils
+discord.py~=2.0.0
+git+https://github.com/LeiRoF/LRFutils@78359b0
