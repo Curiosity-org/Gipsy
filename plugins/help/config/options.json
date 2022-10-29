@@ -1,6 +1,6 @@
 {
     "help_embed_color": {
-        "default": 0,
+        "default": 3092790,
         "type": "int",
         "command": "help_embed_color"
     },

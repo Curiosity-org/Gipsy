@@ -2,6 +2,7 @@ import inspect
 import itertools
 import typing
 from typing import Any, List, Optional, Union
+import numpy as np
 
 import discord
 from discord.ext import commands
@@ -58,7 +59,6 @@ class Help(commands.HelpCommand):
 
         embed = discord.Embed(*args, **kwargs, color=color)
 
-        embed.set_author(name=author, icon_url=icon_url)
         embed.set_footer(
             text=await self.context.bot._(
                 self.context, "help.help-tip", prefix=self.context.clean_prefix
@@ -221,7 +221,7 @@ class Help(commands.HelpCommand):
         :class:`str`
             The string representation of `command`
         """
-        name = f"• **{command.name}**"
+        name = f"> **`{command.name}`**"
         if command.short_doc:
             short_doc = await self.context.bot._(
                 self.context,
@@ -329,13 +329,6 @@ class Help(commands.HelpCommand):
         ctx = self.context
         bot: Gunibot = ctx.bot
 
-        self.embed = await self.get_help_embed(
-            title=await bot._(ctx, "help.bot-help-title")
-        )
-
-        if bot.description:
-            self.embed.description = f"```\n{bot.description}```"
-
         no_category = await bot._(ctx, "help.no-category")
 
         def get_category(command, *, no_category=no_category):
@@ -345,15 +338,23 @@ class Help(commands.HelpCommand):
         filtered = await self.filter_commands(bot.commands, sort=True, key=get_category)
         to_iterate = itertools.groupby(filtered, key=get_category)
 
-        for category, commands_ in to_iterate:
-            commands_ = sorted(commands_, key=lambda c: c.name)
-            self.embed.add_field(
-                name=f"{category}",
-                value=await self.get_bot_command_formating(commands_),
-                inline=False,
-            )
+        embeds = []
 
-        await ctx.send(embed=self.embed)
+        for category, commands_ in to_iterate:
+
+            commands_ = sorted(commands_, key=lambda c: c.name)
+
+            icon = ""
+            if bot.get_cog_icon(category):
+                icon = bot.get_cog_icon(category) + "   "
+
+            embeds.append(
+                await self.get_help_embed(title= f"{icon}__{category}__", description=await self.get_bot_command_formating(commands_))
+            )
+            embeds[-1].set_footer(text=await bot._(ctx, "help.help-cog-tip", prefix=self.context.clean_prefix, cog=category))
+
+        for i in range(int(np.floor(len(embeds)//10))):
+            await ctx.send(embeds=embeds[i*10: min((i+1)*10, len(embeds))])
 
     async def send_command_help(self, command: commands.Command) -> None:
         """Send the help message for command in the context channel
@@ -528,7 +529,7 @@ config = {}
 async def setup(bot:Gunibot=None, plugin_config:dict=None):
     if bot is not None:
         bot.help_command = Help()
-        await bot.add_cog(HelpCog(bot))
+        await bot.add_cog(HelpCog(bot), icon="🤝")
     if plugin_config is not None:
         global config
         config.update(plugin_config)
