@@ -3,7 +3,7 @@ fr:
     bot-help-title: Aide pour le bot Gipsy
     help-tip: Utilisez "%{prefix}help [command]" pour en savoir plus sur une commande !
     help-cog-tip: Utilisez "%{prefix}help %{cog}" pour en savoir plus sur ce plugin !
-    command-help-title: Aide pour la commande `%{name}`
+    command-help-title: Aide pour la commande `%{command}`
     help-signature-format: "%{signature}\n"
     group-help-title: Aide pour le groupe `%{name}`
     cog-help-title: Aide pour le cog `%{name}`
