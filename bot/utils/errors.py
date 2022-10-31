@@ -26,7 +26,7 @@ class Errors(commands.Cog):
             color=discord.Color.red(),
         )
         await ctx.send(embed=embed)
-    
+
     @commands.Cog.listener()
     async def on_command_error(self, ctx: MyContext, error: Exception):
         """The event triggered when an error is raised while invoking a command."""
@@ -55,33 +55,34 @@ class Errors(commands.Cog):
             if checks.is_bot_admin(ctx):
                 await ctx.reinvoke()
                 return
-            await self.send(ctx, 
+            await self.send(
+                ctx,
                 await self.bot._(
                     ctx.channel, "errors.cooldown", c=round(error.retry_after, 2)
-                )
+                ),
             )
             return
         elif isinstance(error, CheckException):
-            return await self.send(ctx, 
-                await self.bot._(ctx.channel, "errors.custom_checks." + error.id)
+            return await self.send(
+                ctx, await self.bot._(ctx.channel, "errors.custom_checks." + error.id)
             )
         elif isinstance(error, (commands.BadArgument, commands.BadUnionArgument)):
             raw_error = str(error)
             if raw_error == "Unknown argument":
-                return await self.send(ctx, 
-                    await self.bot._(ctx.channel, "errors.unknown-arg")
+                return await self.send(
+                    ctx, await self.bot._(ctx.channel, "errors.unknown-arg")
                 )
             elif raw_error == "Unknown dependency action type":
-                return await self.send(ctx, 
-                    await self.bot._(ctx.channel, "errors.invalid-dependency")
+                return await self.send(
+                    ctx, await self.bot._(ctx.channel, "errors.invalid-dependency")
                 )
             elif raw_error == "Unknown dependency trigger type":
-                return await self.send(ctx, 
-                    await self.bot._(ctx.channel, "errors.invalid-trigger")
+                return await self.send(
+                    ctx, await self.bot._(ctx.channel, "errors.invalid-trigger")
                 )
             elif raw_error == "Unknown permission type":
-                return await self.send(ctx, 
-                    await self.bot._(ctx.channel, "errors.invalid-permission")
+                return await self.send(
+                    ctx, await self.bot._(ctx.channel, "errors.invalid-permission")
                 )
             # Could not convert "limit" into int. OR Converting to "int" failed
             # for parameter "number".
@@ -95,13 +96,14 @@ class Errors(commands.Cog):
                     raw_error,
                 )
             if r is not None:
-                return await self.send(ctx, 
+                return await self.send(
+                    ctx,
                     await self.bot._(
                         ctx.channel,
                         "errors.unknown-arg",
                         p=r.group("arg"),
                         t=r.group("type"),
-                    )
+                    ),
                 )
             # zzz is not a recognised boolean option
             r = re.search(
@@ -109,113 +111,129 @@ class Errors(commands.Cog):
                 raw_error,
             )
             if r is not None:
-                return await self.send(ctx, 
+                return await self.send(
+                    ctx,
                     await self.bot._(
                         ctx.channel,
                         "errors.invalid-type",
                         p=r.group("arg"),
                         t=r.group("type"),
-                    )
+                    ),
                 )
             # Member "Z_runner" not found
             r = re.search(r"Member \"([^\"]+)\" not found", raw_error)
             if r is not None:
-                return await self.send(ctx, 
-                    await self.bot._(ctx.channel, "errors.unknown-member", m=r.group(1))
+                return await self.send(
+                    ctx,
+                    await self.bot._(
+                        ctx.channel, "errors.unknown-member", m=r.group(1)
+                    ),
                 )
             # User "Z_runner" not found
             r = re.search(r"User \"([^\"]+)\" not found", raw_error)
             if r is not None:
-                return await self.send(ctx, 
-                    await self.bot._(ctx.channel, "errors.unknown-user", u=r.group(1))
+                return await self.send(
+                    ctx,
+                    await self.bot._(ctx.channel, "errors.unknown-user", u=r.group(1)),
                 )
             # Role "Admin" not found
             r = re.search(r"Role \"([^\"]+)\" not found", raw_error)
             if r is not None:
-                return await self.send(ctx, 
-                    await self.bot._(ctx.channel, "errors.unknown-role", r=r.group(1))
+                return await self.send(
+                    ctx,
+                    await self.bot._(ctx.channel, "errors.unknown-role", r=r.group(1)),
                 )
             # Emoji ":shock:" not found
             r = re.search(r"Emoji \"([^\"]+)\" not found", raw_error)
             if r is not None:
-                return await self.send(ctx, 
-                    await self.bot._(ctx.channel, "errors.unknown-emoji", e=r.group(1))
+                return await self.send(
+                    ctx,
+                    await self.bot._(ctx.channel, "errors.unknown-emoji", e=r.group(1)),
                 )
             # Colour "blue" is invalid
             r = re.search(r"Colour \"([^\"]+)\" is invalid", raw_error)
             if r is not None:
-                return await self.send(ctx, 
-                    await self.bot._(ctx.channel, "errors.invalid-color", c=r.group(1))
+                return await self.send(
+                    ctx,
+                    await self.bot._(ctx.channel, "errors.invalid-color", c=r.group(1)),
                 )
             # Channel "twitter" not found.
             r = re.search(r"Channel \"([^\"]+)\" not found", raw_error)
             if r is not None:
-                return await self.send(ctx, 
+                return await self.send(
+                    ctx,
                     await self.bot._(
                         ctx.channel, "errors.unknown-channel", c=r.group(1)
-                    )
+                    ),
                 )
             # Message "1243" not found.
             r = re.search(r"Message \"([^\"]+)\" not found", raw_error)
             if r is not None:
-                return await self.send(ctx, 
+                return await self.send(
+                    ctx,
                     await self.bot._(
                         ctx.channel, "errors.unknown-message", m=r.group(1)
-                    )
+                    ),
                 )
             # Group "twitter" not found.
             r = re.search(r"Group \"([^\"]+)\" not found", raw_error)
             if r is not None:
-                return await self.send(ctx, 
-                    await self.bot._(ctx.channel, "errors.unknown-group", g=r.group(1))
+                return await self.send(
+                    ctx,
+                    await self.bot._(ctx.channel, "errors.unknown-group", g=r.group(1)),
                 )
             # Too many text channels
             if raw_error == "Too many text channels":
-                return await self.send(ctx, 
-                    await self.bot._(ctx.channel, "errors.too-many-text-channels")
+                return await self.send(
+                    ctx, await self.bot._(ctx.channel, "errors.too-many-text-channels")
                 )
             # Invalid duration: 2d
             r = re.search(r"Invalid duration: ([^\" ]+)", raw_error)
             if r is not None:
-                return await self.send(ctx, 
+                return await self.send(
+                    ctx,
                     await self.bot._(
                         ctx.channel, "errors.invalid-duration", d=r.group(1)
-                    )
+                    ),
                 )
             # Invalid invite: nope
             r = re.search(r"Invalid invite: (\S+)", raw_error)
             if r is not None:
-                return await self.send(ctx, 
-                    await self.bot._(ctx.channel, "errors.invalid-invite")
+                return await self.send(
+                    ctx, await self.bot._(ctx.channel, "errors.invalid-invite")
                 )
             # Invalid guild: test
             r = re.search(r"Invalid guild: (\S+)", raw_error)
             if r is not None:
-                return await self.send(ctx, 
-                    await self.bot._(ctx.channel, "errors.unknown-server")
+                return await self.send(
+                    ctx, await self.bot._(ctx.channel, "errors.unknown-server")
                 )
             # Invalid url: nou
             r = re.search(r"Invalid url: (\S+)", raw_error)
             if r is not None:
-                return await self.send(ctx, 
-                    await self.bot._(ctx.channel, "errors.invalid-url")
+                return await self.send(
+                    ctx, await self.bot._(ctx.channel, "errors.invalid-url")
                 )
             # Invalid emoji: lmao
             r = re.search(r"Invalid emoji: (\S+)", raw_error)
             if r is not None:
-                return await self.send(ctx, 
-                    await self.bot._(ctx.channel, "errors.invalid-emoji")
+                return await self.send(
+                    ctx, await self.bot._(ctx.channel, "errors.invalid-emoji")
                 )
             print("errors -", error)
         elif isinstance(error, commands.MissingRequiredArgument):
-            await self.send(ctx, 
-                await self.bot._(ctx.channel, "errors.missing-arg", a=error.param.name)
+            await self.send(
+                ctx,
+                await self.bot._(ctx.channel, "errors.missing-arg", a=error.param.name),
             )
             await ctx.send_help(ctx.command)
             return
         elif isinstance(error, commands.DisabledCommand):
-            await self.send(ctx, 
-                await self.bot._(ctx.channel, "errors.disabled-cmd", c=ctx.invoked_with)
+            await self.send(
+                ctx,
+                await self.bot._(
+                    ctx.channel, "errors.disabled-cmd", c=ctx.invoked_with
+                ),
             )
             return
         elif isinstance(error, commands.errors.NoPrivateMessage):
@@ -260,5 +278,5 @@ class Errors(commands.Cog):
         return True
 
 
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot: Gunibot = None, plugin_config: dict = None):
     await bot.add_cog(Errors(bot))

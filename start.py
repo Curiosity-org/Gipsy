@@ -24,6 +24,7 @@ if py_version.major != 3 or py_version.minor < 10:
 
 # Check and dispatch the config to all plugins
 from core import config
+
 config.check()
 
 from utils import Gunibot
@@ -37,9 +38,10 @@ for system in os.listdir("./bot/utils/"):
 # Getting plugin list
 plugins = []
 for plugin in os.listdir("./plugins/"):
-    if plugin[0] not in ["_","."]:
+    if plugin[0] not in ["_", "."]:
         if os.path.isdir("./plugins/" + plugin):
             plugins.append(f"plugins.{plugin}.{plugin}")
+
 
 def print_ascii_art():
     """
@@ -68,14 +70,12 @@ def main():
     """
 
     # Creating client
-    client = Gunibot(
-        case_insensitive=True, status=discord.Status("online"), beta=False
-    )
+    client = Gunibot(case_insensitive=True, status=discord.Status("online"), beta=False)
 
     # Writing logs + welcome message
     if not os.path.isdir("logs"):
         os.makedirs("logs")
-    
+
     print(" ")
     log.info("▶️ Starting Gipsy...")
 
@@ -105,12 +105,19 @@ def main():
         log.info("ID : " + str(client.user.id))
         if len(client.guilds) < 200:
             serveurs = [x.name for x in client.guilds]
-            log.info("Connected on " + str(len(client.guilds)) + " servers:\n - " + "\n - ".join(serveurs))
+            log.info(
+                "Connected on "
+                + str(len(client.guilds))
+                + " servers:\n - "
+                + "\n - ".join(serveurs)
+            )
         else:
             log.info("Connected on " + str(len(client.guilds)) + " servers")
         loaded, failed = await load(client, global_systems, plugins)
         log.info(f"{loaded} plugins loaded, {failed} plugins failed")
-        print("--------------------------------------------------------------------------------")
+        print(
+            "--------------------------------------------------------------------------------"
+        )
         await asyncio.sleep(2)
 
     client.add_listener(on_ready)
@@ -123,12 +130,14 @@ def main():
     args = parser.parse_args()
 
     # Launch bot
-    try: client.run(config.get("bot.token"))
+    try:
+        client.run(config.get("bot.token"))
     except discord.errors.LoginFailure:
         log.error("⚠️ Invalid token")
         setup.token_set(force_set=True)
         os.system("python3 start.py")
         exit()
+
 
 if __name__ == "__main__":
     main()

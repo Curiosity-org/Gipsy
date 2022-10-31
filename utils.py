@@ -39,9 +39,7 @@ class MyContext(commands.Context):
 class Gunibot(commands.bot.AutoShardedBot):
     """Bot class, with everything needed to run it"""
 
-    def __init__(
-        self, case_insensitive=None, status=None, beta=False
-    ):
+    def __init__(self, case_insensitive=None, status=None, beta=False):
         # defining allowed default mentions
         ALLOWED = discord.AllowedMentions(everyone=False, roles=False)
         # defining intents usage
@@ -162,7 +160,7 @@ class Gunibot(commands.bot.AutoShardedBot):
             return lambda *args, **kwargs: args[1]
         return cog.tr
 
-    async def add_cog(self, cog: commands.Cog, icon = None):
+    async def add_cog(self, cog: commands.Cog, icon=None):
         """Adds a "cog" to the bot.
         A cog is a class that has its own event listeners and commands.
 
@@ -269,11 +267,26 @@ def setup_logger():
 CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {}
 
 from core import config
-CONFIG_OPTIONS.update({
-        "prefix": {'default': config.get("bot.default_prefix"), 'type': 'text', 'command': None},
-        "language": {'default': config.get("bot.default_language"), 'type': 'text', 'command': None},
-        "admins": {'default': config.get("bot.admins"), 'type': 'categories', 'command': None},
-})
+
+CONFIG_OPTIONS.update(
+    {
+        "prefix": {
+            "default": config.get("bot.default_prefix"),
+            "type": "text",
+            "command": None,
+        },
+        "language": {
+            "default": config.get("bot.default_language"),
+            "type": "text",
+            "command": None,
+        },
+        "admins": {
+            "default": config.get("bot.admins"),
+            "type": "categories",
+            "command": None,
+        },
+    }
+)
 
 for plugin in os.listdir("./plugins/"):
     if plugin[0] != "_":
