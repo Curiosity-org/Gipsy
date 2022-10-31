@@ -83,13 +83,10 @@ class MessageManager(commands.Cog):
             try:
                 channel = self.bot.get_channel(int(channel.replace("<#", "").replace(">", "")))
             except BaseException:
-                try:
-                    channel = await ctx.guild.create_thread(int(channel.replace("<#", "").replace(">", "")))
-                except BaseException:
-                    await ctx.send(
-                        await self.bot._(ctx.guild.id, "message_manager.no-channel")
-                    )
-                    return
+                await ctx.send(
+                    await self.bot._(ctx.guild.id, "message_manager.no-channel")
+                )
+                return
         
         if not isinstance(channel, discord.abc.Messageable):
             await ctx.send(await self.bot._(ctx.guild.id, "message_manager.no-channel"))
@@ -185,13 +182,11 @@ class MessageManager(commands.Cog):
             try:
                 channel = self.bot.get_channel(int(channel.replace("<#", "").replace(">", "")))
             except BaseException:
-                try:
-                    channel = await ctx.guild.create_thread(int(channel.replace("<#", "").replace(">", "")))
-                except BaseException:
-                    await ctx.send(
-                        await self.bot._(ctx.guild.id, "message_manager.no-channel")
-                    )
-                    return
+                await ctx.send(
+                    await self.bot._(ctx.guild.id, "message_manager.no-channel")
+                )
+                return
+                
         if not isinstance(channel, discord.abc.Messageable):
             await ctx.send(await self.bot._(ctx.guild.id, "message_manager.no-channel"))
             return
