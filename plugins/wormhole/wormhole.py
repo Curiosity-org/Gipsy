@@ -534,10 +534,17 @@ class Wormholes(commands.Cog):
     async def modify_webhook_name(
         self, ctx: MyContext, wormhole: str, *, webhook_name: str
     ):
-        """webhook_name is for how names will be displayed:
-        for example: "{user} - {guild}"
-        will display "fantomitechno - Gunivers"
-        Available variables are {user}, {guild} and {channel}"""
+        """
+        Edit the name of the wormhole's webhook. Available variables:
+        - {guild}: name of the guild 
+        - {channel}: name of the channel
+        - {user}: name of the user
+
+        For example: "!wh modify MyWH webhook_name {user} from {guild}"
+
+        If fantomitechno send a message in a Gunivers channel linked to the wormhole "MyWH", the other connected channels will see the message from a webhook called "fantomitechno from Gunivers".
+        """
+
         if not self.check_wh_exists(wormhole):
             return await ctx.send(
                 await self.bot._(
@@ -670,7 +677,7 @@ class Wormholes(commands.Cog):
 config = {}
 async def setup(bot:Gunibot=None, plugin_config:dict=None):
     if bot is not None:
-        await bot.add_cog(Wormholes(bot))
+        await bot.add_cog(Wormholes(bot), icon="🌀")
     if plugin_config is not None:
         global config
         config.update(plugin_config)

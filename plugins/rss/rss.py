@@ -18,7 +18,7 @@ import typing
 from marshal import dumps, loads
 import core
 
-async def setup(bot:Gunibot): await bot.add_cog(Rss(bot))
+async def setup(bot:Gunibot): await bot.add_cog(Rss(bot), icon="📰")
 
 class Rss(commands.Cog):
     """Cog which deals with everything related to rss flows. Whether it is to add automatic tracking to a stream, or just to see the latest video released by Discord, it is this cog that will be used."""

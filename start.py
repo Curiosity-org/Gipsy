@@ -37,7 +37,7 @@ for system in os.listdir("./bot/utils/"):
 # Getting plugin list
 plugins = []
 for plugin in os.listdir("./plugins/"):
-    if plugin[0] != "_":
+    if plugin[0] not in ["_","."]:
         if os.path.isdir("./plugins/" + plugin):
             plugins.append(f"plugins.{plugin}.{plugin}")
 
