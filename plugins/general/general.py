@@ -39,7 +39,7 @@ class General(commands.Cog):
         self.codelines = count
 
     @commands.command(name="hs")
-    async def hs(self, ctx: MyContext, channel: discord.TextChannel = None):
+    async def hs(self, ctx: MyContext, channel: discord.abc.GuildChannel = None):
         if channel:
             msg = await self.bot._(
                 ctx.channel,
