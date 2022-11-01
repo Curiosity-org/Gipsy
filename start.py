@@ -26,7 +26,6 @@ if not os.path.isdir("plugins"):
     os.mkdir("plugins")
 
 # Check and dispatch the config to all plugins
-
 config.check()
 
 # Getting global system list
@@ -78,6 +77,14 @@ def main():
         beta=False,
     )
 
+    # Reading the configuration
+    client.config.load("config.yaml")
+
+    # Checking the configuration for the first time : token and other global things
+    if not client.config.process_check():
+        client.log.error("⚠️ Configuration file seems not valid. There could be issues.")
+        client.log.info("The bot will not crash but it's recommended to check the fields specified above.")
+
     # Writing client.log + welcome message
     if not os.path.isdir("client.log"):
         os.makedirs("client.log")
@@ -101,6 +108,11 @@ def main():
                 client.log.error("Failed to load extension: %s", extension)
                 notloaded += "\n - " + extension
                 failed += 1
+        
+        # Checking the configuration for the second time : plugin specific configuration
+        if not client.config.process_check():
+            log.error("⚠️ Configuration file seems not valid. There could be issues with plugins.")
+
         return loaded, failed
 
     # Printing info when the bot is started
@@ -149,10 +161,7 @@ def main():
 
     # Launch bot
     try:
-        client.run(
-            config.get("bot.token"),
-            log_handler=None,
-        )
+        client.run()
     except discord.errors.LoginFailure:
         client.log.error("⚠️ Invalid token")
         config.token_set(force_set=True)
