@@ -6,21 +6,27 @@ from typing import Union
 
 # Moves a message from its original channel to a parameterized channel
 # using a given webhook
-async def moveMessage(msg: discord.Message, webhook: discord.Webhook):
+async def moveMessage(msg: discord.Message, webhook: discord.Webhook, thread: discord.Thread = None):
     files = [await x.to_file() for x in msg.attachments]
     # grab mentions from the source message
     mentions = discord.AllowedMentions(
         everyone=msg.mention_everyone, users=msg.mentions, roles=msg.role_mentions
     )
-    new_msg: discord.WebhookMessage = await webhook.send(
-        content=msg.content,
-        files=files,
-        embeds=msg.embeds,
-        avatar_url=msg.author.display_avatar,
-        username=msg.author.name,
-        allowed_mentions=discord.AllowedMentions.none(),
-        wait=True,
-    )
+    
+    kargs = {
+        "content": msg.content,
+        "files": files,
+        "embeds": msg.embeds,
+        "avatar_url": msg.author.display_avatar,
+        "username": msg.author.name,
+        "allowed_mentions": discord.AllowedMentions.none(),
+        "wait": True,
+    }
+    if thread:
+        kargs["thread"] = thread
+
+    new_msg: discord.WebhookMessage = await webhook.send(**kargs)
+
     # edit the message to include mentions without notifications
     if mentions.roles or mentions.users or mentions.everyone:
         await new_msg.edit(allowed_mentions=mentions)
@@ -67,7 +73,7 @@ class MessageManager(commands.Cog):
         self,
         ctx: commands.Context,
         msg: discord.Message,
-        channel: Union[discord.TextChannel, str],
+        channel: Union[discord.abc.Messageable, str],
         *,
         confirm=True,
     ):
@@ -75,13 +81,14 @@ class MessageManager(commands.Cog):
 
         if isinstance(channel, str):
             try:
-                channel = self.bot.get_channel(int(channel))
+                channel = self.bot.get_channel(int(channel.replace("<#", "").replace(">", "")))
             except BaseException:
                 await ctx.send(
                     await self.bot._(ctx.guild.id, "message_manager.no-channel")
                 )
                 return
-        if not isinstance(channel, discord.TextChannel):
+        
+        if not isinstance(channel, discord.abc.Messageable):
             await ctx.send(await self.bot._(ctx.guild.id, "message_manager.no-channel"))
             return
 
@@ -121,9 +128,15 @@ class MessageManager(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+        dest = channel
+        thread = None
+        if isinstance(channel, discord.Thread):
+            thread = channel
+            channel = thread.parent
+
         # Creates a webhook to resend the message to another channel
         webhook = await channel.create_webhook(name="Gunipy Hook")
-        await moveMessage(msg, webhook)
+        await moveMessage(msg, webhook, thread=thread)
         await webhook.delete()
 
         if confirm:
@@ -133,7 +146,7 @@ class MessageManager(commands.Cog):
                     ctx.guild.id,
                     "message_manager.move.confirm",
                     user=msg.author.mention,
-                    channel=channel.mention,
+                    channel=dest.mention,
                 ),
                 colour=discord.Colour(51711),
             )
@@ -158,7 +171,7 @@ class MessageManager(commands.Cog):
         ctx: commands.Context,
         msg1: discord.Message,
         msg2: discord.Message,
-        channel: Union[discord.TextChannel, str],
+        channel: Union[discord.abc.Messageable, str],
         *,
         confirm=True,
     ):
@@ -167,13 +180,14 @@ class MessageManager(commands.Cog):
 
         if isinstance(channel, str):
             try:
-                channel = self.bot.get_channel(int(channel))
+                channel = self.bot.get_channel(int(channel.replace("<#", "").replace(">", "")))
             except BaseException:
                 await ctx.send(
                     await self.bot._(ctx.guild.id, "message_manager.no-channel")
                 )
                 return
-        if not isinstance(channel, discord.TextChannel):
+                
+        if not isinstance(channel, discord.abc.Messageable):
             await ctx.send(await self.bot._(ctx.guild.id, "message_manager.no-channel"))
             return
 
@@ -257,19 +271,26 @@ class MessageManager(commands.Cog):
         if msg1.created_at > msg2.created_at:
             msg2, msg1 = msg1, msg2
 
+
+        dest = channel
+        thread = None
+        if isinstance(channel, discord.Thread):
+            thread = channel
+            channel = thread.parent
+
         # Webhook creation (common to all messages)
         webhook = await channel.create_webhook(name="Gunipy Hook")
 
         counter = 0
 
         # Retrieves the message list from msg1 to msg2
-        await moveMessage(msg1, webhook)
+        await moveMessage(msg1, webhook, thread=thread)
         async for msg in msg1.channel.history(
             limit=200, after=msg1.created_at, before=msg2, oldest_first=True
         ):
-            await moveMessage(msg, webhook)
+            await moveMessage(msg, webhook, thread=thread)
             counter += 1
-        await moveMessage(msg2, webhook)
+        await moveMessage(msg2, webhook, thread=thread)
 
         if counter == 0:
             await ctx.send(
@@ -284,7 +305,7 @@ class MessageManager(commands.Cog):
                 description=await self.bot._(
                     ctx.guild.id,
                     "message_manager.moveall.confirm",
-                    channel=channel.mention,
+                    channel=dest.mention,
                     link=introduction.jump_url,
                 ),
                 colour=discord.Colour.green(),
