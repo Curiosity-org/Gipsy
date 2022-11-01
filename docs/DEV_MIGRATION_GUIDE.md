@@ -26,7 +26,7 @@ class Foo():
 ```
 ⚠️ The capital letters are important here. The config variable must be named the same as the plugin folder.
 
-This function return a doctionary containing the config information such as defined in the `/plugins/foo/config.yaml` file. This file must contains the default config for the plugin and will never be edited by the bot.
+This function return a dictionary containing the config information such as defined in the `/plugins/foo/config.yaml` file. This file must contains the default config for the plugin and will never be edited by the bot.
 
 You can also, at any moment, use a path in the `core.config.get` function:
 ```python

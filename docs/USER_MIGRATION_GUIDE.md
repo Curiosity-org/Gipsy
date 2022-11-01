@@ -1,4 +1,4 @@
-# User migration guid
+# User migration guide
 
 ## Migrating 1.3 -> 1.4
 
