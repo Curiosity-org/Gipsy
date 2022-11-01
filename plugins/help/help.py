@@ -2,7 +2,7 @@ import inspect
 import itertools
 import typing
 from typing import Any, List, Optional, Union
-import numpy as np
+import math
 
 import discord
 from discord.ext import commands
@@ -384,7 +384,7 @@ class Help(commands.HelpCommand):
                     )
                 )
 
-        for i in range(int(np.floor(len(embeds)//10))):
+        for i in range(int(math.floor(len(embeds)//10))):
             await ctx.send(embeds=embeds[i*10: min((i+1)*10, len(embeds))])
 
     async def send_command_help(self, command: commands.Command) -> None:
