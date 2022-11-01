@@ -81,8 +81,8 @@ You can invite the bot, learn what it can do and follow its evolution.
 
 ## ⚡ Features
 
-This bot is modular, it means that features are provided by plugins. By default, it have 3 plugins:
-- Misc: containding some simple out of context commands
+This bot is modular, it means that features are provided by plugins. By default, it has 3 plugins:
+- Misc: containing some simple out of context commands
 - Wormhole: which allow to connect 2 text channels
 - RSS: which allow to follow the news from your favorite website, twitter account or youtube channel
 
