@@ -1,19 +1,20 @@
 en:
   help:
     bot-help-title: Help for Gipsy bot
-    help-tip: Use %{prefix}help [command] for more on a command !
-    command-help-title: Help for the command {0}
-    help-signature-format: "`%{signature}`"
-    group-help-title: Help for the group `%{name}`
-    cog-help-title: Help for the cog `%{name}`
+    help-tip: Use "%{prefix}help [command]" for more on a command!
+    help-cog-tip: Use "%{prefix}help %{cog}" for more on this plugin!
+    command-help-title: Help for the command `%{command}`
+    help-signature-format: "%{signature}"
+    group-help-title: Help for the command `%{name}`
+    cog-help-title: Help for the plugin `%{name}`
     no-category: No category
     type: ": %{type}"
     default: " = `%{default}`"
     short_doc: ": *%{short_doc}*"
-    parameters: Commande parameters
+    parameters: Command parameters
     alias: Aliases
     subcommands: Subcommands
-    not-found: The command "%{command}" does not exist !
+    not-found: The command "%{command}" does not exist!
     greedy: "Suite : %{type}"
   
   annotation:

@@ -155,7 +155,7 @@ class Groups(commands.Cog):
         query = "SELECT rowid, * FROM groups WHERE guild=? AND roleID=?;"
         res = self.bot.db_query(query, (guildID, roleID), fetchone=True, astuple=True)
         # comes as: (rowid, guild, roleID, ownerID, channelID, privacy)
-        if res is None:
+        if not res:
             return None
         group = Group(self.bot, *res[1:])
         group.id = res[0]
@@ -733,7 +733,7 @@ class Groups(commands.Cog):
 config = {}
 async def setup(bot:Gunibot=None, plugin_config:dict=None):
     if bot is not None:
-        await bot.add_cog(Groups(bot))
+        await bot.add_cog(Groups(bot), icon="🎭")
     if plugin_config is not None:
         global config
         config.update(plugin_config)

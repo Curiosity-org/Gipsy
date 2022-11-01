@@ -484,7 +484,7 @@ class Thanks(commands.Cog):
 config = {}
 async def setup(bot:Gunibot=None, plugin_config:dict=None):
     if bot is not None:
-        await bot.add_cog(Thanks(bot))
+        await bot.add_cog(Thanks(bot), icon="❤️")
     if plugin_config is not None:
         global config
         config.update(plugin_config)

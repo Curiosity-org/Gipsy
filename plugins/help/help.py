@@ -2,6 +2,7 @@ import inspect
 import itertools
 import typing
 from typing import Any, List, Optional, Union
+import math
 
 import discord
 from discord.ext import commands
@@ -58,7 +59,6 @@ class Help(commands.HelpCommand):
 
         embed = discord.Embed(*args, **kwargs, color=color)
 
-        embed.set_author(name=author, icon_url=icon_url)
         embed.set_footer(
             text=await self.context.bot._(
                 self.context, "help.help-tip", prefix=self.context.clean_prefix
@@ -67,7 +67,7 @@ class Help(commands.HelpCommand):
 
         return embed
 
-    async def get_bot_command_formating(self, commands_: List[commands.Command]) -> str:
+    async def get_bot_command_formating(self, commands_: List[commands.Command], size:int=None) -> str:
         """Returns a string representing `commands_`
 
         Attributes
@@ -80,10 +80,17 @@ class Help(commands.HelpCommand):
         :class:`str`
             The string representation of the commands
         """
-        output = ""
+        output = "```asciidoc\n"
+
+        # Get max size of command name
+        name_size = 0
+        for commands in commands_:
+            name_size = max(name_size, len(commands.name))
+
         for command in commands_:
-            output += await self.get_command_list_string(command)
+            output += await self.get_command_list_string(command, name_size=name_size, total_size=size)
             output += "\n"
+        output += "```"
         return output
 
     async def get_type_string(self, type: Any) -> Optional[str]:
@@ -203,12 +210,12 @@ class Help(commands.HelpCommand):
             else:
                 default = ""
 
-            result += f"**{name}**{type}{default}"
+            result += f"**`{name}`**{type}{default}"
             result += sep  # add end separator
 
         return result if len(result) > 0 else None
 
-    async def get_command_list_string(self, command: commands.Command) -> str:
+    async def get_command_list_string(self, command: commands.Command, name_size:int=0, total_size:int=0) -> str:
         """Returns a string representing `command` in a list of commands
 
         Attributes
@@ -221,18 +228,20 @@ class Help(commands.HelpCommand):
         :class:`str`
             The string representation of `command`
         """
-        name = f"• **{command.name}**"
+        name = f"{command.name.ljust(name_size)} :: "
+        total_size += 4 # number of additionnal characters
         if command.short_doc:
             short_doc = await self.context.bot._(
                 self.context,
                 "help.short_doc",
-                short_doc=command.short_doc[:40]
-                + ("…" if len(command.short_doc) > 40 else ""),
+                short_doc=command.short_doc#[:40]
+                #+ ("…" if len(command.short_doc) > 40 else ""),
             )
+            short_doc = short_doc[3:-1]
         else:
             short_doc = ""
 
-        return name + short_doc
+        return (name + short_doc).ljust(total_size)
 
     async def get_subcommand_string(
         self, group: Union[commands.Group, commands.Cog], sep="\n"
@@ -253,7 +262,7 @@ class Help(commands.HelpCommand):
             If the group has no subcommand, the function returns None
         """
         bot: Gunibot = self.context.bot
-        result = ""
+        result = "```asciidoc\n"
 
         if isinstance(group, commands.Group):
             commands_ = sorted(group.commands, key=lambda command: command.name)
@@ -272,6 +281,7 @@ class Help(commands.HelpCommand):
             result += "**"
             if len(result) > 1024:
                 result = result[:1023] + "…"
+        result += "\n```"
 
         return result if len(result) > 0 else None
 
@@ -329,13 +339,6 @@ class Help(commands.HelpCommand):
         ctx = self.context
         bot: Gunibot = ctx.bot
 
-        self.embed = await self.get_help_embed(
-            title=await bot._(ctx, "help.bot-help-title")
-        )
-
-        if bot.description:
-            self.embed.description = f"```\n{bot.description}```"
-
         no_category = await bot._(ctx, "help.no-category")
 
         def get_category(command, *, no_category=no_category):
@@ -345,15 +348,44 @@ class Help(commands.HelpCommand):
         filtered = await self.filter_commands(bot.commands, sort=True, key=get_category)
         to_iterate = itertools.groupby(filtered, key=get_category)
 
+        max_lenght = 0
+        for category, commands_ in to_iterate:
+            for command in commands_:
+                max_lenght = max(max_lenght, len(command.name) + len(command.short_doc))
+
+        embeds = []
+        to_iterate = itertools.groupby(filtered, key=get_category)
         for category, commands_ in to_iterate:
             commands_ = sorted(commands_, key=lambda c: c.name)
-            self.embed.add_field(
-                name=f"{category}",
-                value=await self.get_bot_command_formating(commands_),
-                inline=False,
-            )
 
-        await ctx.send(embed=self.embed)
+            icon = ""
+            if bot.get_cog_icon(category):
+                icon = bot.get_cog_icon(category)
+
+            embeds.append(
+                await self.get_help_embed(
+                    title= f"{icon}   {category}",
+                    description=await self.get_bot_command_formating(commands_, size=max_lenght)
+                )
+            )
+            if len(commands_) == 1:
+                embeds[-1].set_footer(
+                    text=await bot._(
+                        ctx, "help.help-cog-tip",
+                        prefix=self.context.clean_prefix,
+                        cog=commands_[0].name
+                    )
+                )
+            else:
+                embeds[-1].set_footer(
+                    text=await bot._(
+                        ctx, "help.help-tip",
+                        prefix=self.context.clean_prefix
+                    )
+                )
+
+        for i in range(int(math.floor(len(embeds)//10))):
+            await ctx.send(embeds=embeds[i*10: min((i+1)*10, len(embeds))])
 
     async def send_command_help(self, command: commands.Command) -> None:
         """Send the help message for command in the context channel
@@ -366,11 +398,11 @@ class Help(commands.HelpCommand):
         ctx = self.context
         bot: Gunibot = ctx.bot
         self.embed = await self.get_help_embed(
-            title=await bot._(ctx, "help.command-help-title", name=command.name)
+            title=await bot._(ctx, "help.command-help-title", command=command.name)
         )
 
         description = (
-            "```\n"  # include signature and description in the same code field
+            "```autohotkey\n"  # include signature and description in the same code field
         )
         description += await bot._(
             ctx,
@@ -378,9 +410,10 @@ class Help(commands.HelpCommand):
             signature=self.get_command_signature(command),
         )
 
+        description += "\n```"
+
         if command.help != "":
-            description += f"\n{command.help}"
-        description += "```"
+            description += f"{command.help}"
 
         self.embed.description = description
 
@@ -413,10 +446,10 @@ class Help(commands.HelpCommand):
             "help.help-signature-format",
             signature=self.get_command_signature(group),
         )
+        description += "\n```"
 
         if group.help != "":
-            description += f"\n{group.help}"
-        description += "```"
+            description += f"{group.help}"
 
         self.embed.description = description
 
@@ -528,7 +561,7 @@ config = {}
 async def setup(bot:Gunibot=None, plugin_config:dict=None):
     if bot is not None:
         bot.help_command = Help()
-        await bot.add_cog(HelpCog(bot))
+        await bot.add_cog(HelpCog(bot), icon="🤝")
     if plugin_config is not None:
         global config
         config.update(plugin_config)
