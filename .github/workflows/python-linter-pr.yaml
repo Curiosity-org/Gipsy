@@ -13,6 +13,7 @@ name: Python Linter for Pull Requests
 
 on:
   pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 # On restreint les permissions d'Action pour éviter que de potentielles PR malicieuses
 # aient un trop grand accès à notre repo, mais normalement ici il n'y a pas de problème 
@@ -29,8 +30,6 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
-        with:
-          submodules: recursive
 
       - name: Set up Python
         uses: actions/setup-python@v4
