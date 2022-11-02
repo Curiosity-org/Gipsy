@@ -8,11 +8,6 @@ from core import CheckException, Gunibot, MyContext
 from core import checks
 from core import config
 
-import sys
-
-sys.path.append("./bot")
-
-
 class Errors(commands.Cog):
     """General cog for error management."""
 

@@ -1,14 +1,10 @@
 from typing import Any, List, Union
-import sys
 
 import discord
 from discord.ext import commands
 import emoji
 
 from core import CONFIG_OPTIONS, Gunibot, MyContext, checks
-
-sys.path.append("./bot")
-sys.path.append("./bot")
 
 SERVER_CONFIG = None
 
