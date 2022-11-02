@@ -13,7 +13,7 @@ decline = ["n", "no", "nope", "nah"]
 # check python version
 
 py_version = sys.version_info
-if py_version.major != 3 or py_version.minor < 9:
+if py_version.major != 3 or py_version.minor < 10:
     print("⚠️ \033[33mGipsy require Python 3.10 or more.\033[1m")
     sys.exit(1)
 
@@ -97,7 +97,7 @@ if not check_libs(verbose=verbose):
         os.system("Restarting...")
         os.system("python3 setup.py")
     else:
-        print("\n⚠️ \033[33mThe bot can't run without it's dependancies. Please install all the required modules with the following command:\033[1m\n")
+        print("\n⚠️ \033[33mThe bot can't run without it's dependencies. Please install all the required modules with the following command:\033[1m\n")
         print("       \u001b[47m\033[30mpython3 -m pip install -r requirements.txt\033[0m\n ")
         exit(1)
 
