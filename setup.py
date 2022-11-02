@@ -7,6 +7,10 @@ respectant les principes de diffusion des logiciels libres. Vous pouvez
 utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
+import os
+import subprocess
+from LRFutils.color import Color
+from LRFutils import log
 
 import sys
 import os

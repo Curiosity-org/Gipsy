@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Generic, TypeVar, Any, Callable
+from typing import Generic, TypeVar, Any, Callable, Union, get_args
 
 import os
 
@@ -7,7 +7,7 @@ import yaml
 
 import logging
 
-logger = logging.getLogger("Configuration")
+logger = logging.getLogger("runner")
 
 import re
 
@@ -35,6 +35,18 @@ def append_dict(dict1: dict, dict2: dict):
 
 T = TypeVar("T")
 
+def check_type(value, type) -> bool:
+    """Check if a value is of a given type.
+    """
+    
+    if value is None or type == Any:
+        return True
+    
+    if type is Union:
+        return isinstance(value, get_args(type))
+    else:
+        return isinstance(value, type)
+
 class ConfigurationField(Generic[T]):
     def __init__(
         self,
@@ -43,6 +55,36 @@ class ConfigurationField(Generic[T]):
         default: T | None = None,
         key: str | None = None,
     ):
+        """Creates a configuration field.
+        
+        Arguments:
+            type: The type of the field, e.g. `bool` or `int`.
+                  Should be a yaml supported type. (for now, support for
+                  discord type soontm)
+                  Unions are supported (e.g. `Union[int, str]` or `int | str`).
+            required: Whether the field is required or not.
+                      If the field required but not set, an error will be logged.
+            default: The default value of the field.
+                     If no value is set, this value will be returned.
+            key: The key of the field in the configuration file.
+                 You usually don't need to set this because the configuration
+                 parent sets it but you can use it if you want the field to be
+                 different than the attribute name.
+
+        Example:
+        ```py
+        class MyConfiguration(Configuration):
+            my_field = ConfigurationField(int, required=True)
+        ```
+
+        By setting the configuration this way, you can latter access the field
+        data directly like this:
+        ```py
+        config = MyConfiguration()
+        bot.config.add_configuration_child(config)
+        print(config.my_field) # prints the value of the field set in the
+                               # config.yaml file
+        """
         if required is True and default is not None:
             raise ValueError("You cannot set a default value for a required field")
         self.type = type
@@ -91,7 +133,7 @@ class ConfigurationField(Generic[T]):
                 self.full_name(instance),
             )
         
-        if not isinstance(self.__get__(instance), self.type):
+        if not check_type(self.__get__(instance), self.type):
             check_passed = False
             logger.error(
                 "The field `%s` is not of the type %s (value: %s).",
@@ -117,19 +159,26 @@ class ConfigurationField(Generic[T]):
 
 class Configuration():
     __fields: dict[str, ConfigurationField] = None
+    __childs: dict[str, Configuration] = None
 
     parent: Configuration | None = None
 
     namespace: str = None
 
     def __init_subclass__(cls) -> None:
-        cls.__fields = {}
+        cls.__fields = {} # we prevent shared fields between subclasses
+        cls.__childs = {}
+
         for key in dir(cls):
             attr = getattr(cls, key)
             if isinstance(attr, ConfigurationField):
                 if attr.key is None:
                     attr.key = key
                 cls.__fields[key] = attr
+            elif isinstance(attr, Configuration):
+                cls.__childs[key] = attr
+                if attr.namespace is None:
+                    attr.namespace = key
 
     def __init__(
         self,
@@ -151,10 +200,15 @@ class Configuration():
 
         self.fields: dict[str, ConfigurationField] = {}
         
-        if self.__fields is not None: # if the class has not been subclassed
+        if self.__fields is not None: # if the class has been subclassed
             self.fields.update(self.__fields)
 
         self.child_configurations = {}
+
+        if self.__childs is not None: # if the class has been subclassed
+            for key, child in self.__childs.items():
+                child.parent = self
+                self.child_configurations[key] = child
     
     @property
     def raw_configuration(self):
@@ -202,6 +256,7 @@ class Configuration():
             raise ValueError(f"The namespace '{configuration.namespace}' is already used.")
         
         configuration.parent = self
+
         self.child_configurations[configuration.namespace] = configuration
     
     def add_configuration_field(self, field: ConfigurationField):
@@ -217,16 +272,16 @@ class Configuration():
         This function goes through all the fields and checks if they are valid.
 
         Returns True if all fields are valid, False otherwise.
-
-        Raises an exception if:
-        - a required field is missing
-        - a mandatory check for a field failed
         """
+        check_passed = True
+
         for field in self.fields.values():
-            field.process_check(self)
+            check_passed = check_passed and field.process_check(self)
 
         for child in self.child_configurations.values():
-            child.process_check()
+            check_passed = check_passed and child.process_check()
+        
+        return check_passed
     
     def full_name(self) -> str:
         """Returns the full name of the configuration, including the parent configuration objects."""
@@ -235,11 +290,8 @@ class Configuration():
         else:
             return self.namespace
 
-def regex_check(regex: str, mandatory: bool = False):
+def regex_check(regex: str):
     """Return a function that checks if a string matches a regex.
-    
-    The function raises an exception if the string does not match the regex
-    when the mandatory argument is set to True.
     """
     
     def check(value, field: ConfigurationField, instance: Configuration):

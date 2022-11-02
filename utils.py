@@ -29,8 +29,7 @@ class GlobalConfig(configuration.Configuration):
 
     # check if the token is valid, and raise an error if it's not
     token.check(configuration.regex_check(
-        r"[MN][\w]{25}\.[\w]{6}\.[\w_]{38}$",
-        mandatory=True
+        r"[MN][\w]{25}\.[\w]{6}\.[\w_]{38}$"
     ))
 
     default_language = configuration.ConfigurationField(str, default="en")
