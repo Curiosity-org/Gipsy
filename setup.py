@@ -11,7 +11,7 @@ import os
 import subprocess
 from LRFutils.color import Color
 from LRFutils import log
-
+from core import config
 import sys
 import os
 import subprocess
