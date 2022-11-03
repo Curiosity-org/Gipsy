@@ -12,13 +12,13 @@ en:
     invalid-color: "Colour %{c} is invalid"
     invalid-dependency: Unknown dependency action type
     invalid-duration: "%{d} is not a valid duration"
-    invalid-emoji: The provided emoji is not recognized
-    invalid-invite: The provided invitation is not valid
+    invalid-emoji: Invalid emoji
+    invalid-invite: Invalid invite
     invalid-trigger: Unknown dependency trigger type
     invalid-permission: Unknown permission type
     invalid-type: "%{p} is not a recognised %{t} option"
-    invalid-url: The provided URL is not valid
-    missing-arg: You forgot the argument `<%{a}>`
+    invalid-url: Invalid URL
+    missing-arg: Oops, missing argument %{a}
     too-many-text-channels: You have too many accessible text channels
     unknown-arg: Unknown argument
     unknown-channel: Channel %{c} not found
@@ -28,7 +28,7 @@ en:
     unknown-role: "Unable to find the role %{r} :confused:"
     unknown-server: Unknown server
     unknown-user: "Unable to find user %{u} :confused:"
-    unknown-group: "Unable to find group `%{g}` :confused:"
+    unknown-group: "Unable to find group %{u} :confused:"
   general:
     stats:
       title: "Bot statistics"

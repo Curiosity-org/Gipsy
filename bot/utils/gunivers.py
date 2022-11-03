@@ -19,5 +19,5 @@ class Gunivers(commands.Cog):
             await channel.send("Bon, qu'est-ce qu'on peut poster aujourd'hui ?")
 
 
-async def setup(bot: Gunibot = None, plugin_config: dict = None):
+async def setup(bot:Gunibot=None, plugin_config:dict=None):
     await bot.add_cog(Gunivers(bot))

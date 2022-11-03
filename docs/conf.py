@@ -1,3 +1,4 @@
+
 ######################
 # TocTree generation #
 ######################
@@ -12,40 +13,30 @@ with open("index.rst", "r") as f:
     started = False
     ended = False
     for line in f:
-        if not started:
-            before.append(line)
-        if line.startswith(".. Start plugins documentation"):
-            started = True
-        if line.startswith(".. End plugins documentation"):
-            ended = True
-        if ended:
-            after.append(line)
+        if not started: before.append(line)
+        if line.startswith(".. Start plugins documentation"): started = True
+        if line.startswith(".. End plugins documentation"): ended = True
+        if ended: after.append(line)
 
-if os.path.isdir(f"plugins"):
-    shutil.rmtree(f"plugins")
+if os.path.isdir(f"plugins"): shutil.rmtree(f"plugins")
 
-with open("index.rst", "w+") as toctree:
-    for line in before:
-        toctree.write(line)
+with open("index.rst","w+") as toctree:
+    for line in before: toctree.write(line)
 
     # Generating plugin toctree and moving pugin's doc files in the global docs folder
     toctree.write("\n.. toctree::\n   :maxdepth: 1\n   :caption: Installed plugins\n\n")
     path = os.path.join("", os.pardir)
-    for plugin in os.listdir(f"{path}/plugins"):
-        if os.path.isdir(f"{path}/plugins/" + plugin + "/docs"):
-            for file in os.listdir(f"{path}/plugins/" + plugin + "/docs"):
-                if file[-3:] == ".md" or file[-4:] == ".rst":
-                    if not os.path.isdir(f"/plugins/{plugin}/"):
-                        os.makedirs(f"plugins/{plugin}/")
-                    shutil.copyfile(
-                        f"{path}/plugins/{plugin}/docs/{file}",
-                        f"plugins/{plugin}/{file}",
-                    )
+    for plugin in os.listdir(f'{path}/plugins'):
+        if os.path.isdir(f'{path}/plugins/' + plugin + "/docs"):
+            for file in os.listdir(f'{path}/plugins/' + plugin + "/docs"):
+                if file[-3:] == '.md' or file[-4:] == '.rst':
+                    if not os.path.isdir(f"/plugins/{plugin}/"): os.makedirs(f"plugins/{plugin}/")
+                    shutil.copyfile(f"{path}/plugins/{plugin}/docs/{file}", f"plugins/{plugin}/{file}")
                     toctree.write(f"   plugins/{plugin}/{file}\n")
-
+    
     toctree.write("\n")
-    for line in after:
-        toctree.write(line)
+    for line in after: toctree.write(line)
+
 
 
 # Configuration file for the Sphinx documentation builder.

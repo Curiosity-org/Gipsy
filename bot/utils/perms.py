@@ -130,5 +130,5 @@ class Perms(commands.Cog):
                 pass
 
 
-async def setup(bot: Gunibot = None, plugin_config: dict = None):
+async def setup(bot:Gunibot=None, plugin_config:dict=None):
     await bot.add_cog(Perms(bot))

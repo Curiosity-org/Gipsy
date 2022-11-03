@@ -2,6 +2,10 @@
 
 # 👻 Gipsy
 
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Gunivers/Gipsy?color=orange&label=average%20contributions&style=for-the-badge)](#) [![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed/Gunivers/Gipsy?color=orange&style=for-the-badge)](#) [![GitHub Repo stars](https://img.shields.io/github/stars/Gunivers/Gipsy?color=orange&style=for-the-badge)](#) [![GitHub Sponsors](https://img.shields.io/github/sponsors/Gunivers?color=orange&style=for-the-badge)](#)
+
+[![Discord](https://img.shields.io/discord/125723125685026816?color=blue&label=Discord&style=for-the-badge&logo=Discord)](https://discord.gg/E8qq6tN)
+
 </div>
 
 Gipsy is a multifunction bot managed by the [Gunivers](https://gunivers.net) community.
@@ -12,7 +16,7 @@ This bot is public and open-source. It mean that anyone can host the bot and pro
 
 <div align=center>
 
-👋 [Invite Gipsy](http://utip.io/s/1yhs7W)
+[![](https://img.shields.io/badge/Invite-Gipsy-blue?style=for-the-badge&logo=Discord)](http://utip.io/s/1yhs7W)
 
 </div>
 
@@ -21,32 +25,54 @@ You can also invite the bot in beta version to enjoy the latest features added. 
 
 # 🔌 Installation (self host)
 
-First, install [git CLI](https://git-scm.com/book/en/v2/Getting-Started-The-Command-Line)
+You need to install by yourself:
 
-Please use at least **Python 3.9** to run this project.
+- [git CLI](https://git-scm.com/book/en/v2/Getting-Started-The-Command-Line)
+- [Python 3.10](https://www.python.org/downloads/release/python-3100/)
+- [`pipenv` package](https://pypi.org/project/pipenv/).
 
 Open a terminal and go in the folder you want to install the bot. Then, enter
 
 ```bash
-git clone -recursive https://github.com/Gunivers/Gipsy
+git clone https://github.com/Gunivers/Gipsy
 ```
 
-This command will install Gipsy and the official plugins. If you don't want these plugins, you can simply remove the `-recursive` from the command.
-
-Then, install all the dependencies by running
-
+Then go in the Gipsy directory
 ```bash
-pip install -r requirements.txt
+cd Gipsy
 ```
 
-or, if you are running Gipsy 2.x, simply run `python setup.py` and say yes when it ask if you want to install the dependencies.
+(optional) By default, you will be on the beta version which is the most recent one, but it might can contain bugs. If you want to switch on the stable version, run
+```bash
+git checkout master
+```
 
+Then start the python environment:
+```bash
+pipenv shell
+```
+
+Install the dependencies
+```bash
+pipenv install
+```
+
+And finally, run the setup script and follow the instructions:
+```bash
+python3 setup.py
+```
+The script will ask you if you want to run the bot at the end.
+
+The next times, to run the bot, you will only have to run
+```bash
+python3 start.py
+```
+
+Also, if you want to install new plugins, you can find the official plugin list [here](https://github.com/Gunivers/Gipsy-plugins)
 
 > **Note**
 > 
 > If you updated Gipsy from 1.x to 2.x, you may noticed that plugin files disapeared from your installation. To fix that, empty the `plugins` folder (it may remain `__pycache__` data) and run the command `git submodule update`
-
-
 
 # 📚 About
 
@@ -55,7 +81,22 @@ You can invite the bot, learn what it can do and follow its evolution.
 
 ## ⚡ Features
 
-> TODO
+This bot is modular, it means that features are provided by plugins. By default, it has 3 plugins:
+- Misc: containing some simple out of context commands
+- Wormhole: which allow to connect 2 text channels
+- RSS: which allow to follow the news from your favorite website, twitter account or youtube channel
+
+There is also several other plugins available here:
+
+<div align=center>
+
+🔌[Official plugins repo](https://github.com/Gunivers/Gipsy-plugins)
+
+</div>
+
+> **Note**
+> 
+> You are a plugin developer? You can create a Pull Request on the plugins repository to make your plugin officially supported by Gipsy
 
 # ➕ Additional info
 
