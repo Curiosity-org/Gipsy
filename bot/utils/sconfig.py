@@ -18,6 +18,7 @@ sys.path.append("./bot")
 
 SERVER_CONFIG = None
 
+
 class Sconfig(commands.Cog):
     def __init__(self, bot: Gunibot):
         global SERVER_CONFIG
@@ -194,7 +195,6 @@ class Sconfig(commands.Cog):
             max_key_length += 3
             max_value_length += 1
 
-
             # iterate over modules
             cpt = 0
             embeds = []
@@ -209,26 +209,36 @@ class Sconfig(commands.Cog):
                 # iterate over configs for that group
                 for k, v in subconf.items():
                     value = await self.format_config(ctx.guild, k, v, False)
-                    module_config += (f"{k}:").ljust(max_key_length) + f" {value}".ljust(max_value_length) + "\n"
+                    module_config += (
+                        (f"{k}:").ljust(max_key_length)
+                        + f" {value}".ljust(max_value_length)
+                        + "\n"
+                    )
 
                 if hasattr(self.bot.get_cog(module), "_create_config"):
                     for extra in await self.bot.get_cog(module)._create_config(ctx):
-                        module_config += (f"[{extra[0]}]").ljust(
-                            max_key_length
-                        ) + f" {extra[1]}".ljust(max_value_length) + "\n"
+                        module_config += (
+                            (f"[{extra[0]}]").ljust(max_key_length)
+                            + f" {extra[1]}".ljust(max_value_length)
+                            + "\n"
+                        )
 
                 # Put the config in embeds and stack them to be send in group
                 embeds.append(
-                    discord.Embed(title=module, description=f"```yml\n{module_config}```", colour=0x2F3136)
+                    discord.Embed(
+                        title=module,
+                        description=f"```yml\n{module_config}```",
+                        colour=0x2F3136,
+                    )
                 )
 
                 cpt += 1
 
                 # Send the config by group of 10 (limit of embed number per message)
-                if cpt%10==0:
+                if cpt % 10 == 0:
                     await ctx.send(embeds=embeds)
                     embeds = []
-            
+
             # Send the remaining embeds
             if cpt % 10 != 0:
                 await ctx.send(embeds=embeds)
@@ -362,5 +372,5 @@ class Sconfig(commands.Cog):
     # --------------------------------------------------
 
 
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot: Gunibot = None, plugin_config: dict = None):
     await bot.add_cog(Sconfig(bot))

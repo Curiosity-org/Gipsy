@@ -5,7 +5,7 @@ Gipsy start functions
 """
 
 
-import setup # do not remove this import, it also check the dependencies
+import setup  # do not remove this import, it also check the dependencies
 
 import os
 import asyncio
@@ -19,10 +19,11 @@ from LRFutils import color
 from LRFutils import logs
 
 if not os.path.isdir("plugins"):
-        os.mkdir("plugins")
+    os.mkdir("plugins")
 
 # Check and dispatch the config to all plugins
 from core import config
+
 config.check()
 
 # Getting global system list
@@ -37,6 +38,7 @@ for plugin in os.listdir("./plugins/"):
     if plugin[0] != "_":
         if os.path.isdir("./plugins/" + plugin):
             plugins.append(f"plugins.{plugin}.{plugin}")
+
 
 def print_ascii_art():
     """
@@ -65,14 +67,12 @@ def main():
     """
 
     # Creating client
-    client = Gunibot(
-        case_insensitive=True, status=discord.Status("online"), beta=False
-    )
+    client = Gunibot(case_insensitive=True, status=discord.Status("online"), beta=False)
 
     # Writing logs + welcome message
     if not os.path.isdir("logs"):
         os.makedirs("logs")
-    
+
     print(" ")
     logs.info("▶️ Starting Gipsy...")
 
@@ -102,12 +102,19 @@ def main():
         logs.info("ID : " + str(client.user.id))
         if len(client.guilds) < 200:
             serveurs = [x.name for x in client.guilds]
-            logs.info("Connected on " + str(len(client.guilds)) + " servers:\n - " + "\n - ".join(serveurs))
+            logs.info(
+                "Connected on "
+                + str(len(client.guilds))
+                + " servers:\n - "
+                + "\n - ".join(serveurs)
+            )
         else:
             logs.info("Connected on " + str(len(client.guilds)) + " servers")
         loaded, failed = await load(client, global_systems, plugins)
         logs.info(f"{loaded} plugins loaded, {failed} plugins failed")
-        print("--------------------------------------------------------------------------------")
+        print(
+            "--------------------------------------------------------------------------------"
+        )
         await asyncio.sleep(2)
 
     client.add_listener(on_ready)
@@ -120,12 +127,14 @@ def main():
     args = parser.parse_args()
 
     # Launch bot
-    try: client.run(config.get("bot.token"))
+    try:
+        client.run(config.get("bot.token"))
     except discord.errors.LoginFailure:
         logs.error("⚠️ Invalid token")
         config.token_set(force_set=True)
         os.system("python3 start.py")
         exit()
+
 
 if __name__ == "__main__":
     main()

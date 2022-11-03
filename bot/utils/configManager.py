@@ -133,5 +133,5 @@ class ConfigCog(commands.Cog):
             return [v for k, v in self.FLAGS.items() if i & k == k]
 
 
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot: Gunibot = None, plugin_config: dict = None):
     await bot.add_cog(ConfigCog(bot))
