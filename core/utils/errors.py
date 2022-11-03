@@ -1,9 +1,11 @@
-from utils import CheckException, Gunibot, MyContext
-from discord.ext import commands
-import discord
-from bot import checks
 import re
 import traceback
+
+from discord.ext import commands
+import discord
+
+from core import CheckException, Gunibot, MyContext
+from core import checks
 from core import config
 
 import sys

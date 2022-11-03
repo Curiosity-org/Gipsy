@@ -1,6 +1,6 @@
-import discord
 from discord.ext import tasks, commands
-from utils import Gunibot, MyContext
+
+from core import Gunibot
 
 
 class Gunivers(commands.Cog):

@@ -1,13 +1,12 @@
-import difflib
-from aiohttp import ClientSession
-from utils import Gunibot, MyContext
-from bot import checks
 from typing import List, Union
+import sys
+import difflib
+
 import discord
 from discord.ext import commands
-from itertools import chain
+from aiohttp import ClientSession
 
-import sys
+from core import Gunibot, MyContext, checks
 
 sys.path.append("./bot")
 

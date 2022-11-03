@@ -1,11 +1,11 @@
+from typing import Union
 import random
 from datetime import datetime
 
 import discord
 from discord.ext import commands
-from utils import Gunibot, MyContext
 
-from typing import Union
+from core import Gunibot, MyContext
 
 class Misc(commands.Cog):
 

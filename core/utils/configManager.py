@@ -1,9 +1,9 @@
 import os
 from json import dump, load
-from utils import Gunibot
 
 from discord.ext import commands
-from utils import CONFIG_OPTIONS
+
+from core import Gunibot, CONFIG_OPTIONS
 
 CONFIG_FOLDER = "configs"
 

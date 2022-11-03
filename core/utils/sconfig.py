@@ -1,17 +1,11 @@
-from utils import CONFIG_OPTIONS, Gunibot, MyContext
+from typing import Any, List, Union
+import sys
+
+import discord
 from discord.ext import commands
 import emoji
-import discord
-from bot import checks
-import args
-import asyncio
-import io
-import json
-import re
-from typing import Any, List, Union
-import numpy as np
 
-import sys
+from core import CONFIG_OPTIONS, Gunibot, MyContext, checks
 
 sys.path.append("./bot")
 sys.path.append("./bot")

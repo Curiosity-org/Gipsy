@@ -1,9 +1,10 @@
 import datetime
 import time
-from utils import Gunibot
 
 import discord
 from discord.ext import tasks
+
+from core import Gunibot
 
 fr_months = [
     "Janvier",

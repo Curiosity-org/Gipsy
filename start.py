@@ -6,15 +6,14 @@ Gipsy start functions
 
 import argparse
 import asyncio
-import logging
 import os
-import yaml
 import sys
+
 import discord
 from LRFutils.color import Color
 from LRFutils import log
+
 import setup
-import time
 
 # check python version
 py_version = sys.version_info
@@ -26,13 +25,13 @@ if py_version.major != 3 or py_version.minor < 10:
 from core import config
 config.check()
 
-from utils import Gunibot
+from core import Gunibot
 
 # Getting global system list
 global_systems = []
-for system in os.listdir("./bot/utils/"):
-    if os.path.isfile("./bot/utils/" + system) and system[-3:] == ".py":
-        global_systems.append("bot.utils." + system[0:-3])
+for system in os.listdir("./core/utils/"):
+    if os.path.isfile("./core/utils/" + system) and system[-3:] == ".py":
+        global_systems.append("core.utils." + system[0:-3])
 
 # Getting plugin list
 plugins = []

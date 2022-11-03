@@ -1,30 +1,27 @@
-from utils import Gunibot, MyContext
-from feedparser.util import FeedParserDict
-from discord.ext import commands, tasks
-from aiohttp.client import ClientSession
-from aiohttp import client_exceptions
-import twitter
-import feedparser
-import discord
-from bot import checks
+import typing
 import async_timeout
-import args
 import asyncio
 import datetime
 import html
 import re
 import time
-import typing
-from marshal import dumps, loads
-import core
 
-async def setup(bot:Gunibot): await bot.add_cog(Rss(bot))
+import discord
+from discord.ext import commands, tasks
+from aiohttp.client import ClientSession
+from aiohttp import client_exceptions
+from feedparser.util import FeedParserDict
+import feedparser
+import twitter
+from marshal import dumps, loads
+
+from core import args, Gunibot, MyContext, checks, config
 
 class Rss(commands.Cog):
     """Cog which deals with everything related to rss flows. Whether it is to add automatic tracking to a stream, or just to see the latest video released by Discord, it is this cog that will be used."""
 
     def __init__(self, bot: Gunibot):
-        self.config = core.config.get("rss")
+        self.config = config.get("rss")
         self.bot = bot
         self.time_loop = 15  # min minutes between two rss loops
         # seconds between two rss checks within a loop
@@ -1773,3 +1770,6 @@ class Rss(commands.Cog):
         #     await self.bot.get_cog("Embeds").send([emb])
         # except Exception as e:
         #     await self.bot.get_cog("Errors").on_error(e,None)
+
+async def setup(bot:Gunibot):
+    await bot.add_cog(Rss(bot))

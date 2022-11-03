@@ -1,6 +1,5 @@
-import yaml
-import os
 from LRFutils.color import Color
+
 import core
 
 def run(save=False):

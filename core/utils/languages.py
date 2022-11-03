@@ -1,8 +1,10 @@
-import discord
-import i18n
-from discord.ext import commands
-from utils import Gunibot
 import os
+import i18n
+
+import discord
+from discord.ext import commands
+
+from core import Gunibot
 
 i18n.translations.container.clear()  # invalidate old cache
 i18n.set("filename_format", "{locale}.{format}")

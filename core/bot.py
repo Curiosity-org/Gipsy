@@ -8,8 +8,15 @@ from typing import Any, Callable, Coroutine, Dict, Union, List, TYPE_CHECKING
 import os
 
 if TYPE_CHECKING:
-    from bot.utils.sconfig import Sconfig
+    from .utils.sconfig import Sconfig
 
+__all__ = [
+    "Gunibot",
+    "MyContext",
+    "setup_logger",
+    "CONFIG_OPTIONS",
+    "CheckException"
+]
 
 class MyContext(commands.Context):
     """Replacement for the official commands.Context class
