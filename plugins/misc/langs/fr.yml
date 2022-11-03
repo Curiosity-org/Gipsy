@@ -1,0 +1,75 @@
+fr:
+  misc:
+    dice:
+      title: "Les dés sont jetés !"
+      description: "Le résultat est : %{value}"
+      error:
+        not_int: "La valeur doit être un entier"
+        not_positive: "La valeur doit être positive"
+    cookie:
+      give: "Voilà pour vous %{to}: :cookie:\nDe la part de %{giver}"
+      self: "Voilà pour vous %{to}: :cookie:"
+    hoster:
+      info: "mTx Serv proposent un service d'hébergement de serveur, en particulier destiné aux jeux. Leurs serveurs sont équipé des dernières technologies et sont extrêmement fiable. Ajoutez à celà leur SAV très réactif et sympatique et vous avez le parfait hébergeur pour vos projets !\n:speech_balloon: [Serveur Discord](https://mtxserv.com/discord?utm_source=altearn_website_discord&utm_medium=website&utm_campaign=altearn_to_discord)\n:globe_with_meridians: [Site web](https://mtxserv.com/fr/?utm_source=altearn_website&utm_medium=website&utm_campaign=altearn)"
+    flipacoin:
+      title: Pling !
+      heads: "C'est face !"
+      tails: "C'est pile !"
+      side: "C'est ... tranche ! 😱\n(oui oui, ça peut arriver !)"
+    kills:
+      "0": "Oh toi, tu vas mourir !"
+      "1": "***BOUM !*** {1} est tombé dans un piège posé par {0} !"
+      "2": "Heureusement que le sol a amorti la chute de {1} !"
+      "3": "{0} a crié \"Fus Roh Dah\" alors que {1} était à coté d'une falaise..."
+      "4": "Eh non, tu ne peux pas arreter les balles avec tes mains {1} :shrug:"
+      "5": "Il faut être __dans__ l’ascenseur {1}, pas __au-dessus__..."
+      "6": "{1} est resté trop près des enceintes lors d'un concert de heavy metal."
+      "7": "Rester à moins de 10m d'une explosion atomique, ce n'était pas une bonne idée {1}..."
+      "8": "Non ! Les doubles sauts ne sont pas possibles {1} !"
+      "9": "{1} a imité Icare... splash."
+      "10": "C'est bien d'avoir un pistolet à portails {1}, encore faut il ne pas en ouvrir un au dessus des piques...."
+      "11": "{1} est mort. Paix à son âme... :sneezing_face:"
+      "12": "{0} a tué {1}"
+      "13": "{1} a été shot par {0}"
+      "14": "Bye {1} ! :ghost:"
+      "15": "{1} a vu tomber une enclume volante... sur sa tête :head_bandage:"
+      "16": "{1} part se suicider après que {0} ai coupé sa connexion"
+      "17": "Attention {1} ! Le feu, ça brûle :fire:"
+      "18": "{1} est parti sans pelle lors d'une attaque zombie"
+      "19": "{1} a tenté de faire un calin à un creeper"
+      "20": "{1}, les bains de lave sont chauds, mais la lave, ça brûle..."
+      "21": "{1} a tenté un rocket jump"
+      "22": "Il ne fallait pas écouter la jolie mélodie de la Lullaby, {1} :musical_note:"
+      "23": "{2}.exe *a cessé de fonctionner*"
+    dataja:
+      title: "Don't ask to ask, just ask"
+      description: "Demander si vous pouvez demander est une perte de temps.\nDemander si il y a une personne compétent demande un engagement aveugle de cette dernière en cas de réponse, personne ne voudra donc répondre.\n\nApprenez les bonnes pratiques pour demander quelque chose : \nhttps://zrunner.me/d-a-t-a/fr.html"
+    timestamp:
+      read-result: "La date contenue dans %{source} est le <t:%{timestamp}> (soit <t:%{timestamp}:R>) (timestamp : %{timestamp})"
+      not-found: "Je n'ai pas trouvé de date dans %{source} !"
+      create-result: "Le timestamp du <t:%{timestamp}:F> est : `%{timestamp}` (timestamp pour Discord : `<t:%{timestamp}>`)"
+      help: |
+        ***Le timestamp dans discord***
+
+        *Exemple : Discord a été créé <t:1431468000:R>, le <t:1431468000:D>.*
+
+        __**Utiliser le timestamp**__ :
+        Il faut tout d'abord obtenir un timestamp (vous pouvez utiliser les commandes `timestamp get` et `timestamp create` du bot), puis suivre la syntaxe suivante :
+        ```
+        <t:[TIMESTAMP]>
+        ```
+        En remplaçant `[TIMESTAMP]` par le timestamp que vous souhaitez utiliser.
+
+        __**Utiliser les styles**__ :
+        On peut ajouter un style à la fin du timestamp, sous cette forme :
+        ```
+        <t:[TIMESTAMP]:[STYLE]>
+        ```
+        En remplaçant cette fois `[STYLE]` par une des options suivantes :
+        • `t` (<t:1431468000:t>)
+        • `T` (<t:1431468000:T>)
+        • `d` (<t:1431468000:d>)
+        • `D` (<t:1431468000:D>)
+        • `f` (<t:1431468000:f>, par défaut)
+        • `F` (<t:1431468000:F>)
+        • `R` (<t:1431468000:R>)
