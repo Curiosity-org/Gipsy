@@ -4,9 +4,7 @@ import traceback
 from discord.ext import commands
 import discord
 
-from core import CheckException, Gunibot, MyContext
-from core import checks
-from core import config
+from core import CheckException, Gunibot, MyContext, checks, config
 
 class Errors(commands.Cog):
     """General cog for error management."""

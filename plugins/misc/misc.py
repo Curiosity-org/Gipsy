@@ -147,7 +147,7 @@ class Misc(commands.Cog):
         # Test if the parameter is an integer
         try:
             dice = int(dice)
-        except:
+        except ValueError:
             embed = discord.Embed(
                 description=await self.bot._(ctx.guild.id, "misc.dice.error.not_int"),
                 colour=0xe74c3c,

@@ -1,5 +1,5 @@
 """The core of the bot.
-This module contains all the objetcs and functions necessary to run the bot and
+This module contains all the objects and functions necessary to run the bot and
 create plugins.
 """
 

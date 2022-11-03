@@ -149,8 +149,10 @@ def advanced_setup():
                 for admin in admins:
                     admin = int(admin)
                 _global_config["bot"]["admins"] = admins
-            except:
-                print(f"{Color.Red}👑 Invalid entry. Only user ID (integers), comma and space are expected.{Color.NC}")
+            except ValueError:
+                print(
+                    f"{Color.Red}👑 Invalid entry. Only user ID (integers), comma and space are expected.{Color.NC}"
+                )
                 error = True
 
     # Error channel
@@ -163,8 +165,10 @@ def advanced_setup():
             try:
                 channel = int(choice)
                 _global_config["bot"]["error_channels"] = channel
-            except:
-                print(f"{Color.Red}🤕 Invalid entry. Only channel ID (integers) are expected.{Color.NC}")
-    
+            except ValueError:
+                print(
+                    f"{Color.Red}🤕 Invalid entry. Only channel ID (integers) are expected.{Color.NC}"
+                )
+
     with open("config.yaml", "w") as f:
         yaml.dump(_global_config, f)
