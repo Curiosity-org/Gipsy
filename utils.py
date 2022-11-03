@@ -58,6 +58,7 @@ class Gunibot(commands.bot.AutoShardedBot):
         self.beta: bool = beta  # if the bot is in beta mode
         self.database = sqlite3.connect("data/database.db")  # database connection
         self.database.row_factory = sqlite3.Row
+        self.cog_icons = {} # icons for cogs
         self._update_database_structure()
 
     async def get_context(self, message: discord.Message, *, cls=MyContext):
@@ -159,7 +160,7 @@ class Gunibot(commands.bot.AutoShardedBot):
             return lambda *args, **kwargs: args[1]
         return cog.tr
 
-    async def add_cog(self, cog: commands.Cog):
+    async def add_cog(self, cog: commands.Cog, icon = None):
         """Adds a "cog" to the bot.
         A cog is a class that has its own event listeners and commands.
 
@@ -176,6 +177,9 @@ class Gunibot(commands.bot.AutoShardedBot):
         CommandError
             An error happened during loading.
         """
+
+        self.cog_icons.update({cog.qualified_name.lower(): icon})
+
         await super().add_cog(cog)
         for module in self.cogs.values():
             if not isinstance(cog, type(module)):
@@ -184,6 +188,10 @@ class Gunibot(commands.bot.AutoShardedBot):
                         module.on_anycog_load(cog)
                     except BaseException:
                         self.log.warning(f"[add_cog]", exc_info=True)
+    
+    def get_cog_icon(self, cog_name):
+        """Get a cog icon"""
+        return self.cog_icons.get(cog_name.lower())
 
     def remove_cog(self, cog: str):
         """Removes a cog from the bot.
