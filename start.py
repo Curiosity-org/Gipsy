@@ -4,9 +4,11 @@
 Gipsy start functions
 """
 
+# Ensure that the bot have all it's dependencies
+from core import check_requirements
+check_requirements.ensure()
 
-import setup  # do not remove this import, it also check the dependencies
-
+# Import built-in libs
 import os
 import asyncio
 import time
@@ -14,12 +16,16 @@ from utils import Gunibot
 import argparse
 import logging
 import yaml
+
+# Import external libs
 import discord
 from LRFutils import color
 from LRFutils import logs
 
-if not os.path.isdir("plugins"):
-    os.mkdir("plugins")
+if not check_requirements.plugins():
+    import setup
+    setup.install_plugins()
+
 
 # Check and dispatch the config to all plugins
 from core import config
