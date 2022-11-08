@@ -1,0 +1,56 @@
+# © Aeris1One, aeris@aeris-one.fr (2022) 
+#
+# Ce fichier représente un programme informatique servant à vérifier que le
+# code de ce dépôt est fonctionnel et conforme à la PEP-8.
+#
+# Ce programme est régi par la licence CeCILL soumise au droit français et
+# respectant les principes de diffusion des logiciels libres. Vous pouvez
+# utiliser, modifier et/ou redistribuer ce programme sous les conditions
+# de la licence CeCILL difusée sur le site "http://www.cecill.info".
+
+
+name: Python Linter for Pull Requests
+
+on:
+  pull_request_target:
+
+# On restreint les permissions d'Action pour éviter que de potentielles PR malicieuses
+# aient un trop grand accès à notre repo, mais normalement ici il n'y a pas de problème 
+# puisqu'on n'exécute pas le code de la PR
+permissions:
+  checks: write
+  contents: write
+
+jobs:
+  run-linters:
+    name: Run linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10' 
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Linters
+        run: pip install black pylint
+
+      - name: Run linters
+        uses: wearerequired/lint-action@121b69fdf77b22fa2bbb8d081b455bd31d563197
+        with:
+          # Sur les Pull Requests, Black est désactivé car Github Actions n'as pas les
+          # droits d'écriture sur les forks (il corrigera donc les fautes au moment du merge)
+          black: false
+          pylint: true
+          pylint_args: "--disable=C,R,I"
+
+          # Idem, pas de droits d'écriture, pas d'auto-fix
+          auto_fix: false
