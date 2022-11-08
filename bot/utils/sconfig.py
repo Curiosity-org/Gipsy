@@ -3,7 +3,7 @@ from discord.ext import commands
 import emoji
 import discord
 from bot import checks
-import args
+from bot import args
 import asyncio
 import io
 import json
