@@ -222,7 +222,7 @@ class Wormholes(commands.Cog):
                             pass
 
     @commands.Cog.listener(name="on_message_edit")
-    async def on_message_edit(self, message, newmessage):
+    async def on_message_edit(self, message:discord.Message, newmessage:discord.Message):
         """Executed every time a message is edited"""
         if (
             message.author.bot
@@ -261,7 +261,6 @@ class Wormholes(commands.Cog):
                         oldmessage.id,
                         content=newmessage.content,
                         embeds=newmessage.embeds,
-                        files=newmessage.attachments,
                         allowed_mentions=None,
                     )
 
