@@ -26,11 +26,43 @@ You can invite the bot by `clicking here <http://utip.io/s/1yhs7W>`_
 
 You can also invite the bot in beta version to enjoy the latest features added. Be careful though: the bot in beta version may contain security holes and many bugs. It may also stop working suddenly and for long periods. If you want to invite it though, `click here <https://discordapp.com/oauth2/authorize?client_id=813836349147840513&scope=bot&permissions=8>`_
 
-.. include:: summary.rst
+.. toctree::
+    :maxdepth: 3
+    :caption: Info
 
-Indices and tables
-==================
+    contributing.md
+    faq.md
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. Start plugins documentation
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Installed plugins
+
+   plugins/antikikoo/user_documentation.md
+   plugins/channelArchive/user_documentation.md
+   plugins/contact/user_documentation.md
+   plugins/general/user_documentation.md
+   plugins/giveaway/user_documentation.md
+   plugins/group/user_documentation.md
+   plugins/hypesquad/user_documentation.md
+   plugins/log/user_documentation.md
+   plugins/messageManager/user_documentation.md
+   plugins/misc/user_documentation.md
+   plugins/quizz/user_documentation.md
+   plugins/roleLink/user_documentation.md
+   plugins/rss/user_documentation.md
+   plugins/thanks/user_documentation.md
+   plugins/voice/user_documentation.md
+   plugins/welcome/user_documentation.md
+   plugins/wormhole/user_documentation.md
+   plugins/xp/user_documentation.md
+
+.. End plugins documentation
+
+.. toctree::
+    :maxdepth: 2
+    :caption: For developers
+
+    create_plugin/01-Plugin_structure.md
+    create_plugin/02-Server_configuration_variables.md

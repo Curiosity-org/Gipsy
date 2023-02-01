@@ -1,0 +1,48 @@
+# © Aeris1One, aeris@aeris-one.fr (2022) 
+#
+# Ce fichier représente un programme informatique servant à vérifier que le
+# code de ce dépôt est fonctionnel et conforme à la PEP-8.
+#
+# Ce programme est régi par la licence CeCILL soumise au droit français et
+# respectant les principes de diffusion des logiciels libres. Vous pouvez
+# utiliser, modifier et/ou redistribuer ce programme sous les conditions
+# de la licence CeCILL difusée sur le site "http://www.cecill.info".
+
+name: 'Sync Submodules'
+
+# TODO: il faudrait dans le meilleur des cas mettre à jour les submodules uniquement quand il y a eu
+# un push sur l'un d'entre eux. Mais cela nécessite de jouer avec des webhooks et de passer un token
+# avec un accès écriture sur CE repo en secret dans les repos de submodules. À voir.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'  # tous les jours à minuit
+
+jobs:
+  sync:
+    name: 'Sync Submodules'
+    runs-on: ubuntu-latest
+
+    # on force l'utilisation de Bash
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        submodules: true
+
+    - name: Git Submodule Update
+      run: |
+        git pull --recurse-submodules
+        git submodule update --remote --recursive
+
+    - name: Commit update
+      run: |
+        git config --global user.name 'GuniBot'
+        git config --global user.email 'gunibot@noreply.github.com'
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+        git commit -am "🔄️ submodules: auto-update submodules" && git push || echo "No changes to commit"

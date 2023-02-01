@@ -1,5 +1,6 @@
 import os
 from json import dump, load
+from utils import Gunibot
 
 from discord.ext import commands
 from utils import CONFIG_OPTIONS
@@ -132,5 +133,5 @@ class ConfigCog(commands.Cog):
             return [v for k, v in self.FLAGS.items() if i & k == k]
 
 
-async def setup(bot):
+async def setup(bot: Gunibot = None, plugin_config: dict = None):
     await bot.add_cog(ConfigCog(bot))

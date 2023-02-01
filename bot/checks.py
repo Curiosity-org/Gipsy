@@ -1,9 +1,10 @@
 import discord
 from utils import MyContext, CheckException
+from core import config
 
 
 def is_bot_admin(ctx: MyContext):
-    return ctx.author.id in ctx.bot.config["bot_admins"]
+    return ctx.author.id in config.get("bot.admins")
 
 
 async def is_admin(ctx: MyContext):

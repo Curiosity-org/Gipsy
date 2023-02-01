@@ -1,3 +1,0 @@
-# Anti-kikoo
-
-Nothing here...

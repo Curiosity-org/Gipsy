@@ -5,23 +5,26 @@ Gipsy start functions
 """
 
 
-import argparse
-import asyncio
-import logging
+import setup  # do not remove this import, it also check the dependencies
+
 import os
-import sys
+import asyncio
 import time
+from utils import Gunibot
+import argparse
+import logging
+import yaml
 import discord
+from LRFutils import color
+from LRFutils import logs
 
-from bot.docs import generate_docs
-from bot.config import get_config
-from utils import Gunibot, setup_logger
+if not os.path.isdir("plugins"):
+    os.mkdir("plugins")
 
-# check python version
-py_version = sys.version_info
-if py_version.major != 3 or py_version.minor < 9:
-    print("Vous devez utiliser au moins Python 3.9 !", file=sys.stderr)
-    sys.exit(1)
+# Check and dispatch the config to all plugins
+from core import config
+
+config.check()
 
 # Getting global system list
 global_systems = []
@@ -32,12 +35,9 @@ for system in os.listdir("./bot/utils/"):
 # Getting plugin list
 plugins = []
 for plugin in os.listdir("./plugins/"):
-    if plugin[0] != "_":
+    if plugin[0] not in ["_", "."]:
         if os.path.isdir("./plugins/" + plugin):
-            plugins.append("plugins." + plugin + ".bot.main")
-
-# Generate docs
-generate_docs()
+            plugins.append(f"plugins.{plugin}.{plugin}")
 
 
 def print_ascii_art():
@@ -48,13 +48,13 @@ def print_ascii_art():
     # pylint: disable=anomalous-backslash-in-string
     # pylint: disable=trailing-whitespace
     print(
-        """
+        f"""{color.Blue}
       ___  ____  ____  ___  _  _        ___     ___  
      / __)(_  _)(  _ \/ __)( \/ )      (__ \   / _ \\ 
     ( (_-. _)(_  )___/\__ \ \  /        / _/  ( (_) )
      \___/(____)(__)  (___/ (__)       (____)()\___/ 
 
-        """
+        {color.NC}"""
     )
 
 
@@ -65,34 +65,16 @@ def main():
     """
     Main function
     """
-    # Getting global config
-    conf = get_config("./config/config", isBotConfig=True)
-    if conf is None:
-        return 1
-
-    # Getting plugins configs
-    for plugin_dir in os.listdir("./plugins/"):
-        if plugin_dir[0] != "_":
-            if os.path.isfile(
-                "./plugins/" + plugin_dir + "/config/require-example.json"
-            ):
-                conf.update(
-                    get_config(
-                        "./plugins/" + plugin_dir + "/config/require", isBotConfig=False
-                    )
-                )
 
     # Creating client
-    client = Gunibot(
-        case_insensitive=True, status=discord.Status("online"), beta=False, config=conf
-    )
+    client = Gunibot(case_insensitive=True, status=discord.Status("online"), beta=False)
 
     # Writing logs + welcome message
     if not os.path.isdir("logs"):
         os.makedirs("logs")
-    log = setup_logger()
-    log.setLevel(logging.DEBUG)
-    log.info("Lancement du bot")
+
+    print(" ")
+    logs.info("▶️ Starting Gipsy...")
 
     # pylint: disable-next=anomalous-backslash-in-string
     print_ascii_art()
@@ -107,30 +89,32 @@ def main():
                 await bot_client.load_extension(extension)
                 loaded += 1
             except Exception:  # pylint: disable=broad-except
-                log.exception("Failed to load extension: %s", extension)
+                logs.error(f"Failed to load extension: {extension}")
                 notloaded += "\n - " + extension
                 failed += 1
-        if failed > 0:
-            raise Exception(f"\n{failed} modules not loaded" + notloaded)
         return loaded, failed
 
     # Printing info when the bot is started
     async def on_ready():
         """Called when the bot is connected to Discord API"""
-        print("Bot connecté")
-        print("Nom : " + client.user.name)
-        print("ID : " + str(client.user.id))
+        logs.info(f"{color.Green}✅ Bot connected")
+        logs.info("Nom : " + client.user.name)
+        logs.info("ID : " + str(client.user.id))
         if len(client.guilds) < 200:
             serveurs = [x.name for x in client.guilds]
-            print(
-                "Connecté sur [" + str(len(client.guilds)) + "] " + ", ".join(serveurs)
+            logs.info(
+                "Connected on "
+                + str(len(client.guilds))
+                + " servers:\n - "
+                + "\n - ".join(serveurs)
             )
         else:
-            print("Connecté sur " + str(len(client.guilds)) + " serveurs")
-        print(time.strftime("%d/%m  %H:%M:%S"))
+            logs.info("Connected on " + str(len(client.guilds)) + " servers")
         loaded, failed = await load(client, global_systems, plugins)
-        print(f"{loaded} plugins chargés, {failed} plugins en erreur")
-        print("------")
+        logs.info(f"{loaded} plugins loaded, {failed} plugins failed")
+        print(
+            "--------------------------------------------------------------------------------"
+        )
         await asyncio.sleep(2)
 
     client.add_listener(on_ready)
@@ -143,11 +127,13 @@ def main():
     args = parser.parse_args()
 
     # Launch bot
-    if args.beta:
-        client.beta = True
-        client.run(conf["token_beta"])
-    else:
-        client.run(conf["token"])
+    try:
+        client.run(config.get("bot.token"))
+    except discord.errors.LoginFailure:
+        logs.error("⚠️ Invalid token")
+        config.token_set(force_set=True)
+        os.system("python3 start.py")
+        exit()
 
 
 if __name__ == "__main__":

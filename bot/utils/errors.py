@@ -4,6 +4,7 @@ import discord
 from bot import checks
 import re
 import traceback
+from core import config
 
 import sys
 
@@ -242,12 +243,12 @@ class Errors(commands.Cog):
 
     async def senf_err_msg(self, msg):
         """Sends a message to the error channel"""
-        salon = self.bot.get_channel(self.bot.config["errors_channel"])
-        if salon is None:
+        channel = self.bot.get_channel(config.get("bot.error_channels"))
+        if channel is None:
             return False
-        await salon.send(msg)
+        await channel.send(msg)
         return True
 
 
-async def setup(bot):
+async def setup(bot: Gunibot = None, plugin_config: dict = None):
     await bot.add_cog(Errors(bot))

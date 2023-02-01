@@ -1,0 +1,1 @@
+# This folder is deprecated and have to be removed in future versions. Most of files here will be moved (and adapted) in `core/` folder.
