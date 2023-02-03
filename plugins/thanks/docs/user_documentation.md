@@ -1,3 +1,10 @@
+<!--
+Ce programme est régi par la licence CeCILL soumise au droit français et
+respectant les principes de diffusion des logiciels libres. Vous pouvez
+utiliser, modifier et/ou redistribuer ce programme sous les conditions
+de la licence CeCILL diffusée sur le site "http://www.cecill.info".
+-->
+
 # Thanks
 
 At Gunivers, we believe that active members of a project should be rewarded for their efforts. We have therefore set up a reward system, allowing the server staff to congratulate certain people via a simple command: the `thanks` command.
