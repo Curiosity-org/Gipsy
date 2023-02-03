@@ -1,3 +1,8 @@
+# Ce programme est régi par la licence CeCILL soumise au droit français et
+# respectant les principes de diffusion des logiciels libres. Vous pouvez
+# utiliser, modifier et/ou redistribuer ce programme sous les conditions
+# de la licence CeCILL diffusée sur le site "http://www.cecill.info".
+
 en:
   rss:
     change-txt: "The current message contain \n```\n{text}\n```\nPlease enter the text to be used in a new post. You can use several variables, there is the list:\n- `{author}`: post author\n- `{channel}`: channel name (usually the same as the author)\n- `{date}`: post date (UTC)\n- `{link}` or `{url}`: a link to the post\n- `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)\n- `{mentions}`: list of mentionned roles\n- `{title}`: post title"
