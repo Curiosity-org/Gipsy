@@ -1,3 +1,10 @@
+<!--
+Ce programme est régi par la licence CeCILL soumise au droit français et
+respectant les principes de diffusion des logiciels libres. Vous pouvez
+utiliser, modifier et/ou redistribuer ce programme sous les conditions
+de la licence CeCILL diffusée sur le site "http://www.cecill.info".
+-->
+
 # Log
 
 This bot offers a log system for your server, which grows over time. So you can set up a room where you can send messages when a member leaves the server, when a message is deleted, when an invitation is created... and many other things.

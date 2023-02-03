@@ -1,3 +1,10 @@
+<!--
+Ce programme est régi par la licence CeCILL soumise au droit français et
+respectant les principes de diffusion des logiciels libres. Vous pouvez
+utiliser, modifier et/ou redistribuer ce programme sous les conditions
+de la licence CeCILL diffusée sur le site "http://www.cecill.info".
+-->
+
 # Contact
 
 With this bot, you can create a room in your server where your members can contact the staff. The bot will then create a private room, visible only to said member and your staff, and delete the original message to keep the room clean.
