@@ -1,4 +1,6 @@
-Copyright © Ascpial 2020 - 2023
+Copyright © Aeris One 2022
+Copyright © ascpial 2022
+Copyright © Leirof 2022
 
 Ce programme est régi par la licence CeCILL soumise au droit français et
 respectant les principes de diffusion des logiciels libres. Vous pouvez
