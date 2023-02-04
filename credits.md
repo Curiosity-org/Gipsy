@@ -1,8 +1,8 @@
 Copyright © ZRunner 2020 - 2023
 Copyright © Aeris One 2020 - 2023
-Copyright © Leirof 2022 - 2023
+Copyright © Leirof 2020 - 2023
 Copyright © theogiraudet 2020 - 2023
-Copyright © Ascpial 2020 - 2023
+Copyright © ascpial 2021 - 2023
 Copyright © Theaustudio 2022 - 2023
 
 Ce programme est régi par la licence CeCILL soumise au droit français et
