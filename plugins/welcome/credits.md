@@ -1,4 +1,7 @@
 Copyright © ZRunner 2020 - 2023
+Copyright © Leirof 2021 - 2022
+Copyright © ascpial 2021
+Copyright © Aeris One 2022
 
 Ce programme est régi par la licence CeCILL soumise au droit français et
 respectant les principes de diffusion des logiciels libres. Vous pouvez
