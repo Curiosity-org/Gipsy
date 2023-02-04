@@ -1,4 +1,4 @@
-Copyright © ZRunner 2021 - 2023
+Copyright © ZRunner 2021
 Copyright © Leirof 2022 - 2022
 Copyright © Aeris One 2022
 
