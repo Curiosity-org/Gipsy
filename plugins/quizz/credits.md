@@ -1,4 +1,4 @@
-Copyright © Just_a_player 2020 - 2023
+Copyright © Just_a_player 2021
 Copyright © Leirof 2021 - 2022
 Copyright © ZRunner 2021
 Copyright © Aeris One 2022

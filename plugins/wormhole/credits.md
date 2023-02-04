@@ -1,4 +1,4 @@
-Copyright © Fantomitechno 2021 - 2023
+Copyright © Fantomitechno 2021
 Copyright © Leirof 2021 - 2022
 Copyright © ZRunner 2021
 Copyright © Theaustudio 2021
