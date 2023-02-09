@@ -85,7 +85,6 @@ release = "2.0"
 extensions = [
     "myst_parser",
     "sphinx_design",
-    "sphinxcontrib.youtube"
 ]
 
 
