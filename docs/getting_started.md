@@ -38,56 +38,57 @@ If you invite the beta version, you will be able to test the latest features add
 
 4. Open a terminal and go where you want to install it
 
-   ```bash
-   cd /path/to/installation
-   ```
+      ```bash
+      cd /path/to/installation
+      ```
 
 5. Clone the repository
 
-   ```bash
-   git clone https://github.com/Gunivers/Gipsy
-   ```
+      ```bash
+      git clone https://github.com/Gunivers/Gipsy
+      ```
 
 6. (Optional) Create a virtual environment with 
-   ```
-   python3.9 -m venv venv
-   ```
-   and activate it with
-   ```
-   source venv/bin/activate # Linux.
-   venv\Scripts\activate # Windows
-   ```
+
+      ```
+      python3.9 -m venv venv
+      ```
+      and activate it with
+      ```
+      source venv/bin/activate # Linux.
+      venv\Scripts\activate # Windows
+      ```
 
 7. Install dependencies
-   ```
-   pip install -r requirements.txt
-   ```
+8. 
+      ```
+      pip install -r requirements.txt
+      ```
 
-8. Run the setup script and answer the questions.
+9.  Run the setup script and answer the questions.
 
-   ```bash
-   python setup.py
-   ```
+      ```bash
+      python setup.py
+      ```
 
-9. Start the bot
+10. Start the bot
+      ```bash
+      python start.py
+      ```
 
-   ```bash
-   python start.py
-   ```
+11. In the logs, find a line like this:
 
-10. In the logs, find a line like this:
+      ```
+      09/02/2023 at 19:59:32 | [INFO] ID : 786546781919641600
+      ```
 
-   ```
-   09/02/2023 at 19:59:32 | [INFO] ID : 786546781919641600
-   ```
+12. Copy the ID an place it in the following URL (replace the underscores with the ID):
 
-11. Copy the ID an place it in the following URL (replace the underscores with the ID):
-
-    ```
-    https://discord.com/oauth2/authorize?scope=bot&client_id=__________________
-    ```
+      ```
+      https://discord.com/oauth2/authorize?scope=bot&client_id=__________________
+      ```
    
-12. Open the URL in your browser and invite the bot to your server.
+13. Open the URL in your browser and invite the bot to your server.
 
 :::
 ::::

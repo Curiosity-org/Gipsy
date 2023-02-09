@@ -75,7 +75,7 @@ copyright = "2023, Gunivers"
 author = "Gunivers"
 
 # The full version, including alpha/beta/rc tags
-release = "2.0"
+# release = ""
 
 # -- General configuration ---------------------------------------------------
 
