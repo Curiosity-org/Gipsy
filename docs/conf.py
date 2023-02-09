@@ -30,7 +30,7 @@ def generate_plugin_doc():
             toctree.write(line)
 
         # Generating plugin toctree and moving pugin's doc files in the global docs folder
-        toctree.write("\n.. toctree::\n   :maxdepth: 1\n   :caption: Installed plugins\n\n")
+        toctree.write("\n.. toctree::\n   :maxdepth: 1\n   :caption: User guide\n\n")
         path = os.path.join("", os.pardir)
         for plugin in os.listdir(f"{path}/plugins"):
             if os.path.isdir(f"{path}/plugins/" + plugin + "/docs"):
@@ -48,7 +48,7 @@ def generate_plugin_doc():
         for line in after:
             toctree.write(line)
 
-# generate_plugin_doc()
+generate_plugin_doc()
 
 
 # Configuration file for the Sphinx documentation builder.
@@ -85,6 +85,7 @@ release = "2.0"
 extensions = [
     "myst_parser",
     "sphinx_design",
+    "sphinxcontrib.youtube"
 ]
 
 
@@ -110,3 +111,32 @@ html_theme = "sphinx_book_theme"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+
+html_theme_options = {
+    "home_page_in_toc": False,
+    "github_url": "https://github.com/Gunivers/Gipsy",
+    "repository_url": "https://github.com/Gunivers/Gipsy",
+    "repository_branch": "master",
+    "path_to_docs": "docs",
+    "use_repository_button": True,
+    "use_edit_page_button": True,
+  "announcement": "⚠️ You are reading a doc of an undergoing development version. Information can be out of date and/or change at any time. ⚠️",
+}
+
+html_logo = "img/logo.png"
+
+myst_enable_extensions = [
+    "amsmath",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    #"linkify",
+    "replacements",
+    "smartquotes",
+    "strikethrough",
+    "substitution",
+    "tasklist",
+]

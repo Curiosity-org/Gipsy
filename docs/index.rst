@@ -17,7 +17,7 @@
 
 .. toctree::
    :maxdepth: 1
-   :caption: Installed plugins
+   :caption: User guide
 
    plugins/antikikoo/user_documentation.md
    plugins/channelArchive/user_documentation.md
@@ -42,7 +42,7 @@
 
 .. toctree::
     :maxdepth: 2
-    :caption: For developers
+    :caption: Developers guide
 
     create_plugin/01-Plugin_structure.md
     create_plugin/02-Server_configuration_variables.md

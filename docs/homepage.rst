@@ -5,8 +5,15 @@ Welcome to Gipsy's documentation!
 --------------
 
 Gipsy is modular, free and open-source Discord bot whose focus on accessibility and customization. It is written in Python and uses the Discord.py library and is managed by the `Gunivers <https://gunivers.net>`_ community.
+ 
+.. button-link:: https://youtu.be/HaYenuxtibU
+    :color: primary
+    :align: center
+    :shadow:
 
-⚙️ Built-in Features
+    Watch the presentation video
+
+⚙️ Built-in features
 --------------------
 
 .. grid:: 2
@@ -42,14 +49,14 @@ Gipsy is modular, free and open-source Discord bot whose focus on accessibility 
     .. grid-item-card:: 📎 Role Link
         :link: plugins/roleLink/user_documentation
         :link-type: doc
-        :margin: 0 0 0 0
+        :margin: 0 3 0 0
 
         Link roles between them to automatize the role management and create hierarchy relations!
 
     .. grid-item-card:: 🌀 Wormhole
         :link: plugins/wormhole/user_documentation
         :link-type: doc
-        :margin: 0 0 0 0
+        :margin: 0 3 0 0
 
         Create a wormhole between two channels to make a unique inter-server channel!
 
