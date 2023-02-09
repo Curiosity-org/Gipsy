@@ -48,7 +48,7 @@ def generate_plugin_doc():
         for line in after:
             toctree.write(line)
 
-generate_plugin_doc()
+# generate_plugin_doc()
 
 
 # Configuration file for the Sphinx documentation builder.
