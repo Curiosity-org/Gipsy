@@ -1,4 +1,4 @@
-# Contact
+# 📞 Contact
 
 With this bot, you can create a room in your server where your members can contact the staff. The bot will then create a private room, visible only to said member and your staff, and delete the original message to keep the room clean.
 A command also exists to delete contact rooms older than X days.

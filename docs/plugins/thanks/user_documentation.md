@@ -1,4 +1,4 @@
-# Thanks
+# 💖 Thanks
 
 At Gunivers, we believe that active members of a project should be rewarded for their efforts. We have therefore set up a reward system, allowing the server staff to congratulate certain people via a simple command: the `thanks` command.
 

@@ -1,3 +1,3 @@
-# Global commands
+# 🌐 Global commands
 
 Nothing here...

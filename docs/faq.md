@@ -1,3 +1,3 @@
-# FAQ
+# ❓ FAQ
 
 Nothing here...

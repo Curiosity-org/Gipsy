@@ -1,4 +1,4 @@
-# Voice
+# 🔊 Voice
 
 ## Automatic role giving
 

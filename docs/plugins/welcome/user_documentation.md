@@ -1,4 +1,4 @@
-# Welcome
+# 👋 Welcome
 
 ## Verification system
 

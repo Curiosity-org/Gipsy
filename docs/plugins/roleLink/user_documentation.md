@@ -1,4 +1,4 @@
-# Role link
+# 📎 Role link
 
 This system allows you to create dependencies between roles and thus manage automatically the gain/withdrawal of roles according to the acquisition or loss of other roles. To create a link between roles, you will need to perform the command:
 
