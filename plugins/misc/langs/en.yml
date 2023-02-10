@@ -46,6 +46,7 @@ en:
       "21": "{1}, lava baths are hot, but lava burns..."
       "22": "{1} tried a rocket jump"
       "23": "You shouldn't listen to the pretty melody of the Lullaby, {1} :musical_note:"
+      "footer": "Death messages created by Aragorn1202"
     dataja: 
       title: "Don't ask to ask, just ask"
       description: "Learn the best practices to ask question:\nhttps://zrunner.me/d-a-t-a/en.html"

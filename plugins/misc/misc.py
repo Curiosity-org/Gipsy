@@ -218,7 +218,7 @@ class Misc(commands.Cog):
         """Wanna kill someone? Take a breath
         Usage:
         - kill someone: kill <user>
-          - user: the guyr you want to kill. It can be a mention, an ID or simply a name."""
+          - user: the guy you want to kill. It can be a mention, an ID or simply a name."""
 
         # Suicide
         if target is None:
@@ -244,10 +244,13 @@ class Misc(commands.Cog):
             msg = await self.bot._(ctx.channel, f"misc.kills.{choice}")
             tries += 1
 
+        footer = self.bot._(ctx.channel, f"misc.kills.footer")
+
         # Building the result message
         embed = discord.Embed(
             description=msg.format(author, victime, ex),
             colour=0x2F3136,
+            footer=footer
         )
         embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/3074/3074476.png")
         
