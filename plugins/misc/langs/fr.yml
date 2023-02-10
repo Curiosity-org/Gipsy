@@ -46,6 +46,7 @@ fr:
       "21": "{1} a tenté un rocket jump"
       "22": "Il ne fallait pas écouter la jolie mélodie de la Lullaby, {1} :musical_note:"
       "23": "{2}.exe *a cessé de fonctionner*"
+      "footer": "Messages de morts créés par Aragorn1202"
     dataja:
       title: "Don't ask to ask, just ask"
       description: "Demander si vous pouvez demander est une perte de temps.\nDemander si il y a une personne compétent demande un engagement aveugle de cette dernière en cas de réponse, personne ne voudra donc répondre.\n\nApprenez les bonnes pratiques pour demander quelque chose : \nhttps://zrunner.me/d-a-t-a/fr.html"
