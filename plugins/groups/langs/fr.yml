@@ -45,4 +45,4 @@ fr:
       no-channel: "Ce group ne possède pas de salon"
       no-delete-channel: "Impossible de trouver un groupe avec cet identifiant ou ce nom"
       channel-exist: "Ce groupe possède déja un salon"
-      no-category: "Vous devez d'abord configuré une catégorie pour les salons de groupes : `%{p}config group_channel_category`"
+      no-category: "Vous devez d'abord configurer une catégorie pour les salons de groupes : `%{p}config group_channel_category`"
