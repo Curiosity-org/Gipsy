@@ -60,16 +60,18 @@ If you invite the beta version, you will be able to test the latest features add
       ```
 
 7. Install dependencies
-8. 
+   
       ```
       pip install -r requirements.txt
       ```
 
-9.  Run the setup script and answer the questions.
+8.  Run the setup script and answer the questions.
 
       ```bash
       python setup.py
       ```
+
+9. Create a `plugins` folder and add all the plugins you wan to use on your bot. You can find all the official plugins [here](https://github.com/Gunivers/Gipsy-plugins). To install a plugin, simply copy the folder of the plugin in the `plugins` folder.
 
 10. Start the bot
       ```bash
@@ -91,7 +93,28 @@ If you invite the beta version, you will be able to test the latest features add
 13. Open the URL in your browser and invite the bot to your server.
 
 :::
+:::{tab-item} 🌐 Other Gipsy instances
+
+Here is the list of other Gipsy instances hosted by trusted peoples:
+
+```` {grid} 2
+```{grid-item-card}  Axobot
+:link: https://top.gg/bot/1048011651145797673
+:link-type: url
+:margin: 0 3 0 0
+
+<div align=center>
+<img src="https://top.gg/_next/image?url=https%3A%2F%2Fimages.discordapp.net%2Favatars%2F1048011651145797673%2Fc49887b3f50a86b13432f2be002f06bd.png%3Fsize%3D128&w=128&q=75" style="width=30px; height=30px; border-radius:15px">
+</div>
+
+Axobot is not really a Gipsy instance, but it is maintained by the same original creator and both project share the same origin. It is designed to a ready-to-use high quality bot capable of handling a huge amount of servers, such as most popular bots like Mee6 or Dyno.
+
+```
+````
+
+:::
 ::::
+
 ## 👶 First steps
 
 In a channel where the bot can read and write messages, follow the instructions below.
