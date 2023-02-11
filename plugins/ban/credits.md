@@ -1,5 +1,5 @@
 Copyright © Aeris One 2022
-Copyright © ascpial 2022
+Copyright © ascpial 2022 - 2023
 Copyright © Leirof 2022
 
 Ce programme est régi par la licence CeCILL soumise au droit français et
