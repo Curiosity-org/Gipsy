@@ -270,13 +270,14 @@ class GroupRoles(commands.Cog):
 
     @commands.group(name="rolelink")
     @commands.guild_only()
+    @commands.has_permissions(manage_guild=True)
     async def rolelink_main(self, ctx: commands.Context):
         """Manage your roles-links"""
         if ctx.subcommand_passed is None:
             await ctx.send_help("rolelink")
 
     @rolelink_main.command(name="add")
-    @commands.check(checks.is_server_manager)
+    @commands.has_permissions(manage_guild=True)
     async def rolelink_create(
         self,
         ctx: commands.Context,
@@ -328,6 +329,7 @@ class GroupRoles(commands.Cog):
 
     @rolelink_main.command(name="list")
     @commands.cooldown(1, 10, commands.BucketType.guild)
+    @commands.has_permissions(manage_guild=True)
     async def rolelink_list(self, ctx: commands.Context):
         """List your roles-links"""
         actions = self.db_get_config(ctx.guild.id)
@@ -342,7 +344,7 @@ class GroupRoles(commands.Cog):
         await ctx.send(txt)
 
     @rolelink_main.command(name="remove")
-    @commands.check(checks.is_server_manager)
+    @commands.has_permissions(manage_guild=True)
     async def rolelink_delete(self, ctx: commands.Context, id: int):
         """Delete one of your roles-links"""
         deleted = self.db_delete_action(ctx.guild.id, id)
