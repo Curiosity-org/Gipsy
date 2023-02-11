@@ -1,0 +1,12 @@
+{
+    "logs_channel": {
+        "default": null,
+        "type": "channels",
+        "command": "logs_channel"
+    },
+    "modlogs_flags": {
+        "default": 0,
+        "type": "modlogsFlags",
+        "command": "modlogs"
+    }
+}
