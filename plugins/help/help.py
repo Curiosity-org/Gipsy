@@ -5,6 +5,8 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
+from __future__ import annotations
+
 import inspect
 import itertools
 import typing
@@ -15,6 +17,37 @@ import discord
 from discord.ext import commands
 from utils import Gunibot, MyContext
 
+
+def permission_check(callback: callable):
+    """Decorator used to check if the user has the permission to use the
+    command and returns a "not found" message else.
+    
+    This is used to prevent the user from seing commands he can't run.
+    """
+
+    async def decorator(
+        self: Help,
+        command: Union[commands.Command, commands.Group, commands.Cog]
+    ):
+        # to check if the user can run the command in the context, we use the
+        # filter function of the helper class to remove the command if the user
+        # don't have the permission
+        if issubclass(type(command), commands.Cog):
+            # we check the permission for each command
+            if len(await self.filter_commands(command.get_commands())) == 0:
+                return await self.send_error_message(
+                    await self.command_not_found(command.qualified_name)
+                )
+        else:
+            if len(await self.filter_commands([command])) == 0: # the user can't use the command
+                return await self.send_error_message(
+                    await self.command_not_found(command.qualified_name)
+                )
+        
+        # the user can use the command
+        return await callback(self, command)
+
+    return decorator
 
 class Help(commands.HelpCommand):
     ANNOTATION_TRANSLATION = {
@@ -222,7 +255,11 @@ class Help(commands.HelpCommand):
 
         return result if len(result) > 0 else None
 
-    async def get_command_list_string(self, command: commands.Command, name_size:int=0, total_size:int=0) -> str:
+    async def get_command_list_string(
+        self, command: commands.Command,
+        name_size:int=0,
+        total_size:int=0
+    ) -> str:
         """Returns a string representing `command` in a list of commands
 
         Attributes
@@ -268,13 +305,18 @@ class Help(commands.HelpCommand):
             The string representation of group subcommands
             If the group has no subcommand, the function returns None
         """
-        bot: Gunibot = self.context.bot
         result = "```asciidoc\n"
 
         if isinstance(group, commands.Group):
-            commands_ = sorted(group.commands, key=lambda command: command.name)
+            commands_ = sorted(
+                await self.filter_commands(group.commands),
+                key=lambda command: command.name
+            )
         elif issubclass(type(group), commands.Cog):
-            commands_ = sorted(group.get_commands(), key=lambda command: command.name)
+            commands_ = sorted(
+                await self.filter_commands(group.get_commands()),
+                key=lambda command: command.name
+            )
 
         for command in commands_:
             result += await self.get_command_list_string(command)
@@ -391,9 +433,10 @@ class Help(commands.HelpCommand):
                     )
                 )
 
-        for i in range(int(math.floor(len(embeds)//10))):
+        for i in range(int(math.ceil(len(embeds)/10))):
             await ctx.send(embeds=embeds[i*10: min((i+1)*10, len(embeds))])
 
+    @permission_check
     async def send_command_help(self, command: commands.Command) -> None:
         """Send the help message for command in the context channel
 
@@ -430,6 +473,7 @@ class Help(commands.HelpCommand):
 
         await ctx.send(embed=self.embed)
 
+    @permission_check
     async def send_group_help(self, group: commands.Group) -> None:
         """Send the help message for a group in the context channel
 
@@ -468,6 +512,7 @@ class Help(commands.HelpCommand):
 
         await ctx.send(embed=self.embed)
 
+    @permission_check
     async def send_cog_help(self, cog: commands.Cog) -> None:
         """Send the help message for the cog in the context channel
 
