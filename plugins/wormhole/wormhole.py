@@ -28,7 +28,7 @@ def similar(msg1, msg2):
 
 # Get the corresponding answered message in other channels
 async def get_corresponding_answer(
-    channel: discord.TextChannel, message: discord.Message
+    channel: discord.abc.Messageable, message: discord.Message
 ) -> discord.Message:
     date = message.created_at
     async for msg in channel.history(limit=20, after=date, oldest_first=True):
@@ -46,6 +46,7 @@ async def sendMessage(
     username: str,
     pp_guild: bool,
     embed_reply: discord.Embed = None,
+    thread: discord.Thread = None
 ):
     files = [await x.to_file() for x in msg.attachments]
     # grab mentions from the source message
@@ -68,15 +69,28 @@ async def sendMessage(
         embeds.append(embed_reply)
     elif embed_reply:
         embeds = [embed_reply]
-    new_msg: discord.WebhookMessage = await webhook.send(
-        content=msg.content,
-        files=files,
-        embeds=embeds,
-        avatar_url=avatar_url,
-        username=username,
-        allowed_mentions=discord.AllowedMentions.none(),
-        wait=True,
-    )
+
+    if thread is None:
+        new_msg: discord.WebhookMessage = await webhook.send(
+            content=msg.content,
+            files=files,
+            embeds=embeds,
+            avatar_url=avatar_url,
+            username=username,
+            allowed_mentions=discord.AllowedMentions.none(),
+            wait=True,
+        )
+    else:
+        new_msg: discord.WebhookMessage = await webhook.send(
+            content=msg.content,
+            files=files,
+            embeds=embeds,
+            thread = thread,
+            avatar_url=avatar_url,
+            username=username,
+            allowed_mentions=discord.AllowedMentions.none(),
+            wait=True,
+        )
     # edit the message to include mentions without notifications
     if mentions.roles or mentions.users or mentions.everyone:
         await new_msg.edit(allowed_mentions=mentions)
@@ -213,7 +227,7 @@ class Wormholes(commands.Cog):
             for row in wh_targets:
                 # We're starting to send the message in all the channels linked
                 # to that wormhole
-                channel: discord.TextChannel = self.bot.get_channel(row[1])
+                channel: discord.abc.Messageable = self.bot.get_channel(row[1])
                 if channel:
                     webhook = discord.Webhook.partial(row[4], row[5], session=session)
                     oldmessage = await get_corresponding_answer(channel, message)
@@ -259,17 +273,27 @@ class Wormholes(commands.Cog):
             for row in wh_targets:
                 # We're starting to send the message in all the channels linked
                 # to that wormhole
-                channel: discord.TextChannel = self.bot.get_channel(row[1])
+                channel: discord.abc.Messageable = self.bot.get_channel(row[1])
                 if channel:
                     webhook = discord.Webhook.partial(row[4], row[5], session=session)
                     embed_reply = None
                     oldmessage = await get_corresponding_answer(channel, message)
-                    await webhook.edit_message(
-                        oldmessage.id,
-                        content=newmessage.content,
-                        embeds=newmessage.embeds,
-                        allowed_mentions=None,
-                    )
+
+                    if isinstance(channel, discord.Thread):
+                        await webhook.edit_message(
+                            oldmessage.id,
+                            content=newmessage.content,
+                            embeds=newmessage.embeds,
+                            allowed_mentions=None,
+                            thread=channel,
+                        )
+                    else:
+                        await webhook.edit_message(
+                            oldmessage.id,
+                            content=newmessage.content,
+                            embeds=newmessage.embeds,
+                            allowed_mentions=None,
+                        )
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -323,7 +347,7 @@ class Wormholes(commands.Cog):
 
             # We're starting to send the message in all the channels linked to that wormhole
             for connected_channel in wh_targets:
-                channel: discord.TextChannel = self.bot.get_channel(connected_channel[1])
+                channel: discord.abc.Messageable = self.bot.get_channel(connected_channel[1])
 
                 if channel:
                     # Get the webhook associated to the wormhole
@@ -366,7 +390,7 @@ class Wormholes(commands.Cog):
                             .replace("{channel}", message.channel.name, 10)
                         )
                     await sendMessage(
-                        message, webhook, wormhole[0], wormhole[1], embed_reply
+                        message, webhook, wormhole[0], wormhole[1], embed_reply, thread=channel if isinstance(channel, discord.Thread) else None
                     )
 
     @commands.group(name="wormhole", aliases=["wh"])
@@ -447,7 +471,12 @@ class Wormholes(commands.Cog):
                 )
                 return
             query = "INSERT INTO wormhole_channel (name, channelID, guildID, type, webhookID, webhookTOKEN) VALUES (?, ?, ?, ?, ?, ?)"
-            webhook: discord.Webhook = await ctx.channel.create_webhook(name=wormhole)
+
+            if isinstance(ctx.channel, discord.Thread):
+                webhook: discord.Webhook = await ctx.channel.parent.create_webhook(name=wormhole)
+            else:
+                webhook: discord.Webhook = await ctx.channel.create_webhook(name=wormhole)
+
             self.bot.db_query(
                 query,
                 (
