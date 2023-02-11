@@ -99,17 +99,17 @@ class Gunibot(commands.bot.AutoShardedBot):
                         c.executescript(f.read())
         c.close()
 
-    async def user_avatar_as(self, user, size=512):
+    async def user_avatar_as(
+        self,
+        user: Union[discord.User, discord.Member],
+        size=512,
+    ):
         """Get the avatar of an user, format gif or png (as webp isn't supported by some browsers)"""
-        if not hasattr(user, "avatar_url_as"):
-            raise ValueError
-        try:
-            if user.is_avatar_animated():
-                return user.display_avatar_as(format="gif", size=size)
-            else:
-                return user.display_avatar_as(format="png", size=size)
-        except Exception as e:
-            await self.cogs["Errors"].on_error(e, None)
+        avatar = user.display_avatar.with_size(size) # the avatar always exist, returns the URL to the default one
+        if avatar.is_animated():
+            return avatar.with_format("gif")
+        else:
+            return avatar.with_format("png")
 
     class SafeDict(dict):
         def __missing__(self, key):
