@@ -187,7 +187,7 @@ class Rss(commands.Cog):
     async def rss_main(self, ctx: MyContext):
         """See the last post of a rss feed"""
         if ctx.subcommand_passed is None:
-            await self.bot.get_cog("Help").help_command(ctx, ["rss"])
+            await ctx.send_help('rss')
 
     @rss_main.command(name="youtube", aliases=["yt"])
     async def request_yt(self, ctx: MyContext, ID):
