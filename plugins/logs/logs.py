@@ -367,7 +367,7 @@ class Logs(commands.Cog):
         _yes = await self.bot._(role.guild.id, "logs._yes")
         _pos = await self.bot._(role.guild.id, "logs.role_created.pos")
         _ment = await self.bot._(role.guild.id, "logs.role_created.mentionnable")
-        data = [_pos + ' {role.position}',
+        data = [_pos + f' {role.position}',
                 _ment + ' ' + (_yes if role.mentionable else _no)]
         if role.color != discord.Color.default():
             data.append(await self.bot._(role.guild.id, "logs.role_created.color") + f' {role.color}')
@@ -395,7 +395,7 @@ class Logs(commands.Cog):
         _yes = await self.bot._(role.guild.id, "logs._yes")
         _pos = await self.bot._(role.guild.id, "logs.role_created.pos")
         _ment = await self.bot._(role.guild.id, "logs.role_created.mentionnable")
-        data = [_pos + ' {role.position}',
+        data = [_pos + f' {role.position}',
                 _ment + ' ' + (_yes if role.mentionable else _no)]
         if role.color != discord.Color.default():
             data.append(await self.bot._(role.guild.id, "logs.role_created.color") + f' {role.color}')
