@@ -311,8 +311,9 @@ class Sconfig(commands.Cog):
                 await self.bot._(ctx.guild.id, "sconfig.invalid-language", p=ctx.prefix)
             )
         else:  # correct case
-            selected = cog.languages.index(lang)
-            await ctx.send(await self.edit_config(ctx.guild.id, "language", selected))
+            await ctx.send(
+                await self.edit_config(ctx.guild.id, "language", lang)
+            ) # lang should be a string
 
     # --------------------------------------------------
     # Hypesquad
