@@ -99,13 +99,14 @@ class Antikikoo(commands.Cog):
 
     @commands.group(name="antikikoo", aliases=["ak", "antitroll"])
     @commands.guild_only()
+    @commands.has_permissions(administrator=True)
     async def ak_main(self, ctx: MyContext):
         """Kikoo filter configuration"""
         if ctx.subcommand_passed is None:
             await ctx.send_help("antikikoo")
 
     @ak_main.command(name="channel")
-    @commands.check(checks.is_admin)
+    @commands.has_permissions(administrator=True)
     async def ak_channel(self, ctx: MyContext, channel: discord.TextChannel):
         """Modifies the channel where members will have to check themselves"""
         self.bot.server_configs[ctx.guild.id]["verification_channel"] = channel.id
@@ -116,7 +117,7 @@ class Antikikoo(commands.Cog):
         )
 
     @ak_main.command(name="info_message")
-    @commands.check(checks.is_admin)
+    @commands.has_permissions(administrator=True)
     async def ak_msg(self, ctx: MyContext, *, message: str = None):
         """Modifies the informative message sent in the verification channel
         Put nothing to reset it, or "None" for no message"""

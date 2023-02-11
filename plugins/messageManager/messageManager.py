@@ -51,17 +51,13 @@ class MessageManager(commands.Cog):
 
     @commands.command(name="imitate")
     @commands.guild_only()
+    @commands.has_permissions(manage_messages=True, manage_nicknames=True)
     async def imitate(
         self, ctx: commands.Context, user: discord.User = None, *, text=None
     ):
         """Say something with someone else's appearance"""
 
-        if (
-            user
-            and text
-            and ctx.channel.permissions_for(ctx.author).manage_messages
-            and ctx.channel.permissions_for(ctx.author).manage_nicknames
-        ):
+        if (user is not None and text is not None): # c'est python, autant être verbeux
             # Create a webhook in the image of the targeted member
             webhook = await ctx.channel.create_webhook(name=user.name)
             await webhook.send(content=text, avatar_url=user.display_avatar)
@@ -76,6 +72,11 @@ class MessageManager(commands.Cog):
 
     @commands.command(names="move", aliases=["mv"])
     @commands.guild_only()
+    @commands.has_permissions(
+        manage_messages=True,
+        read_messages=True,
+        read_message_history=True,
+    )
     async def move(
         self,
         ctx: commands.Context,
@@ -120,12 +121,7 @@ class MessageManager(commands.Cog):
             return
 
         # Check permission
-        if (
-            not ctx.channel.permissions_for(ctx.author).manage_messages
-            or not ctx.channel.permissions_for(ctx.author).read_messages
-            or not ctx.channel.permissions_for(ctx.author).read_message_history
-            or not channel.permissions_for(author).manage_messages
-        ):
+        if (not channel.permissions_for(author).manage_messages):
             embed = discord.Embed(
                 description=await self.bot._(
                     ctx.guild.id, "message_manager.permission"
@@ -173,6 +169,11 @@ class MessageManager(commands.Cog):
 
     @commands.command(names="moveall", aliases=["mva"])
     @commands.guild_only()
+    @commands.has_permissions(
+        manage_messages=True,
+        read_messages=True,
+        read_message_history=True,
+    )
     async def moveall(
         self,
         ctx: commands.Context,
@@ -219,12 +220,7 @@ class MessageManager(commands.Cog):
             return
 
         # Check member permissions
-        if (
-            not ctx.channel.permissions_for(ctx.author).manage_messages
-            or not ctx.channel.permissions_for(ctx.author).read_messages
-            or not ctx.channel.permissions_for(ctx.author).read_message_history
-            or not channel.permissions_for(author).manage_messages
-        ):
+        if (not channel.permissions_for(author).manage_messages):
             embed = discord.Embed(
                 description=await self.bot._(
                     ctx.guild.id, "message_manager.permission"

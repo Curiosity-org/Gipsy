@@ -162,6 +162,7 @@ class ChannelArchive(commands.Cog):
 
     @commands.command(name="list_archive")
     @commands.guild_only()
+    @commands.has_permissions(manage_guild=True)
     async def list_archive(self, ctx: MyContext):
 
         config = self.bot.server_configs[ctx.guild.id]
@@ -239,6 +240,7 @@ class ChannelArchive(commands.Cog):
 
     @commands.command(name="archive")
     @commands.guild_only()
+    @commands.has_permissions(manage_channels=True, manage_permissions=True)
     async def archive(self, ctx: MyContext, channel: discord.TextChannel = None):
         """Archive a channel"""
 
