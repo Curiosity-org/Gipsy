@@ -32,7 +32,7 @@ class Ban(commands.Cog):
         self.load_friendly_ban()
 
     @commands.Cog.listener()
-    async def on_member_join(self, member):
+    async def on_member_join(self, member: discord.Member):
         if member.guild.id in self.friendly_ban_guilds:
             if member.id in self.roles_backup:
                 # Give the roles back to the users
@@ -41,7 +41,7 @@ class Ban(commands.Cog):
                 forbidden: list[discord.Role] = []
 
                 for role in self.roles_backup.pop(member.id):
-                    if role.id != role.guild.id: # We ignore the @everyone role
+                    if role.id != role.guild.id and role not in member.roles: # We ignore the @everyone role
                         try:
                             await member.add_roles(role)
                         except discord.Forbidden:
