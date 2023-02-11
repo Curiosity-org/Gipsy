@@ -13,16 +13,17 @@ import discord
 from discord.ext import commands
 from utils import Gunibot, MyContext
 
+from core import config
 
 class Ban(commands.Cog):
     friendly_ban_guilds: list[int]
-    friendly_ban_config: dict
 
     friendly_ban_events: list[dict]
     systematic_events: list
     random_events: list
     friendly_ban_whitelisted_roles: list[int]
-    friendly_banned_roles: dict[int,list[discord.Role]]
+
+    roles_backup: dict[int,list[discord.Role]]
 
     def __init__(self, bot: Gunibot):
         self.bot = bot
@@ -33,13 +34,13 @@ class Ban(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         if member.guild.id in self.friendly_ban_guilds:
-            if member.id in self.friendly_banned_roles:
+            if member.id in self.roles_backup:
                 # Give the roles back to the users
 
                 # setup a list of the role that could not be given back
                 forbidden: list[discord.Role] = []
 
-                for role in self.friendly_banned_roles.pop(member.id):
+                for role in self.roles_backup.pop(member.id):
                     if role.id != role.guild.id: # We ignore the @everyone role
                         try:
                             await member.add_roles(role)
@@ -183,23 +184,54 @@ class Ban(commands.Cog):
 
     def load_friendly_ban(self):
         """Loads configuration and events for the friendly ban command"""
-        
+
         # look for the configuration, gets an empty dict if it doesn't exist
-        self.friendly_ban_config = self.bot.config.get("friendly_ban", {})
+        self.config = config.get('ban') or {}
 
         # loads the guild ids from the configuration
-        self.friendly_ban_guilds: list[int] = self.friendly_ban_config.get(
-            "guilds",
-            []
-        )
+        self.friendly_ban_guilds: list[int] = self.config.get("guilds", [])
 
-        self.friendly_ban_whitelisted_roles: list[int] = self.friendly_ban_config.get(
+        self.friendly_ban_whitelisted_roles: list[int] = self.config.get(
             "whitelisted_roles",
             []
         )
 
+        print(self.friendly_ban_guilds)
+        print(self.friendly_ban_whitelisted_roles)
+
         # loads the events
-        self.friendly_ban_events = self.friendly_ban_config.get("events", [])
+        self.friendly_ban_events = [
+            {
+                "name": "Autoban?",
+                "chances": None, # systematic
+                "module_name": "autoban"
+            },
+            {
+                "name": "Baldban",
+                "chances": None, # systematic
+                "module_name": "baldban"
+            },
+            {
+                "name": "UnoReverse",
+                "chances": 1,
+                "module_name": "reverse"
+            },
+            {
+                "name": "Bothban",
+                "chances": 1,
+                "module_name": "bothban"
+            },
+            {
+                "name": "Rickroll",
+                "chances": 1,
+                "module_name": "rickroll"
+            },
+            {
+                "name": "Normal ban",
+                "chances": 7,
+                "module_name": "just_a_message"
+            }
+        ]
         self.systematic_events: list[function] = []
         self.random_events: list[function] = []
 
@@ -220,7 +252,7 @@ class Ban(commands.Cog):
                     )
         
         # initiate the cache for the banned users roles
-        self.friendly_banned_roles: dict[int,list[discord.Role]] = {}
+        self.roles_backup: dict[int,list[discord.Role]] = {}
     
     async def fake_ban(
         self,
@@ -255,7 +287,7 @@ class Ban(commands.Cog):
                 await ctx.send(await ctx.bot._(ctx, 'ban.gunivers.whoups'))
         
         # store the roles somewhere to give them back to the user
-        self.friendly_banned_roles[user.id] = ctx.guild.get_member(
+        self.roles_backup[user.id] = ctx.guild.get_member(
             user.id
         ).roles
         
@@ -273,5 +305,5 @@ class Ban(commands.Cog):
         return True
 
 # The end.
-async def setup(bot):
-    await bot.add_cog(Ban(bot))
+async def setup(bot:Gunibot=None):
+    await bot.add_cog(Ban(bot), icon="🔨")
