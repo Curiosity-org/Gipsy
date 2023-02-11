@@ -734,6 +734,7 @@ class XP(commands.Cog):
         return True
 
     @commands.group(name="roles_levels")
+    @commands.has_permissions(manage_guild=True)
     @commands.guild_only()
     async def rr_main(self, ctx: MyContext):
         """Manage your roles rewards like a boss"""
