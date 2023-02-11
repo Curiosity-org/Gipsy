@@ -196,9 +196,6 @@ class Ban(commands.Cog):
             []
         )
 
-        print(self.friendly_ban_guilds)
-        print(self.friendly_ban_whitelisted_roles)
-
         # loads the events
         self.friendly_ban_events = [
             {
