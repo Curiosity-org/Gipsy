@@ -5,7 +5,11 @@
 
 fr:
   invite-tracker:
-    join-code: "%{member} a rejoint %{guild} avec l'invitation `%{code}` créée par %{inviter}, qui a maintenant `%{uses}` utilisations !"
-    join-description: "%{member} a rejoint %{guild} avec l'invitation \"%{description}\" (`%{code}`) créée par %{inviter}, qui a maintenant `%{uses}` utilisations !"
+    joined: "%{member} a rejoint %{guild} avec l'invitation %{invitation} !"
+    joined-no-invite: "%{member} a rejoint %{guild}, mais je n'ai pas trouvé l'invitation qu'il a utilisé..."
+    joined-many-invites: "%{member} a rejoint %{guild}, il a pu utiliser une des invitations suivantes : %{invitations}."
     not-found: J'ai cherché partout, mais l'invitation reste introuvable !
-    set-description-done: J'ai bien changé la description de `%{code}` !
+    set-description-done: "J'ai bien changé la description de `%{code}` !"
+
+    description: "\"%{description}\" (`%{code}`) créée par %{inviter} qui a été utilisée %{uses} fois"
+    code-only: "`%{code}` créée par %{inviter} qui a été utilisée %{uses} fois"
