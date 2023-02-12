@@ -82,7 +82,7 @@ class Sconfig(commands.Cog):
                 if "command" in opt:
                     try:
                         self.bot.get_command("config " + opt["command"]).enabled = False
-                    except AttributeError:
+                    except (AttributeError, TypeError): # if opt["command"] is None
                         # if the command doesn't exist
                         pass
             del self.sorted_options[cog]
