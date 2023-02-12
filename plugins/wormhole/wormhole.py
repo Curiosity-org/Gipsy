@@ -18,6 +18,8 @@ import sys
 
 sys.path.append("./bot")
 
+from LRFutils import logPrint
+
 
 # Check if a message is similar to another one with 80% similarity
 
@@ -201,6 +203,36 @@ class Wormholes(commands.Cog):
         query_res = self.bot.db_query(query, (wormhole,), astuple=True)
         # comes as: (name, privacy, webhook_name, webhook_pp_guild)
         return len(query_res) > 0
+    
+    async def update_webhook(
+        self,
+        channel: Union[discord.TextChannel, discord.Thread],
+        wormhole_name: str,
+    ) -> discord.Webhook:
+        """Fetchs a webhook for the specified channel, updates the linked
+        channels and returns the webhook.
+        """
+        if isinstance(channel, discord.Thread):
+            new_webhook: discord.Webhook = await channel.parent.create_webhook(
+                name=wormhole_name,
+            )
+        else:
+            new_webhook: discord.Webhook = await channel.create_webhook(
+                name=wormhole_name,
+            )
+        query = "UPDATE wormhole_channel SET webhookID=?, webhookTOKEN=? WHERE name=? AND channelID=?;"
+
+        self.bot.db_query(
+            query,
+            (
+                new_webhook.id,
+                new_webhook.token,
+                wormhole_name,
+                channel.id,
+            )
+        ) # update the webhook in the database
+
+        return new_webhook
 
     @commands.Cog.listener(name="on_message_delete")
     async def on_message_delete(self, message):
@@ -279,21 +311,31 @@ class Wormholes(commands.Cog):
                     embed_reply = None
                     oldmessage = await get_corresponding_answer(channel, message)
 
-                    if isinstance(channel, discord.Thread):
-                        await webhook.edit_message(
-                            oldmessage.id,
-                            content=newmessage.content,
-                            embeds=newmessage.embeds,
-                            allowed_mentions=None,
-                            thread=channel,
+                    try:
+                        if isinstance(channel, discord.Thread):
+                            await webhook.edit_message(
+                                oldmessage.id,
+                                content=newmessage.content,
+                                embeds=newmessage.embeds,
+                                allowed_mentions=None,
+                                thread = channel,
+                            )
+                        else:
+                            await webhook.edit_message(
+                                oldmessage.id,
+                                content=newmessage.content,
+                                embeds=newmessage.embeds,
+                                allowed_mentions=None,
+                            )
+                    except discord.NotFound: # the webhook has been deleted
+                        logPrint(
+                            f"The webhook for channel {row[1]} for wormhole {wh_name} has been deleted and a message has not been edited."
                         )
-                    else:
-                        await webhook.edit_message(
-                            oldmessage.id,
-                            content=newmessage.content,
-                            embeds=newmessage.embeds,
-                            allowed_mentions=None,
+                    except discord.Forbidden: # the webhook has changed, should not be possible due to checks before
+                        logPrint(
+                            f"The webhook for channel {row[1]} for wormhole {wh_name} has changed and a message has not been edited."
                         )
+
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -347,7 +389,7 @@ class Wormholes(commands.Cog):
 
             # We're starting to send the message in all the channels linked to that wormhole
             for connected_channel in wh_targets:
-                channel: discord.abc.Messageable = self.bot.get_channel(connected_channel[1])
+                channel: Union[discord.TextChannel, discord.Thread] = self.bot.get_channel(connected_channel[1])
 
                 if channel:
                     # Get the webhook associated to the wormhole
@@ -368,7 +410,6 @@ class Wormholes(commands.Cog):
                                 colour=0x2F3136,  # 2F3136
                             )
                         else:
-                            content = reply.content
                             content = content.replace("\n", " ")
                             if len(content) > 80:
                                 content = content[:80] + "..."
@@ -389,9 +430,30 @@ class Wormholes(commands.Cog):
                             .replace("{guild}", message.guild.name, 10)
                             .replace("{channel}", message.channel.name, 10)
                         )
-                    await sendMessage(
-                        message, webhook, wormhole[0], wormhole[1], embed_reply, thread=channel if isinstance(channel, discord.Thread) else None
-                    )
+                    
+                    try:
+                        await sendMessage(
+                            message,
+                            webhook,
+                            wormhole[0],
+                            wormhole[1],
+                            embed_reply,
+                            thread = channel if isinstance(channel, discord.Thread) else None,
+                        )
+                    except discord.NotFound: # the webhook has been deleted
+                        new_webhook = await self.update_webhook(
+                            channel,
+                            wh_name,
+                        )
+
+                        await sendMessage(
+                            message,
+                            new_webhook,
+                            wormhole[0],
+                            wormhole[1],
+                            embed_reply,
+                            thread=channel if isinstance(channel, discord.Thread) else None,
+                        ) # send the message again
 
     @commands.group(name="wormhole", aliases=["wh"])
     @commands.guild_only()
