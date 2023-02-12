@@ -15,7 +15,7 @@ from discord.ext import commands, tasks
 # pylint: disable=import-error
 from utils import Gunibot, MyContext
 
-from quipyquizz import QuiPyQuizz
+from .quipyquizz import QuiPyQuizz
 
 
 def clean_question(question: str):
