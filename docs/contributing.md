@@ -34,3 +34,9 @@ The subject contains a succinct description of the change:
 * use the imperative, present tense: "change" not "changed" nor "changes"
 * don't capitalize the first letter
 * no dot (.) at the end
+
+```{admonition} 🤝 Help us to improve this documentation!
+:class: tip
+
+If you want to help us to improve this documentation, you can edit it on the [GitHub repo](https://github.com/Gunivers/Gipsy/) or come and discuss with us on our [Discord server](https://discord.gg/E8qq6tN)!
+```

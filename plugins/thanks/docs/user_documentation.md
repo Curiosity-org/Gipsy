@@ -5,7 +5,7 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 -->
 
-# Thanks
+# 💖 Thanks
 
 At Gunivers, we believe that active members of a project should be rewarded for their efforts. We have therefore set up a reward system, allowing the server staff to congratulate certain people via a simple command: the `thanks` command.
 
@@ -20,3 +20,9 @@ Three configuration options are available:
 * `thanks_duration` : The duration of validity of a thank you
 
 The `thankslist` command can be used to see the list of thanks given to a user, and `thanksreload` to refresh the roles.
+
+```{admonition} 🤝 Help us to improve this documentation!
+:class: tip
+
+If you want to help us to improve this documentation, you can edit it on the [GitHub repo](https://github.com/Gunivers/Gipsy/) or come and discuss with us on our [Discord server](https://discord.gg/E8qq6tN)!
+```

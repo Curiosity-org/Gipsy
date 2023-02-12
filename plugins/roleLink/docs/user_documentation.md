@@ -5,7 +5,7 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 -->
 
-# Role link
+# 📎 Role link
 
 This system allows you to create dependencies between roles and thus manage automatically the gain/withdrawal of roles according to the acquisition or loss of other roles. To create a link between roles, you will need to perform the command:
 
@@ -27,3 +27,9 @@ To remove one of them, you can simply do:
 `/rolelink remove <ID>`
 
 Where `<ID>` is the number present in front of the corresponding role links in the link list.
+
+```{admonition} 🤝 Help us to improve this documentation!
+:class: tip
+
+If you want to help us to improve this documentation, you can edit it on the [GitHub repo](https://github.com/Gunivers/Gipsy/) or come and discuss with us on our [Discord server](https://discord.gg/E8qq6tN)!
+```

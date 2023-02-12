@@ -93,7 +93,7 @@ If you invite the beta version, you will be able to test the latest features add
 13. Open the URL in your browser and invite the bot to your server.
 
 :::
-:::{tab-item} 🌐 Other Gipsy instances
+:::{tab-item} 🌐 Other instances
 
 Here is the list of other Gipsy instances hosted by trusted peoples:
 
