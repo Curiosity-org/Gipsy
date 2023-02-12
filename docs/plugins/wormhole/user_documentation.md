@@ -1,3 +1,0 @@
-# 🌀 Wormhole
-
-Nothing here...

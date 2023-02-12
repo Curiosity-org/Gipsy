@@ -48,7 +48,7 @@ def generate_plugin_doc():
         for line in after:
             toctree.write(line)
 
-# generate_plugin_doc()
+generate_plugin_doc()
 
 
 # Configuration file for the Sphinx documentation builder.
@@ -72,7 +72,7 @@ def generate_plugin_doc():
 
 project = "Gipsy"
 copyright = "2023, Gunivers"
-author = "Gunivers"
+author = "Z_runner, Leirof, Aeris One, ascpial, theogiraudet, fantomitechno, Just_a_Player and Aragorn"
 
 # The full version, including alpha/beta/rc tags
 # release = ""

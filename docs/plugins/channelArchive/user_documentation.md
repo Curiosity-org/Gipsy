@@ -1,3 +1,0 @@
-# 🗃️ Channel archive
-
-Nothing here...

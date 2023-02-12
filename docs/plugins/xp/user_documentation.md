@@ -1,3 +1,0 @@
-# 🎖️ XP
-
-Nothing here...
