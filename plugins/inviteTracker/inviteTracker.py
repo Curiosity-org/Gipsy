@@ -205,36 +205,55 @@ class Invite(commands.Cog):
         """
         if not member.guild.me.guild_permissions.manage_guild:
             return
-        invite = await self.check_invites(member.guild)
-        if invite is not None:
-            channel = self.bot.server_configs[member.guild.id]["invite_log"]
-            if channel is not None:
-                channel = self.bot.get_channel(channel)
-                if invite.description == "":
-                    await channel.send(
-                        await self.bot._(
-                            member.guild.id,
-                            "invite-tracker.join-code",
-                            member=member.mention,
-                            guild=member.guild,
-                            code=invite.code,
-                            inviter=(await invite.fetch_inviter()).mention,
-                            uses=invite.uses,
-                        )
+        invites = await self.check_invites(member.guild)
+        if len(invites) == 1:
+            invite = invites[0]
+
+            invite_string = await self.get_invitation_string(
+                invite,
+                member,
+            )
+
+            message = await self.bot._(
+                member.guild.id,
+                "invite-tracker.joined",
+                member=member.mention,
+                guild=member.guild,
+                invitation=invite_string,
+            )
+        elif len(invites) == 0:
+            message = await self.bot._(
+                member.guild.id,
+                "invite-tracker.joined-no-invite",
+                member=member.mention,
+                guild=member.guild,
+            )
+        else: # multiple invitations
+            invites_string = ', '.join(
+                [
+                    await self.get_invitation_string(
+                        invite,
+                        member,
                     )
-                else:
-                    await channel.send(
-                        await self.bot._(
-                            member.guild.id,
-                            "invite-tracker.join-description",
-                            member=member.mention,
-                            guild=member.guild,
-                            code=invite.code,
-                            inviter=(await invite.fetch_inviter()).mention,
-                            description=invite.description,
-                            uses=invite.uses,
-                        )
-                    )
+                    for invite in invites
+                ]
+            )
+
+            message = await self.bot._(
+                member.guild.id,
+                "invite-tracker.joined-many-invites",
+                member=member.mention,
+                guild=member.guild,
+                invitations=invites_string,
+            )
+        
+        channel = self.bot.server_configs[member.guild.id]["invite_log"]
+        if channel is not None:
+            channel = self.bot.get_channel(channel)
+            await channel.send(
+                content=message,
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
@@ -246,7 +265,7 @@ class Invite(commands.Cog):
                 await self.check_invites(guild)
         self.bot.log.info("Invitations successfully synced")
 
-    async def check_invites(self, guild: discord.Guild) -> Optional[DatabaseInvite]:
+    async def check_invites(self, guild: discord.Guild) -> List[DatabaseInvite]:
         """Check for all guild invite and changes
 
         Attributes
@@ -256,20 +275,21 @@ class Invite(commands.Cog):
 
         Returns
         -------
-        Optional[discord.Invite]
-            The last discord invite with changes detected
+        List[discord.Invite]
+            All the invitations that changed since last refresh
         """
         invites = await guild.invites()
-        output_invite = None
+        output_invites = []
         for invite in invites:
             database_invite = self.get_invite_by_id(invite.id)
             if database_invite is None:
                 database_invite = DatabaseInvite.add(invite, self.bot)
                 if invite.uses > 0:
-                    output_invite = database_invite
+                    output_invites.append(database_invite)
             else:
-                if await database_invite.check_use():
-                    output_invite = database_invite
+                if invite.uses > database_invite.uses:
+                    database_invite.update(invite)
+                    output_invites.append(database_invite)
         for invitation in self.get_invite_by_server(guild):
             is_in = False
             for database_invite in invites:
@@ -277,7 +297,7 @@ class Invite(commands.Cog):
                     is_in = True
             if not is_in:
                 invitation.delete()
-        return output_invite
+        return output_invites
 
     def get_invite_by_code(self, code: str) -> Optional[DatabaseInvite]:
         """Return a dict representing the discord invitation stored in database
@@ -322,7 +342,7 @@ class Invite(commands.Cog):
     def get_invite_by_server(
         self, guild: Union[int, discord.Guild]
     ) -> List[DatabaseInvite]:
-        """Retrieve all invites stored in database in a guild
+        """Retrieve all invites stored in database for a guild
 
         Attributes
         ----------
@@ -339,6 +359,38 @@ class Invite(commands.Cog):
         query = f"SELECT * FROM invites WHERE guild = ?;"
         datas = self.bot.db_query(query, (guild,), astuple=True)
         return [DatabaseInvite(data, self.bot) for data in datas]
+    
+    async def get_invitation_string(
+        self,
+        invite: DatabaseInvite,
+        member: discord.Member,
+    ) -> str:
+        """Returns a string representation for the given invitation
+        
+        Attributes
+        ----------
+        invite: DatabaseInvite
+            The invitation to represent
+        member: discord.Member
+            The member used to represent the invitation, to get the language
+        """
+        if invite.description == "":
+            return await self.bot._(
+                member.guild.id,
+                "invite-tracker.code-only",
+                code=invite.code,
+                inviter=(await invite.fetch_inviter()).mention,
+                uses=invite.uses,
+            )
+        else:
+            return await self.bot._(
+                member.guild.id,
+                "invite-tracker.description",
+                description=invite.description,
+                code=invite.code,
+                inviter=(await invite.fetch_inviter()).mention,
+                uses=invite.uses,
+            )
 
 config = {}
 async def setup(bot:Gunibot=None, plugin_config:dict=None):
