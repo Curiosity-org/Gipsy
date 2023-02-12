@@ -1,0 +1,11 @@
+# Ce programme est régi par la licence CeCILL soumise au droit français et
+# respectant les principes de diffusion des logiciels libres. Vous pouvez
+# utiliser, modifier et/ou redistribuer ce programme sous les conditions
+# de la licence CeCILL diffusée sur le site "http://www.cecill.info".
+
+en:
+  invite-tracker:
+    join-code: "%{member} joins %{guild} with the invite `%{code}` created by %{inviter}, which has been used `%{uses}` times now !"
+    join-description: "%{member} joins %{guild} with the invite \"%{description}\" (`%{code}`) created by %{inviter}, which has been used `%{uses}` times now !"
+    not-found: Invitation not found.
+    set-description-done: "`%{code}`'s description changed."

@@ -1,0 +1,38 @@
+# Ce programme est régi par la licence CeCILL soumise au droit français et
+# respectant les principes de diffusion des logiciels libres. Vous pouvez
+# utiliser, modifier et/ou redistribuer ce programme sous les conditions
+# de la licence CeCILL diffusée sur le site "http://www.cecill.info".
+
+fr:
+  help:
+    bot-help-title: Aide pour le bot Gipsy
+    help-tip: Utilisez "%{prefix}help [command]" pour en savoir plus sur une commande !
+    help-cog-tip: Utilisez "%{prefix}help %{cog}" pour en savoir plus sur ce plugin !
+    command-help-title: Aide pour la commande `%{command}`
+    help-signature-format: "%{signature}\n"
+    group-help-title: Aide pour le groupe `%{name}`
+    cog-help-title: Aide pour le cog `%{name}`
+    no-category: Sans catégorie
+    type: " : %{type}"
+    default: " = *%{default}*"
+    short_doc: " : *%{short_doc}*"
+    parameters: Paramètres de la commande
+    alias: Alias
+    subcommands: Sous-commandes
+    not-found: Impossible de trouver la commande "%{command}" !
+    greedy: "Suite : %{type}"
+  
+  annotation:
+    user: Utilisateur (mention ou ID)
+    textchannel: Salon textuel (mention ou ID)
+    voicechannel: Salon vocal (mention ou ID)
+    role: Role (mention ou ID)
+    guild: Serveur (ID)
+    string: Chaîne de caractères (pour mettre des espaces, utiliser "")
+    int: Nombre
+    bool: Vrai / faux (y, n, 1, 0, true, false...)
+    message: Message (lien ou ID)
+  
+  help_default:
+    true_: Oui
+    false_: Non

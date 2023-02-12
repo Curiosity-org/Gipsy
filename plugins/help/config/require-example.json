@@ -1,0 +1,5 @@
+{
+    "help_embed_color": 0,
+    "help_author": "{user.name}",
+    "help_author_icon_url": "{user.display_avatar.url}"
+}

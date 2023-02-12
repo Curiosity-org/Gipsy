@@ -1,3 +1,10 @@
+"""
+Ce programme est régi par la licence CeCILL soumise au droit français et
+respectant les principes de diffusion des logiciels libres. Vous pouvez
+utiliser, modifier et/ou redistribuer ce programme sous les conditions
+de la licence CeCILL diffusée sur le site "http://www.cecill.info".
+"""
+
 import typing
 
 import discord
@@ -67,7 +74,10 @@ class Perms(commands.Cog):
                     }
                 )
             col = target.color
-            avatar = ctx.guild.icon_url_as(format="png", size=256)
+            if target.guild.icon is not None: # the guild could have no icon
+                avatar = ctx.guild.icon.with_size(256).with_format('png')
+            else:
+                avatar = None
             name = str(target)
         permsl = list()
 

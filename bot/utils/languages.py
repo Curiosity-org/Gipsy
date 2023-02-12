@@ -1,3 +1,10 @@
+"""
+Ce programme est régi par la licence CeCILL soumise au droit français et
+respectant les principes de diffusion des logiciels libres. Vous pouvez
+utiliser, modifier et/ou redistribuer ce programme sous les conditions
+de la licence CeCILL diffusée sur le site "http://www.cecill.info".
+"""
+
 import discord
 import i18n
 from discord.ext import commands
@@ -28,16 +35,16 @@ class Languages(commands.Cog):
         lang = self.languages[0]
         if isinstance(ctx, commands.Context):
             if ctx.guild:
-                lang = self.languages[await self.get_lang(ctx.guild.id)]
+                lang = await self.get_lang(ctx.guild.id, use_str=True)
         elif isinstance(ctx, discord.Guild):
-            lang = self.languages[await self.get_lang(ctx.id)]
+            lang = await self.get_lang(ctx.id, use_str=True)
         elif isinstance(ctx, discord.abc.GuildChannel):
-            lang = self.languages[await self.get_lang(ctx.guild.id)]
+            lang = await self.get_lang(ctx.guild.id, use_str=True)
         elif isinstance(ctx, str) and ctx in self.languages:
             lang = ctx
         elif isinstance(ctx, int):  # guild ID
             if self.bot.get_guild(ctx):  # if valid guild
-                lang = self.languages[await self.get_lang(ctx)]
+                lang = await self.get_lang(ctx, use_str=True)
             else:
                 lang = self.languages[0]
         return i18n.t(key, locale=lang, **kwargs)
@@ -46,7 +53,9 @@ class Languages(commands.Cog):
         if guildID is None:
             as_int = 0
         else:
-            as_int = self.languages.index(self.bot.server_configs[guildID]["language"])
+            as_int = self.languages.index(
+                self.bot.server_configs[guildID]["language"]
+            )
         if use_str:
             return self.languages[as_int]
         return as_int
