@@ -16,5 +16,4 @@ env/
 docs/_*
 docs/build
 require.json
-plugins/
 docs/plugins
