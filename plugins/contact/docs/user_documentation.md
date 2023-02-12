@@ -5,7 +5,7 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 -->
 
-# Contact
+# 📞 Contact
 
 With this bot, you can create a room in your server where your members can contact the staff. The bot will then create a private room, visible only to said member and your staff, and delete the original message to keep the room clean.
 A command also exists to delete contact rooms older than X days.
@@ -21,3 +21,9 @@ It is your duty to make sure that the bot can read the contact channel, and crea
 The bot will send the message posted by the user back to his private room, if possible as a webhook with the user's name and avatar.
 
 The command to semi-automatically clean up contact rooms is `contact-clear`. You can specify a minimum number of days of inactivity, by default 15: the bot will then look if the last message posted is old enough before deleting the room.
+
+```{admonition} 🤝 Help us to improve this documentation!
+:class: tip
+
+If you want to help us to improve this documentation, you can edit it on the [GitHub repo](https://github.com/Gunivers/Gipsy/) or come and discuss with us on our [Discord server](https://discord.gg/E8qq6tN)!
+```

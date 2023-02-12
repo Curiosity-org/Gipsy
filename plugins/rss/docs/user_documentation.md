@@ -5,11 +5,11 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 -->
 
-# RSS
+# 📰 RSS
 
 Gipsy offers you the possibility to follow different content sources, from social networks like Youtube or Twitter to simple blogs equipped with an RSS feed system.
 
-## **Add or remove a feed**
+## Add or remove a feed
 
 ```
 rss add <link>
@@ -25,13 +25,13 @@ rss remove <id>
 
 Where `<id>` is the number of the feed you will find in the feed list.
 
-## **See feed list**
+## See feed list
 
 ```
 rss list
 ```
 
-## **Move a feed to another room**.
+## Move a feed to another room.
 
 ```
 rss move <id> <channel>
@@ -39,7 +39,7 @@ rss move <id> <channel>
 
 Where `<id>` is the number of the feed you will find in the feed list, and `<channel>` is the lounge you want to move it to.
 
-## **Mention a role when content appears**
+## Mention a role when content appears
 
 ```
 rss roles
@@ -53,7 +53,7 @@ rss mentions <id> <role1> [role2] [role3] ...
 
 Will directly modify the feed to mention the filled-in roles
 
-## **Change the text of an rss feed**
+## Change the text of an rss feed
 
 ```
 rss text <id> <text>
@@ -77,7 +77,7 @@ rss text
 
 Which will run a guided script, similar to the rss roles command.
 
-## **Test if the feed is working properly**
+## Test if the feed is working properly
 
 ```
 rss test <link>
@@ -85,7 +85,7 @@ rss test <link>
 
 Where link is the link to the rss feed or the social network account.
 
-## **Use embeds to display content**
+## Use embeds to display content
 
 ```
 rss embed <id> <true/false>
@@ -98,3 +98,10 @@ rss embed 6678466620137 true title="hey u" footer = "Hi \nI'm a footer"
 ```
 
 Changes the content of the embed for the specified feed. You can also use variables, like the `rss text` command.
+
+
+```{admonition} 🤝 Help us to improve this documentation!
+:class: tip
+
+If you want to help us to improve this documentation, you can edit it on the [GitHub repo](https://github.com/Gunivers/Gipsy/) or come and discuss with us on our [Discord server](https://discord.gg/E8qq6tN)!
+```
