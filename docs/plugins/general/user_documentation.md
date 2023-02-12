@@ -1,3 +1,0 @@
-# Global commands
-
-Nothing here...

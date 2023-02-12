@@ -5,47 +5,50 @@
 import os
 import shutil
 
-# Saving index.rst file content
-with open("index.rst", "r") as f:
-    before = []
-    after = []
-    started = False
-    ended = False
-    for line in f:
-        if not started:
-            before.append(line)
-        if line.startswith(".. Start plugins documentation"):
-            started = True
-        if line.startswith(".. End plugins documentation"):
-            ended = True
-        if ended:
-            after.append(line)
+def generate_plugin_doc():
+    # Saving index.rst file content
+    with open("index.rst", "r") as f:
+        before = []
+        after = []
+        started = False
+        ended = False
+        for line in f:
+            if not started:
+                before.append(line)
+            if line.startswith(".. Start plugins documentation"):
+                started = True
+            if line.startswith(".. End plugins documentation"):
+                ended = True
+            if ended:
+                after.append(line)
 
-if os.path.isdir(f"plugins"):
-    shutil.rmtree(f"plugins")
+    if os.path.isdir(f"plugins"):
+        shutil.rmtree(f"plugins")
 
-with open("index.rst", "w+") as toctree:
-    for line in before:
-        toctree.write(line)
+    with open("index.rst", "w+") as toctree:
+        for line in before:
+            toctree.write(line)
 
-    # Generating plugin toctree and moving pugin's doc files in the global docs folder
-    toctree.write("\n.. toctree::\n   :maxdepth: 1\n   :caption: Installed plugins\n\n")
-    path = os.path.join("", os.pardir)
-    for plugin in os.listdir(f"{path}/plugins"):
-        if os.path.isdir(f"{path}/plugins/" + plugin + "/docs"):
-            for file in os.listdir(f"{path}/plugins/" + plugin + "/docs"):
-                if file[-3:] == ".md" or file[-4:] == ".rst":
-                    if not os.path.isdir(f"/plugins/{plugin}/"):
-                        os.makedirs(f"plugins/{plugin}/")
-                    shutil.copyfile(
-                        f"{path}/plugins/{plugin}/docs/{file}",
-                        f"plugins/{plugin}/{file}",
-                    )
-                    toctree.write(f"   plugins/{plugin}/{file}\n")
+        # Generating plugin toctree and moving pugin's doc files in the global docs folder
+        toctree.write("\n.. toctree::\n   :maxdepth: 1\n   :caption: User guide\n\n")
+        path = os.path.join("", os.pardir)
+        for plugin in os.listdir(f"{path}/plugins"):
+            if os.path.isdir(f"{path}/plugins/" + plugin + "/docs"):
+                for file in os.listdir(f"{path}/plugins/" + plugin + "/docs"):
+                    if file[-3:] == ".md" or file[-4:] == ".rst":
+                        if not os.path.isdir(f"/plugins/{plugin}/"):
+                            os.makedirs(f"plugins/{plugin}/")
+                        shutil.copyfile(
+                            f"{path}/plugins/{plugin}/docs/{file}",
+                            f"plugins/{plugin}/{file}",
+                        )
+                        toctree.write(f"   plugins/{plugin}/{file}\n")
 
-    toctree.write("\n")
-    for line in after:
-        toctree.write(line)
+        toctree.write("\n")
+        for line in after:
+            toctree.write(line)
+
+generate_plugin_doc()
 
 
 # Configuration file for the Sphinx documentation builder.
@@ -68,18 +71,21 @@ with open("index.rst", "w+") as toctree:
 # -- Project information -----------------------------------------------------
 
 project = "Gipsy"
-copyright = "2021, Gunivers"
-author = "Gunivers"
+copyright = "2023, Gunivers"
+author = "Z_runner, Leirof, Aeris One, ascpial, theogiraudet, fantomitechno, Just_a_Player and Aragorn"
 
 # The full version, including alpha/beta/rc tags
-release = "2.0"
+# release = ""
 
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["myst_parser"]
+extensions = [
+    "myst_parser",
+    "sphinx_design",
+]
 
 
 # Add any paths that contain templates here, relative to this directory.
@@ -98,9 +104,38 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "sphinx_rtd_theme"
+html_theme = "sphinx_book_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+
+html_theme_options = {
+    "home_page_in_toc": False,
+    "github_url": "https://github.com/Gunivers/Gipsy",
+    "repository_url": "https://github.com/Gunivers/Gipsy",
+    "repository_branch": "master",
+    "path_to_docs": "docs",
+    "use_repository_button": True,
+    "use_edit_page_button": True,
+  "announcement": "⚠️ You are reading a doc of an undergoing development version. Information can be out of date and/or change at any time. ⚠️",
+}
+
+html_logo = "img/logo.png"
+
+myst_enable_extensions = [
+    "amsmath",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    #"linkify",
+    "replacements",
+    "smartquotes",
+    "strikethrough",
+    "substitution",
+    "tasklist",
+]
