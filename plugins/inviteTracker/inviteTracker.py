@@ -5,9 +5,9 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 import discord
-from discord.ext import tasks, commands
+from discord.ext import commands
 from utils import Gunibot, MyContext
 from bot import checks
 
@@ -144,15 +144,15 @@ class DatabaseInvite:
         query = "UPDATE invites SET description=? WHERE id=?;"
         self.parent.db_query(query, (description, self.id))
 
-    def __eq__(self, object: Union[int, str, "Invite", discord.Invite]) -> bool:
-        if isinstance(object, int):
-            return self.id == object
-        elif isinstance(object, str):
-            return self.code == object
-        elif isinstance(object, Invite):
-            return self.id == object.id
-        elif isinstance(object, discord.Invite):
-            return self.id == object.id
+    def __eq__(self, item: Union[int, str, "Invite", discord.Invite]) -> bool:
+        if isinstance(item, int):
+            return self.id == item
+        elif isinstance(item, str):
+            return self.code == item
+        elif isinstance(item, Invite):
+            return self.id == item.id
+        elif isinstance(item, discord.Invite):
+            return self.id == item.id
 
 
 class Invite(commands.Cog):
@@ -319,7 +319,7 @@ class Invite(commands.Cog):
         else:
             return None
 
-    def get_invite_by_id(self, id: int) -> Optional[DatabaseInvite]:
+    def get_invite_by_id(self, invite_id: int) -> Optional[DatabaseInvite]:
         """Return a dict representing the discord invitation stored in database
 
         Attributes
@@ -333,7 +333,7 @@ class Invite(commands.Cog):
             The representation of the database object
         """
         query = "SELECT * FROM invites WHERE id = ?"
-        data = self.bot.db_query(query, (id,), fetchone=True, astuple=True)
+        data = self.bot.db_query(query, (invite_id,), fetchone=True, astuple=True)
         if data is not tuple():
             return DatabaseInvite(data, self.bot)
         else:
@@ -356,7 +356,7 @@ class Invite(commands.Cog):
         """
         if isinstance(guild, discord.Guild):
             guild = guild.id
-        query = f"SELECT * FROM invites WHERE guild = ?;"
+        query = "SELECT * FROM invites WHERE guild = ?;"
         datas = self.bot.db_query(query, (guild,), astuple=True)
         return [DatabaseInvite(data, self.bot) for data in datas]
     
@@ -392,11 +392,14 @@ class Invite(commands.Cog):
                 uses=invite.uses,
             )
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
+    """
+    Fonction d'initialisation du plugin
+
+    :param bot: Le bot
+    :type bot: Gunibot
+    :param plugin_config: La configuration du plugin
+    :type plugin_config: dict
+    """
     if bot is not None:
         await bot.add_cog(Invite(bot), icon="👋")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)
-
