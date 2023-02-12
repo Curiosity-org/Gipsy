@@ -1,11 +1,11 @@
+from typing import Union
 import random
 from datetime import datetime
 
 import discord
 from discord.ext import commands
-from utils import Gunibot, MyContext
 
-from typing import Union
+from core import Gunibot, MyContext
 
 class Misc(commands.Cog):
 
@@ -147,7 +147,7 @@ class Misc(commands.Cog):
         # Test if the parameter is an integer
         try:
             dice = int(dice)
-        except:
+        except ValueError:
             embed = discord.Embed(
                 description=await self.bot._(ctx.guild.id, "misc.dice.error.not_int"),
                 colour=0xe74c3c,

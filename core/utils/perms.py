@@ -2,7 +2,8 @@ import typing
 
 import discord
 from discord.ext import commands
-from utils import Gunibot, MyContext
+
+from core import Gunibot, MyContext
 
 
 class Perms(commands.Cog):

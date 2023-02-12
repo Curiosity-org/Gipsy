@@ -1,15 +1,10 @@
-from utils import CheckException, Gunibot, MyContext
-from discord.ext import commands
-import discord
-from bot import checks
 import re
 import traceback
-from core import config
 
-import sys
+from discord.ext import commands
+import discord
 
-sys.path.append("./bot")
-
+from core import CheckException, Gunibot, MyContext, checks, config
 
 class Errors(commands.Cog):
     """General cog for error management."""

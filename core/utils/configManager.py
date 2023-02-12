@@ -1,11 +1,11 @@
 import os
 from json import dump, load
-from utils import Gunibot
 
 from discord.ext import commands
-from utils import CONFIG_OPTIONS
 
-CONFIG_FOLDER = "configs"
+from core import Gunibot, CONFIG_OPTIONS
+
+CONFIG_FOLDER = "data/configs"
 
 CONFIG_TEMPLATE = {k: v["default"] for k, v in CONFIG_OPTIONS.items() if "default" in v}
 
@@ -41,6 +41,11 @@ class ConfigCog(commands.Cog):
         self.bot = bot
         self.file = "configManager"
         self.confManager = self.configManager()
+
+        # create the configs folder if it does no exists
+
+        if not os.path.exists(CONFIG_FOLDER):
+            os.makedirs(CONFIG_FOLDER)
 
     class configManager(dict):
         def __init__(self):

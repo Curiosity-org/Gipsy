@@ -2,10 +2,15 @@
 # coding=utf-8
 import os
 import subprocess
-from LRFutils.color import Color
-from LRFutils import log
-from core import config
 import sys
+
+from LRFutils.color import Color
+
+from core import config
+
+__all__ = [
+    "install_dependencies",
+]
 
 accept = ["y", "yes", "yep", "yeah"]
 decline = ["n", "no", "nope", "nah"]

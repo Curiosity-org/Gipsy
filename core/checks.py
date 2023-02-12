@@ -1,10 +1,18 @@
 import discord
-from utils import MyContext, CheckException
-from core import config
 
+from .bot import MyContext, CheckException
+from .config import get
+
+__all__ = [
+    "is_bot_admin",
+    "is_admin",
+    "is_server_manager",
+    "is_roles_manager",
+    "can_group",
+]
 
 def is_bot_admin(ctx: MyContext):
-    return ctx.author.id in config.get("bot.admins")
+    return ctx.author.id in get("bot.admins")
 
 
 async def is_admin(ctx: MyContext):
