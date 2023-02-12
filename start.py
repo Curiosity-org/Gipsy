@@ -70,7 +70,11 @@ def main():
     """
 
     # Creating client
-    client = Gunibot(case_insensitive=True, status=discord.Status("online"), beta=False)
+    client = Gunibot(
+        case_insensitive=True,
+        status=discord.Status.do_not_disturb,
+        beta=False
+    )
 
     # Writing logs + welcome message
     if not os.path.isdir("logs"):
@@ -117,6 +121,9 @@ def main():
         logs.info(f"{loaded} plugins loaded, {failed} plugins failed")
         print(
             "--------------------------------------------------------------------------------"
+        )
+        await client.change_presence(
+            status=discord.Status.online,
         )
         await asyncio.sleep(2)
 
