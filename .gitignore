@@ -17,4 +17,5 @@ docs/_templates
 docs/_build
 docs/build
 require.json
+.pylintrc
 docs/plugins
