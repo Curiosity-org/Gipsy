@@ -8,7 +8,6 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-import setup  # do not remove this import, it also check the dependencies
 
 import os
 import asyncio
@@ -17,6 +16,8 @@ import argparse
 import discord
 from LRFutils import color
 from LRFutils import logs
+
+import setup  # do not remove this import, it also check the dependencies
 
 if not os.path.isdir("plugins"):
     os.mkdir("plugins")

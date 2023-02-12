@@ -11,12 +11,22 @@ from typing import Optional
 
 import discord
 from discord.ext import commands, tasks
+
+# pylint: disable=import-error
 from utils import Gunibot, MyContext
 
-from .QuiPyQuizz import QuiPyQuizz
+from quipyquizz import QuiPyQuizz
 
 
 def clean_question(question: str):
+    """
+    Retire les balises <p> et </p> de la question
+
+    :param question: La question à nettoyer
+    :type question: str
+    :return: La question nettoyée
+    :rtype: str
+    """
     junk_to_remove = ["<p>", "</p>"]
     for junk in junk_to_remove:
         question = question.replace(junk, "")
@@ -24,12 +34,46 @@ def clean_question(question: str):
 
 
 def clean_answer(answer: str):
+    """
+    Retire les balises <p> et </p> de la réponse et les remplace par des
+    sauts de ligne pris en charge par Discord
+
+    :param answer: La réponse à nettoyer
+    :type answer: str
+    :return: La réponse nettoyée
+    :rtype: str
+    """
     answer = answer.replace("<p>", "\n")
     answer = answer.replace("</p>", "")
     return answer
 
 
+# pylint: disable=too-few-public-methods
 class REACTIONS:
+    """
+    Classe contenant les réactions utilisées par le quizz
+
+    :cvar ANSWER_TRUE: Réaction pour répondre vrai
+    :vartype ANSWER_TRUE: str
+    :cvar ANSWER_FALSE: Réaction pour répondre faux
+    :vartype ANSWER_FALSE: str
+    :cvar ANSWER_SEPARATOR: Réaction pour séparer les réponses
+    :vartype ANSWER_SEPARATOR: str
+    :cvar ANSWER_LEAVE: Réaction pour quitter le quizz
+    :vartype ANSWER_LEAVE: str
+    :cvar START_QUIZ: Réaction pour démarrer le quizz
+    :vartype START_QUIZ: str
+    :cvar STOP_QUIZ: Réaction pour arrêter le quizz
+    :vartype STOP_QUIZ: str
+    :cvar JOIN_QUIZ: Réaction pour rejoindre le quizz
+    :vartype JOIN_QUIZ: str
+    :cvar FORWARD_QUESTION: Réaction pour passer une question
+    :vartype FORWARD_QUESTION: str
+    :cvar PREVIOUS_QUESTION: Réaction pour revenir à la question précédente
+    :vartype PREVIOUS_QUESTION: str
+    :cvar NEXT_QUESTION: Réaction pour passer à la question suivante
+    :vartype NEXT_QUESTION: str
+    """
     ANSWER_TRUE = "✅"
     ANSWER_FALSE = "❎"
     ANSWER_SEPARATOR = "⬛"
@@ -56,13 +100,22 @@ class REACTIONS:
 
 
 def sort_dict(leaders: dict) -> list[tuple]:
-    """Sort a dict by each value, returning a list of (key, value) couples
-    Note that it will sort in lexicographical order
-    For mathematical way, change it to float"""
+    """
+    Trie un dictionnaire par valeur, renvoie une liste de couples (clé, valeur)
+    Notez que cela triera dans l'ordre lexicographique
+
+    :param leaders: Le dictionnaire à trier
+    :type leaders: dict
+    :return: La liste triée
+    :rtype: list[tuple]
+    """
     return sorted(leaders.items(), key=lambda kv: (kv[1], kv[0]))
 
 
 class Quizz(commands.Cog):
+    """
+    Plugin "Quizz" pour le bot Gipsy
+    """
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "quizz"
@@ -73,37 +126,86 @@ class Quizz(commands.Cog):
         self.quick_quizz_channels = []
         self.quick_quizz_messages = []  # Same
         self.check_if_active.start()  # Démarrage du check des quizz inactifs
-        self.QPQ = QuiPyQuizz()
+        self.quipyquizz = QuiPyQuizz()
 
     def update_timestamp(self, party_id):
+        """
+        Met à jour le timestamp de la partie
+
+        :param party_id: L'ID de la partie
+        :type party_id: str
+
+        :return: None
+        """
         self.parties[party_id]["timestamp"] = time.time()
 
-    # Vu que c'est gros et qu'il faut le foutre partout j'en ai fait une
-    # fonction
+
     def ez_set_author(self, embed: discord.Embed, party_id):
-        # Récupère l'id du quizz
+        """
+        Ajoute les informations dans le champ "author" de l'embed
+
+        :param embed: L'embed à modifier
+        :type embed: discord.Embed
+        :param party_id: L'ID de la partie
+        :type party_id: str
+
+        :return: L'embed modifié
+        :rtype: discord.Embed
+        """
         quizz_id = self.parties[party_id]["quizz"]["id"]
         embed.set_author(
-            name=self.QPQ.get_name(quizz_id),
-            url=self.QPQ.get_url(quizz_id),
-            icon_url="https://scontent.fcdg1-1.fna.fbcdn.net/v/t1.6435-1/p148x148/48416529_2354370714793494_5893141918379933696_n.png?_nc_cat=110&ccb=1-3&_nc_sid=1eb0c7&_nc_ohc=AI2a2_Vn0c4AX9pPIK8&_nc_ht=scontent.fcdg1-1.fna&tp=30&oh=f8c88dae60c23d52fe81b8264031bf9f&oe=60D6AFB7",
+            name=self.quipyquizz.get_name(quizz_id),
+            url=self.quipyquizz.get_url(quizz_id),
+            icon_url="https://scontent.fcdg1-1.fna.fbcdn.net/v/t1.6435-1/p148x148"
+                     "/48416529_2354370714793494_5893141918379933696_n.png?_nc_cat=110&ccb=1-3&_nc_sid=1eb0c7&_nc_ohc"
+                     "=AI2a2_Vn0c4AX9pPIK8&_nc_ht=scontent.fcdg1-1.fna&tp=30&oh=f8c88dae60c23d52fe81b8264031bf9f&oe"
+                     "=60D6AFB7",
         )
         return embed
 
     def ez_players_list(self, party_id, waiting=False):
+        """
+        Génère la liste des joueurs
+
+        :param party_id: L'ID de la partie
+        :type party_id: str
+        :param waiting: Si le joueur est en attente de réponse
+        :type waiting: bool
+
+        :return: La liste des joueurs
+        :rtype: list[str]
+        """
         final_list = []
         for player in self.parties[party_id]["players"]:
+            if waiting:
+                hourglass = " <a:hourgalss:873200874636337172>"
+            else:
+                hourglass = ""
+
             final_list.append(
-                f"- <@!{player}>: {self.parties[party_id]['players'][player]['score']}/10{' <a:hourgalss:873200874636337172>' if waiting else ''}"
+                f"- <@!{player}>: {self.parties[party_id]['players'][player]['score']}/10{hourglass}"
             )
         return final_list
 
     # Used to generate question embed lmao
     def ez_question_embed(self, party_id, leaderboard=False, waiting=False):
+        """
+        Génère l'embed de la question
+
+        :param party_id: L'ID de la partie
+        :type party_id: str
+        :param leaderboard: Si le leaderboard doit être affiché
+        :type leaderboard: bool
+        :param waiting: Si le joueur est en attente de réponse
+        :type waiting: bool
+
+        :return: L'embed de la question
+        :rtype: discord.Embed
+        """
         curent_question_id = self.parties[party_id]["ids"][
             self.parties[party_id]["quizz"]["current"]
-        ]  # Choppe l'id de la question en cours
-        raw_question = self.QPQ.get_question(
+        ]  # Récupère l'id de la question en cours
+        raw_question = self.quipyquizz.get_question(
             self.parties[party_id]["quizz"]["id"], curent_question_id
         )  # Récupère le paquet de la question
 
@@ -114,7 +216,7 @@ class Quizz(commands.Cog):
         )
 
         try:
-            # Rajoute une thumbnail si il y en a une
+            # Rajoute une thumbnail s'il y en a une
             embed.set_thumbnail(url=f"https://quipoquiz.com{raw_question['image']}")
         except KeyError:
             pass
@@ -130,13 +232,22 @@ class Quizz(commands.Cog):
         return embed
 
     def ez_answer_embed(self, party_id):
+        """
+        Génère l'embed de la réponse
+
+        :param party_id: L'ID de la partie
+        :type party_id: str
+
+        :return: L'embed de la réponse
+        :rtype: discord.Embed
+        """
         curent_question_id = self.parties[party_id]["ids"][
             self.parties[party_id]["quizz"]["current"]
         ]  # Choppe l'id de la question en cours
-        raw_answer = self.QPQ.get_answer(
+        raw_answer = self.quipyquizz.get_answer(
             self.parties[party_id]["quizz"]["id"], curent_question_id
         )  # Choppe le paquet de la réponse
-        raw_question = self.QPQ.get_question(
+        raw_question = self.quipyquizz.get_question(
             self.parties[party_id]["quizz"]["id"], curent_question_id
         )  # Choppe le paquet de la question
 
@@ -173,6 +284,15 @@ class Quizz(commands.Cog):
         return embed
 
     def ez_summary_embed(self, party_id):
+        """
+        Génère l'embed de fin de partie
+
+        :param party_id: L'ID de la partie
+        :type party_id: str
+
+        :return: L'embed de fin de partie
+        :rtype: discord.Embed
+        """
         embed = discord.Embed(title="Quizz terminé !", color=discord.Colour.gold())
         embed = self.ez_set_author(embed, party_id)
         embed.set_footer(text=party_id)
@@ -193,7 +313,15 @@ class Quizz(commands.Cog):
         return embed
 
     def has_everyone_answered(self, party_id):
-        """Test si tout le monde a répondu"""
+        """
+        Vérifie si tout le monde a répondu
+
+        :param party_id: L'ID de la partie
+        :type party_id: str
+
+        :return: True si tout le monde a répondu, False sinon
+        :rtype: bool
+        """
         verif = True
         for player_id in self.parties[party_id]["players"]:
             if self.parties[party_id]["players"][player_id]["answer"] is None:
@@ -202,6 +330,16 @@ class Quizz(commands.Cog):
         return verif
 
     async def send_question(self, player_id, party_id):
+        """
+        Envoie la question a un joueur
+
+        :param player_id: L'ID du joueur
+        :type player_id: int
+        :param party_id: L'ID de la partie
+        :type party_id: str
+
+        :return: None
+        """
         # Fetch player
         player: discord.User = await self.bot.fetch_user(player_id)
         embed = self.ez_question_embed(party_id)  # Generate question embed
@@ -217,12 +355,27 @@ class Quizz(commands.Cog):
         self.quick_quizz_channels.append(msg.channel.id)
 
     async def send_party_question(self, party_id):
-        """Envoie les question a tout les joueurs"""
+        """
+        Envoie la question a tout les joueurs d'une partie
+
+        :param party_id: L'ID de la partie
+        :type party_id: str
+
+        :return: None
+        """
         for player_id in self.parties[party_id]["players"]:
             await self.send_question(player_id, party_id)
         self.update_timestamp(party_id)
 
     async def send_answer(self, party_id):
+        """
+        Envoie la réponse a tout les joueurs d'une partie
+
+        :param party_id: L'ID de la partie
+        :type party_id: str
+
+        :return: None
+        """
         for player_id in self.parties[party_id]["players"]:
             # Fetch player
             player: discord.User = await self.bot.fetch_user(player_id)
@@ -231,7 +384,7 @@ class Quizz(commands.Cog):
             )
             embed = self.ez_question_embed(party_id)  # Generate question embed
 
-            raw_answer = self.QPQ.get_answer(
+            raw_answer = self.quipyquizz.get_answer(
                 self.parties[party_id]["quizz"]["id"],
                 self.parties[party_id]["ids"][
                     self.parties[party_id]["quizz"]["current"]
@@ -252,6 +405,18 @@ class Quizz(commands.Cog):
         self.update_timestamp(party_id)
 
     async def update_main_embed(self, embed: discord.Embed, party_id, player_id):
+        """
+        Met a jour l'embed principal de la partie
+
+        :param embed: L'embed a mettre a jour
+        :type embed: discord.Embed
+        :param party_id: L'ID de la partie
+        :type party_id: str
+        :param player_id: L'ID du joueur
+        :type player_id: int
+
+        :return: None
+        """
         old_field = embed.fields[0]
         raw_players = old_field.value.split("\n")
         new_field_value = []
@@ -274,6 +439,18 @@ class Quizz(commands.Cog):
         return await msg.edit(embed=embed)
 
     async def player_leave_update(self, message: discord.Message, party_id, user):
+        """
+        Met a jour l'embed principal de la partie quand un joueur quitte
+
+        :param message: Le message a mettre a jour
+        :type message: discord.Message
+        :param party_id: L'ID de la partie
+        :type party_id: str
+        :param user: Le joueur qui quitte
+        :type user: discord.User
+
+        :return: None
+        """
         embed = message.embeds[0]  # Récupère l'embed
         raw_players = embed.fields[0].value.split("\n")  # Split tout les joueurs
 
@@ -288,7 +465,7 @@ class Quizz(commands.Cog):
         embed.clear_fields()  # Cleanup
 
         embed.add_field(
-            name="{} joueur{}".format(temp, "s" if temp > 1 else ""), value=players
+            name=f"{temp} joueur{'s' if temp > 1 else ''}", value=players
         )  # Refait la liste des joueurs
         self.parties[party_id]["players"].pop(user.id)  # remove le joueur de la party
         embed.set_footer(text=party_id)
@@ -297,6 +474,16 @@ class Quizz(commands.Cog):
         return await message.edit(embed=embed)  # Nouvel embed
 
     async def update_player_choice(self, party_id, player_id):
+        """
+        Met a jour l'embed principal de la partie quand un joueur a répondu
+
+        :param party_id: L'ID de la partie
+        :type party_id: str
+        :param player_id: L'ID du joueur
+        :type player_id: int
+
+        :return: None
+        """
         channel: discord.TextChannel = await self.bot.fetch_channel(
             self.parties[party_id]["channel_id"]
         )
@@ -309,11 +496,9 @@ class Quizz(commands.Cog):
         new_value = ""
         for line in field_value:
             if str(player_id) in line:
-                new_value += "\n{}".format(
-                    line.replace("<a:hourgalss:873200874636337172>", "✅")
-                )
+                new_value += f"\n{line.replace('<a:hourgalss:873200874636337172>', '✅')}"
             else:
-                new_value += "\n{}".format(line)
+                new_value += f"\n{line}"
         embed.clear_fields()
         embed.add_field(name=field_name, value=new_value)
         await msg.edit(embed=embed)
@@ -321,6 +506,11 @@ class Quizz(commands.Cog):
 
     @tasks.loop(minutes=5)
     async def check_if_active(self):
+        """
+        Vérifie que les parties sont toujours actives
+
+        :return: None
+        """
         timestamp = round(time.time())
         partys_to_pop = []
         for party_id in self.parties:
@@ -330,8 +520,10 @@ class Quizz(commands.Cog):
                         self.parties[party_id]["channel_id"]
                     )
                     if channel is not None:
+                        quiz_name = self.quipyquizz.get_name(self.parties[party_id]['quizz']['id'])
                         await channel.send(
-                            f"<@{self.parties[party_id]['author_id']}> ton quizz sur {self.QPQ.get_name(self.parties[party_id]['quizz']['id'])} s'est arrêté car inactif !"
+                            f"<@{self.parties[party_id]['author_id']}> ton quizz sur {quiz_name} s'est arrêté car "
+                            f"inactif !"
                         )
                     partys_to_pop.append(party_id)
                 else:
@@ -340,23 +532,32 @@ class Quizz(commands.Cog):
         for party_id in partys_to_pop:
             self.parties.pop(party_id)
 
+    # pylint: disable=too-many-locals, too-many-return-statements, too-many-branches, too-many-statements
     @commands.Cog.listener()
-    async def on_raw_reaction_add(self, pauload: discord.RawReactionActionEvent):
-        if pauload.emoji.name not in REACTIONS.all_reactions:
-            return  # Si c'est pas les émojis du quizz alors on passe
-        elif pauload.user_id == self.bot.user.id:
-            return  # Si c'est le bot sa dégage
-        elif pauload.channel_id not in self.quick_quizz_channels:
-            return  # Permet d'éviter de faire une chiée de requêtes
-        elif pauload.message_id not in self.quick_quizz_messages:
-            return  # Same
+    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+        """
+        Gère les réactions sur les messages
 
-        channel: discord.DMChannel = await self.bot.fetch_channel(pauload.channel_id)
-        message: discord.Message = await channel.fetch_message(pauload.message_id)
+        :param payload: Le payload de la réaction
+        :type payload: discord.RawReactionActionEvent
+
+        :return: None
+        """
+        if payload.emoji.name not in REACTIONS.all_reactions:
+            return  # Si ce n'est pas les émojis du quizz alors on passe
+        if payload.user_id == self.bot.user.id:
+            return  # Si c'est le bot qui a réagi alors on passe
+        if payload.channel_id not in self.quick_quizz_channels:
+            return  # Si le channel n'est pas dans la liste des channels du quizz alors on passe
+        if payload.message_id not in self.quick_quizz_messages:
+            return  # Idem
+
+        channel: discord.DMChannel = await self.bot.fetch_channel(payload.channel_id)
+        message: discord.Message = await channel.fetch_message(payload.message_id)
         if len(message.embeds) == 0:
-            return  # Vu que tout passe par embeds, si y'en a pas on passe
+            return  # Vu que tout passe par embeds, s'il n'y en a pas on passe
 
-        if pauload.emoji.name == REACTIONS.PREVIOUS_QUESTION:
+        if payload.emoji.name == REACTIONS.PREVIOUS_QUESTION:
             if "/" in message.embeds[0].footer.text:
                 raw_footer = message.embeds[0].footer.text.split("/")
                 embed = message.embeds[0]
@@ -366,40 +567,40 @@ class Quizz(commands.Cog):
                 else:
                     param = int(raw_footer[0]) - 1
 
-                ids = [quizz_id for quizz_id in self.QPQ.data]
-                for n in range(15):
+                ids = list(self.quipyquizz.data)
+                for index in range(15):
                     embed.add_field(
-                        name=self.QPQ.data[ids[n + ((param - 1) * 15)]]["name"],
-                        value=f"ID du quizz: `{ids[n + ((param-1) * 15)]}`",
+                        name=self.quipyquizz.data[ids[index + ((param - 1) * 15)]]["name"],
+                        value=f"ID du quizz: `{ids[index + ((param-1) * 15)]}`",
                     )
-                embed.set_footer(text=f"{param}/{len(self.QPQ.data) // 15}")
+                embed.set_footer(text=f"{param}/{len(self.quipyquizz.data) // 15}")
                 await message.remove_reaction(
-                    REACTIONS.PREVIOUS_QUESTION, pauload.member
+                    REACTIONS.PREVIOUS_QUESTION, payload.member
                 )
                 return await message.edit(embed=embed)
 
-        elif pauload.emoji.name == REACTIONS.NEXT_QUESTION:
+        elif payload.emoji.name == REACTIONS.NEXT_QUESTION:
             if "/" in message.embeds[0].footer.text:
                 raw_footer = message.embeds[0].footer.text.split("/")
                 embed = message.embeds[0]
                 embed.clear_fields()
-                if raw_footer[0] == str(len(self.QPQ.data) // 15):
-                    param = len(self.QPQ.data) // 15
+                if raw_footer[0] == str(len(self.quipyquizz.data) // 15):
+                    param = len(self.quipyquizz.data) // 15
                 else:
                     param = int(raw_footer[0]) + 1
 
-                ids = [quizz_id for quizz_id in self.QPQ.data]
-                for n in range(15):
+                ids = list(self.quipyquizz.data)
+                for index in range(15):
                     embed.add_field(
-                        name=self.QPQ.data[ids[n + ((param - 1) * 15)]]["name"],
-                        value=f"ID du quizz: `{ids[n + ((param-1) * 15)]}`",
+                        name=self.quipyquizz.data[ids[index + ((param - 1) * 15)]]["name"],
+                        value=f"ID du quizz: `{ids[index + ((param-1) * 15)]}`",
                     )
-                embed.set_footer(text=f"{param}/{len(self.QPQ.data) // 15}")
-                await message.remove_reaction(REACTIONS.NEXT_QUESTION, pauload.member)
+                embed.set_footer(text=f"{param}/{len(self.quipyquizz.data) // 15}")
+                await message.remove_reaction(REACTIONS.NEXT_QUESTION, payload.member)
                 return await message.edit(embed=embed)
 
         try:
-            # On vérifie que y'est bien l'id de la party dans le footer
+            # On vérifie qu'il y ait bien l'id de la party dans le footer
             party_id = int(message.embeds[0].footer.text)
         except ValueError:
             return  # Sinon on passe
@@ -409,11 +610,11 @@ class Quizz(commands.Cog):
         if party_id not in self.parties:
             return
 
-        if pauload.guild_id is not None:  # Si la réaction est sur un serveur
-            # Si celui qui a réagis est le créateur du quizz
-            if pauload.user_id == self.parties[party_id]["author_id"]:
+        if payload.guild_id is not None:  # Si la réaction est sur un serveur
+            # Si celui qui a réagi est le créateur du quizz
+            if payload.user_id == self.parties[party_id]["author_id"]:
                 if (
-                    pauload.emoji.name == REACTIONS.START_QUIZ
+                    payload.emoji.name == REACTIONS.START_QUIZ
                 ):  # 🆗 => Commencer le quizz
 
                     # Génération de l'embed de question
@@ -422,16 +623,13 @@ class Quizz(commands.Cog):
                         message.embeds[0].fields[0].value.split("\n")
                     )  # On récupère les joueurs
 
-                    for n, player in enumerate(prev_players_markdown):
+                    for index, player in enumerate(prev_players_markdown):
                         # On rajoute le petit emote de sablier
-                        prev_players_markdown[n] = (
+                        prev_players_markdown[index] = (
                             player + " <a:hourgalss:873200874636337172>"
                         )
                     embed.add_field(
-                        name="{} joueur{}".format(
-                            len(prev_players_markdown),  # Nombre de joueurs
-                            "s" if len(prev_players_markdown) > 1 else "",
-                        ),
+                        name=f"{len(prev_players_markdown)} joueur{'s' if len(prev_players_markdown) > 1 else ''}",
                         value="\n".join(prev_players_markdown),
                     )  # Remise de la liste des joueurs
                     await message.edit(embed=embed)  # Edit de l'ancien embed
@@ -439,19 +637,19 @@ class Quizz(commands.Cog):
                     await message.clear_reaction(REACTIONS.START_QUIZ)
                     await message.add_reaction(REACTIONS.FORWARD_QUESTION)
                     self.parties[party_id]["started"] = True
-                    # On envoit les questions en mp
+                    # On envoie les questions en mp
                     return await self.send_party_question(party_id)
 
-                elif (
-                    pauload.emoji.name == REACTIONS.STOP_QUIZ
+                if (
+                        payload.emoji.name == REACTIONS.STOP_QUIZ
                 ):  # ❌ => annulation du quizz
                     embed = discord.Embed(title="Quizz annulé")
                     self.parties.pop(party_id)  # Supression dans le dict
                     await message.clear_reactions()  # Retire toute les réactions
                     return await message.edit(embed=embed)  # Feedback user
 
-                elif (
-                    pauload.emoji.name == REACTIONS.FORWARD_QUESTION
+                if (
+                        payload.emoji.name == REACTIONS.FORWARD_QUESTION
                 ):  # on skip cette question
                     if not self.has_everyone_answered(party_id):
                         return await channel.send(
@@ -468,52 +666,50 @@ class Quizz(commands.Cog):
                         for player in self.parties[party_id]["players"]:
                             self.parties[party_id]["players"][player]["answer"] = None
                         await message.remove_reaction(
-                            REACTIONS.FORWARD_QUESTION, pauload.member
+                            REACTIONS.FORWARD_QUESTION, payload.member
                         )
                     else:
                         await message.clear_reactions()
                         await message.edit(embed=self.ez_summary_embed(party_id))
                         return self.parties.pop(party_id)
             else:
-                if pauload.emoji.name == REACTIONS.JOIN_QUIZ:  # Un joueur join
+                if payload.emoji.name == REACTIONS.JOIN_QUIZ:  # Un joueur join
                     embed = message.embeds[0]
                     # Rajoute le joueur dans l'embed
                     players = (
-                        embed.fields[0].value + f"\n- <@!{pauload.user_id}> 0/10"
+                        embed.fields[0].value + f"\n- <@!{payload.user_id}> 0/10"
                         f'{" <a:hourgalss:873200874636337172>" if self.parties[party_id]["started"] else ""}'
                     )
                     embed.clear_fields()  # Cleanup
 
                     temp = players.split("\n")
                     embed.add_field(
-                        name="{} joueur{}".format(
-                            len(temp), "s" if len(temp) > 1 else ""
-                        ),
+                        name=f"{len(temp)} joueur{'s' if len(temp) > 1 else ''}",
                         value=players,
                     )
                     embed.set_footer(text=party_id)
                     embed = self.ez_set_author(embed, party_id)
-                    self.parties[party_id]["players"][int(pauload.user_id)] = {
+                    self.parties[party_id]["players"][int(payload.user_id)] = {
                         "score": 0,
                         "answer": None,
                         "msg_id": 0,
                     }
                     if self.parties[party_id]["started"]:
-                        await self.send_question(pauload.user_id, party_id)
+                        await self.send_question(payload.user_id, party_id)
 
                     return await message.edit(embed=embed)  # Nouvel embed
 
         else:  # Si c'est en mp
-            if pauload.emoji.name == REACTIONS.ANSWER_FALSE:
+            if payload.emoji.name == REACTIONS.ANSWER_FALSE:
                 # Choisi la réponse négative
-                self.parties[party_id]["players"][pauload.user_id]["answer"] = False
-                await self.update_player_choice(party_id, pauload.user_id)
-            elif pauload.emoji.name == REACTIONS.ANSWER_TRUE:
+                self.parties[party_id]["players"][payload.user_id]["answer"] = False
+                await self.update_player_choice(party_id, payload.user_id)
+            elif payload.emoji.name == REACTIONS.ANSWER_TRUE:
                 # Choisi la réponse positive
-                self.parties[party_id]["players"][pauload.user_id]["answer"] = True
-                await self.update_player_choice(party_id, pauload.user_id)
+                self.parties[party_id]["players"][payload.user_id]["answer"] = True
+                await self.update_player_choice(party_id, payload.user_id)
 
-            if pauload.emoji.name in [REACTIONS.ANSWER_TRUE, REACTIONS.ANSWER_FALSE]:
+            if payload.emoji.name in [REACTIONS.ANSWER_TRUE, REACTIONS.ANSWER_FALSE]:
                 if self.has_everyone_answered(party_id):
                     main_channel: discord.TextChannel = await self.bot.fetch_channel(
                         self.parties[party_id]["channel_id"]
@@ -527,7 +723,7 @@ class Quizz(commands.Cog):
                     return
 
             if (
-                pauload.emoji.name == REACTIONS.ANSWER_LEAVE
+                payload.emoji.name == REACTIONS.ANSWER_LEAVE
             ):  # Le joueur veut quitter le quizz
                 main_channel: discord.TextChannel = await self.bot.fetch_channel(
                     self.parties[party_id]["channel_id"]
@@ -536,25 +732,31 @@ class Quizz(commands.Cog):
                     self.parties[party_id]["msg_id"]
                 )
                 # Faut optimiser ct'e merde
-                user = await self.bot.fetch_user(pauload.user_id)
+                user = await self.bot.fetch_user(payload.user_id)
                 # Retire le joueur
                 await self.player_leave_update(main_message, party_id, user)
                 # Feedback user
                 return await channel.send("Vous avez quitté le quizz")
 
     @commands.Cog.listener()
-    async def on_raw_reaction_remove(self, pauload: discord.RawReactionActionEvent):
-        if pauload.emoji.name != REACTIONS.JOIN_QUIZ:
+    async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
+        """
+        Permet de gérer les réactions retirées
+
+        :param payload: Le payload de la réaction
+        :type payload: discord.RawReactionActionEvent
+        """
+        if payload.emoji.name != REACTIONS.JOIN_QUIZ:
             return  # Si c'est pas les émojis du quizz alors on passe
-        elif pauload.user_id == self.bot.user.id:
+        if payload.user_id == self.bot.user.id:
             return  # Si c'est le bot, alors on passe
-        elif pauload.channel_id not in self.quick_quizz_channels:
+        if payload.channel_id not in self.quick_quizz_channels:
             return  # Permet d'éviter de faire une chiée de requêtes
-        elif pauload.message_id not in self.quick_quizz_messages:
+        if payload.message_id not in self.quick_quizz_messages:
             return  # Same
 
-        channel: discord.DMChannel = await self.bot.fetch_channel(pauload.channel_id)
-        message: discord.Message = await channel.fetch_message(pauload.message_id)
+        channel: discord.DMChannel = await self.bot.fetch_channel(payload.channel_id)
+        message: discord.Message = await channel.fetch_message(payload.message_id)
         if len(message.embeds) == 0:
             return  # Vu que tout passe par embeds, si y'en a pas on passe
 
@@ -570,23 +772,31 @@ class Quizz(commands.Cog):
             return
 
         if (
-            pauload.guild_id is not None
-            and pauload.emoji.name == REACTIONS.JOIN_QUIZ
+            payload.guild_id is not None
+            and payload.emoji.name == REACTIONS.JOIN_QUIZ
             and not self.parties[party_id]["started"]
         ):  # Si un joueur se barre
             # Récupère l'user
-            user: discord.User = await self.bot.fetch_user(pauload.user_id)
+            user: discord.User = await self.bot.fetch_user(payload.user_id)
             # Generate new player list
             return await self.player_leave_update(message, party_id, user)
 
     @commands.group(name="quizz")
     async def quizz_core(self, ctx: MyContext):
+        """
+        Fonction principale du quizz, est appelée quand on fait la commande `quizz`
+
+        :param ctx: Le contexte de la commande
+        :type ctx: MyContext
+
+        :return: None
+        """
         await ctx.message.delete()
         if ctx.invoked_subcommand is None:
             embed = discord.Embed(title="Quizz help", color=discord.Colour.orange())
-            embed.add_field(name=f"`quizz`", value="Shows this message", inline=False)
+            embed.add_field(name="`quizz`", value="Shows this message", inline=False)
             embed.add_field(
-                name=f"`quizz start <quizz_id>`", value="Démarre un quizz", inline=False
+                name="`quizz start <quizz_id>`", value="Démarre un quizz", inline=False
             )
             embed.add_field(
                 name="`quizz themes`",
@@ -597,12 +807,22 @@ class Quizz(commands.Cog):
 
     @quizz_core.command(name="start")
     async def _quizz_start(self, ctx: MyContext, quizz_id: str):
+        """
+        Démarre un quizz
+
+        :param ctx: Le contexte de la commande
+        :type ctx: MyContext
+        :param quizz_id: L'ID du quizz
+        :type quizz_id: str
+
+        :return: None
+        """
         party_id = "0"
         while party_id in self.parties:
             party_id = str(round(random.random() * 10000))
 
         question_ids = []
-        raw_question = self.QPQ.get_questions(quizz_id)
+        raw_question = self.quipyquizz.get_questions(quizz_id)
         if raw_question is None:
             return await ctx.send("L'ID du quizz est invalide.")
         for question_id in raw_question:
@@ -622,7 +842,7 @@ class Quizz(commands.Cog):
 
         embed = discord.Embed(
             title=f"Partie de {ctx.author.display_name}",
-            description=f"Sur le thème de :\n\t- **{self.QPQ.get_name(quizz_id)}**",
+            description=f"Sur le thème de :\n\t- **{self.quipyquizz.get_name(quizz_id)}**",
         )
         embed.add_field(name="1 joueur", value=f"- {ctx.author.mention}: 0/10")
         embed.set_footer(text=party_id)
@@ -637,13 +857,21 @@ class Quizz(commands.Cog):
 
     @quizz_core.command(name="themes")
     async def _quizz_themes(self, ctx: MyContext):
+        """
+        Donne la liste des thèmes
+
+        :param ctx: Le contexte de la commande
+        :type ctx: MyContext
+
+        :return: None
+        """
         embed = discord.Embed(title="THEMES", color=discord.Colour.random())
-        ids = [quizz_id for quizz_id in self.QPQ.data]
-        for n in range(15):
+        ids = list(self.quipyquizz.data)
+        for index in range(15):
             embed.add_field(
-                name=self.QPQ.data[ids[n]]["name"], value=f"ID du quizz: `{ids[n]}`"
+                name=self.quipyquizz.data[ids[index]]["name"], value=f"ID du quizz: `{ids[index]}`"
             )
-        embed.set_footer(text=f"1/{len(self.QPQ.data)//15}")
+        embed.set_footer(text=f"1/{len(self.quipyquizz.data) // 15}")
         msg: discord.Message = await ctx.send(embed=embed)
         emojis = ["⬅️", "➡️"]
         for emoji in emojis:
@@ -654,9 +882,16 @@ class Quizz(commands.Cog):
 
 config = {}
 async def setup(bot:Gunibot=None, plugin_config:dict=None):
+    """
+    Fonction d'initialisation du plugin
+
+    :param bot: Le bot
+    :type bot: Gunibot
+    :param plugin_config: La configuration du plugin
+    :type plugin_config: dict
+    """
     if bot is not None:
         await bot.add_cog(Quizz(bot), icon="❓")
     if plugin_config is not None:
         global config
         config.update(plugin_config)
-
