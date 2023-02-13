@@ -5,7 +5,11 @@
 
 en:
   invite-tracker:
-    join-code: "%{member} joins %{guild} with the invite `%{code}` created by %{inviter}, which has been used `%{uses}` times now !"
-    join-description: "%{member} joins %{guild} with the invite \"%{description}\" (`%{code}`) created by %{inviter}, which has been used `%{uses}` times now !"
+    joined: "%{member} joined %{guild} using the invitation %{invitation}!"
+    joined-no-invite: "%{member} joined %{guild}, but I did not found the invitation he used..."
+    joined-many-invites: "%{member} joined %{guild}, he could have used one of the following invitations: %{invitations}."
     not-found: Invitation not found.
     set-description-done: "`%{code}`'s description changed."
+
+    description: "\"%{description}\" (`%{code}`) created by %{inviter} used %{uses} times now"
+    code-only: "`%{code}` created by %{inviter} used %{uses} times now"

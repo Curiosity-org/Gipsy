@@ -618,6 +618,6 @@ async def setup(bot:Gunibot=None, plugin_config:dict=None):
         global config
         config.update(plugin_config)
         
-def teardown(bot: Gunibot):
+async def teardown(bot: Gunibot):
     bot.help_command = commands.DefaultHelpCommand()
-    bot.remove_cog("HelpCog")
+    await bot.remove_cog("HelpCog")

@@ -7,3 +7,8 @@ fr:
   antikikoo:
     channel-edited: Le salon de vérification est maintenant %{channel} !
     msg-edited: Le message d'information a bien été modifié !
+    pass-edited: Les message de pass a bien été modifié !
+    info-channel-edited: Le salon d'informations est maintenant %{channel} !
+    role-edited: Le rôle de vérification est maintenant paramétré sur %{role} !
+    add-role-enabled: Le rôle %{role} va être donné aux utilisateurs vérifiés !
+    add-role-disabled: Aucun rôle ne va être donné aux utilisateurs vérifiés.

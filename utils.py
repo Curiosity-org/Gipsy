@@ -200,7 +200,7 @@ class Gunibot(commands.bot.AutoShardedBot):
         """Get a cog icon"""
         return self.cog_icons.get(cog_name.lower())
 
-    def remove_cog(self, cog: str):
+    async def remove_cog(self, cog: str):
         """Removes a cog from the bot.
 
         All registered commands and event listeners that the
@@ -213,7 +213,7 @@ class Gunibot(commands.bot.AutoShardedBot):
         name: :class:`str`
             The name of the cog to remove.
         """
-        super().remove_cog(cog)
+        await super().remove_cog(cog)
         for module in self.cogs.values():
             if not isinstance(cog, type(module)):
                 if hasattr(module, "on_anycog_unload"):
