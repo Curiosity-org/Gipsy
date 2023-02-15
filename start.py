@@ -127,6 +127,9 @@ def main():
         )
         await asyncio.sleep(2)
 
+        # only load plugins once
+        client.remove_listener(on_ready)
+
     client.add_listener(on_ready)
 
     # Check if the bot must run in beta
