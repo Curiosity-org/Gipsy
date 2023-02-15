@@ -69,7 +69,7 @@ class XP(commands.Cog):
         else:
             channels = [channel.id for channel in channels]
         x = await self.bot.sconfig.edit_config(ctx.guild.id, "noxp_channels", channels)
-        self.xp_channels_cache[ctx.guild.id] = channels
+        self.xp_channels_cache[ctx.guild.id] = channels if channels is not None else []
         await ctx.send(x)
 
     @commands.command(name="xp_reduction")
