@@ -330,7 +330,8 @@ class Help(commands.HelpCommand):
             result += "**"
             if len(result) > 1024:
                 result = result[:1023] + "…"
-        result += "\n```"
+        else:
+            result += "\n```"
 
         return result if len(result) > 0 else None
 
