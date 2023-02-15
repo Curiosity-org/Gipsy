@@ -69,6 +69,7 @@ class XP(commands.Cog):
         else:
             channels = [channel.id for channel in channels]
         x = await self.bot.sconfig.edit_config(ctx.guild.id, "noxp_channels", channels)
+        self.xp_channels_cache[ctx.guild.id] = channels
         await ctx.send(x)
 
     @commands.command(name="xp_reduction")
@@ -189,29 +190,35 @@ class XP(commands.Cog):
         except discord.errors.NotFound:
             return None
 
-    async def check_noxp(self, msg: discord.Message):
+    async def check_noxp(self, message: discord.Message):
         """Check if this channel/user can get xp"""
-        if msg.guild is None:
+        if message.guild is None:
             return False
-        if msg.guild.id in self.xp_channels_cache.keys():
-            if msg.channel.id in self.xp_channels_cache[msg.guild.id]:
+        
+        # get the channel ID (or parent channel id for thread)
+        channel_id = message.channel.parent.id if isinstance(message.channel, discord.Thread) else message.channel.id
+        # get the category
+        category_id = message.channel.category.id if message.channel.category is not None else 0 # dumb ID
+
+        if message.guild.id in self.xp_channels_cache:
+            if channel_id in self.xp_channels_cache[message.guild.id]:
                 return False
-            if msg.channel.category is not None:
-                if msg.channel.category.id in self.xp_channels_cache[msg.guild.id]:
-                    return False
-        else:
-            chans = self.bot.server_configs[msg.guild.id]["noxp_channels"]
-            if chans is not None:
+            if category_id in self.xp_channels_cache[message.guild.id]:
+                return False
+        else: # load cache
+            channels = self.bot.server_configs[message.guild.id]["noxp_channels"]
+            if channels is not None:
                 # convert to a list even if there's only one item
-                chans = [chans] if isinstance(chans, str) else chans
-                chans = [int(x) for x in chans]
-                if msg.channel.id in chans:
-                    return False
-                if msg.channel.category in chans:
+                channels = [channels] if isinstance(channels, str) else channels
+                channels = [int(x) for x in channels]
+                
+                self.xp_channels_cache[message.guild.id] = channels
+
+                if channel_id in channels or category_id in channels:
                     return False
             else:
-                chans = []
-            self.xp_channels_cache[msg.guild.id] = chans
+                self.xp_channels_cache[message.guild.id] = []
+        
         return True
 
     async def check_cmd(self, msg: discord.Message):
@@ -229,7 +236,7 @@ class XP(commands.Cog):
         d = dict()
         # count frequency of letters in the message
         for c in text:
-            if c in d.keys():
+            if c in d:
                 d[c] += 1
             else:
                 d[c] = 1
@@ -251,8 +258,9 @@ class XP(commands.Cog):
             and self.bot.server_configs[msg.guild.id]["enable_xp"]
         ):
             return
+        
         # if xp of that guild is not in cache yet
-        if msg.guild.id not in self.cache.keys() or len(self.cache[msg.guild.id]) == 0:
+        if msg.guild.id not in self.cache or len(self.cache[msg.guild.id]) == 0:
             await self.bdd_load_cache(msg.guild.id)
         # if xp of that member is in cache
         if msg.author.id in self.cache[msg.guild.id].keys():
