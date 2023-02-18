@@ -41,8 +41,8 @@
 .. End plugins documentation
 
 .. toctree::
-    :maxdepth: 2
-    :caption: Developers guide
+   :maxdepth: 1
+   :caption: Developer guide
 
-    create_plugin/01-Plugin_structure.md
-    create_plugin/02-Server_configuration_variables.md
+   create_plugin/01-Plugin_structure
+   create_plugin/02-Server_configuration_variables
