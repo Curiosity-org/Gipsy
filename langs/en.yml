@@ -147,41 +147,6 @@ en:
     footer1: "Author: %{author} • Message ID: %{message}"
     footer2: "Author: %{author}"
     footer3: "Member: %{member}"
-  perms:
-    list:
-      add_reactions: Add reactions
-      administrator: Administrator
-      attach_files: Attach files
-      ban_members: Ban members
-      change_nickname: Change nickname
-      connect: Connect
-      create_instant_invite: Create invite
-      deafen_members: Deafen members
-      embed_links: Embed links
-      external_emojis: Use external emoji
-      kick_members: Kick members
-      manage_channels: Manage channels
-      manage_emojis: Manage emojis
-      manage_guild: Mannage server
-      manage_messages: Manage messages
-      manage_nicknames: Manage nicknames
-      manage_roles: Manage roles
-      manage_webhooks: Manage webhooks
-      mention_everyone: Mention everyone, here and all roles
-      move_members: Move members
-      mute_members: Mute members
-      priority_speaker: Priority speaker
-      read_message_history: Read message history
-      read_messages: View channel
-      request_to_speak: Request to speak
-      send_messages: Send messages
-      send_tts_messages: Send Text-to-Speech messages
-      speak: Speak
-      stream: Video
-      use_slash_commands: Use slash commands
-      use_voice_activation: Use voice activity
-      view_audit_log: View audit log
-      view_guild_insights: View server insights
   sconfig:
     invalid-emoji: This emoji is invalid. If it is a custom emoji, make sure I'm on its server
     invalid-duration: Invalid duration
