@@ -6,20 +6,26 @@ en:
       attach_files: Attach files
       ban_members: Ban members
       change_nickname: Change nickname
-      connect: Connect
+      connect: Connect to a voice channel
       create_instant_invite: Create invite
+      create_private_threads: Create private threads
+      create_public_threads: Create public threads
       deafen_members: Deafen members
       embed_links: Embed links
       external_emojis: Use external emoji
+      external_stickers: Use external stickers
       kick_members: Kick members
       manage_channels: Manage channels
       manage_emojis: Manage emojis
+      manage_events: Manage events
       manage_guild: Mannage server
       manage_messages: Manage messages
       manage_nicknames: Manage nicknames
       manage_roles: Manage roles
+      manage_threads: Manage threads
       manage_webhooks: Manage webhooks
       mention_everyone: Mention everyone, here and all roles
+      moderate_members: Timeout members
       move_members: Move members
       mute_members: Mute members
       priority_speaker: Priority speaker
@@ -27,10 +33,12 @@ en:
       read_messages: View channel
       request_to_speak: Request to speak
       send_messages: Send messages
+      send_messages_in_threads: Send messages in threads
       send_tts_messages: Send Text-to-Speech messages
-      speak: Speak
-      stream: Video
-      use_slash_commands: Use slash commands
+      speak: Speak in voice channel
+      stream: Video in voice channel
+      use_application_commands: Use slash commands
+      use_embedded_activities: Use Activites in voice channel
       use_voice_activation: Use voice activity
       view_audit_log: View audit log
       view_guild_insights: View server insights

@@ -6,20 +6,26 @@ fr:
       attach_files: Joindre des fichiers
       ban_members: Bannir des membres
       change_nickname: Changer de pseudo
-      connect: Se connecter
+      connect: Se connecter à un salon vocal
       create_instant_invite: Créer une invitation
+      create_private_threads: Créer des fils privés
+      create_public_threads: Créer des fils publics
       deafen_members: Mettre en sourdine des membres
       embed_links: Intégrer des liens
       external_emojis: Utiliser des émojis externes
+      external_stickers: Utiliser des autocollants externes
       kick_members: Expulser des membres
       manage_channels: Gérer les salons
       manage_emojis: Gérer les émojis
+      manage_events: Gérer les évènements
       manage_guild: Gérer le serveur
       manage_messages: Gérer les messages
       manage_nicknames: Gérer les pseudos
       manage_roles: Gérer les rôles
+      manage_threads: Gérer les fils
       manage_webhooks: Gérer les webhooks
       mention_everyone: Mentionner everyone, here et tous les rôles
+      moderate_members: Exclure des membres
       move_members: Déplacer des membres
       mute_members: Couper le micro de membres
       priority_speaker: Voix prioritaire
@@ -27,10 +33,12 @@ fr:
       read_messages: Voir le salon
       request_to_speak: Demander la parole
       send_messages: Envoyer des messages
+      send_messages_in_threads: Envoyer des messages dans des fils
       send_tts_messages: Envoyer des messages TTS
-      speak: Parler
-      stream: Utiliser la vidéo
-      use_slash_commands: Utiliser les commandes slash
+      speak: Parler dans un salon vocal
+      stream: Utiliser la vidéo dans un salon vocal
+      use_application_commands: Utiliser les commandes slash
+      use_embedded_activities: Utiliser les activités dans les salons vocaux
       use_voice_activation: Utiliser la Détection de la voix
       view_audit_log: Voir les logs du serveur
       view_guild_insights: Voir les analyses de serveur
