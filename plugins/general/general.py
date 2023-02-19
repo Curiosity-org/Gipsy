@@ -5,19 +5,21 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-import asyncio
+from typing import Union
 import os
 import sys
-import time
-from platform import system as system_name  # Returns the system/OS name
-from subprocess import call as system_call  # Execute a shell command
 
 import discord
 import psutil
 from discord.ext import commands
 from git import Repo
+
 from utils import Gunibot, MyContext
 
+CHANNEL_TYPES = Union[
+    discord.Thread,
+    discord.abc.GuildChannel,
+]
 
 class General(commands.Cog):
     def __init__(self, bot: Gunibot):
@@ -46,7 +48,7 @@ class General(commands.Cog):
         self.codelines = count
 
     @commands.command(name="hs")
-    async def hs(self, ctx: MyContext, channel: discord.abc.GuildChannel = None):
+    async def hs(self, ctx: MyContext, channel: CHANNEL_TYPES = None):
         if channel:
             msg = await self.bot._(
                 ctx.channel,
