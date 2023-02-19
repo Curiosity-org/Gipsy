@@ -94,6 +94,42 @@ myst_enable_extensions = [
 import os
 import shutil
 
+CONTRIBUTE = """
+```{admonition} 🤝 Help us to improve this documentation!
+:class: tip
+
+If you want to help us to improve this documentation, you can edit it on the [GitHub repo](https://github.com/Gunivers/Gipsy/) or come and discuss with us on our [Discord server](https://discord.gg/E8qq6tN)!
+```
+"""
+
+GITHUB_DISCUSSION_FOOTER = """
+---
+
+
+## 💬 Did it help you?
+
+
+Feel free to leave your questions and feedbacks below!
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="{orga}/{repo}"
+        data-repo-id="R_kgDOHQph3g"
+        data-category="Documentation"
+        data-category-id="DIC_kwDOHQph3s4CUSnO"
+        data-mapping="title"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="light"
+        data-lang="fr"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async>
+</script>
+"""
+
 def generate_plugin_doc():
     # Saving index.rst file content
     with open("index.rst", "r") as f:
@@ -133,30 +169,16 @@ def generate_plugin_doc():
                         )
                         toctree.write(f"   plugins/{plugin}/{file}\n")
 
-                        if "repository_url" in html_theme_options and html_theme_options["repository_url"].startswith("https://github.com/"):
-                            orga = html_theme_options["repository_url"].split("/")[3]
-                            repo = html_theme_options["repository_url"].split("/")[4]
+                        with open(f"plugins/{plugin}/{file}", "a", encoding="utf-8") as f:
+                            f.write(CONTRIBUTE)
 
-                            with open(f"plugins/{plugin}/{file}", "a", encoding="utf-8") as f:
-                                f.write(f"\n---\n\n")
-                                f.write(f"# 💬 Did it help you?\n\n")
-                                f.write(f"Feel free to leave your questions and feedbacks below!\n\n")
-                                f.write(f"<script src=\"https://giscus.app/client.js\"\n")
-                                f.write(f"        data-repo=\"{orga}/{repo}\"\n")
-                                f.write(f"        data-repo-id=\"R_kgDOHQph3g\"\n")
-                                f.write(f"        data-category=\"Documentation\"\n")
-                                f.write(f"        data-category-id=\"DIC_kwDOHQph3s4CUSnO\"\n")
-                                f.write(f"        data-mapping=\"title\"\n")
-                                f.write(f"        data-strict=\"0\"\n")
-                                f.write(f"        data-reactions-enabled=\"1\"\n")
-                                f.write(f"        data-emit-metadata=\"0\"\n")
-                                f.write(f"        data-input-position=\"bottom\"\n")
-                                f.write(f"        data-theme=\"light\"\n")
-                                f.write(f"        data-lang=\"fr\"\n")
-                                f.write(f"        data-loading=\"lazy\"\n")
-                                f.write(f"        crossorigin=\"anonymous\"\n")
-                                f.write(f"        async>\n")
-                                f.write(f"</script>\n")
+                            if "repository_url" in html_theme_options and html_theme_options["repository_url"].startswith("https://github.com/"):
+                                orga = html_theme_options["repository_url"].split("/")[3]
+                                repo = html_theme_options["repository_url"].split("/")[4]
+                                
+                                f.write(
+                                    GITHUB_DISCUSSION_FOOTER.format(orga=orga, repo=repo)
+                                )
 
         toctree.write("\n")
         for line in after:

@@ -24,9 +24,3 @@ Enter the `hoster` command to get information about the bot's host.
 > It is often said that the best weapon is the one you don't have to use. I don't agree. In my opinion, the best weapon is the one you only have to use once." - Tony Stark
 
 Are you tired of people asking if there are people to answer a question without saying what the question is? Well, so are we! After extensive research we have developed a formidable weapon in the form of a simple command that makes these people realize that it is better to ask a question directly than to make unnecessary detours that waste everyone's time. This command is `/dataja`, to be handled with the utmost care.
-
-```{admonition} 🤝 Help us to improve this documentation!
-:class: tip
-
-If you want to help us to improve this documentation, you can edit it on the [GitHub repo](https://github.com/Gunivers/Gipsy/) or come and discuss with us on our [Discord server](https://discord.gg/E8qq6tN)!
-```

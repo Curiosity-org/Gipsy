@@ -22,8 +22,3 @@ The bot will send the message posted by the user back to his private room, if po
 
 The command to semi-automatically clean up contact rooms is `contact-clear`. You can specify a minimum number of days of inactivity, by default 15: the bot will then look if the last message posted is old enough before deleting the room.
 
-```{admonition} 🤝 Help us to improve this documentation!
-:class: tip
-
-If you want to help us to improve this documentation, you can edit it on the [GitHub repo](https://github.com/Gunivers/Gipsy/) or come and discuss with us on our [Discord server](https://discord.gg/E8qq6tN)!
-```

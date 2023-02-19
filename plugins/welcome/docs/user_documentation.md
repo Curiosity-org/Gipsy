@@ -27,9 +27,3 @@ Other options will come later, like customizing the welcome message.
 ## Automatic roles
 
 It is also possible to configure the bot to give a role to any newcomer, independently of the verification system detailed above. To do so, you just have to configure the `welcome_roles` option with the list of roles to give.
-
-```{admonition} 🤝 Help us to improve this documentation!
-:class: tip
-
-If you want to help us to improve this documentation, you can edit it on the [GitHub repo](https://github.com/Gunivers/Gipsy/) or come and discuss with us on our [Discord server](https://discord.gg/E8qq6tN)!
-```
