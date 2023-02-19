@@ -27,9 +27,3 @@ To remove one of them, you can simply do:
 `/rolelink remove <ID>`
 
 Where `<ID>` is the number present in front of the corresponding role links in the link list.
-
-```{admonition} 🤝 Help us to improve this documentation!
-:class: tip
-
-If you want to help us to improve this documentation, you can edit it on the [GitHub repo](https://github.com/Gunivers/Gipsy/) or come and discuss with us on our [Discord server](https://discord.gg/E8qq6tN)!
-```
