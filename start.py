@@ -12,11 +12,8 @@ import setup  # do not remove this import, it also check the dependencies
 
 import os
 import asyncio
-import time
 from utils import Gunibot
 import argparse
-import logging
-import yaml
 import discord
 from LRFutils import color
 from LRFutils import logs
@@ -51,13 +48,13 @@ def print_ascii_art():
     # pylint: disable=anomalous-backslash-in-string
     # pylint: disable=trailing-whitespace
     print(
-        f"""{color.Blue}
+        f"""{color.fg.blue}
       ___  ____  ____  ___  _  _        ___     ___  
      / __)(_  _)(  _ \/ __)( \/ )      (__ \   / _ \\ 
     ( (_-. _)(_  )___/\__ \ \  /        / _/  ( (_) )
      \___/(____)(__)  (___/ (__)       (____)()\___/ 
 
-        {color.NC}"""
+        {color.stop}"""
     )
 
 
@@ -104,7 +101,7 @@ def main():
     # Printing info when the bot is started
     async def on_ready():
         """Called when the bot is connected to Discord API"""
-        logs.info(f"{color.Green}✅ Bot connected")
+        logs.info(f"{color.fg.green}✅ Bot connected")
         logs.info("Nom : " + client.user.name)
         logs.info("ID : " + str(client.user.id))
         if len(client.guilds) < 200:
