@@ -12,14 +12,12 @@ from bot import checks
 from typing import List, Union
 import discord
 from discord.ext import commands
-from itertools import chain
 
 import sys
 
 sys.path.append("./bot")
 
-from LRFutils import logPrint
-
+from LRFutils import logs
 
 # Check if a message is similar to another one with 80% similarity
 
@@ -328,11 +326,11 @@ class Wormholes(commands.Cog):
                                 allowed_mentions=None,
                             )
                     except discord.NotFound: # the webhook has been deleted
-                        logPrint(
+                        logs.info(
                             f"The webhook for channel {row[1]} for wormhole {wh_name} has been deleted and a message has not been edited."
                         )
                     except discord.Forbidden: # the webhook has changed, should not be possible due to checks before
-                        logPrint(
+                        logs.info(
                             f"The webhook for channel {row[1]} for wormhole {wh_name} has changed and a message has not been edited."
                         )
 
