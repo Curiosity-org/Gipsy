@@ -1,4 +1,4 @@
-# Create a configuration variable
+# Create a server configuration variable
 
 ```{admonition} 🤝 Help us building this project!
 :class: note

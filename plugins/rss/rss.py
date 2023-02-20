@@ -35,7 +35,7 @@ async def setup(bot:Gunibot):
 class TwitterConfiguration(configuration.Configuration):
     namespace = "twitter"
 
-    consumer_key = configuration.ConfigurationField(type=str | int)
+    consumer_key = configuration.ConfigurationField(type=str)
     consumer_secret = configuration.ConfigurationField(type=str)
     access_token_key = configuration.ConfigurationField(type=str)
     access_token_secret = configuration.ConfigurationField(type=str)
