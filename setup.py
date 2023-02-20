@@ -154,8 +154,7 @@ import sys
 # ________________________________________________________________________________
 # Setup script
 
-if __name__ == "__main__":
-
+def main():
     if not os.path.isdir("plugins"):
         os.mkdir("plugins")
 
@@ -164,7 +163,7 @@ if __name__ == "__main__":
     # Optional settings
 
     choice = input(
-        f"\n{color.Blue}Do you want to configure optional bot settings? [Y/n]:{color.NC} "
+        f"\n{color.fg.blue}Do you want to configure optional bot settings? [Y/n]:{color.stop} "
     )
     if choice.lower() not in decline:
         config.advanced_setup()
@@ -173,14 +172,18 @@ if __name__ == "__main__":
 
     config.setup_plugins()
 
-    print(f"\n{color.Green}✅ Setup complete!{color.NC}")
+    print(f"\n{color.fg.green}✅ Setup complete!{color.stop}")
+
+if __name__ == "__main__":
+
+    main()
 
     # Start bot
 
     print(
-        f"\n{color.Yellow}⚠️ Before starting the bot, you should open the config.yaml file and check that everything is correct.{color.NC} "
+        f"\n{color.fg.yellow}⚠️ Before starting the bot, you should open the config.yaml file and check that everything is correct.{color.stop} "
     )
-    choice = input(f"{color.Blue}▶️ Do you want to start the bot? [Y/n]{color.NC} ")
+    choice = input(f"{color.fg.blue}▶️ Do you want to start the bot? [Y/n]{color.stop} ")
     if choice.lower() not in decline:
         print(
             "   Starting the bot...\n--------------------------------------------------------------------------------"

@@ -5,15 +5,13 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-import yaml
-import os
 from LRFutils import color
 import core
 
 def run(save=False):
 
-    blue = color.Blue
-    NC = color.NC
+    blue = color.fg.blue
+    NC = color.stop
 
     accept = ["yes", "y", "yeah","yep"]
     decline = ["no", "n", "nah", "nope"]
