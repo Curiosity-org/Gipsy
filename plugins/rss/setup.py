@@ -7,13 +7,13 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 
 import yaml
 import os
-from LRFutils.color import Color
+from LRFutils import color
 import core
 
 def run(save=False):
 
-    blue = Color.Blue
-    NC = Color.NC
+    blue = color.Blue
+    NC = color.NC
 
     accept = ["yes", "y", "yeah","yep"]
     decline = ["no", "n", "nah", "nope"]
