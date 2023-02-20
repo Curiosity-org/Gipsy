@@ -141,7 +141,7 @@ def advanced_setup():
             f"\n{color.fg.blue}🌐 Choose your language [en/fr] (current: {language}):{color.stop} "
         )
         if lang.lower() not in ["en", "fr", ""]:
-            print(f"{color.red}🌐 Invalid language.{color.stop}")
+            print(f"{color.fg.red}🌐 Invalid language.{color.stop}")
     if lang != "":
         _global_config["bot"]["default_language"] = lang.lower()
 
@@ -170,7 +170,7 @@ def advanced_setup():
                 _global_config["bot"]["admins"] = admins
             except:
                 print(
-                    f"{color.red}👑 Invalid entry. Only user ID (integers), comma and space are expected.{color.stop}"
+                    f"{color.fg.red}👑 Invalid entry. Only user ID (integers), comma and space are expected.{color.stop}"
                 )
                 error = True
 
@@ -188,8 +188,9 @@ def advanced_setup():
                 _global_config["bot"]["error_channels"] = channel
             except:
                 print(
-                    f"{color.red}🤕 Invalid entry. Only channel ID (integers) are expected.{color.stop}"
+                    f"{color.fg.red}🤕 Invalid entry. Only channel ID (integers) are expected.{color.stop}"
                 )
+                error = True
 
     with open("config.yaml", "w") as f:
         yaml.dump(_global_config, f)
