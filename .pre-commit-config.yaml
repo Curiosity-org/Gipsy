@@ -1,5 +1,15 @@
 default_install_hook_types: [pre-commit, commit-msg]
 
+ci:
+    autofix_commit_msg: |
+        :art: style: auto-fix by pre-commit.ci
+    autofix_prs: true
+    autoupdate_branch: ''
+    autoupdate_commit_msg: ':technologist: ci: auto-updated pre-commit hooks'
+    autoupdate_schedule: monthly
+    skip: []
+    submodules: false
+
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
@@ -12,6 +22,20 @@ repos:
     rev: 23.1.0
     hooks:
     -   id: black
+- repo: local
+  hooks:
+    - id: pylint
+      name: pylint
+      entry: pylint
+      language: system
+      types: [python]
+      args:
+        [
+          "-rn", # Only display messages
+          "-sn", # Don't display the score
+          "--disable=C,R,I", # Disable some checks
+          "--max-line-length=120", # Set max line length
+        ]
 - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
   rev: v9.4.0
   hooks:
