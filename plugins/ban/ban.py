@@ -15,35 +15,22 @@ from discord.ext import commands
 
 from utils import Gunibot, MyContext
 from core import config
+from core import configuration
 
-async def ban_perm_check(ctx: commands.Context) -> bool:
-    """Checks if the user has the permission to ban"""
+class BanConfiguration(configuration.Configuration):
+    guilds = configuration.ConfigurationListField(
+        configuration.ConfigurationField(int),
+    )
 
-    self: Ban = ctx.bot.get_cog("Ban")
-
-    if ctx.guild.id not in self.friendly_ban_guilds:
-        return await commands.has_guild_permissions(ban_members=True).predicate(ctx)
-    else:
-        for role in ctx.author.roles:
-            if role.id in self.friendly_ban_whitelisted_roles:
-                return True
-
-        return await commands.has_guild_permissions(ban_members=True).predicate(ctx)
-
-async def fake_ban_guild_check(ctx: commands.Context) -> bool:
-    """Checks if the guild is configured for the friendly ban command"""
-
-    self: Ban = ctx.bot.get_cog("Ban")
-
-    return ctx.guild.id in self.friendly_ban_guilds
+    whitelisted_roles = configuration.ConfigurationListField(
+        configuration.ConfigurationField(int)
+    )
 
 class Ban(commands.Cog):
-    friendly_ban_guilds: list[int]
-
     friendly_ban_events: list[dict]
     systematic_events: list
     random_events: list
-    friendly_ban_whitelisted_roles: list[int]
+    configuration.whitelisted_roles: list[int]
 
     roles_backup: dict[int,list[discord.Role]]
 
@@ -51,11 +38,14 @@ class Ban(commands.Cog):
         self.bot = bot
         self.file = "ban"
 
+        self.configuration = BanConfiguration('ban')
+        self.bot.config.add_configuration_child(self.configuration)
+
         self.load_friendly_ban()
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
-        if member.guild.id in self.friendly_ban_guilds:
+        if member.guild.id in self.configuration.guilds:
             if member.id in self.roles_backup:
                 # Give the roles back to the users
 
@@ -77,6 +67,27 @@ class Ban(commands.Cog):
                          + ", ".join([role.name for role in forbidden]))[:2000]
                     )
 
+    async def ban_perm_check(ctx: commands.Context) -> bool:
+        """Checks if the user has the permission to ban"""
+        
+        self: Ban = ctx.bot.get_cog("Ban")
+
+        if ctx.guild.id not in self.configuration.guilds:
+            return await commands.has_guild_permissions(ban_members=True).predicate(ctx)
+        else:
+            for role in ctx.author.roles:
+                if role.id in self.configuration.whitelisted_roles:
+                    return True
+            
+            return await commands.has_guild_permissions(ban_members=True).predicate(ctx)
+    
+    async def fake_ban_guild_check(ctx: commands.Context) -> bool:
+        """Checks if the guild is configured for the friendly ban command"""
+        
+        self: Ban = ctx.bot.get_cog("Ban")
+
+        return ctx.guild.id in self.configuration.guilds
+
     # ------------------#
     # Commande /ban    #
     # ------------------#
@@ -91,7 +102,7 @@ class Ban(commands.Cog):
         reason: str = "Aucune raison donnée",
     ):
         "Banhammer. Use at your own risk."
-        if user == ctx.author and not ctx.guild.id in self.friendly_ban_guilds:
+        if user == ctx.author and not ctx.guild.id in self.configuration.guilds:
             await ctx.send("Tu ne peux pas te bannir toi-même !")
             return
         if not ctx.guild.me.guild_permissions.ban_members:
@@ -108,7 +119,7 @@ class Ban(commands.Cog):
             return
 
         # Normal ban
-        if not ctx.guild.id in self.friendly_ban_guilds:
+        if not ctx.guild.id in self.configuration.guilds:
             try:
                 await ctx.guild.ban(
                     user,
@@ -186,18 +197,6 @@ class Ban(commands.Cog):
 
     def load_friendly_ban(self):
         """Loads configuration and events for the friendly ban command"""
-
-        # look for the configuration, gets an empty dict if it doesn't exist
-        self.config = config.get('ban') or {}
-
-        # loads the guild ids from the configuration
-        self.friendly_ban_guilds: list[int] = self.config.get("guilds", [])
-
-        self.friendly_ban_whitelisted_roles: list[int] = self.config.get(
-            "whitelisted_roles",
-            []
-        )
-
         # loads the events
         self.friendly_ban_events = [
             {
