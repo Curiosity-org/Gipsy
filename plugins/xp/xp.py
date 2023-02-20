@@ -73,7 +73,7 @@ class XP(commands.Cog):
         await ctx.send(x)
 
     @commands.command(name="xp_reduction")
-    async def config_xp_reduction(self, ctx: MyContext, enabled:bool):
+    async def config_xp_reduction(self, ctx: MyContext, enabled: bool):
         """Enable or disable the xp reduction system"""
         await ctx.send(
             await self.bot.sconfig.edit_config(ctx.guild.id, "xp_reduction", enabled)
@@ -158,26 +158,30 @@ class XP(commands.Cog):
             result.append((f"{_lvl} {k}", " ".join(subroles)))
         return result
 
-
     ################
     # XP reduction #
     ################
 
-    @tasks.loop(hours=24*7)
+    @tasks.loop(hours=24 * 7)
     async def xp_reduction(self):
         """Reduce the xp of all members each week"""
-        
+
         # Compute the XP to remove each week
-        xp_to_remove = await self.calc_xp(f"Vous savez, moi je ne crois pas qu’il y ait de bonne ou de mauvaise situation. Moi, si je devais résumer ma vie aujourd’hui avec vous, je dirais que c’est d’abord des rencontres. Des gens qui m’ont tendu la main, peut-être à un moment où je ne pouvais pas, où j’étais seul chez moi. Et c’est assez curieux de se dire que les hasards, les rencontres forgent une destinée... Parce que quand on a le goût de la chose, quand on a le goût de la chose bien faite, le beau geste, parfois on ne trouve pas l’interlocuteur en face je dirais, le miroir qui vous aide à avancer. Alors ça n’est pas mon cas, comme je disais là, puisque moi au contraire, j’ai pu ; et je dis merci à la vie, je lui dis merci, je chante la vie, je danse la vie... je ne suis qu’amour ! Et finalement, quand des gens me disent « Mais comment fais-tu pour avoir cette humanité ? », je leur réponds très simplement que c’est ce goût de l’amour, ce goût donc qui m’a poussé aujourd’hui à entreprendre une construction mécanique... mais demain qui sait ? Peut-être simplement à me mettre au service de la communauté, à faire le don, le don de soi.")
-        
+        xp_to_remove = await self.calc_xp(
+            f"Vous savez, moi je ne crois pas qu’il y ait de bonne ou de mauvaise situation. Moi, si je devais résumer ma vie aujourd’hui avec vous, je dirais que c’est d’abord des rencontres. Des gens qui m’ont tendu la main, peut-être à un moment où je ne pouvais pas, où j’étais seul chez moi. Et c’est assez curieux de se dire que les hasards, les rencontres forgent une destinée... Parce que quand on a le goût de la chose, quand on a le goût de la chose bien faite, le beau geste, parfois on ne trouve pas l’interlocuteur en face je dirais, le miroir qui vous aide à avancer. Alors ça n’est pas mon cas, comme je disais là, puisque moi au contraire, j’ai pu ; et je dis merci à la vie, je lui dis merci, je chante la vie, je danse la vie... je ne suis qu’amour ! Et finalement, quand des gens me disent « Mais comment fais-tu pour avoir cette humanité ? », je leur réponds très simplement que c’est ce goût de l’amour, ce goût donc qui m’a poussé aujourd’hui à entreprendre une construction mécanique... mais demain qui sait ? Peut-être simplement à me mettre au service de la communauté, à faire le don, le don de soi."
+        )
+
         # xp_to_remove *= 1
         for guild in self.bot.guilds:
             if self.bot.server_configs[guild.id]["xp_reduction"]:
                 for member in guild.members:
-                    await self.bdd_set_xp(userID=member.id, points=xp_to_remove, Type="remove", guild=guild.id)
+                    await self.bdd_set_xp(
+                        userID=member.id,
+                        points=xp_to_remove,
+                        Type="remove",
+                        guild=guild.id,
+                    )
 
-    
-                
     async def get_lvlup_chan(self, msg: discord.Message):
         value = self.bot.server_configs[msg.guild.id]["levelup_channel"]
         if value is None or value == "none":
@@ -194,31 +198,37 @@ class XP(commands.Cog):
         """Check if this channel/user can get xp"""
         if message.guild is None:
             return False
-        
+
         # get the channel ID (or parent channel id for thread)
-        channel_id = message.channel.parent.id if isinstance(message.channel, discord.Thread) else message.channel.id
+        channel_id = (
+            message.channel.parent.id
+            if isinstance(message.channel, discord.Thread)
+            else message.channel.id
+        )
         # get the category
-        category_id = message.channel.category.id if message.channel.category is not None else 0 # dumb ID
+        category_id = (
+            message.channel.category.id if message.channel.category is not None else 0
+        )  # dumb ID
 
         if message.guild.id in self.xp_channels_cache:
             if channel_id in self.xp_channels_cache[message.guild.id]:
                 return False
             if category_id in self.xp_channels_cache[message.guild.id]:
                 return False
-        else: # load cache
+        else:  # load cache
             channels = self.bot.server_configs[message.guild.id]["noxp_channels"]
             if channels is not None:
                 # convert to a list even if there's only one item
                 channels = [channels] if isinstance(channels, str) else channels
                 channels = [int(x) for x in channels]
-                
+
                 self.xp_channels_cache[message.guild.id] = channels
 
                 if channel_id in channels or category_id in channels:
                     return False
             else:
                 self.xp_channels_cache[message.guild.id] = []
-        
+
         return True
 
     async def check_cmd(self, msg: discord.Message):
@@ -258,7 +268,7 @@ class XP(commands.Cog):
             and self.bot.server_configs[msg.guild.id]["enable_xp"]
         ):
             return
-        
+
         # if xp of that guild is not in cache yet
         if msg.guild.id not in self.cache or len(self.cache[msg.guild.id]) == 0:
             await self.bdd_load_cache(msg.guild.id)
@@ -451,7 +461,7 @@ class XP(commands.Cog):
                     query = "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p) ON CONFLICT(guild, userid) DO UPDATE SET xp = (xp - :p);"
             else:
                 query = "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p) ON CONFLICT(guild, userid) DO UPDATE SET xp = :p;"
-                
+
             self.bot.db_query(query, {"g": guild, "u": userID, "p": points})
             return True
         except Exception as e:
@@ -841,16 +851,17 @@ class XP(commands.Cog):
             )
         except Exception as e:
             await self.bot.get_cog("Errors").on_command_error(ctx, e)
-    
+
     def cog_unload(self):
         self.xp_reduction.cancel()
 
 
 config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+
+
+async def setup(bot: Gunibot = None, plugin_config: dict = None):
     if bot is not None:
         await bot.add_cog(XP(bot), icon="🪙")
     if plugin_config is not None:
         global config
         config.update(plugin_config)
-

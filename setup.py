@@ -154,6 +154,7 @@ import sys
 # ________________________________________________________________________________
 # Setup script
 
+
 def main():
     if not os.path.isdir("plugins"):
         os.mkdir("plugins")

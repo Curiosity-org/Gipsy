@@ -40,7 +40,7 @@ Gipsy is modular, free and open-source Discord bot whose focus on accessibility 
 
     .. grid-item-card:: 🎖️ XP System
         :link: plugins/giveaways/user_documentation
-        :link-type: doc 
+        :link-type: doc
         :margin: 0 3 0 0
 
         Give XP to your active members and let them level up and getting roles!
@@ -57,7 +57,7 @@ Gipsy is modular, free and open-source Discord bot whose focus on accessibility 
         :link-type: doc
         :margin: 0 3 0 0
 
-        Challenge your community with a huge variety of quizz!  
+        Challenge your community with a huge variety of quizz!
 
     .. grid-item-card:: 📎 Role Link
         :link: plugins/roleLink/user_documentation

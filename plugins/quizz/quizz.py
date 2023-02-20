@@ -415,7 +415,6 @@ class Quizz(commands.Cog):
                 if (
                     pauload.emoji.name == REACTIONS.START_QUIZ
                 ):  # 🆗 => Commencer le quizz
-
                     # Génération de l'embed de question
                     embed = self.ez_question_embed(party_id)
                     prev_players_markdown = (
@@ -652,11 +651,13 @@ class Quizz(commands.Cog):
         self.quick_quizz_channels.append(ctx.channel.id)
         return
 
+
 config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+
+
+async def setup(bot: Gunibot = None, plugin_config: dict = None):
     if bot is not None:
         await bot.add_cog(Quizz(bot), icon="❓")
     if plugin_config is not None:
         global config
         config.update(plugin_config)
-

@@ -21,4 +21,3 @@ It is your duty to make sure that the bot can read the contact channel, and crea
 The bot will send the message posted by the user back to his private room, if possible as a webhook with the user's name and avatar.
 
 The command to semi-automatically clean up contact rooms is `contact-clear`. You can specify a minimum number of days of inactivity, by default 15: the bot will then look if the last message posted is old enough before deleting the room.
-

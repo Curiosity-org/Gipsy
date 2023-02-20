@@ -71,7 +71,6 @@ class ChannelArchive(commands.Cog):
     async def update(
         self, guild: discord.Guild, log_channel: typing.Optional[discord.TextChannel]
     ):
-
         # Get archive duration
         config = self.bot.server_configs[guild.id]
         duration = config["archive_duration"]
@@ -164,7 +163,6 @@ class ChannelArchive(commands.Cog):
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     async def list_archive(self, ctx: MyContext):
-
         config = self.bot.server_configs[ctx.guild.id]
         if self.bot.get_channel(config["archive_category"]) is None:
             await ctx.send(
@@ -253,7 +251,6 @@ class ChannelArchive(commands.Cog):
             channel.permissions_for(ctx.author).manage_channels is True
             and channel.permissions_for(ctx.author).manage_permissions is True
         ):
-
             config = self.bot.server_configs[ctx.guild.id]
             if self.bot.get_channel(config["archive_category"]) is None:
                 await ctx.send(
@@ -271,7 +268,6 @@ class ChannelArchive(commands.Cog):
                 colour=discord.Colour(51711),
             )
         else:
-
             # Missing permission message
             embed = discord.Embed(
                 description=await self.bot._(
@@ -284,7 +280,9 @@ class ChannelArchive(commands.Cog):
 
 
 config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+
+
+async def setup(bot: Gunibot = None, plugin_config: dict = None):
     if bot is not None:
         await bot.add_cog(ChannelArchive(bot), icon="🗃️")
     if plugin_config is not None:

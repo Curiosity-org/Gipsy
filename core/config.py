@@ -16,6 +16,7 @@ decline = ["n", "no", "nope", "nah"]
 
 _global_config = {}
 
+
 # Check basic requirements and start this script if something is missing
 def check():
     if not os.path.isfile("config.yaml"):
@@ -76,7 +77,6 @@ def setup_plugins():
 
     for plugin in os.listdir(f"plugins"):
         if os.path.isfile(f"plugins/" + plugin + "/setup.py"):
-
             plugin_setup = importlib.import_module(f"plugins." + plugin + ".setup")
 
             choice = input(
@@ -131,7 +131,6 @@ def token_set(force_set=False):
 
 
 def advanced_setup():
-
     # Language
 
     lang = "Baguette de fromage"

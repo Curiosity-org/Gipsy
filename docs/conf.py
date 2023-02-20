@@ -66,7 +66,7 @@ html_theme_options = {
     "path_to_docs": "docs",
     "use_repository_button": True,
     "use_edit_page_button": True,
-  "announcement": "⚠️ You are reading a doc of an undergoing development version. Information can be out of date and/or change at any time. ⚠️",
+    "announcement": "⚠️ You are reading a doc of an undergoing development version. Information can be out of date and/or change at any time. ⚠️",
 }
 
 html_logo = "img/logo.png"
@@ -79,7 +79,7 @@ myst_enable_extensions = [
     "fieldlist",
     "html_admonition",
     "html_image",
-    #"linkify",
+    # "linkify",
     "replacements",
     "smartquotes",
     "strikethrough",
@@ -87,9 +87,9 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
-#==============================================================================
+# ==============================================================================
 # Plugin doc extraction
-#==============================================================================
+# ==============================================================================
 
 import os
 import shutil
@@ -130,6 +130,7 @@ Feel free to leave your questions and feedbacks below!
 </script>
 """
 
+
 def generate_plugin_doc():
     # Saving index.rst file content
     with open("index.rst", "r") as f:
@@ -169,19 +170,33 @@ def generate_plugin_doc():
                         )
                         toctree.write(f"   plugins/{plugin}/{file}\n")
 
-                        with open(f"plugins/{plugin}/{file}", "a", encoding="utf-8") as f:
+                        with open(
+                            f"plugins/{plugin}/{file}", "a", encoding="utf-8"
+                        ) as f:
                             f.write(CONTRIBUTE)
 
-                            if "repository_url" in html_theme_options and html_theme_options["repository_url"].startswith("https://github.com/"):
-                                orga = html_theme_options["repository_url"].split("/")[3]
-                                repo = html_theme_options["repository_url"].split("/")[4]
-                                
+                            if (
+                                "repository_url" in html_theme_options
+                                and html_theme_options["repository_url"].startswith(
+                                    "https://github.com/"
+                                )
+                            ):
+                                orga = html_theme_options["repository_url"].split("/")[
+                                    3
+                                ]
+                                repo = html_theme_options["repository_url"].split("/")[
+                                    4
+                                ]
+
                                 f.write(
-                                    GITHUB_DISCUSSION_FOOTER.format(orga=orga, repo=repo)
+                                    GITHUB_DISCUSSION_FOOTER.format(
+                                        orga=orga, repo=repo
+                                    )
                                 )
 
         toctree.write("\n")
         for line in after:
             toctree.write(line)
+
 
 generate_plugin_doc()

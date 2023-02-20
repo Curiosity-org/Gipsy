@@ -25,7 +25,10 @@ import typing
 from marshal import dumps, loads
 import core
 
-async def setup(bot:Gunibot): await bot.add_cog(Rss(bot), icon="📰")
+
+async def setup(bot: Gunibot):
+    await bot.add_cog(Rss(bot), icon="📰")
+
 
 class Rss(commands.Cog):
     """Cog which deals with everything related to rss flows. Whether it is to add automatic tracking to a stream, or just to see the latest video released by Discord, it is this cog that will be used."""
@@ -187,7 +190,7 @@ class Rss(commands.Cog):
     async def rss_main(self, ctx: MyContext):
         """See the last post of a rss feed"""
         if ctx.subcommand_passed is None:
-            await ctx.send_help('rss')
+            await ctx.send_help("rss")
 
     @rss_main.command(name="youtube", aliases=["yt"])
     async def request_yt(self, ctx: MyContext, ID):

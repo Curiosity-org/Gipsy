@@ -98,4 +98,3 @@ rss embed 6678466620137 true title="hey u" footer = "Hi \nI'm a footer"
 ```
 
 Changes the content of the embed for the specified feed. You can also use variables, like the `rss text` command.
-

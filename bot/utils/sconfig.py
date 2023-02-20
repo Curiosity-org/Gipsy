@@ -82,7 +82,7 @@ class Sconfig(commands.Cog):
                 if "command" in opt:
                     try:
                         self.bot.get_command("config " + opt["command"]).enabled = False
-                    except (AttributeError, TypeError): # if opt["command"] is None
+                    except (AttributeError, TypeError):  # if opt["command"] is None
                         # if the command doesn't exist
                         pass
             del self.sorted_options[cog]
@@ -206,7 +206,6 @@ class Sconfig(commands.Cog):
             cpt = 0
             embeds = []
             for module, options in sorted(self.sorted_options.items()):
-
                 subconf = {k: v for k, v in config.items() if k in options}
                 if len(subconf) == 0:
                     continue
@@ -313,7 +312,7 @@ class Sconfig(commands.Cog):
         else:  # correct case
             await ctx.send(
                 await self.edit_config(ctx.guild.id, "language", lang)
-            ) # lang should be a string
+            )  # lang should be a string
 
     # --------------------------------------------------
     # Hypesquad

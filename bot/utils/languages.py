@@ -31,7 +31,8 @@ class Languages(commands.Cog):
 
     async def tr(self, ctx, key: str, **kwargs):
         """Translate something
-        Ctx can be either a Context, a guild, a guild id, a channel or a lang directly"""
+        Ctx can be either a Context, a guild, a guild id, a channel or a lang directly
+        """
         lang = self.languages[0]
         if isinstance(ctx, commands.Context):
             if ctx.guild:
@@ -53,9 +54,7 @@ class Languages(commands.Cog):
         if guildID is None:
             as_int = 0
         else:
-            as_int = self.languages.index(
-                self.bot.server_configs[guildID]["language"]
-            )
+            as_int = self.languages.index(self.bot.server_configs[guildID]["language"])
         if use_str:
             return self.languages[as_int]
         return as_int
