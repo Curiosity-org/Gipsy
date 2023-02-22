@@ -5,32 +5,25 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
+from typing import List, Optional, Union
 import datetime
 import random
 import time
 from marshal import dumps, loads
-from typing import List, Optional, Union
 
-import sys
-
-sys.path.append("./bot")
-import args
-import sys
-
-sys.path.append("./bot")
-from bot import checks
 import discord
-import emoji
 from discord.ext import commands, tasks
+import emoji
+
 from utils import Gunibot, MyContext
-import re
+from bot import checks, args
 
 
 class Giveaways(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.config_options = ["giveaways_emojis"]
-        self.internal_task.start()
+        self.internal_task.start() # pylint: disable=no-member
 
         bot.get_command("config").add_command(self.giveaways_emojis)
 
@@ -255,7 +248,7 @@ class Giveaways(commands.Cog):
                     channel = await commands.TextChannelConverter().convert(
                         ctx, setting.replace("channel: ", "")
                     )
-                except:
+                except commands.BadArgument:
                     await ctx.send(
                         await self.bot._(
                             ctx.guild.id, "giveaways.creation.invalid-channel"
@@ -338,9 +331,9 @@ class Giveaways(commands.Cog):
             return
         if msg.channel.permissions_for(ctx.guild.me).add_reactions:
             try:
-                for emoji in allowed_emojis:
+                for allowed_emoji in allowed_emojis:
                     try:
-                        await msg.add_reaction(emoji)
+                        await msg.add_reaction(allowed_emoji)
                     except discord.NotFound:
                         pass
             except discord.Forbidden:
@@ -622,21 +615,17 @@ class Giveaways(commands.Cog):
             )
         )
 
-    def cog_unload(self):
-        self.internal_task.cancel()
+    async def cog_unload(self):
+        self.internal_task.cancel() # pylint: disable=no-member
 
     @tasks.loop(seconds=2.0)
     async def internal_task(self):
         for giveaway in self.db_get_expired_giveaways():
             if giveaway["running"]:
-                try:
-                    serv = self.bot.get_guild(giveaway["guild"])
-                    winners = await self.pick_winners(serv, giveaway)
-                    await self.send_results(giveaway, winners)
-                    self.db_stop_giveaway(giveaway["rowid"])
-                except Exception as e:
-                    await self.bot.get_cog("Errors").on_error(e)
-                    self.db_stop_giveaway(giveaway["rowid"])
+                serv = self.bot.get_guild(giveaway["guild"])
+                winners = await self.pick_winners(serv, giveaway)
+                await self.send_results(giveaway, winners)
+                self.db_stop_giveaway(giveaway["rowid"])
 
     async def get_users(
         self,
@@ -732,10 +721,6 @@ class Giveaways(commands.Cog):
         self.db_delete_giveaway(giveaway["rowid"])
 
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
     if bot is not None:
         await bot.add_cog(Giveaways(bot), icon="🎁")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)
