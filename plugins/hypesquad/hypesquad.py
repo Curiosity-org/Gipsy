@@ -9,12 +9,15 @@ import time
 from typing import Dict
 
 import discord
-from checks import is_roles_manager
 from discord.ext import commands, tasks
+
+from bot.checks import is_roles_manager
 from utils import Gunibot, MyContext
 
 
 class Hypesquad(commands.Cog):
+    """Give role to users based on their Hypesquad guild."""
+
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.config_options = [
@@ -23,15 +26,15 @@ class Hypesquad(commands.Cog):
             "hs_balance_role",
             "hs_none_role",
         ]
-        self.roles_loop.start()
+        self.roles_loop.start() # pylint: disable=no-member
 
         bot.get_command("config").add_command(self.hs_main)
 
-    @commands.group(name="hypesquad", aliases=["hs"], enabled=False)
+    @commands.group(name="hypesquad")
     async def hs_main(self, ctx: MyContext):
-        """Manage options about Discord ypesquads"""
+        """Hypesquads-related commands"""
         if ctx.subcommand_passed is None:
-            await ctx.send_help("config hypesquad")
+            await ctx.send_help("hypesquad")
 
     @hs_main.command(name="role")
     async def hs_role(self, ctx: MyContext, house: str, *, role: discord.Role = None):
@@ -67,21 +70,21 @@ class Hypesquad(commands.Cog):
     @tasks.loop(hours=12)
     async def roles_loop(self):
         """Check every 12h the members roles"""
-        t1 = time.time()
+        start = time.time()
         self.bot.log.debug("[hypesquad] Started roles check")
         count = 0  # count of edited members
-        for g in self.bot.guilds:
+        for guild in self.bot.guilds:
             try:
-                roles = await self.get_roles(g)
+                roles = await self.get_roles(guild)
                 if any(roles.values()):  # if at least a role is set
-                    for member in g.members:
+                    for member in guild.members:
                         count += await self.edit_roles(member, roles)
             except discord.Forbidden:
                 # missing a perm
                 self.bot.log.warn(
-                    f"[hypesquad] Unable to give roles in guild {g.id} ({g.name})"
+                    f"[hypesquad] Unable to give roles in guild {guild.id} ({guild.name})"
                 )
-        delta = round(time.time() - t1, 2)
+        delta = round(time.time() - start, 2)
         self.bot.log.info(
             f"[hypesquad] Finished roles check in {delta}s with {count} editions"
         )
@@ -184,12 +187,6 @@ class Hypesquad(commands.Cog):
                 result[k] = guild.get_role(config[k])
         return result
 
-    @commands.group(name="hypesquad")
-    async def hs_main(self, ctx: MyContext):
-        """Hypesquads-related commands"""
-        if ctx.subcommand_passed is None:
-            await ctx.send_help("hypesquad")
-
     @hs_main.command(name="reload")
     @commands.check(is_roles_manager)
     async def hs_reload(self, ctx: MyContext, *, user: discord.Member):
@@ -212,10 +209,12 @@ class Hypesquad(commands.Cog):
                 await self.bot._(ctx.guild.id, "hypesquad.not-edited", user=user)
             )
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
+    """
+    Fonction d'initialisation du plugin
+
+    :param bot: Le bot
+    :type bot: Gunibot
+    """
     if bot is not None:
         await bot.add_cog(Hypesquad(bot), icon="⚜️")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)
