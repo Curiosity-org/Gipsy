@@ -12,11 +12,10 @@ from typing import Optional
 import discord
 from discord.ext import commands, tasks
 
-# pylint: disable=import-error
 from utils import Gunibot, MyContext
 
+# pylint: disable=relative-beyond-top-level
 from .quipyquizz import QuiPyQuizz
-
 
 def clean_question(question: str):
     """
@@ -125,6 +124,7 @@ class Quizz(commands.Cog):
         # on_aw_reaction_add/remove
         self.quick_quizz_channels = []
         self.quick_quizz_messages = []  # Same
+        # pylint: disable=no-member
         self.check_if_active.start()  # Démarrage du check des quizz inactifs
         self.quipyquizz = QuiPyQuizz()
 
@@ -880,18 +880,12 @@ class Quizz(commands.Cog):
         self.quick_quizz_channels.append(ctx.channel.id)
         return
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
     """
     Fonction d'initialisation du plugin
 
     :param bot: Le bot
     :type bot: Gunibot
-    :param plugin_config: La configuration du plugin
-    :type plugin_config: dict
     """
     if bot is not None:
         await bot.add_cog(Quizz(bot), icon="❓")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)

@@ -6,17 +6,20 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
 import typing
+
 import discord
 from discord.ext import tasks, commands
+
 from utils import Gunibot, MyContext
-import bot.args as args
+from bot import args
 
 
 class ChannelArchive(commands.Cog):
+
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.config_options = ["archive_category", "archive_duration"]
-        self.update_loop.start()
+        self.update_loop.start() # pylint: disable=no-member
 
         bot.get_command("config").add_command(self.config_archive_category)
         bot.get_command("config").add_command(self.config_archive_duration)
@@ -48,8 +51,8 @@ class ChannelArchive(commands.Cog):
         )
         await ctx.send(x)
 
-    def cog_unload(self):
-        self.update_loop.cancel()
+    async def cog_unload(self):
+        self.update_loop.cancel() # pylint: disable=no-member
 
     async def add_to_archive(self, guild: discord.Guild, channel: discord.TextChannel):
         # Get archive category
@@ -283,10 +286,6 @@ class ChannelArchive(commands.Cog):
         await ctx.send(embed=embed)
 
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
     if bot is not None:
         await bot.add_cog(ChannelArchive(bot), icon="🗃️")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)

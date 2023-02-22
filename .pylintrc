@@ -1,0 +1,4 @@
+[MASTER]
+
+# resolve import issues for local modules
+init-hook='import sys; sys.path.append(".")'
