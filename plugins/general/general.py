@@ -34,7 +34,7 @@ class General(commands.Cog):
         """Count the number of lines for the whole project"""
         count = 0
         try:
-            for root, dirs, files in os.walk("."):
+            for root, dirs, files in os.walk("."): # pylint: disable=unused-variable
                 if "/lib/python" in root:
                     continue
                 for file in files:
@@ -43,8 +43,8 @@ class General(commands.Cog):
                             for line in f.read().split("\n"):
                                 if len(line.strip()) > 2 and line[0] != "#":
                                     count += 1
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e, None)
+        except Exception as exception: # pylint: disable=broad-exception-caught
+            await self.bot.get_cog("Errors").on_error(exception, None)
         self.codelines = count
 
     @commands.command(name="hs")
@@ -156,21 +156,17 @@ class General(commands.Cog):
                 )
                 d = d.replace(cpu_txt, cpu_ended)
                 await msg.edit(content=d)
-        except Exception as e:
-            await ctx.bot.get_cog("Errors").on_command_error(ctx, e)
+        except Exception as exception: # pylint: disable=broad-exception-caught
+            await ctx.bot.get_cog("Errors").on_command_error(ctx, exception)
 
     @commands.command(name="halp", enabled=False)
     async def halp(self, ctx):
-        embed = discord.Embed(name="Help", colour=discord.Colour.green())
-        embed.set_author(name=f"Gunibot commands")
+        embed = discord.Embed(title="Help", colour=discord.Colour.green())
+        embed.set_author(name="Gunibot commands")
         embed.add_field(name="admin", value="Affiche les commandes admin disponibles")
         embed.add_field(name="admin", value="Affiche les commandes admin disponibles")
         await ctx.send(embed=embed)
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
     if bot is not None:
         await bot.add_cog(General(bot), icon="🌍")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)
