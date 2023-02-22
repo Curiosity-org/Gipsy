@@ -5,16 +5,14 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-from utils import Gunibot, MyContext
-from discord.ext import commands
-import discord
-from bot import checks
-import asyncio
 from typing import List
+from utils import Gunibot, MyContext
 
-import sys
+import discord
+from discord.ext import commands
+import asyncio
 
-sys.path.append("./bot")
+from bot import checks
 
 
 class Group:
@@ -27,6 +25,7 @@ class Group:
         channelID: int,
         privacy: bool,
     ):
+        self.bot = bot
         self.roleID = roleID
         self.ownerID = ownerID
         self.channelID = channelID
@@ -126,8 +125,8 @@ class GroupConverter(commands.Converter):
         try:
             # try to convert it to a role
             role = await commands.RoleConverter().convert(ctx, arg)
-        except commands.BadArgument:
-            raise commands.BadArgument(f'Group "{arg}" not found.')
+        except commands.BadArgument as exception:
+            raise commands.BadArgument(f'Group "{arg}" not found.') from exception
         # make sure the cog is actually loaded, let's not break everything
         if cog := ctx.bot.get_cog("Groups"):
             if res := cog.db_get_group(ctx.guild.id, role.id):
@@ -473,7 +472,7 @@ class Groups(commands.Cog):
             )
             return
         txt = "**" + await self.bot._(ctx.guild.id, "groups.list") + "**\n"
-        for group in groups:
+        for group in groups: # pylint: disable=not-an-iterable
             txt += group.to_str() + "\n\n"
         if ctx.can_send_embed:
             embed = discord.Embed(description=txt)
@@ -736,10 +735,6 @@ class Groups(commands.Cog):
                     )
                 )
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
     if bot is not None:
         await bot.add_cog(Groups(bot), icon="🎭")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)
