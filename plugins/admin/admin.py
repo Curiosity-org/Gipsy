@@ -5,17 +5,19 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-from utils import Gunibot
-from git import Repo, exc
-from discord.ext import commands
-import discord
-from bot import checks
 import io
 import os
 import sys
 import textwrap
 import traceback
 from contextlib import redirect_stdout
+
+import discord
+from discord.ext import commands
+from git import Repo, GitCommandError
+
+from utils import Gunibot
+from bot import checks
 
 sys.path.append("./bot")
 
@@ -38,6 +40,7 @@ class Admin(commands.Cog):
     @commands.check(checks.is_bot_admin)
     async def main_msg(self, ctx: commands.Context):
         """Commandes réservées aux administrateurs de GuniBot"""
+        self.main_msg: commands.Group
         if ctx.subcommand_passed is None:
             text = "Liste des commandes disponibles :"
             for cmd in sorted(self.main_msg.commands, key=lambda x: x.name):
@@ -60,7 +63,7 @@ class Admin(commands.Cog):
         if branch:
             try:
                 repo.git.checkout(branch)
-            except exc.GitCommandError as e:
+            except GitCommandError as e:
                 self.bot.log.exception(e)
                 if (
                     "Your local changes to the following files would be overwritten by checkout"
@@ -150,7 +153,7 @@ class Admin(commands.Cog):
                 await ctx.send("Cog {} can't be found".format(cog))
             except commands.errors.ExtensionNotLoaded:
                 await ctx.send("Cog {} was never loaded".format(cog))
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-exception-caught
                 await errors_cog.on_error(e, ctx)
                 await ctx.send(f"**`ERROR:`** {type(e).__name__} - {e}")
             else:
@@ -171,7 +174,7 @@ class Admin(commands.Cog):
             self.bot.load_extension("plugins." + name)
             await ctx.send("Module '{}' ajouté !".format(name))
             self.bot.log.info("Module {} ajouté".format(name))
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-exception-caught
             await ctx.send(str(e))
 
     @main_msg.command(name="del_cog", aliases=["remove_cog"], hidden=True)
@@ -181,7 +184,7 @@ class Admin(commands.Cog):
             self.bot.unload_extension("plugins." + name)
             await ctx.send("Module '{}' désactivé !".format(name))
             self.bot.log.info("Module {} désactivé".format(name))
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-exception-caught
             await ctx.send(str(e))
 
     @main_msg.command(name="cogs", hidden=True)
@@ -236,19 +239,19 @@ class Admin(commands.Cog):
         stdout = io.StringIO()
         try:
             to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_error(e, ctx)
             return
         try:
-            exec(to_compile, env)
-        except Exception as e:
+            exec(to_compile, env) # pylint: disable=exec-used
+        except Exception as e: # pylint: disable=broad-exception-caught
             return await ctx.send(f"```py\n{e.__class__.__name__}: {e}\n```")
 
         func = env["func"]
         try:
             with redirect_stdout(stdout):
                 ret = await func()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-exception-caught
             value = stdout.getvalue()
             await ctx.send(f"```py\n{value}{traceback.format_exc()}\n```")
         else:
@@ -261,10 +264,6 @@ class Admin(commands.Cog):
                 self._last_result = ret
                 await ctx.send(f"```py\n{value}{ret}\n```")
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
     if bot is not None:
         await bot.add_cog(Admin(bot), icon="🚨")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)
