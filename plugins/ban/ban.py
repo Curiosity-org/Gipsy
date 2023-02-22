@@ -5,15 +5,37 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
+from typing import Callable
 import importlib
 import random
 
 import discord.abc
 import discord
 from discord.ext import commands
-from utils import Gunibot, MyContext
 
+from utils import Gunibot, MyContext
 from core import config
+
+async def ban_perm_check(ctx: commands.Context) -> bool:
+    """Checks if the user has the permission to ban"""
+    
+    self: Ban = ctx.bot.get_cog("Ban")
+
+    if ctx.guild.id not in self.friendly_ban_guilds:
+        return await commands.has_guild_permissions(ban_members=True).predicate(ctx)
+    else:
+        for role in ctx.author.roles:
+            if role.id in self.friendly_ban_whitelisted_roles:
+                return True
+        
+        return await commands.has_guild_permissions(ban_members=True).predicate(ctx)
+
+async def fake_ban_guild_check(ctx: commands.Context) -> bool:
+    """Checks if the guild is configured for the friendly ban command"""
+    
+    self: Ban = ctx.bot.get_cog("Ban")
+
+    return ctx.guild.id in self.friendly_ban_guilds
 
 class Ban(commands.Cog):
     friendly_ban_guilds: list[int]
@@ -53,27 +75,6 @@ class Ban(commands.Cog):
                         (await self.bot._(member, "ban.gunivers.missing_roles") \
                          + ", ".join([role.name for role in forbidden]))[:2000]
                     )
-
-    async def ban_perm_check(ctx: commands.Context) -> bool:
-        """Checks if the user has the permission to ban"""
-        
-        self: Ban = ctx.bot.get_cog("Ban")
-
-        if ctx.guild.id not in self.friendly_ban_guilds:
-            return await commands.has_guild_permissions(ban_members=True).predicate(ctx)
-        else:
-            for role in ctx.author.roles:
-                if role.id in self.friendly_ban_whitelisted_roles:
-                    return True
-            
-            return await commands.has_guild_permissions(ban_members=True).predicate(ctx)
-    
-    async def fake_ban_guild_check(ctx: commands.Context) -> bool:
-        """Checks if the guild is configured for the friendly ban command"""
-        
-        self: Ban = ctx.bot.get_cog("Ban")
-
-        return ctx.guild.id in self.friendly_ban_guilds
 
     # ------------------#
     # Commande /ban    #
@@ -229,8 +230,8 @@ class Ban(commands.Cog):
                 "module_name": "just_a_message"
             }
         ]
-        self.systematic_events: list[function] = []
-        self.random_events: list[function] = []
+        self.systematic_events: list[Callable] = []
+        self.random_events: list[Callable] = []
 
         for event in self.friendly_ban_events:
             chances = event.get("chances", None)
