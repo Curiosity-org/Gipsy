@@ -5,19 +5,17 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-import sqlite3
-from utils import Gunibot, MyContext
-from discord.utils import snowflake_time
-from discord.ext import commands
-import discord
-from bot import checks
 import typing
+import sqlite3
 from datetime import datetime, timedelta
 
+import discord
+from discord.utils import snowflake_time
+from discord.ext import commands
 import aiohttp
-import sys
 
-# sys.path.append("./bot")
+from bot import checks
+from utils import Gunibot, MyContext
 
 
 class Contact(commands.Cog):
@@ -217,10 +215,6 @@ class Contact(commands.Cog):
         await ctx.send(answer)
 
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
     if bot is not None:
         await bot.add_cog(Contact(bot), icon="💬")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)
