@@ -5,16 +5,19 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
+from typing import Union
 import random
 from datetime import datetime
 
 import discord
 from discord.ext import commands
+
 from utils import Gunibot, MyContext
 
-from typing import Union
-
 class Misc(commands.Cog):
+    """Random commands.
+    What do you except from a plugin called misc.
+    """
 
     CONTAINS_TIMESTAMP = Union[
         int,
@@ -43,7 +46,8 @@ class Misc(commands.Cog):
         Usage:
         - Get a cookie: cookie
         - Give a cookie to someone: cookie <user>
-          - user: the member you want to give the cookie to. Can be a mention, an id or simply it's name."""
+          - user: the member you want to give the cookie to. Can be a mention, an id or simply it's
+            name."""
 
         # If the cookie is given
         if user:
@@ -68,7 +72,8 @@ class Misc(commands.Cog):
         # Sending the message
         await webhook.send(
             content=message,
-            avatar_url="https://d31sxl6qgne2yj.cloudfront.net/wordpress/wp-content/uploads/20190121140737/Minecraft-Villager-Head.jpg",
+            avatar_url="https://d31sxl6qgne2yj.cloudfront.net/wordpress/wp-content/uploads/"\
+                "20190121140737/Minecraft-Villager-Head.jpg",
         )
 
         # Cleaning webhook & command
@@ -118,12 +123,12 @@ class Misc(commands.Cog):
         - Flip a coin: coin
         """
 
-        a = random.randint(-100, 100)
+        state = random.randint(-100, 100)
 
         # The sign of the number define the result. 0 correspond to the side of the coin
-        if a > 0:
+        if state > 0:
             description = await self.bot._(ctx.guild.id, "misc.flipacoin.tails")
-        elif a < 0:
+        elif state < 0:
             description = await self.bot._(ctx.guild.id, "misc.flipacoin.heads")
         else:
             description = await self.bot._(ctx.guild.id, "misc.flipacoin.side")
@@ -154,12 +159,15 @@ class Misc(commands.Cog):
         # Test if the parameter is an integer
         try:
             dice = int(dice)
-        except:
+        except ValueError:
             embed = discord.Embed(
                 description=await self.bot._(ctx.guild.id, "misc.dice.error.not_int"),
                 colour=0xe74c3c,
             )
-            embed.set_author(name="Error", icon_url="https://cdn-icons-png.flaticon.com/512/738/738884.png")
+            embed.set_author(
+                name="Error",
+                icon_url="https://cdn-icons-png.flaticon.com/512/738/738884.png",
+            )
             ctx.send(embed=embed)
 
         # Test if the parameter is upper than 0
@@ -168,7 +176,10 @@ class Misc(commands.Cog):
                 description=await self.bot._(ctx.guild.id, "misc.dice.error.not_positive"),
                 colour=0xe74c3c,
             )
-            embed.set_author(name="Error", icon_url="https://cdn-icons-png.flaticon.com/512/738/738884.png")
+            embed.set_author(
+                name="Error",
+                icon_url="https://cdn-icons-png.flaticon.com/512/738/738884.png",
+            )
             ctx.send(embed=embed)
 
         # Generate the random value and print it
@@ -200,7 +211,7 @@ class Misc(commands.Cog):
             colour=0x2F3136,
         )
         embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/1180/1180260.png")
-        
+
         await ctx.send(embed = embed)
 
         # Deleting command
@@ -244,16 +255,16 @@ class Misc(commands.Cog):
             msg = await self.bot._(ctx.channel, f"misc.kills.{choice}")
             tries += 1
 
-        footer = self.bot._(ctx.channel, f"misc.kills.footer")
+        footer = self.bot._(ctx.channel, "misc.kills.footer")
 
         # Building the result message
         embed = discord.Embed(
             description=msg.format(author, victime, ex),
             colour=0x2F3136,
-            footer=footer
         )
+        embed.set_footer(text=footer)
         embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/3074/3074476.png")
-        
+
         # Send it
         await ctx.send(
             embed=embed,
@@ -339,12 +350,12 @@ class Misc(commands.Cog):
         )
 
 
-# The end.
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
+    """
+    Fonction d'initialisation du plugin
+
+    :param bot: Le bot
+    :type bot: Gunibot
+    """
     if bot is not None:
         await bot.add_cog(Misc(bot), icon="🍪")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)
-
