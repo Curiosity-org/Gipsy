@@ -400,8 +400,6 @@ async def setup(bot:Gunibot=None):
 
     :param bot: Le bot
     :type bot: Gunibot
-    :param plugin_config: La configuration du plugin
-    :type plugin_config: dict
     """
     if bot is not None:
         await bot.add_cog(Invite(bot), icon="👋")

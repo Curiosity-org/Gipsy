@@ -5,17 +5,19 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-import datetime
 from typing import List
+import datetime
 
 import discord
 from discord.ext import commands
+
 from utils import Gunibot, MyContext
 from bot.utils.sconfig import SERVER_CONFIG
-import args
+from bot import args
 
 
 class Logs(commands.Cog):
+    """Monitor what is happening on the server."""
 
     def __init__(self, bot: Gunibot):
         self.bot = bot
@@ -26,6 +28,7 @@ class Logs(commands.Cog):
 
     @commands.command(name="modlogs_flags")
     async def config_modlogs_flags(self, ctx: MyContext):
+        """Edit logs configuration."""
         await ctx.send(await self.bot._(ctx.guild.id, "sconfig.modlogs-help", p=ctx.prefix))
 
     @commands.group(name="modlogs")
@@ -41,13 +44,15 @@ class Logs(commands.Cog):
         if not options:
             await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-modlogs"))
             return
-        LogsFlags = self.bot.get_cog('ConfigCog').LogsFlags()
+        logs_flags = self.bot.get_cog('ConfigCog').LogsFlags()
         flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
-        flags = LogsFlags.intToFlags(flags) + options
+        flags = logs_flags.intToFlags(flags) + options
         flags = list(set(flags))  # remove duplicates
         await SERVER_CONFIG.edit_config(ctx.guild.id, 'modlogs_flags',
-                                  LogsFlags.flagsToInt(flags))
-        await ctx.send(await self.bot._(ctx.guild.id, "sconfig.modlogs-enabled", type=', '.join(options)))
+                                  logs_flags.flagsToInt(flags))
+        await ctx.send(
+            await self.bot._(ctx.guild.id, "sconfig.modlogs-enabled", type=', '.join(options))
+        )
 
     @config_modlogs.command(name="disable")
     async def modlogs_disable(self, ctx: MyContext, options: commands.Greedy[args.moderatorFlag]):
@@ -55,18 +60,26 @@ class Logs(commands.Cog):
         if not options:
             await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-modlogs"))
             return
-        LogsFlags = self.bot.get_cog('ConfigCog').LogsFlags()
+        logs_flags = self.bot.get_cog('ConfigCog').LogsFlags()
         flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
-        flags = LogsFlags.intToFlags(flags)
+        flags = logs_flags.intToFlags(flags)
         flags = [x for x in flags if x not in options]
-        await SERVER_CONFIG.edit_config(ctx.guild.id, 'modlogs_flags', LogsFlags.flagsToInt(flags))
-        await ctx.send(await self.bot._(ctx.guild.id, "sconfig.modlogs-disabled", type=', '.join(options)))
+        await SERVER_CONFIG.edit_config(
+            ctx.guild.id,
+            'modlogs_flags',
+            logs_flags.flagsToInt(flags)
+        )
+        await ctx.send(
+            await self.bot._(ctx.guild.id, "sconfig.modlogs-disabled", type=', '.join(options))
+        )
 
     @config_modlogs.command(name="list")
     async def modlogs_list(self, ctx: MyContext):
         """See available logs categories"""
-        f = self.bot.get_cog('ConfigCog').LogsFlags.FLAGS.values()
-        await ctx.send(await self.bot._(ctx.guild.id, "sconfig.modlogs-list", list=" - ".join(f)))
+        flags = self.bot.get_cog('ConfigCog').LogsFlags.FLAGS.values()
+        await ctx.send(
+            await self.bot._(ctx.guild.id, "sconfig.modlogs-list", list=" - ".join(flags))
+        )
 
     async def has_logs(self, guild) -> bool:
         """Check if a Guild has a valid logs channel"""
@@ -77,8 +90,8 @@ class Logs(commands.Cog):
             config["logs_channel"])
         if not isinstance(logs_channel, discord.TextChannel):
             return False
-        p = logs_channel.permissions_for(guild.me)
-        return p.read_messages and p.send_messages and p.embed_links
+        permissions = logs_channel.permissions_for(guild.me)
+        return permissions.read_messages and permissions.send_messages and permissions.embed_links
 
     async def send_embed(self, guild, embed: discord.Embed):
         """Send the embed in a logs channel"""
@@ -91,9 +104,10 @@ class Logs(commands.Cog):
             return
         await logs_channel.send(embed=embed)
 
-    def get_flags(self, guildID):
-        f = self.bot.get_cog('ConfigCog').LogsFlags().intToFlags
-        return f(self.bot.server_configs[guildID]['modlogs_flags'])
+    def get_flags(self, guild_id):
+        """Return the log flags for a the given `guild_id`."""
+        flags = self.bot.get_cog('ConfigCog').LogsFlags().intToFlags
+        return flags(self.bot.server_configs[guild_id]['modlogs_flags'])
 
     @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):
@@ -105,12 +119,22 @@ class Logs(commands.Cog):
         embed = discord.Embed(
             timestamp=message.created_at,
             title=await self.bot._(message.guild.id, "logs.msg_delete.title"),
-            description=await self.bot._(message.guild.id, "logs.msg_delete.desc", author=message.author.mention, channel=message.channel.mention),
+            description=await self.bot._(
+                message.guild.id,
+                "logs.msg_delete.desc",
+                author=message.author.mention,
+                channel=message.channel.mention,
+            ),
             colour=discord.Colour(13632027)
         )
         embed.set_author(name=str(message.author),
                          icon_url=message.author.display_avatar.url)
-        _footer = await self.bot._(message.guild.id, "logs.footer1", author=message.author.id, message=message.id)
+        _footer = await self.bot._(
+            message.guild.id,
+            "logs.footer1",
+            author=message.author.id,
+            message=message.id,
+        )
         embed.set_footer(text=_footer)
         if len(message.content) > 1024:
             message.content = message.content[:1020] + '...'
@@ -130,12 +154,23 @@ class Logs(commands.Cog):
         embed = discord.Embed(
             timestamp=after.created_at,
             title=await self.bot._(before.guild.id, "logs.msg_edit.title"),
-            description=await self.bot._(before.guild.id, "logs.msg_edit.desc", url=before.jump_url, author=before.author.mention, channel=before.channel.mention),
+            description=await self.bot._(
+                before.guild.id,
+                "logs.msg_edit.desc",
+                url=before.jump_url,
+                author=before.author.mention,
+                channel=before.channel.mention,
+            ),
             colour=discord.Colour(16294684)
         )
         embed.set_author(name=str(before.author),
                          icon_url=before.author.display_avatar.url)
-        _footer = await self.bot._(before.guild.id, "logs.footer1", author=before.author.id, message=before.id)
+        _footer = await self.bot._(
+            before.guild.id,
+            "logs.footer1",
+            author=before.author.id,
+            message=before.id,
+        )
         embed.set_footer(text=_footer)
         if len(before.content) > 1024:
             before.content = before.content[:1020] + '...'
@@ -159,7 +194,12 @@ class Logs(commands.Cog):
         embed = discord.Embed(
             timestamp=datetime.datetime.utcnow(),
             title=await self.bot._(payload.guild_id, "logs.bulk_delete.title"),
-            description=await self.bot._(payload.guild_id, "logs.bulk_delete.desc", count=count, channel=payload.channel_id),
+            description=await self.bot._(
+                payload.guild_id,
+                "logs.bulk_delete.desc",
+                count=count,
+                channel=payload.channel_id,
+            ),
             colour=discord.Colour.red()
         )
         await self.send_embed(guild, embed)
@@ -174,7 +214,11 @@ class Logs(commands.Cog):
         embed = discord.Embed(
             timestamp=invite.created_at,
             title=await self.bot._(invite.guild.id, "logs.invite_created.title"),
-            description=await self.bot._(invite.guild.id, "logs.invite_created.desc", channel=invite.channel.mention),
+            description=await self.bot._(
+                invite.guild.id,
+                "logs.invite_created.desc",
+                channel=invite.channel.mention,
+            ),
             colour=discord.Colour.green()
         )
         if invite.inviter:  # sometimes Discord doesn't send that info
@@ -208,7 +252,11 @@ class Logs(commands.Cog):
             return
         embed = discord.Embed(
             title=await self.bot._(invite.guild.id, "logs.invite_delete.title"),
-            description=await self.bot._(invite.guild.id, "logs.invite_delete.desc", channel=invite.channel.mention),
+            description=await self.bot._(
+                invite.guild.id,
+                "logs.invite_delete.desc",
+                channel=invite.channel.mention,
+            ),
             colour=discord.Colour.green()
         )
         if invite.inviter:
@@ -240,7 +288,11 @@ class Logs(commands.Cog):
         if join:
             embed = discord.Embed(
                 title=await self.bot._(member.guild.id, "logs.member_join.title"),
-                description=await self.bot._(member.guild.id, "logs.member_join.desc", user=member.mention),
+                description=await self.bot._(
+                    member.guild.id,
+                    "logs.member_join.desc",
+                    user=member.mention,
+                ),
                 colour=discord.Colour.green()
             )
             date = await self.bot.get_cog("TimeCog").date(member.created_at, year=True)
@@ -249,10 +301,20 @@ class Logs(commands.Cog):
         else:
             embed = discord.Embed(
                 title=await self.bot._(member.guild.id, "logs.member_left.title"),
-                description=await self.bot._(member.guild.id, "logs.member_left.desc", user=member.mention),
+                description=await self.bot._(
+                    member.guild.id,
+                    "logs.member_left.desc",
+                    user=member.mention,
+                ),
                 colour=discord.Colour(15994684)
             )
-            delta = await self.bot.get_cog("TimeCog").time_delta(member.joined_at, datetime.datetime.utcnow(), lang="fr", year=True, precision=0)
+            delta = await self.bot.get_cog("TimeCog").time_delta(
+                member.joined_at,
+                datetime.datetime.utcnow(),
+                lang="fr",
+                year=True,
+                precision=0,
+            )
             _date = await self.bot._(member.guild.id, "logs.member_left.date")
             embed.add_field(name=_date, value=delta)
         embed.set_author(name=str(member), icon_url=member.display_avatar.url)
@@ -296,7 +358,12 @@ class Logs(commands.Cog):
         await self.send_embed(guild, embed)
 
     @commands.Cog.listener()
-    async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
+    async def on_voice_state_update(
+        self,
+        member: discord.Member,
+        before: discord.VoiceState,
+        after: discord.VoiceState,
+    ):
         "https://discordpy.readthedocs.io/en/latest/api.html#discord.on_voice_state_update"
         if not await self.has_logs(member.guild):
             return
@@ -305,21 +372,25 @@ class Logs(commands.Cog):
         # member joined a channel
         if before.channel is None and after.channel is not None:
             _desc = "join"
-            kw = {'after': after.channel.name}
+            kw_args = {'after': after.channel.name}
         # member left a channel
         elif before.channel is not None and after.channel is None:
             _desc = "left"
-            kw = {'before': before.channel.name}
+            kw_args = {'before': before.channel.name}
         # member moved in another channel
         elif before.channel != after.channel:
             _desc = "move"
-            kw = {'before': before.channel.name, 'after': after.channel.name}
+            kw_args = {'before': before.channel.name, 'after': after.channel.name}
         else:
             return
         _title = await self.bot._(member.guild.id, "logs.voice_move.title")
         embed = discord.Embed(
             title=_title,
-            description=await self.bot._(member.guild.id, "logs.voice_move." + _desc, user=member.mention, **kw)
+            description=await self.bot._(
+                member.guild.id,
+                "logs.voice_move." + _desc, user=member.mention,
+                **kw_args,
+            ),
         )
         embed.colour = discord.Color.light_gray()
         embed.set_author(name=str(member), icon_url=member.display_avatar.url)
@@ -347,8 +418,13 @@ class Logs(commands.Cog):
                 description=await self.bot._(before.guild.id, "logs.boost.desc-lost")
             )
         if before.premium_tier != after.premium_tier:
-            _desc = await self.bot._(before.guild.id, "logs.boost.change", before=before.premium_tier, after=after.premium_tier)
-            embed.description += "\n" + _desc
+            description = await self.bot._(
+                before.guild.id,
+                "logs.boost.change",
+                before=before.premium_tier,
+                after=after.premium_tier,
+            )
+            embed.description += "\n" + description
         embed.color = discord.Color(0xf47fff)
         await self.send_embed(after, embed)
 
@@ -361,7 +437,12 @@ class Logs(commands.Cog):
             return
         embed = discord.Embed(
             title=await self.bot._(role.guild.id, "logs.role_created.title"),
-            description=await self.bot._(role.guild.id, "logs.role_created.desc", mention=role.mention, name=role.name)
+            description=await self.bot._(
+                role.guild.id,
+                "logs.role_created.desc",
+                mention=role.mention,
+                name=role.name,
+            )
         )
         _no = await self.bot._(role.guild.id, "logs._no")
         _yes = await self.bot._(role.guild.id, "logs._yes")
@@ -370,7 +451,10 @@ class Logs(commands.Cog):
         data = [_pos + f' {role.position}',
                 _ment + ' ' + (_yes if role.mentionable else _no)]
         if role.color != discord.Color.default():
-            data.append(await self.bot._(role.guild.id, "logs.role_created.color") + f' {role.color}')
+            data.append(await self.bot._(
+                role.guild.id,
+                "logs.role_created.color",
+            ) + f' {role.color}')
         if role.hoist:
             data.append(await self.bot._(role.guild.id, "logs.role_created.hoisted"))
         if role.permissions.administrator:
@@ -398,7 +482,10 @@ class Logs(commands.Cog):
         data = [_pos + f' {role.position}',
                 _ment + ' ' + (_yes if role.mentionable else _no)]
         if role.color != discord.Color.default():
-            data.append(await self.bot._(role.guild.id, "logs.role_created.color") + f' {role.color}')
+            data.append(await self.bot._(
+                role.guild.id,
+                "logs.role_created.color",
+            ) + f' {role.color}')
         if role.hoist:
             data.append(await self.bot._(role.guild.id, "logs.role_created.hoisted"))
         if role.permissions.administrator:
@@ -420,7 +507,12 @@ class Logs(commands.Cog):
             return
         embed = discord.Embed(
             title=await self.bot._(after.guild.id, "logs.role_updated.title"),
-            description=await self.bot._(after.guild.id, "logs.role_updated.desc", mention=after.mention, name=after.name)
+            description=await self.bot._(
+                after.guild.id,
+                "logs.role_updated.desc",
+                mention=after.mention,
+                name=after.name,
+            )
         )
         _no = await self.bot._(after.guild.id, "logs._no")
         _yes = await self.bot._(after.guild.id, "logs._yes")
@@ -432,20 +524,20 @@ class Logs(commands.Cog):
             _name = await self.bot._(after.guild.id, "logs.role_updated.name")
             data.append(_name + f" {before.name} -> {after.name}")
         if before.permissions.administrator != after.permissions.administrator:
-            b1 = _yes if before.permissions.administrator else _no
-            b2 = _yes if after.permissions.administrator else _no
+            state_1 = _yes if before.permissions.administrator else _no
+            state_2 = _yes if after.permissions.administrator else _no
             _admin = await self.bot._(after.guild.id, "logs.role_created.admin")
-            data.append(_admin + f": {b1} -> {b2}")
+            data.append(_admin + f": {state_1} -> {state_2}")
         if before.mentionable != after.mentionable:
-            b1 = _yes if before.mentionable else _no
-            b2 = _yes if after.mentionable else _no
+            state_1 = _yes if before.mentionable else _no
+            state_2 = _yes if after.mentionable else _no
             _ment = await self.bot._(after.guild.id, "logs.role_created.mentionnable")
-            data.append(_ment + f": {b1} -> {b2}")
+            data.append(_ment + f": {state_1} -> {state_2}")
         if before.hoist != after.hoist:
-            b1 = _yes if before.hoist else _no
-            b2 = _yes if after.hoist else _no
+            state_1 = _yes if before.hoist else _no
+            state_2 = _yes if after.hoist else _no
             _hoist = await self.bot._(after.guild.id, "logs.role_created.hoisted")
-            data.append(_hoist + f": {b1} -> {b2}")
+            data.append(_hoist + f": {state_1} -> {state_2}")
         if len(data) == 0:
             return
         _changes = await self.bot._(after.guild.id, "logs.role_updated.changes")
@@ -469,10 +561,18 @@ class Logs(commands.Cog):
             got = [r.mention for r in after.roles if r not in before.roles]
             lost = [r.mention for r in before.roles if r not in after.roles]
             if got:
-                _added = await self.bot._(after.guild.id, "logs.member_update.roles_added", count=len(got))
+                _added = await self.bot._(
+                    after.guild.id,
+                    "logs.member_update.roles_added",
+                    count=len(got),
+                )
                 embed.add_field(name=_added, value=" ".join(got), inline=False)
             if lost:
-                _removed = await self.bot._(after.guild.id, "logs.member_update.roles_removed", count=len(lost))
+                _removed = await self.bot._(
+                    after.guild.id,
+                    "logs.member_update.roles_removed",
+                    count=len(lost),
+                )
                 embed.add_field(
                     name=_removed, value=" ".join(lost), inline=False)
         if len(embed.fields) == 0:
@@ -484,7 +584,12 @@ class Logs(commands.Cog):
         await self.send_embed(before.guild, embed)
 
     @commands.Cog.listener()
-    async def on_guild_emojis_update(self, guild: discord.Guild, before: List[discord.Emoji], after: List[discord.Emoji]):
+    async def on_guild_emojis_update(
+        self,
+        guild: discord.Guild,
+        before: List[discord.Emoji],
+        after: List[discord.Emoji],
+    ):
         """https://discordpy.readthedocs.io/en/latest/api.html#discord.on_guild_emojis_update"""
         if not await self.has_logs(guild):
             return
@@ -494,39 +599,47 @@ class Logs(commands.Cog):
                               color=discord.Color(0xf8d71c))
         new = [str(e) for e in after if e not in before]
         lost = [str(e) for e in before if e not in after]
-        renamed = list()
-        restrict = list()
-        for b in before:
-            for a in after:
-                if a.id == b.id:
-                    if a.name != b.name:
-                        renamed.append(f'{a} :{b.name}: -> :{a.name}:')
-                    if a.roles != b.roles:
-                        a_roles = ' '.join([x.mention for x in a.roles])
-                        b_roles = ' '.join([x.mention for x in b.roles])
-                        restrict.append(f'{a} {b_roles} -> {a_roles}')
+        renamed = []
+        restrict = []
+        for emoji_before in before:
+            for emoji_after in after:
+                if emoji_after.id == emoji_before.id:
+                    if emoji_after.name != emoji_before.name:
+                        renamed.append(
+                            f'{emoji_after} :{emoji_before.name}: -> :{emoji_after.name}:'
+                        )
+                    if emoji_after.roles != emoji_before.roles:
+                        a_roles = ' '.join([x.mention for x in emoji_after.roles])
+                        b_roles = ' '.join([x.mention for x in emoji_before.roles])
+                        restrict.append(f'{emoji_after} {b_roles} -> {a_roles}')
         if not (new or lost or renamed):
             # can happen when Discord fetch emojis from Twitch without any
             # change
             return
         if new:
-            n = await self.bot._(guild.id, "logs.emoji_update.added", count=len(new))
-            embed.add_field(name=n, value="".join(new), inline=False)
+            field_name = await self.bot._(guild.id, "logs.emoji_update.added", count=len(new))
+            embed.add_field(name=field_name, value="".join(new), inline=False)
         if lost:
-            n = await self.bot._(guild.id, "logs.emoji_update.removed", count=len(lost))
-            embed.add_field(name=n, value="".join(lost), inline=False)
+            field_name = await self.bot._(guild.id, "logs.emoji_update.removed", count=len(lost))
+            embed.add_field(name=field_name, value="".join(lost), inline=False)
         if renamed:
-            n = await self.bot._(guild.id, "logs.emoji_update.renamed", count=len(renamed))
-            embed.add_field(name=n, value="\n".join(renamed), inline=False)
+            field_name = await self.bot._(guild.id, "logs.emoji_update.renamed", count=len(renamed))
+            embed.add_field(name=field_name, value="\n".join(renamed), inline=False)
         if restrict:
-            n = await self.bot._(guild.id, "logs.emoji_update.restrict", count=len(restrict))
-            embed.add_field(name=n, value="\n".join(restrict), inline=False)
+            field_name = await self.bot._(
+                guild.id,
+                "logs.emoji_update.restrict",
+                count=len(restrict),
+            )
+            embed.add_field(name=field_name, value="\n".join(restrict), inline=False)
         await self.send_embed(guild, embed)
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
+    """
+    Fonction d'initialisation du plugin
+
+    :param bot: Le bot
+    :type bot: Gunibot
+    """
     if bot is not None:
         await bot.add_cog(Logs(bot), icon="📜")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)
