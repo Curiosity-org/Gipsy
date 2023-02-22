@@ -18,13 +18,13 @@ class DatabaseInvite:
     guild: discord.Guild
     channel: discord.TextChannel
     user: int
-    id: int
+    invite_id: int
     code: int
     uses: int
     description: str
 
     def __init__(self, data: Tuple[Any], parent: Gunibot) -> None:
-        """Constrcut the classe with the database data
+        """Construct the classe with the database data
 
         Attributes
         ----------
@@ -37,7 +37,7 @@ class DatabaseInvite:
         self.guild = self.parent.get_guild(data[0])
         self.channel = self.guild.get_channel(data[1])
         self.user = data[2]
-        self.id = data[3]
+        self.invite_id = data[3]
         self.code = data[4]
         self.uses = data[5]
         self.description = data[6]
@@ -51,8 +51,8 @@ class DatabaseInvite:
             If the invitation was used since last update or not
         """
         invites = await self.channel.invites()
-        if self.id in (invite.id for invite in invites):
-            invite = [invite for invite in invites if invite.id == self.id][0]
+        if self.invite_id in (invite.id for invite in invites):
+            invite = [invite for invite in invites if invite.id == self.invite_id][0]
             if invite.uses != self.uses:
                 self.update(invite)
                 return True
@@ -63,7 +63,7 @@ class DatabaseInvite:
     def delete(self) -> None:
         """Delete the invitation in the database"""
         query = "DELETE FROM invites WHERE id = ?"
-        self.parent.db_query(query, (self.id,))
+        self.parent.db_query(query, (self.invite_id,))
 
     def update(self, invite: discord.Invite) -> None:
         """Update the invite to match the given in database
@@ -73,7 +73,7 @@ class DatabaseInvite:
         invite: discord.Invite
             The invitation to update
         """
-        if invite.id != self.id:
+        if invite.id != self.invite_id:
             raise ValueError("The invitation is not the current one")
         self.uses = invite.uses
         query = "UPDATE invites SET uses=? WHERE id=?;"
@@ -81,7 +81,7 @@ class DatabaseInvite:
             query,
             (
                 self.uses,
-                self.id,
+                self.invite_id,
             ),
         )
 
@@ -142,20 +142,22 @@ class DatabaseInvite:
             The new description
         """
         query = "UPDATE invites SET description=? WHERE id=?;"
-        self.parent.db_query(query, (description, self.id))
+        self.parent.db_query(query, (description, self.invite_id))
 
     def __eq__(self, item: Union[int, str, "Invite", discord.Invite]) -> bool:
         if isinstance(item, int):
-            return self.id == item
+            return self.invite_id == item
         elif isinstance(item, str):
             return self.code == item
         elif isinstance(item, Invite):
-            return self.id == item.id
+            return self.invite_id == item.id
         elif isinstance(item, discord.Invite):
-            return self.id == item.id
+            return self.invite_id == item.id
 
 
 class Invite(commands.Cog):
+    """Track who invited with which invitation."""
+    
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.config_options = ["invite_log"]
@@ -246,7 +248,7 @@ class Invite(commands.Cog):
                 guild=member.guild,
                 invitations=invites_string,
             )
-        
+
         channel = self.bot.server_configs[member.guild.id]["invite_log"]
         if channel is not None:
             channel = self.bot.get_channel(channel)
@@ -359,7 +361,7 @@ class Invite(commands.Cog):
         query = "SELECT * FROM invites WHERE guild = ?;"
         datas = self.bot.db_query(query, (guild,), astuple=True)
         return [DatabaseInvite(data, self.bot) for data in datas]
-    
+
     async def get_invitation_string(
         self,
         invite: DatabaseInvite,
