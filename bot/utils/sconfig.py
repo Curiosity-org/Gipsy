@@ -159,7 +159,7 @@ class Sconfig(commands.Cog):
             value = [value] if isinstance(value, str) else value
             return " ".join([emojis_convert(x, self.bot.emojis) for x in value])
         if config["type"] == "modlogsFlags":
-            flags = self.bot.get_cog("ConfigCog").LogsFlags().intToFlags(value)
+            flags = self.bot.get_cog("ConfigCog").LogsFlags().int_to_flags(value)
             return " - ".join(flags) if len(flags) > 0 else None
         if config["type"] == "language":
             cog = self.bot.get_cog("Languages")

@@ -46,10 +46,10 @@ class Logs(commands.Cog):
             return
         logs_flags = self.bot.get_cog('ConfigCog').LogsFlags()
         flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
-        flags = logs_flags.intToFlags(flags) + options
+        flags = logs_flags.int_to_flags(flags) + options
         flags = list(set(flags))  # remove duplicates
         await SERVER_CONFIG.edit_config(ctx.guild.id, 'modlogs_flags',
-                                  logs_flags.flagsToInt(flags))
+                                  logs_flags.flags_to_int(flags))
         await ctx.send(
             await self.bot._(ctx.guild.id, "sconfig.modlogs-enabled", type=', '.join(options))
         )
@@ -62,12 +62,12 @@ class Logs(commands.Cog):
             return
         logs_flags = self.bot.get_cog('ConfigCog').LogsFlags()
         flags = self.bot.server_configs[ctx.guild.id]['modlogs_flags']
-        flags = logs_flags.intToFlags(flags)
+        flags = logs_flags.int_to_flags(flags)
         flags = [x for x in flags if x not in options]
         await SERVER_CONFIG.edit_config(
             ctx.guild.id,
             'modlogs_flags',
-            logs_flags.flagsToInt(flags)
+            logs_flags.flags_to_int(flags)
         )
         await ctx.send(
             await self.bot._(ctx.guild.id, "sconfig.modlogs-disabled", type=', '.join(options))
@@ -106,7 +106,7 @@ class Logs(commands.Cog):
 
     def get_flags(self, guild_id):
         """Return the log flags for a the given `guild_id`."""
-        flags = self.bot.get_cog('ConfigCog').LogsFlags().intToFlags
+        flags = self.bot.get_cog('ConfigCog').LogsFlags().int_to_flags()
         return flags(self.bot.server_configs[guild_id]['modlogs_flags'])
 
     @commands.Cog.listener()

@@ -5,19 +5,19 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-import discord
 from discord.ext import tasks, commands
-from utils import Gunibot, MyContext
+
+from utils import Gunibot
 
 
 class Gunivers(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "gunivers"
-        self.update_loop.start()
+        self.update_loop.start() # pylint: disable=no-member
 
-    def cog_unload(self):
-        self.update_loop.cancel()
+    async def cog_unload(self):
+        self.update_loop.cancel() # pylint: disable=no-member
 
     @tasks.loop(minutes=60.0 * 24.0)
     async def update_loop(self):
@@ -26,5 +26,5 @@ class Gunivers(commands.Cog):
             await channel.send("Bon, qu'est-ce qu'on peut poster aujourd'hui ?")
 
 
-async def setup(bot: Gunibot = None, plugin_config: dict = None):
+async def setup(bot: Gunibot = None):
     await bot.add_cog(Gunivers(bot))
