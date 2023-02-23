@@ -327,11 +327,13 @@ class Wormholes(commands.Cog):
                                 embeds=newmessage.embeds,
                                 allowed_mentions=None,
                             )
-                    except discord.NotFound: # the webhook has been deleted
+                    except discord.NotFound:  # the webhook has been deleted
                         logs.info(
                             f"The webhook for channel {row[1]} for wormhole {wh_name} has been deleted and a message has not been edited."
                         )
-                    except discord.Forbidden: # the webhook has changed, should not be possible due to checks before
+                    except (
+                        discord.Forbidden
+                    ):  # the webhook has changed, should not be possible due to checks before
                         logs.info(
                             f"The webhook for channel {row[1]} for wormhole {wh_name} has changed and a message has not been edited."
                         )

@@ -175,8 +175,8 @@ def main():
 
     print(f"\n{color.fg.green}✅ Setup complete!{color.stop}")
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     main()
 
     # Start bot
@@ -184,7 +184,9 @@ if __name__ == "__main__":
     print(
         f"\n{color.fg.yellow}⚠️ Before starting the bot, you should open the config.yaml file and check that everything is correct.{color.stop} "
     )
-    choice = input(f"{color.fg.blue}▶️ Do you want to start the bot? [Y/n]{color.stop} ")
+    choice = input(
+        f"{color.fg.blue}▶️ Do you want to start the bot? [Y/n]{color.stop} "
+    )
     if choice.lower() not in decline:
         print(
             "   Starting the bot...\n--------------------------------------------------------------------------------"

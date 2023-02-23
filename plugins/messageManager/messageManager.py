@@ -59,7 +59,7 @@ class MessageManager(commands.Cog):
     ):
         """Say something with someone else's appearance"""
 
-        if (member is not None and text is not None): # c'est python, autant être verbeux
+        if member is not None and text is not None:  # c'est python, autant être verbeux
             # Create a webhook in the image of the targeted member
             webhook = await ctx.channel.create_webhook(name=member.display_name)
             await webhook.send(content=text, avatar_url=member.display_avatar)
