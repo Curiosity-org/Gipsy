@@ -1,19 +1,17 @@
+import os
+import shutil
 
+# pylint: disable=invalid-name, redefined-builtin
 
 # -- Project information -----------------------------------------------------
 
 project = "Gipsy"
 copyright = "2023, Gunivers"
-author = "Z_runner, Leirof, Aeris One, ascpial, theogiraudet, fantomitechno, Just_a_Player and Aragorn"
+author = "Z_runner, Leirof, Aeris One, ascpial, theogiraudet, fantomitechno,"\
+    "Just_a_Player and Aragorn"
 
-import os
-
-# Project information ---------------------------------------------------------
-
-project = 'Gipsy'
-copyright = '2023, Gunivers'
-author = 'Gunivers'
-html_favicon = "_static/logo.png"
+# The full version, including alpha/beta/rc tags
+# release = ""
 
 # -- General configuration ----------------------------------------------------
 
@@ -37,7 +35,8 @@ html_theme = 'pydata_sphinx_theme'
 
 html_theme_options = {
     "github_url": "https://github.com/Gunivers/Gipsy",
-    "announcement": "⚠️ You are reading a doc of an undergoing development version. Information can be out of date and/or change at any time. ⚠️",
+    "announcement": "⚠️ You are reading a doc of an undergoing development version."\
+    "Information can be out of date and/or change at any time. ⚠️",
     "logo": {
         "image_dark": "_static/logo.png",
         "text": "Gipsy",  # Uncomment to try text with logo
@@ -89,7 +88,6 @@ myst_enable_extensions = [
 
 # Plugin doc generation -------------------------------------------------------
 
-import shutil
 
 CONTRIBUTE = """
 ```{admonition} 🤝 Help us to improve this documentation!
@@ -131,8 +129,8 @@ def generate_plugin_doc():
                 break
 
     # Removing old plugin doc files
-    if os.path.isdir(f"plugins"):
-        shutil.rmtree(f"plugins")
+    if os.path.isdir("plugins"):
+        shutil.rmtree("plugins")
 
     # Restoring index.md file content without plugin toctree
     with open("user_guide.md", "w+", encoding="utf-8") as toctree:
@@ -143,7 +141,7 @@ def generate_plugin_doc():
         # Generating plugin toctree and moving pugin's doc files in the global docs folder
         path = os.path.join("", os.pardir)
         for plugin in os.listdir(f"{path}/plugins"):
-            
+
             # Checking if plugin has a doc folder
             if not os.path.isdir(f"{path}/plugins/" + plugin + "/docs"):
                 continue
@@ -155,7 +153,7 @@ def generate_plugin_doc():
                 if not file[-3:] == ".md" and not file[-4:] == ".rst":
                     continue
 
-                
+
                 if not os.path.isdir(f"/plugins/{plugin}/"):
                     os.makedirs(f"plugins/{plugin}/")
                 shutil.copyfile(
@@ -168,13 +166,15 @@ def generate_plugin_doc():
                     f.write(CONTRIBUTE)
 
                     if "repository_url" in html_theme_options\
-                            and html_theme_options["repository_url"].startswith("https://github.com/"):
+                            and html_theme_options["repository_url"].startswith(
+                                "https://github.com/"
+                    ):
                         orga = html_theme_options["repository_url"].split("/")[3]
                         repo = html_theme_options["repository_url"].split("/")[4]
-                        
+
                         f.write(
                             GITHUB_DISCUSSION_FOOTER.format(orga=orga, repo=repo)
                         )
-        
+
         toctree.write("\n```")
 generate_plugin_doc()
