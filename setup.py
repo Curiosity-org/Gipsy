@@ -163,10 +163,10 @@ def main():
 
     # Optional settings
 
-    choice = input(
+    user_choice = input(
         f"\n{color.fg.blue}Do you want to configure optional bot settings? [Y/n]:{color.stop} "
     )
-    if choice.lower() not in decline:
+    if user_choice.lower() not in decline:
         config.advanced_setup()
 
     # End optional settings

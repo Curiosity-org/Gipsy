@@ -9,6 +9,7 @@ import discord
 from discord.ext import commands
 
 
+# pylint: disable=unused-argument
 async def execute(
     ban_plugin,
     ctx: commands.Context,
@@ -16,9 +17,9 @@ async def execute(
     reason: str,
 ) -> bool:
     """Just send a rickroll"""
-    await ctx.bot._(ctx.channel, f"ban.gunivers.rickroll")
+    await ctx.bot._(ctx.channel, "ban.gunivers.rickroll")
     await ctx.send(
-        "Never gonna give you up,\nnever gonna let you down,\nnever gonna run around and ban you :musical_note:"
+        "Never gonna give you up,\nnever gonna let you down,\nnever gonna run around and ban you :musical_note:" # pylint: disable=line-too-long
     )
     await ctx.send(
         "https://thumbs.gfycat.com/VengefulDesertedHalibut-size_restricted.gif"
