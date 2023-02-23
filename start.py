@@ -49,10 +49,10 @@ def print_ascii_art():
     # pylint: disable=trailing-whitespace
     print(
         f"""{color.fg.blue}
-      ___  ____  ____  ___  _  _        ___     ___  
-     / __)(_  _)(  _ \/ __)( \/ )      (__ \   / _ \\ 
+      ___  ____  ____  ___  _  _        ___     ___
+     / __)(_  _)(  _ \/ __)( \/ )      (__ \   / _ \\
     ( (_-. _)(_  )___/\__ \ \  /        / _/  ( (_) )
-     \___/(____)(__)  (___/ (__)       (____)()\___/ 
+     \___/(____)(__)  (___/ (__)       (____)()\___/
 
         {color.stop}"""
     )
@@ -68,9 +68,7 @@ def main():
 
     # Creating client
     client = Gunibot(
-        case_insensitive=True,
-        status=discord.Status.do_not_disturb,
-        beta=False
+        case_insensitive=True, status=discord.Status.do_not_disturb, beta=False
     )
 
     # Writing logs + welcome message

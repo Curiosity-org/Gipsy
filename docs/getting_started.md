@@ -48,7 +48,7 @@ If you invite the beta version, you will be able to test the latest features add
       git clone https://github.com/Gunivers/Gipsy
       ```
 
-6. (Optional) Create a virtual environment with 
+6. (Optional) Create a virtual environment with
 
       ```
       python3.9 -m venv venv
@@ -60,7 +60,7 @@ If you invite the beta version, you will be able to test the latest features add
       ```
 
 7. Install dependencies
-   
+
       ```
       pip install -r requirements.txt
       ```
@@ -89,7 +89,7 @@ If you invite the beta version, you will be able to test the latest features add
       ```
       https://discord.com/oauth2/authorize?scope=bot&client_id=__________________
       ```
-   
+
 13. Open the URL in your browser and invite the bot to your server.
 
 :::
@@ -120,7 +120,7 @@ Axobot is not really a Gipsy instance, but it is maintained by the same original
 In a channel where the bot can read and write messages, follow the instructions below.
 
 1. Define your language with the command `@gipsy config language <en|fr>`
-2. Define the prefix with the command `@gipsy config prefix <prefix>`. 
+2. Define the prefix with the command `@gipsy config prefix <prefix>`.
    Exemple: type `@gipsy config prefix !` and then `!ping`
 
 ```{note}

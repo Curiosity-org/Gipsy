@@ -47,7 +47,7 @@ en:
       "22": "{1} tried a rocket jump"
       "23": "You shouldn't listen to the pretty melody of the Lullaby, {1} :musical_note:"
       "footer": "Death messages created by Aragorn1202"
-    dataja: 
+    dataja:
       title: "Don't ask to ask, just ask"
       description: "Learn the best practices to ask question:\nhttps://zrunner.me/d-a-t-a/en.html"
     timestamp:
@@ -56,16 +56,16 @@ en:
       create-result: "The timestamp for the <t:%{timestamp}:F> is: `%{timestamp}` (Discord timestamp : `<t:%{timestamp}>`)"
       help: |
             ***The timestamp in discord***
-      
+
             *Example : Discord was created <t:1431468000:R>, the <t:1431468000:D>.*
-      
+
             __**Use the timestamp feature**__ :
             You needs to get a UNIX timestamp (you can use the `timestamp get` and `timestamp create` commands), then you can use it with the following syntax:
             ```
             <t:[TIMESTAMP]>
             ```
             `[TIMESTAMP]` should be replaced with the timestamp you get.
-      
+
             __**Utiliser les styles**__ :
             You can also style the timestamp using this syntax :
             ```

@@ -105,7 +105,9 @@ class Gunibot(commands.bot.AutoShardedBot):
         size=512,
     ):
         """Get the avatar of an user, format gif or png (as webp isn't supported by some browsers)"""
-        avatar = user.display_avatar.with_size(size) # the avatar always exist, returns the URL to the default one
+        avatar = user.display_avatar.with_size(
+            size
+        )  # the avatar always exist, returns the URL to the default one
         if avatar.is_animated():
             return avatar.with_format("gif")
         else:
@@ -135,7 +137,8 @@ class Gunibot(commands.bot.AutoShardedBot):
     ) -> Union[int, List[dict], dict]:
         """Do any query to the bot database
         If SELECT, it will return a list of results, or only the first result (if fetchone)
-        For any other query, it will return the affected row ID if returnrowscount, or the amount of affected rows (if returnrowscount)"""
+        For any other query, it will return the affected row ID if returnrowscount, or the amount of affected rows (if returnrowscount)
+        """
         cursor = self.database.cursor()
         try:
             cursor.execute(query, args)

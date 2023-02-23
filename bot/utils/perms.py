@@ -44,7 +44,8 @@ class Perms(commands.Cog):
         target: typing.Union[discord.Member, discord.Role] = None,
     ):
         """Permissions assigned to a member/role (the user by default)
-        The channel used to view permissions is the channel in which the command is entered."""
+        The channel used to view permissions is the channel in which the command is entered.
+        """
         if target is None:
             target = ctx.author
         perms = None
@@ -74,8 +75,8 @@ class Perms(commands.Cog):
                     }
                 )
             col = target.color
-            if target.guild.icon is not None: # the guild could have no icon
-                avatar = ctx.guild.icon.with_size(256).with_format('png')
+            if target.guild.icon is not None:  # the guild could have no icon
+                avatar = ctx.guild.icon.with_size(256).with_format("png")
             else:
                 avatar = None
             name = str(target)

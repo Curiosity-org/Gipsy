@@ -21,6 +21,7 @@ CHANNEL_TYPES = Union[
     discord.abc.GuildChannel,
 ]
 
+
 class General(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
@@ -167,8 +168,11 @@ class General(commands.Cog):
         embed.add_field(name="admin", value="Affiche les commandes admin disponibles")
         await ctx.send(embed=embed)
 
+
 config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+
+
+async def setup(bot: Gunibot = None, plugin_config: dict = None):
     if bot is not None:
         await bot.add_cog(General(bot), icon="🌍")
     if plugin_config is not None:

@@ -14,8 +14,8 @@ from utils import Gunibot, MyContext
 
 from typing import Union
 
-class Misc(commands.Cog):
 
+class Misc(commands.Cog):
     CONTAINS_TIMESTAMP = Union[
         int,
         discord.User,
@@ -32,9 +32,9 @@ class Misc(commands.Cog):
         self.bot = bot
         self.file = "misc"
 
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
     # 🍪 Cookie
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
     @commands.command(name="cookie", aliases=["🍪"])
     @commands.guild_only()
@@ -43,7 +43,8 @@ class Misc(commands.Cog):
         Usage:
         - Get a cookie: cookie
         - Give a cookie to someone: cookie <user>
-          - user: the member you want to give the cookie to. Can be a mention, an id or simply it's name."""
+          - user: the member you want to give the cookie to. Can be a mention, an id or simply it's name.
+        """
 
         # If the cookie is given
         if user:
@@ -78,11 +79,11 @@ class Misc(commands.Cog):
         except discord.errors.NotFound:
             pass
 
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
     # 🖥️ Hoster
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
-    @commands.command(name="hoster", aliases=["host","mtxserv","mtx","🖥️","💻"])
+    @commands.command(name="hoster", aliases=["host", "mtxserv", "mtx", "🖥️", "💻"])
     @commands.guild_only()
     async def hoster(self, ctx: MyContext):
         """Give all informations about the hoster.
@@ -92,10 +93,11 @@ class Misc(commands.Cog):
         # Building the result message
         embed = discord.Embed(colour=discord.Colour.blue())
         embed.add_field(
-            name="mTx Serv",
-            value=await self.bot._(ctx.guild.id, "misc.hoster.info")
+            name="mTx Serv", value=await self.bot._(ctx.guild.id, "misc.hoster.info")
         )
-        embed.set_thumbnail(url="http://gunivers.net/wp-content/uploads/2021/07/Logo-mTxServ.png")
+        embed.set_thumbnail(
+            url="http://gunivers.net/wp-content/uploads/2021/07/Logo-mTxServ.png"
+        )
 
         # Building the webhook that will take the appearance off the hoster
         webhook: discord.Webhook = await ctx.channel.create_webhook(name="mTx Serv")
@@ -107,11 +109,11 @@ class Misc(commands.Cog):
         # Cleaning the webhook
         await webhook.delete()
 
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
     # 🪙 Flip a coin
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
-    @commands.command(name="flipacoin", aliases=["fc","coin","🪙"])
+    @commands.command(name="flipacoin", aliases=["fc", "coin", "🪙"])
     async def flip(self, ctx: MyContext):
         """Flip a coin.
         Usage:
@@ -136,14 +138,14 @@ class Misc(commands.Cog):
         )
         embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/867/867351.png")
 
-        await ctx.send(embed = embed)
+        await ctx.send(embed=embed)
 
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
     # 🎲 Roll a dice
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
-    @commands.command(name="rolladice", aliases=["rad","dice","🎲"])
-    async def rolladice(self, ctx: MyContext, *, dice:int = 6):
+    @commands.command(name="rolladice", aliases=["rad", "dice", "🎲"])
+    async def rolladice(self, ctx: MyContext, *, dice: int = 6):
         """Roll a dice.
         Usage:
         - Throw a classic dice: dice
@@ -157,18 +159,26 @@ class Misc(commands.Cog):
         except:
             embed = discord.Embed(
                 description=await self.bot._(ctx.guild.id, "misc.dice.error.not_int"),
-                colour=0xe74c3c,
+                colour=0xE74C3C,
             )
-            embed.set_author(name="Error", icon_url="https://cdn-icons-png.flaticon.com/512/738/738884.png")
+            embed.set_author(
+                name="Error",
+                icon_url="https://cdn-icons-png.flaticon.com/512/738/738884.png",
+            )
             ctx.send(embed=embed)
 
         # Test if the parameter is upper than 0
         if dice <= 0:
             embed = discord.Embed(
-                description=await self.bot._(ctx.guild.id, "misc.dice.error.not_positive"),
-                colour=0xe74c3c,
+                description=await self.bot._(
+                    ctx.guild.id, "misc.dice.error.not_positive"
+                ),
+                colour=0xE74C3C,
             )
-            embed.set_author(name="Error", icon_url="https://cdn-icons-png.flaticon.com/512/738/738884.png")
+            embed.set_author(
+                name="Error",
+                icon_url="https://cdn-icons-png.flaticon.com/512/738/738884.png",
+            )
             ctx.send(embed=embed)
 
         # Generate the random value and print it
@@ -177,16 +187,20 @@ class Misc(commands.Cog):
         # Building the result message
         embed = discord.Embed(
             title=await self.bot._(ctx.guild.id, "misc.dice.title"),
-            description=await self.bot._(ctx.guild.id, "misc.dice.description", value=value),
+            description=await self.bot._(
+                ctx.guild.id, "misc.dice.description", value=value
+            ),
             colour=0x2F3136,
         )
-        embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/1055/1055855.png")
+        embed.set_thumbnail(
+            url="https://cdn-icons-png.flaticon.com/512/1055/1055855.png"
+        )
 
-        await ctx.send(embed = embed)
+        await ctx.send(embed=embed)
 
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
     # ❓ dataja
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
     @commands.command(name="dataja", aliases=["data", "ask", "❓"])
     async def dataja(self, ctx: MyContext):
@@ -199,9 +213,11 @@ class Misc(commands.Cog):
             description=await self.bot._(ctx.guild.id, "misc.dataja.description"),
             colour=0x2F3136,
         )
-        embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/1180/1180260.png")
-        
-        await ctx.send(embed = embed)
+        embed.set_thumbnail(
+            url="https://cdn-icons-png.flaticon.com/512/1180/1180260.png"
+        )
+
+        await ctx.send(embed=embed)
 
         # Deleting command
         try:
@@ -209,16 +225,17 @@ class Misc(commands.Cog):
         except discord.errors.NotFound:
             pass
 
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
     # 🗡️ kill
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
     @commands.command(name="kill", aliases=["🗡️"])
     async def kill(self, ctx: MyContext, *, target: str = None):
         """Wanna kill someone? Take a breath
         Usage:
         - kill someone: kill <user>
-          - user: the guy you want to kill. It can be a mention, an ID or simply a name."""
+          - user: the guy you want to kill. It can be a mention, an ID or simply a name.
+        """
 
         # Suicide
         if target is None:
@@ -236,10 +253,8 @@ class Misc(commands.Cog):
         # Generating a random answer
         msg = "misc.kills"
         while msg.startswith("misc.kills") or (
-                "{0}" in msg
-                and target is None
-                and tries < 50
-            ):
+            "{0}" in msg and target is None and tries < 50
+        ):
             choice = random.randint(0, 23)
             msg = await self.bot._(ctx.channel, f"misc.kills.{choice}")
             tries += 1
@@ -248,21 +263,21 @@ class Misc(commands.Cog):
 
         # Building the result message
         embed = discord.Embed(
-            description=msg.format(author, victime, ex),
-            colour=0x2F3136,
-            footer=footer
+            description=msg.format(author, victime, ex), colour=0x2F3136, footer=footer
         )
-        embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/3074/3074476.png")
-        
+        embed.set_thumbnail(
+            url="https://cdn-icons-png.flaticon.com/512/3074/3074476.png"
+        )
+
         # Send it
         await ctx.send(
             embed=embed,
             allowed_mentions=discord.AllowedMentions.none(),
         )
 
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
     # ⌚ Timestamp
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
     @commands.group(name="timestamp")
     async def timestamp(self, ctx: MyContext):
@@ -341,10 +356,11 @@ class Misc(commands.Cog):
 
 # The end.
 config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+
+
+async def setup(bot: Gunibot = None, plugin_config: dict = None):
     if bot is not None:
         await bot.add_cog(Misc(bot), icon="🍪")
     if plugin_config is not None:
         global config
         config.update(plugin_config)
-

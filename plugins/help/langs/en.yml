@@ -21,7 +21,7 @@ en:
     subcommands: Subcommands
     not-found: The command "%{command}" does not exist!
     greedy: "Suite : %{type}"
-  
+
   annotation:
     user: User (mention or ID)
     textchannel: Text channel (mention or ID)
@@ -32,7 +32,7 @@ en:
     int: Integer
     bool: True / False (y, n, 1, 0, true, false...)
     message: Message (link or ID)
-  
+
   help_default:
     true_: "Yes"
     false_: "No"

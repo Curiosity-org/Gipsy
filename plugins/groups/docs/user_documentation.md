@@ -8,4 +8,3 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 # 🎭 Groups
 
 Nothing here... for the moment.
-

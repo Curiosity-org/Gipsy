@@ -220,7 +220,8 @@ class Admin(commands.Cog):
     @commands.check(checks.is_bot_admin)
     async def _eval(self, ctx: commands.Context, *, body: str):
         """Evaluates a code
-        Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)"""
+        Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)
+        """
         env = {
             "bot": self.bot,
             "ctx": ctx,
@@ -261,8 +262,11 @@ class Admin(commands.Cog):
                 self._last_result = ret
                 await ctx.send(f"```py\n{value}{ret}\n```")
 
+
 config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+
+
+async def setup(bot: Gunibot = None, plugin_config: dict = None):
     if bot is not None:
         await bot.add_cog(Admin(bot), icon="🚨")
     if plugin_config is not None:

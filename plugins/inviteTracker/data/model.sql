@@ -4,7 +4,7 @@
 -- de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 
 CREATE TABLE IF NOT EXISTS `invites` (
-    `guild` BIGINT NOT NULL, 
+    `guild` BIGINT NOT NULL,
     `channel` BIGINT NOT NULL,
     `user` BIGINT NOT NULL, /*The people who created the invite*/
     `id` BIGINT NOT NULL,

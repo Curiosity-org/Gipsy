@@ -406,7 +406,8 @@ class Giveaways(commands.Cog):
     async def pick(self, ctx: MyContext, *, giveaway: str):
         """Picks winners for the giveaway, which usually should be 1
         Example:
-        [p]giveaway pick Minecraft account (This will pick winners from all the people who entered the Minecraft account giveaway)"""
+        [p]giveaway pick Minecraft account (This will pick winners from all the people who entered the Minecraft account giveaway)
+        """
         giveaways = self.db_get_giveaways(ctx.guild.id)
         if len(giveaways) == 0:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
@@ -733,7 +734,9 @@ class Giveaways(commands.Cog):
 
 
 config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+
+
+async def setup(bot: Gunibot = None, plugin_config: dict = None):
     if bot is not None:
         await bot.add_cog(Giveaways(bot), icon="🎁")
     if plugin_config is not None:

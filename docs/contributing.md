@@ -1,27 +1,47 @@
 # 🤝 Contributing
 
+## Pre-commit hooks
+We use [pre-commit](https://pre-commit.com/) to ensure a consistent code style.\
+Before starting to contribute, you should install the pre-commit hooks by running `pre-commit install` in the root
+directory of the project (make sure you have dependencies in `requirements.txt` installed, and that you're in the venv
+if you use one).
+
+Hooks are in place to ensure :
+- consistent code style (black is enabled with auto-fix)
+- no broken configs (JSON and YAML files are checked for syntax errors)
+- commit message format consistency
+
+Hooks are strongly recommended, but you can bypass them by using the `--no-verify` flag when committing.\
+Note that we will most likely refuse any PR that doesn't pass successfully the pre-commit hooks
+
 ## Commit Message Format
-We do not have a strict policy regarding commit messages, however we tend to apply a consistent style looking like this:
+To ensure consistency and ease of reading of the history, commit messages must follow this format:
 `:emote: [type](scope): <subject>`
 
 *examples:*  `🪱 fix(all): fix some import errors`
             `🧱 deps: use discord.py 2.0`
 
-### Emote
-The emote should represent the commit you've made. For example, a commit which make the code looks prettier may use those emotes 🌟, 😍 or ✨.\
-The emote choice is left at the committer appreciation.
+
+#### Emote
+We use [gitmoji](https://gitmoji.dev/) to add an emote to the commit message.\
+You can find the list of available emotes [here](https://gitmoji.dev/)
+There's also a [VSCode extension](https://marketplace.visualstudio.com/items?itemName=vtrois.gitmoji-vscode) or a
+[PyCharm plugin](https://plugins.jetbrains.com/plugin/13389-gitmoji) to help you find the right emote.
 
 ### Type
 As of types, we try to align with AngularJS policy, types may be:
-* **ci**: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
+* **build**: Changes that affect the build system or external dependencies
+* **ci**: Changes to our CI configuration files and scripts
 * **docs**: Documentation only changes
 * **feat**: A new feature
 * **fix**: A bug fix
 * **perf**: A code change that improves performance
 * **refactor**: A code change that neither fixes a bug nor adds a feature
+* **revert**: Reverts a previous commit
 * **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
-
-You may also use any type which is not listed in this document as long as you find it better suiting the commit type. (example: `deps`, `chore`, etc.)
+* **test**: Adding missing tests or correcting existing tests
+* **chore**: Changes to the build process or auxiliary tools and libraries such as documentation generation
+* **wip**: Work in progress
 
 
 ### Scope

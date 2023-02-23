@@ -21,7 +21,7 @@ fr:
     subcommands: Sous-commandes
     not-found: Impossible de trouver la commande "%{command}" !
     greedy: "Suite : %{type}"
-  
+
   annotation:
     user: Utilisateur (mention ou ID)
     textchannel: Salon textuel (mention ou ID)
@@ -32,7 +32,7 @@ fr:
     int: Nombre
     bool: Vrai / faux (y, n, 1, 0, true, false...)
     message: Message (lien ou ID)
-  
+
   help_default:
     true_: Oui
     false_: Non

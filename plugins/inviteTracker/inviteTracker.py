@@ -228,8 +228,8 @@ class Invite(commands.Cog):
                 member=member.mention,
                 guild=member.guild,
             )
-        else: # multiple invitations
-            invites_string = ', '.join(
+        else:  # multiple invitations
+            invites_string = ", ".join(
                 [
                     await self.get_invitation_string(
                         invite,
@@ -246,7 +246,7 @@ class Invite(commands.Cog):
                 guild=member.guild,
                 invitations=invites_string,
             )
-        
+
         channel = self.bot.server_configs[member.guild.id]["invite_log"]
         if channel is not None:
             channel = self.bot.get_channel(channel)
@@ -359,14 +359,14 @@ class Invite(commands.Cog):
         query = f"SELECT * FROM invites WHERE guild = ?;"
         datas = self.bot.db_query(query, (guild,), astuple=True)
         return [DatabaseInvite(data, self.bot) for data in datas]
-    
+
     async def get_invitation_string(
         self,
         invite: DatabaseInvite,
         member: discord.Member,
     ) -> str:
         """Returns a string representation for the given invitation
-        
+
         Attributes
         ----------
         invite: DatabaseInvite
@@ -392,11 +392,13 @@ class Invite(commands.Cog):
                 uses=invite.uses,
             )
 
+
 config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+
+
+async def setup(bot: Gunibot = None, plugin_config: dict = None):
     if bot is not None:
         await bot.add_cog(Invite(bot), icon="👋")
     if plugin_config is not None:
         global config
         config.update(plugin_config)
-

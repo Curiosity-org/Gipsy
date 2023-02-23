@@ -13,13 +13,15 @@ from typing import Union
 
 # Moves a message from its original channel to a parameterized channel
 # using a given webhook
-async def moveMessage(msg: discord.Message, webhook: discord.Webhook, thread: discord.Thread = None):
+async def moveMessage(
+    msg: discord.Message, webhook: discord.Webhook, thread: discord.Thread = None
+):
     files = [await x.to_file() for x in msg.attachments]
     # grab mentions from the source message
     mentions = discord.AllowedMentions(
         everyone=msg.mention_everyone, users=msg.mentions, roles=msg.role_mentions
     )
-    
+
     kargs = {
         "content": msg.content,
         "files": files,
@@ -57,7 +59,7 @@ class MessageManager(commands.Cog):
     ):
         """Say something with someone else's appearance"""
 
-        if (member is not None and text is not None): # c'est python, autant être verbeux
+        if member is not None and text is not None:  # c'est python, autant être verbeux
             # Create a webhook in the image of the targeted member
             webhook = await ctx.channel.create_webhook(name=member.display_name)
             await webhook.send(content=text, avatar_url=member.display_avatar)
@@ -89,13 +91,15 @@ class MessageManager(commands.Cog):
 
         if isinstance(channel, str):
             try:
-                channel = self.bot.get_channel(int(channel.replace("<#", "").replace(">", "")))
+                channel = self.bot.get_channel(
+                    int(channel.replace("<#", "").replace(">", ""))
+                )
             except BaseException:
                 await ctx.send(
                     await self.bot._(ctx.guild.id, "message_manager.no-channel")
                 )
                 return
-        
+
         if not isinstance(channel, discord.abc.Messageable):
             await ctx.send(await self.bot._(ctx.guild.id, "message_manager.no-channel"))
             return
@@ -121,7 +125,7 @@ class MessageManager(commands.Cog):
             return
 
         # Check permission
-        if (not channel.permissions_for(author).manage_messages):
+        if not channel.permissions_for(author).manage_messages:
             embed = discord.Embed(
                 description=await self.bot._(
                     ctx.guild.id, "message_manager.permission"
@@ -188,13 +192,15 @@ class MessageManager(commands.Cog):
 
         if isinstance(channel, str):
             try:
-                channel = self.bot.get_channel(int(channel.replace("<#", "").replace(">", "")))
+                channel = self.bot.get_channel(
+                    int(channel.replace("<#", "").replace(">", ""))
+                )
             except BaseException:
                 await ctx.send(
                     await self.bot._(ctx.guild.id, "message_manager.no-channel")
                 )
                 return
-                
+
         if not isinstance(channel, discord.abc.Messageable):
             await ctx.send(await self.bot._(ctx.guild.id, "message_manager.no-channel"))
             return
@@ -220,7 +226,7 @@ class MessageManager(commands.Cog):
             return
 
         # Check member permissions
-        if (not channel.permissions_for(author).manage_messages):
+        if not channel.permissions_for(author).manage_messages:
             embed = discord.Embed(
                 description=await self.bot._(
                     ctx.guild.id, "message_manager.permission"
@@ -274,7 +280,6 @@ class MessageManager(commands.Cog):
         if msg1.created_at > msg2.created_at:
             msg2, msg1 = msg1, msg2
 
-
         dest = channel
         thread = None
         if isinstance(channel, discord.Thread):
@@ -326,10 +331,11 @@ class MessageManager(commands.Cog):
 
 # The End.
 config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+
+
+async def setup(bot: Gunibot = None, plugin_config: dict = None):
     if bot is not None:
         await bot.add_cog(MessageManager(bot), icon="📋")
     if plugin_config is not None:
         global config
         config.update(plugin_config)
-

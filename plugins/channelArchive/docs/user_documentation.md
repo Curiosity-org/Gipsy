@@ -8,5 +8,3 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 # 🗃️ Channel archive
 
 Nothing here... for the moment.
-
-
