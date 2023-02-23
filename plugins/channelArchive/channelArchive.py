@@ -36,7 +36,7 @@ class ChannelArchive(commands.Cog):
 
     @commands.command(name="archive_duration")
     async def config_archive_duration(
-        self, ctx: MyContext, duration: commands.Greedy[args.tempdelta]
+        self, ctx: MyContext, duration: commands.Greedy[args.tempdelta],
     ):
         duration = sum(duration)
         if duration == 0:
@@ -46,10 +46,10 @@ class ChannelArchive(commands.Cog):
                 )
                 return
             duration = None
-        x = await self.bot.sconfig.edit_config(
+        msg = await self.bot.sconfig.edit_config(
             ctx.guild.id, "archive_duration", duration
         )
-        await ctx.send(x)
+        await ctx.send(msg)
 
     async def cog_unload(self):
         self.update_loop.cancel() # pylint: disable=no-member
@@ -86,11 +86,11 @@ class ChannelArchive(commands.Cog):
         records = self.bot.db_query(query, ())
 
         # Adding manually archived channels
-        channelIds = []
+        channel_ids = []
         added = 0
         for channel in self.bot.get_channel(archive_category).channels:
             listed = False
-            channelIds.append(channel.id)
+            channel_ids.append(channel.id)
             for record in records:
                 if channel.id == record["channel"]:
                     listed = True
@@ -107,7 +107,8 @@ class ChannelArchive(commands.Cog):
                     self.bot.get_channel(record["channel"]).category.id
                     != archive_category
                 ):
-                    query = f"DELETE FROM archive WHERE channel = {record['channel']} AND guild = {guild.id}"
+                    query = f"DELETE FROM archive WHERE channel = {record['channel']}"\
+                        f"AND guild = {guild.id}"
                     unarchived += 1
                     self.bot.db_query(query, ())
 
@@ -116,11 +117,13 @@ class ChannelArchive(commands.Cog):
         for record in records:
             if self.bot.get_channel(record["channel"]) is None:
                 removed_records += 1
-                query = f"DELETE FROM archive WHERE channel = {record['channel']} AND guild = {guild.id}"
+                query = f"DELETE FROM archive WHERE channel = {record['channel']}"\
+                    f"AND guild = {guild.id}"
                 self.bot.db_query(query, ())
 
         # Get & delete old channels
-        query = f"SELECT * FROM archive WHERE timestamp <= datetime('now','-{duration} seconds') AND guild = {guild.id}"
+        query = f"SELECT * FROM archive WHERE timestamp <= datetime('now','-{duration} seconds')"\
+            f"AND guild = {guild.id}"
         records = self.bot.db_query(query, ())
 
         removed_channels = 0
@@ -133,7 +136,8 @@ class ChannelArchive(commands.Cog):
 
                     # Remove record
                     removed_records += 1
-                    query = f"DELETE FROM archive WHERE channel = {record['channel']} AND guild = {guild.id}"
+                    query = f"DELETE FROM archive WHERE channel = {record['channel']}"\
+                        f"AND guild = {guild.id}"
                     self.bot.db_query(query, ())
 
         # Send confirmation

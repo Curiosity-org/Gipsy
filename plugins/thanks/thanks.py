@@ -464,12 +464,11 @@ class Thanks(commands.Cog):
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "thanks.went-wrong"))
 
-async def setup(bot:Gunibot=None):
+async def setup(bot:Gunibot):
     """
     Fonction d'initialisation du plugin
 
     :param bot: Le bot
     :type bot: Gunibot
     """
-    if bot is not None:
-        await bot.add_cog(Thanks(bot), icon="❤️")
+    await bot.add_cog(Thanks(bot), icon="❤️")

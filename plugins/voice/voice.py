@@ -272,6 +272,5 @@ class VoiceChannels(commands.Cog):
         await ctx.send(await self.bot._(ctx.guild.id, "voices.result", count=i))
 
 
-async def setup(bot:Gunibot=None):
-    if bot is not None:
-        await bot.add_cog(VoiceChannels(bot), icon="🎙️")
+async def setup(bot:Gunibot):
+    await bot.add_cog(VoiceChannels(bot), icon="🎙️")

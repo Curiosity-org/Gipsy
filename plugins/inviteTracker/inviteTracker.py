@@ -6,8 +6,10 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
 from typing import Any, List, Optional, Tuple, Union
+
 import discord
 from discord.ext import commands
+
 from utils import Gunibot, MyContext
 from bot import checks
 
@@ -157,7 +159,7 @@ class DatabaseInvite:
 
 class Invite(commands.Cog):
     """Track who invited with which invitation."""
-    
+
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.config_options = ["invite_log"]

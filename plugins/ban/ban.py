@@ -18,7 +18,7 @@ from core import config
 
 async def ban_perm_check(ctx: commands.Context) -> bool:
     """Checks if the user has the permission to ban"""
-    
+
     self: Ban = ctx.bot.get_cog("Ban")
 
     if ctx.guild.id not in self.friendly_ban_guilds:
@@ -27,12 +27,12 @@ async def ban_perm_check(ctx: commands.Context) -> bool:
         for role in ctx.author.roles:
             if role.id in self.friendly_ban_whitelisted_roles:
                 return True
-        
+
         return await commands.has_guild_permissions(ban_members=True).predicate(ctx)
 
 async def fake_ban_guild_check(ctx: commands.Context) -> bool:
     """Checks if the guild is configured for the friendly ban command"""
-    
+
     self: Ban = ctx.bot.get_cog("Ban")
 
     return ctx.guild.id in self.friendly_ban_guilds
@@ -63,12 +63,13 @@ class Ban(commands.Cog):
                 forbidden: list[discord.Role] = []
 
                 for role in self.roles_backup.pop(member.id):
-                    if role.id != role.guild.id and role not in member.roles: # We ignore the @everyone role
+                    # We ignore the @everyone role
+                    if role.id != role.guild.id and role not in member.roles:
                         try:
                             await member.add_roles(role)
                         except discord.Forbidden:
                             forbidden.append(role)
-                
+
                 # send a message to the user if some roles could not be given back
                 if len(forbidden) > 0:
                     await member.send(
@@ -130,7 +131,7 @@ class Ban(commands.Cog):
                 # indicate that they should be ignored
                 if await event(self, ctx, user, reason):
                     return
-            
+
             # Pick a random event and execute it if no systematic event has been executed
             # random events should always run successfully
             await random.choice(self.random_events)(self, ctx, user, reason)
@@ -248,10 +249,10 @@ class Ban(commands.Cog):
                             f"plugins.ban.events.{event['module_name']}"
                         ).execute
                     )
-        
+
         # initiate the cache for the banned users roles
         self.roles_backup: dict[int,list[discord.Role]] = {}
-    
+
     async def fake_ban(
         self,
         ctx: commands.Context,
@@ -293,9 +294,9 @@ class Ban(commands.Cog):
         self.roles_backup[user.id] = ctx.guild.get_member(
             user.id
         ).roles
-        
+
         try:
-            await ctx.guild.kick(user, reason=f"Auto-ban!")
+            await ctx.guild.kick(user, reason="Auto-ban!")
         except discord.Forbidden:
             if show_error:
                 await ctx.send(
@@ -308,5 +309,5 @@ class Ban(commands.Cog):
         return True
 
 # The end.
-async def setup(bot:Gunibot=None):
+async def setup(bot:Gunibot):
     await bot.add_cog(Ban(bot), icon="🔨")

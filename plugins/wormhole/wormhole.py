@@ -127,10 +127,11 @@ class Wormhole:
         """Transform the Wormhole to a human-readable string"""
         private = self.privacy == 1
         owners: List[str] = []
-        for o in self.owners:
-            user = self.bot.get_user(o)
+        for owner in self.owners:
+            user = self.bot.get_user(owner)
             owners.append(user.name if user else "Unknown user")
-        return f"Wormhole: {self.name}\n┗━▷ Private: {private} - Admins: {', '.join(owners)} - **{self.channels}** Discord channels are linked"
+        return f"Wormhole: {self.name}\n┗━▷ Private: {private} - Admins: {', '.join(owners)} - "\
+            f"**{self.channels}** Discord channels are linked"
 
 
 class WormholeChannel:

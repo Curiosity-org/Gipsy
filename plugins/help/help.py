@@ -626,7 +626,7 @@ async def setup(bot:Gunibot=None):
     if bot is not None:
         bot.help_command = Help()
         await bot.add_cog(HelpCog(bot), icon="🤝")
-        
+
 async def teardown(bot: Gunibot):
     """
     Fonction de retrait du plugin

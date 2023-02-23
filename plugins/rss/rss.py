@@ -11,10 +11,10 @@ import html
 import re
 import time
 import typing
-from feedparser.util import FeedParserDict
 from marshal import dumps, loads
 import async_timeout
 
+from feedparser.util import FeedParserDict
 import discord
 from aiohttp.client import ClientSession
 from aiohttp import client_exceptions
@@ -131,19 +131,19 @@ class Rss(commands.Cog):
                 self.mentions = roles
             return self
 
-        async def create_msg(self, language, Format=None):
-            if Format is None:
-                Format = self.message_format
+        async def create_msg(self, language, msg_format=None):
+            if msg_format is None:
+                msg_format = self.message_format
             if not isinstance(self.date, str):
                 date = await self.bot.get_cog("TimeCog").date(
                     self.date, lang=language, year=False, hour=True, digital=True
                 )
             else:
                 date = self.date
-            Format = Format.replace("\\n", "\n")
+            msg_format = msg_format.replace("\\n", "\n")
             _channel = discord.utils.escape_markdown(self.channel)
             _author = discord.utils.escape_markdown(self.author)
-            text = Format.format_map(
+            text = msg_format.format_map(
                 self.bot.SafeDict(
                     channel=_channel,
                     title=self.title,
@@ -189,17 +189,17 @@ class Rss(commands.Cog):
             await ctx.send_help('rss')
 
     @rss_main.command(name="youtube", aliases=["yt"])
-    async def request_yt(self, ctx: MyContext, ID):
+    async def request_yt(self, ctx: MyContext, video_id):
         """The last video of a YouTube channel
 
         ..Examples:
             - rss youtube UCZ5XnGb-3t7jCkXdawN2tkA
             - rss youtube https://www.youtube.com/channel/UCZ5XnGb-3t7jCkXdawN2tkA"""
-        if "youtube.com" in ID or "youtu.be" in ID:
-            ID = await self.parse_yt_url(ID)
-        if ID is None:
+        if "youtube.com" in video_id or "youtu.be" in video_id:
+            video_id = await self.parse_yt_url(video_id)
+        if video_id is None:
             return await ctx.send(await self.bot._(ctx.channel, "rss.web-invalid"))
-        text = await self.rss_yt(ctx.channel, ID)
+        text = await self.rss_yt(ctx.channel, video_id)
         if isinstance(text, str):
             await ctx.send(text)
         else:
@@ -569,8 +569,8 @@ class Rss(commands.Cog):
         pattern = re.findall(r"((?<![\\])[\"])((?:.(?!(?<![\\])\1))*.?)\1", arg)
         if len(pattern) > 0:
 
-            def flatten(l):
-                return [item for sublist in l for item in sublist]
+            def flatten(liste):
+                return [item for sublist in liste for item in sublist]
 
             params = [[x for x in group if x != '"'] for group in pattern]
             return flatten(params)
@@ -1214,8 +1214,8 @@ class Rss(commands.Cog):
                 ).total_seconds() < self.min_time_between_posts["tw"]:
                     break
                 text = html.unescape(getattr(post, "full_text", post.text))
-                if r := re.search(r"https://t.co/([^\s]+)", text):
-                    text = text.replace(r.group(0), "")
+                if result := re.search(r"https://t.co/([^\s]+)", text):
+                    text = text.replace(result.group(0), "")
                 url = f"https://twitter.com/{name.lower()}/status/{post.id}"
                 img = None
                 if post.media:  # if exists and is not empty
@@ -1559,7 +1559,7 @@ class Rss(commands.Cog):
         self, obj, channel: discord.TextChannel, roles: typing.List[str], send_stats
     ):
         if channel is not None:
-            t = await obj.create_msg(await self.get_lang(channel.guild))
+            content = await obj.create_msg(await self.get_lang(channel.guild))
             mentions = list()
             for item in roles:
                 if item == "":
@@ -1568,17 +1568,17 @@ class Rss(commands.Cog):
                 if role is not None:
                     mentions.append(role)
             try:
-                if isinstance(t, discord.Embed):
+                if isinstance(content, discord.Embed):
                     await channel.send(
                         " ".join(obj.mentions),
-                        embed=t,
+                        embed=content,
                         allowed_mentions=discord.AllowedMentions(
                             everyone=False, roles=True
                         ),
                     )
                 else:
                     await channel.send(
-                        t,
+                        content,
                         allowed_mentions=discord.AllowedMentions(
                             everyone=False, roles=True
                         ),
@@ -1765,8 +1765,3 @@ class Rss(commands.Cog):
     async def send_log(self, text: str, guild: discord.Guild): # pylint: disable=unused-argument
         """Send a log to the logging channel"""
         return
-        # try:
-        #     emb = self.bot.get_cog("Embeds").Embed(desc="[RSS] "+text,color=5366650,footer_text=guild.name).update_timestamp().set_author(self.bot.user)
-        #     await self.bot.get_cog("Embeds").send([emb])
-        # except Exception as e:
-        #     await self.bot.get_cog("Errors").on_error(e,None)

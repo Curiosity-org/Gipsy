@@ -11,6 +11,7 @@ from discord.ext import commands
 
 from utils import Gunibot, MyContext
 
+# pylint: disable=line-too-long
 WELCOME_MESSAGE = """(FR) Bienvenue sur {server} {user} !
 Vous n'avez accès qu'au salon Lobby pour le moment. Pour débloquer l'accès au reste du Discord, lisez les instructions présentes dans le salon {channel} :wink:
 
@@ -58,7 +59,7 @@ class Antikikoo(commands.Cog):
         verif_channel: TextChannel = self.bot.get_channel(
             config["verification_channel"]
         )
-        info_channel = "<#{}>".format(config["info_channel"])
+        info_channel = f"<#{config['info_channel']}>"
         # if config is None, we use the default one
         welcome_msg: str = config["verification_info_message"] or WELCOME_MESSAGE
         await verif_channel.send(
@@ -76,11 +77,11 @@ class Antikikoo(commands.Cog):
         config = self.bot.server_configs[message.guild.id]
         if message.channel.id != config["verification_channel"]:
             return
-        
+
         if config["pass_message"] is None: # not set
             return
-        
-        info_channel = "<#{}>".format(config["info_channel"])
+
+        info_channel = f"<#{config['info_channel']}>"
         if message.content.lower() == config["pass_message"].lower():
             emb = discord.Embed(
                 description=CONFIRM_MESSAGE.format(
@@ -133,7 +134,7 @@ class Antikikoo(commands.Cog):
         Put nothing to reset it, or "None" for no message"""
         self.bot.server_configs[ctx.guild.id]["verification_info_message"] = message
         await ctx.send(await self.bot._(ctx.guild.id, "antikikoo.msg-edited"))
-    
+
     @commands.command(name='pass_message')
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
@@ -151,7 +152,7 @@ class Antikikoo(commands.Cog):
                 context.guild.id, "antikikoo.pass-edited",
             )
         )
-    
+
     @commands.command(name='info_channel')
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
@@ -171,7 +172,7 @@ class Antikikoo(commands.Cog):
                 channel=channel.mention,
             )
         )
-    
+
     @commands.command(name='verification_role')
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
@@ -193,7 +194,7 @@ class Antikikoo(commands.Cog):
             ),
             allowed_mentions=discord.AllowedMentions.none(),
         )
-    
+
     @commands.command(name='verification_add_role')
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
