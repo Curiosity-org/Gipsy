@@ -17,7 +17,6 @@ from aiohttp import ClientSession
 from utils import Gunibot, MyContext
 from bot import checks
 
-
 # Check if a message is similar to another one with 80% similarity
 
 

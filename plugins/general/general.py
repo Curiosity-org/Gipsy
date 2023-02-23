@@ -16,6 +16,10 @@ from git import Repo
 
 from utils import Gunibot, MyContext
 
+ChannelTypes = Union[
+    discord.Thread,
+    discord.abc.GuildChannel,
+]
 CPU_INTERVAL = 3.0
 CHANNEL_TYPES = Union[
     discord.Thread,
