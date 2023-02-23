@@ -30,26 +30,25 @@ class Welcome(commands.Cog):
         )
 
     async def give_welcome_roles(self, member: discord.Member):
-        g = member.guild
-        config = self.bot.server_configs[g.id]
-        rolesID = config["welcome_roles"]
-        if not rolesID:  # if nothing has been setup
+        config = self.bot.server_configs[member.guild.id]
+        roles_id = config["welcome_roles"]
+        if not roles_id:  # if nothing has been setup
             return
-        roles = [g.get_role(x) for x in rolesID]
-        pos = g.me.top_role.position
+        roles = [member.guild.get_role(x) for x in roles_id]
+        pos = member.guild.me.top_role.position
         roles = filter(lambda x: (x is not None) and (x.position < pos), roles)
         await member.add_roles(*roles, reason="New members roles")
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         """Called when a member joins a guild"""
-        g = member.guild
-        if not g.me.guild_permissions.manage_roles:  # if not allowed to manage roles
+        if not member.guild.me.guild_permissions.manage_roles:  # if not allowed to manage roles
             self.bot.log.info(
-                f'Module - Welcome: Missing "manage_roles" permission on guild "{g.name}"'
+                'Module - Welcome: Missing "manage_roles" permission'\
+                    f'on guild "{member.guild.name}"'
             )
             return
-        if "MEMBER_VERIFICATION_GATE_ENABLED" not in g.features:
+        if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features:
             # we give new members roles if the verification gate is disabled
             await self.give_welcome_roles(member)
 
@@ -61,11 +60,6 @@ class Welcome(commands.Cog):
                 await self.give_welcome_roles(after)
 
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
     if bot is not None:
         await bot.add_cog(Welcome(bot), icon="👋")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)
-
