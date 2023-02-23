@@ -44,6 +44,8 @@ class MyContext(commands.Context):
         """If the bot has the right permissions to send an embed in the current context"""
         return self.bot_permissions.embed_links
 
+# defining allowed default mentions
+ALLOWED = discord.AllowedMentions(everyone=False, roles=False)
 
 class Gunibot(commands.bot.AutoShardedBot):
     """
@@ -51,8 +53,6 @@ class Gunibot(commands.bot.AutoShardedBot):
     """
 
     def __init__(self, case_insensitive=None, status=None, beta=False):
-        # defining allowed default mentions
-        ALLOWED = discord.AllowedMentions(everyone=False, roles=False)
         # defining intents usage
         intents = discord.Intents.default()
         intents.message_content = True
@@ -136,7 +136,8 @@ class Gunibot(commands.bot.AutoShardedBot):
         :param size: La taille de l'avatar
         :return: L'avatar
         """
-        avatar = user.display_avatar.with_size(size) # the avatar always exist, returns the URL to the default one
+        # the avatar always exist, returns the URL to the default one
+        avatar = user.display_avatar.with_size(size)
         if avatar.is_animated():
             return avatar.with_format("gif")
         else:
@@ -183,7 +184,8 @@ class Gunibot(commands.bot.AutoShardedBot):
         :param query: La requête à faire
         :param args: Les arguments de la requête
         :param fetchone: Si la requête est un SELECT, retourne seulement le premier résultat
-        :param returnrowcount: Si la requête est un INSERT, UPDATE ou DELETE, retourne le nombre de lignes affectées
+        :param returnrowcount: Si la requête est un INSERT, UPDATE ou DELETE, retourne le nombre
+            de lignes affectées
         :param astuple: Si la requête est un SELECT, retourne les résultats sous forme de tuple
         :return: Le résultat de la requête
         """
@@ -283,7 +285,7 @@ class CheckException(commands.CommandError):
     """
     def __init__(self, check_id, *args):
         super().__init__(message=f"Custom check '{check_id}' failed", *args)
-        self.id = check_id
+        self.id = check_id # pylint: disable=invalid-name
 
 
 def setup_logger():
@@ -314,9 +316,9 @@ def setup_logger():
     stream_handler.setLevel(logging.INFO)
     stream_handler.setFormatter(formatter)
 
-    # supposons que nous voulions collecter les erreurs sur ton site d'analyse d'erreurs comme sentry
+    # supposons que nous voulions collecter les erreurs sur un site d'analyse d'erreurs comme sentry
     # sentry_handler = x
-    # sentry_handler.setLevel(logging.ERROR)  # on veut voir que les erreurs et au delà, pas en dessous
+    # sentry_handler.setLevel(logging.ERROR)
     # sentry_handler.setFormatter(format)
 
     # log.debug("message de debug osef")
@@ -357,5 +359,9 @@ CONFIG_OPTIONS.update(
 for plugin in os.listdir("./plugins/"):
     if plugin[0] != "_":
         if os.path.isfile("./plugins/" + plugin + "/config/options.json"):
-            with open("./plugins/" + plugin + "/config/options.json", "r", encoding="utf8") as config:
+            with open(
+                "./plugins/" + plugin + "/config/options.json",
+                "r",
+                encoding="utf8"
+            ) as config:
                 CONFIG_OPTIONS.update(json.load(config))

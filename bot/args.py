@@ -5,17 +5,18 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-import discord
 import re
+
 from discord.ext import commands
+
 from utils import MyContext
 
 
-class tempdelta(commands.Converter):
-    async def convert(self, ctx: MyContext, argument: str) -> int:
-        d = 0
+class tempdelta(commands.Converter): # pylint: disable=invalid-name
+    async def convert(self, ctx: MyContext, argument: str) -> int: # pylint: disable=unused-argument
+        time = 0
         found = False
-        for x in [
+        for time_spec in [
             ("y", 86400 * 365),
             ("w", 604800),
             ("d", 86400),
@@ -23,23 +24,23 @@ class tempdelta(commands.Converter):
             ("m", 60),
             ("min", 60),
         ]:
-            r = re.search(r"^(\d+)" + x[0] + "$", argument)
-            if r is not None:
-                d += int(r.group(1)) * x[1]
+            pattern = re.search(r"^(\d+)" + time_spec[0] + "$", argument)
+            if pattern is not None:
+                time += int(pattern.group(1)) * time_spec[1]
                 found = True
-        r = re.search(r"^(\d+)h(\d+)m?$", argument)
-        if r is not None:
-            d += int(r.group(1)) * 3600 + int(r.group(2)) * 60
+        pattern = re.search(r"^(\d+)h(\d+)m?$", argument)
+        if pattern is not None:
+            time += int(pattern.group(1)) * 3600 + int(pattern.group(2)) * 60
             found = True
         if not found:
             raise commands.errors.BadArgument("Invalid duration: " + argument)
-        return d
+        return time
 
 
-class moderatorFlag(commands.Converter):
+class moderatorFlag(commands.Converter): # pylint: disable=invalid-name
     async def convert(self, ctx: MyContext, argument: str) -> str:
-        LogsFlags = ctx.bot.get_cog("ConfigCog").LogsFlags.FLAGS
-        if argument not in LogsFlags.values():
+        logs_flags = ctx.bot.get_cog("ConfigCog").LogsFlags.FLAGS
+        if argument not in logs_flags.values():
             raise commands.errors.BadArgument("Invalid moderation flag: " + argument)
         return argument
 
@@ -48,15 +49,15 @@ def constant(word: str):
     class Constant(commands.Converter):
         w = word
 
-        async def convert(self, ctx: MyContext, arg: str):
+        async def convert(self, ctx: MyContext, arg: str): # pylint: disable=unused-argument
             if arg != self.w:
                 raise commands.errors.BadArgument("Unknown argument")
 
     return Constant
 
 
-class arguments(commands.Converter):
-    async def convert(self, ctx: MyContext, argument: str) -> dict:
+class arguments(commands.Converter): # pylint: disable=invalid-name
+    async def convert(self, ctx: MyContext, argument: str) -> dict: # pylint: disable=unused-argument
         answer = dict()
         for result in re.finditer(r"(\w+) ?= ?\"((?:[^\"\\]|\\\"|\\)+)\"", argument):
             answer[result.group(1)] = result.group(2).replace('\\"', '"')
