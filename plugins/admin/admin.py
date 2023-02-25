@@ -19,8 +19,6 @@ from git import Repo, GitCommandError
 from utils import Gunibot
 from bot import checks
 
-sys.path.append("./bot")
-
 
 def cleanup_code(content):
     """Automatically removes code blocks from the code."""

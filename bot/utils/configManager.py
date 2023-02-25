@@ -18,10 +18,10 @@ CONFIG_TEMPLATE = {k: v["default"] for k, v in CONFIG_OPTIONS.items() if "defaul
 
 
 class ServerConfig(dict):
-    def __init__(self, manager, serverID, value):
+    def __init__(self, manager, server_id, value):
         super().__init__(value)
         self.manager = manager
-        self.server_id = serverID
+        self.server_id = server_id
 
     def __getitem__(self, key):
         try:

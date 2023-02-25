@@ -406,10 +406,11 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
         put remove as True if you want to remove unneeded roles rewards too"""
         counter = 0
         # List of roles IDs owned by user
-        has_roles = [x.id for x in member.roles]
+        has_roles = [role.id for role in member.roles]
         # for each role that should be given and not already owned by user
         for role in [
-            x for x in rr_list if x["level"] <= level and x["role"] not in has_roles
+            role_reward for role_reward in rr_list\
+            if role_reward["level"] <= level and role_reward["role"] not in has_roles
         ]:
             try:
                 member_role = member.guild.get_role(role["role"])
@@ -533,7 +534,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
             i = 0
             users = []
             if guild is not None:
-                users = [x.id for x in guild.members]
+                users = [member.id for member in guild.members]
             for user_data in liste:
                 if guild is None or (guild is not None and user_data["userid"] in users):
                     i += 1

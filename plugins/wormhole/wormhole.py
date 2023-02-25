@@ -741,8 +741,8 @@ class Wormholes(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "wormhole.error.not-admin"))
             return
         query = "SELECT 1 FROM wormhole_admin WHERE name = ? AND admin = ?"
-        is_alread = len(self.bot.db_query(query, (wormhole, user.id))) > 0
-        if not is_alread:
+        is_already = len(self.bot.db_query(query, (wormhole, user.id))) > 0
+        if not is_already:
             query = "INSERT INTO wormhole_admin (name, admin) VALUES (?, ?)"
             self.bot.db_query(query, (wormhole, user.id))
             await ctx.send(

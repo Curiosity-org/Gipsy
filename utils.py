@@ -178,8 +178,8 @@ class Gunibot(commands.bot.AutoShardedBot):
         Faire une requête à la base de données du bot
 
         Si SELECT, retourne une liste de résultats, ou seulement le premier résultat (si fetchone)
-        Pour toute autre requête, retourne l'ID de la ligne affectée si returnrowscount,
-        ou le nombre de lignes affectées (si returnrowscount)
+        Pour toute autre requête, retourne l'ID de la ligne affectée, ou le nombre de lignes
+        affectées (si returnrowscount)
 
         :param query: La requête à faire
         :param args: Les arguments de la requête
