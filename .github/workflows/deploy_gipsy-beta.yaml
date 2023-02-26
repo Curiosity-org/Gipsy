@@ -10,12 +10,12 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v2
         with:
           fetch-depth: 10
           submodules: recursive
-      - name: deploy
+      - name: Deploy to server
         uses:  swznd/sftp-deploy@master
         with:
           host: ${{ secrets.BETA_SFTP_IP }}
@@ -23,3 +23,13 @@ jobs:
           user: ${{ secrets.BETA_SFTP_USER }}
           password: ${{ secrets.BETA_SFTP_PASSWORD }}
           ignore: .github/**,.gitignore,**/.gitignore,**/.git/**
+      - name: Restart running bot
+        run: |
+          curl ${{ secrets.GIPSY_RESTART_BETA_ENDPOINT }} \
+            -H 'Accept: application/json' \
+            -H 'Content-Type: application/json' \
+            -H 'Authorization: Bearer ${{ secrets.GIPSY_RESTART_BETA_BEARER }}' \
+            -X POST \
+            -d '{
+            "signal": "restart"
+            }'
