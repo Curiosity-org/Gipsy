@@ -24,11 +24,14 @@ jobs:
           password: ${{ secrets.PROD_SFTP_PASSWORD }}
           ignore: .github/**,.gitignore,**/.gitignore,**/.git/**
       - name: Restart running bot
+        env:
+          GIPSY_RESTART_PROD_ENDPOINT: ${{ secrets.GIPSY_RESTART_PROD_ENDPOINT }}
+          GIPSY_RESTART_PROD_BEARER: ${{ secrets.GIPSY_RESTART_PROD_BEARER }}
         run: |
-          curl ${{ secrets.GIPSY_RESTART_PROD_ENDPOINT }} \
+          curl $GIPSY_RESTART_PROD_ENDPOINT \
             -H 'Accept: application/json' \
             -H 'Content-Type: application/json' \
-            -H 'Authorization: Bearer ${{ secrets.GIPSY_RESTART_PROD_BEARER }}' \
+            -H 'Authorization: Bearer $GIPSY_RESTART_PROD_BEARER' \
             -X POST \
             -d '{
             "signal": "restart"
