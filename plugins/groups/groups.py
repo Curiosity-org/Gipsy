@@ -220,8 +220,7 @@ class Groups(commands.Cog):
     @commands.guild_only()
     async def group_main(self, ctx: MyContext):
         """Manage your groups
-
-        by fantomitechno 🦊#5973"""
+        """
         if ctx.subcommand_passed is None:
             await ctx.send_help("group")
             return
