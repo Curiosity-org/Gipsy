@@ -6,6 +6,7 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 from utils import Gunibot
 from typing import Union
@@ -49,11 +50,19 @@ class MessageManager(commands.Cog):
     # Command /imitate #
     # -------------------#
 
-    @commands.command(name="imitate")
+    @commands.hybrid_command(name="imitate", description="Say something with someone else's appearance")
+    @app_commands.describe(
+        member="The member you want to imitate",
+        text="The text you want to say"
+    )
     @commands.guild_only()
     @commands.has_permissions(manage_messages=True, manage_nicknames=True)
     async def imitate(
-            self, ctx: commands.Context, member: discord.Member = None, *, text=None
+            self,
+            ctx: commands.Context,
+            member: discord.Member = None,
+            *,
+            text=None
     ):
         """Say something with someone else's appearance"""
 
@@ -64,13 +73,24 @@ class MessageManager(commands.Cog):
 
             # Deletes the original message as well as the webhook
             await webhook.delete()
-            await ctx.message.delete()
+            if not ctx.interaction:
+                await ctx.message.delete()
+            else:
+                await ctx.send(
+                    await self.bot._(ctx.guild.id, "message_manager.imitate.success"),
+                    ephemeral=True,
+                    delete_after=3
+                )
 
     # ----------------#
     # Command /move #
     # ----------------#
 
     @commands.hybrid_command(names="move", aliases=["mv"])
+    @app_commands.describe(
+        msg="The message you want to move",
+        channel="The channel where you want to move the message"
+    )
     @commands.guild_only()
     @commands.has_permissions(
         manage_messages=True,
@@ -165,6 +185,11 @@ class MessageManager(commands.Cog):
     # -------------------#
 
     @commands.hybrid_command(names="moveall", aliases=["mva"])
+    @app_commands.describe(
+        msg1="The first message of the conversation you want to move",
+        msg2="The last message of the conversation you want to move",
+        channel="The channel where you want to move the messages"
+    )
     @commands.guild_only()
     @commands.has_permissions(
         manage_messages=True,

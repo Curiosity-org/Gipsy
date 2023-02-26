@@ -5,6 +5,8 @@
 
 en:
   message_manager:
+      imitate:
+        success: "Message sent !"
       move:
         confirm: "%{user}, your message was moved in %{channel}"
         footer: "Message moved by %{user}"
