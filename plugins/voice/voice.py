@@ -230,7 +230,7 @@ class VoiceChannels(commands.Cog):
 
         # If we don't have any names in cache, we get some new ones
         randommer_api_key = self.config.get("randommer_api_key")
-        if source != "asterix" and randommer_api_key is not None:
+        if source != "asterix" and randommer_api_key != '':
             headers = {"X-Api-Key": randommer_api_key}
             async with aiohttp.ClientSession() as session:
                 async with session.get(
