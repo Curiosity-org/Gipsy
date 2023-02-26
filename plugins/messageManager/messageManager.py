@@ -201,6 +201,7 @@ class MessageManager(commands.Cog):
 
         author = channel.guild.get_member(ctx.author.id)
 
+
         # Check bot permissions
         perm1: discord.Permissions = ctx.channel.permissions_for(ctx.guild.me)
         perm2: discord.Permissions = channel.permissions_for(channel.guild.me)
@@ -215,7 +216,7 @@ class MessageManager(commands.Cog):
                 await self.bot._(ctx.guild.id, "message_manager.moveall.missing-perm")
             )
             self.bot.log.info(
-                f'Alakon - /moveall: Missing permissions on guild "{ctx.guild.name}"'
+                f'messageManager - /moveall: Missing permissions on guild "{ctx.guild.name}"'
             )
             return
 
@@ -229,6 +230,28 @@ class MessageManager(commands.Cog):
             )
             await ctx.send(embed=embed)
             return
+
+        # Checks that the messages are not the same
+        if msg1 == msg2:
+            await ctx.send(
+                await self.bot._(
+                    ctx.guild.id, "message_manager.moveall.same-message"
+                )
+            )
+            return
+
+        # Checks that the messages are in the same channel
+        if msg1.channel != msg2.channel:
+            await ctx.send(
+                await self.bot._(
+                    ctx.guild.id, "message_manager.moveall.channel-conflict"
+                )
+            )
+            return
+
+        # Ensures that msg1 is indeed the first message of the two
+        if msg1.created_at > msg2.created_at:
+            msg2, msg1 = msg1, msg2
 
         # Send confirmation that the bot started to move messages
         embed = discord.Embed(
@@ -261,20 +284,6 @@ class MessageManager(commands.Cog):
         )
         introduction = await channel.send(embed=embed)
 
-        # Checks that the messages are in the same channel
-        if msg1.channel != msg2.channel:
-            await ctx.send(
-                await self.bot._(
-                    ctx.guild.id, "message_manager.moveall.channel-conflict"
-                )
-            )
-            return
-
-        # Ensures that msg1 is indeed the first message of the two
-        if msg1.created_at > msg2.created_at:
-            msg2, msg1 = msg1, msg2
-
-
         dest = channel
         thread = None
         if isinstance(channel, discord.Thread):
@@ -294,13 +303,6 @@ class MessageManager(commands.Cog):
             await moveMessage(msg, webhook, thread=thread)
             counter += 1
         await moveMessage(msg2, webhook, thread=thread)
-
-        if counter == 0:
-            await ctx.send(
-                await self.bot._(ctx.guild.id, "message_manager.moveall.no-msg")
-            )
-            await webhook.delete()
-            return
 
         if confirm:
             # Creates an embed to notify that the messages have been moved
