@@ -227,7 +227,7 @@ class VoiceChannels(commands.Cog):
 
         # Otherwise, we get some new ones
         # Using local file for asterix names
-        if source == "asterix":
+        if True or source == "asterix":
             with open(
                 "plugins/voice/rsrc/asterix_names.txt", "r", encoding="utf-8"
             ) as file:
@@ -235,16 +235,18 @@ class VoiceChannels(commands.Cog):
                 random.shuffle(self.names[source])
             return self.names[source].pop()
 
+        # TODO : This part is fully broken, should be rewritten.
+        #  In the meantime, we use Asterix names for everything
         # Using randommer.io for random names
-        else:
-            headers = {"X-Api-Key": self.bot.config["random_api_token"]}
-            async with aiohttp.ClientSession() as session:
-                async with session.get(
-                    "https://randommer.io/api/Name?nameType=surname&quantity=20",
-                    headers=headers,
-                ) as resp:
-                    self.names[source] = await resp.json()
-                return self.names[source].pop()
+        #else:
+            #headers = {"X-Api-Key": self.bot.config["randommer_api_key"]}
+            #async with aiohttp.ClientSession() as session:
+            #    async with session.get(
+            #        "https://randommer.io/api/Name?nameType=surname&quantity=20",
+            #        headers=headers,
+            #    ) as resp:
+            #        self.names[source] = await resp.json()
+            #    return self.names[source].pop()
 
     @commands.command(name="voice-clean")
     @commands.guild_only()
