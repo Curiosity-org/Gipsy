@@ -19,7 +19,7 @@ async def moveMessage(msg: discord.Message, webhook: discord.Webhook, thread: di
     mentions = discord.AllowedMentions(
         everyone=msg.mention_everyone, users=msg.mentions, roles=msg.role_mentions
     )
-    
+
     kargs = {
         "content": msg.content,
         "files": files,
@@ -53,11 +53,11 @@ class MessageManager(commands.Cog):
     @commands.guild_only()
     @commands.has_permissions(manage_messages=True, manage_nicknames=True)
     async def imitate(
-        self, ctx: commands.Context, member: discord.Member = None, *, text=None
+            self, ctx: commands.Context, member: discord.Member = None, *, text=None
     ):
         """Say something with someone else's appearance"""
 
-        if (member is not None and text is not None): # c'est python, autant être verbeux
+        if (member is not None and text is not None):  # c'est python, autant être verbeux
             # Create a webhook in the image of the targeted member
             webhook = await ctx.channel.create_webhook(name=member.display_name)
             await webhook.send(content=text, avatar_url=member.display_avatar)
@@ -70,7 +70,7 @@ class MessageManager(commands.Cog):
     # Command /move #
     # ----------------#
 
-    @commands.command(names="move", aliases=["mv"])
+    @commands.hybrid_command(names="move", aliases=["mv"])
     @commands.guild_only()
     @commands.has_permissions(
         manage_messages=True,
@@ -78,26 +78,21 @@ class MessageManager(commands.Cog):
         read_message_history=True,
     )
     async def move(
-        self,
-        ctx: commands.Context,
-        msg: discord.Message,
-        channel: Union[discord.abc.Messageable, str],
-        *,
-        confirm=True,
+            self,
+            ctx: commands.Context,
+            msg: discord.Message,
+            channel: Union[discord.TextChannel, discord.Thread, discord.VoiceChannel],
+            *,
+            confirm=True,
     ):
         """Move a message in another channel"""
 
-        if isinstance(channel, str):
-            try:
-                channel = self.bot.get_channel(int(channel.replace("<#", "").replace(">", "")))
-            except BaseException:
-                await ctx.send(
-                    await self.bot._(ctx.guild.id, "message_manager.no-channel")
-                )
-                return
-        
+        # Check if the channel is a valid channel
         if not isinstance(channel, discord.abc.Messageable):
-            await ctx.send(await self.bot._(ctx.guild.id, "message_manager.no-channel"))
+            await ctx.send(
+                await self.bot._(ctx.guild.id, "message_manager.no-channel"),
+                ephemeral=True
+            )
             return
 
         author = channel.guild.get_member(ctx.author.id)
@@ -107,16 +102,17 @@ class MessageManager(commands.Cog):
         perm2: discord.Permissions = channel.permissions_for(channel.guild.me)
 
         if not (
-            perm1.read_messages
-            and perm1.read_message_history
-            and perm1.manage_messages
-            and perm2.manage_messages
+                perm1.read_messages
+                and perm1.read_message_history
+                and perm1.manage_messages
+                and perm2.manage_messages
         ):
             await ctx.send(
-                await self.bot._(ctx.guild.id, "message_manager.moveall.missing-perm")
+                await self.bot._(ctx.guild.id, "message_manager.moveall.missing-perm"),
+                ephemeral=True,
             )
             self.bot.log.info(
-                f'Alakon - /move: Missing permissions on guild "{ctx.guild.name}"'
+                f'messageManager - /move: Missing permissions on guild "{ctx.guild.name}"'
             )
             return
 
@@ -128,7 +124,7 @@ class MessageManager(commands.Cog):
                 ),
                 colour=discord.Colour.red(),
             )
-            await ctx.send(embed=embed)
+            await ctx.send(embed=embed, ephemeral=True)
             return
 
         dest = channel
@@ -138,7 +134,7 @@ class MessageManager(commands.Cog):
             channel = thread.parent
 
         # Creates a webhook to resend the message to another channel
-        webhook = await channel.create_webhook(name="Gunipy Hook")
+        webhook = await channel.create_webhook(name="Gipsy Hook")
         await moveMessage(msg, webhook, thread=thread)
         await webhook.delete()
 
@@ -160,14 +156,15 @@ class MessageManager(commands.Cog):
             )
             await ctx.send(embed=embed)
 
-        # Deletes the command
-        await ctx.message.delete()
+        # Deletes the command message if it is not a slash command
+        if not ctx.interaction:
+            await ctx.message.delete()
 
     # -------------------#
     # Command /moveall #
     # -------------------#
 
-    @commands.command(names="moveall", aliases=["mva"])
+    @commands.hybrid_command(names="moveall", aliases=["mva"])
     @commands.guild_only()
     @commands.has_permissions(
         manage_messages=True,
@@ -175,13 +172,13 @@ class MessageManager(commands.Cog):
         read_message_history=True,
     )
     async def moveall(
-        self,
-        ctx: commands.Context,
-        msg1: discord.Message,
-        msg2: discord.Message,
-        channel: Union[discord.abc.Messageable, str],
-        *,
-        confirm=True,
+            self,
+            ctx: commands.Context,
+            msg1: discord.Message,
+            msg2: discord.Message,
+            channel: Union[discord.TextChannel, discord.Thread, discord.VoiceChannel],
+            *,
+            confirm=True,
     ):
         """Move several messages in another channel
         msg1 and msg2 need to be from the same channel"""
@@ -194,7 +191,7 @@ class MessageManager(commands.Cog):
                     await self.bot._(ctx.guild.id, "message_manager.no-channel")
                 )
                 return
-                
+
         if not isinstance(channel, discord.abc.Messageable):
             await ctx.send(await self.bot._(ctx.guild.id, "message_manager.no-channel"))
             return
@@ -206,10 +203,10 @@ class MessageManager(commands.Cog):
         perm2: discord.Permissions = channel.permissions_for(channel.guild.me)
 
         if not (
-            perm1.read_messages
-            and perm1.read_message_history
-            and perm1.manage_messages
-            and perm2.manage_messages
+                perm1.read_messages
+                and perm1.read_message_history
+                and perm1.manage_messages
+                and perm2.manage_messages
         ):
             await ctx.send(
                 await self.bot._(ctx.guild.id, "message_manager.moveall.missing-perm")
@@ -274,7 +271,6 @@ class MessageManager(commands.Cog):
         if msg1.created_at > msg2.created_at:
             msg2, msg1 = msg1, msg2
 
-
         dest = channel
         thread = None
         if isinstance(channel, discord.Thread):
@@ -286,14 +282,26 @@ class MessageManager(commands.Cog):
 
         counter = 0
 
-        # Retrieves the message list from msg1 to msg2
-        await moveMessage(msg1, webhook, thread=thread)
-        async for msg in msg1.channel.history(
-            limit=200, after=msg1.created_at, before=msg2, oldest_first=True
-        ):
-            await moveMessage(msg, webhook, thread=thread)
-            counter += 1
-        await moveMessage(msg2, webhook, thread=thread)
+        # Move messages from msg1 to msg2
+        async with dest.typing():
+            await moveMessage(msg1, webhook, thread=thread)
+            async for msg in msg1.channel.history(
+                    limit=200, after=msg1.created_at, before=msg2, oldest_first=True
+            ):
+                await moveMessage(msg, webhook, thread=thread)
+                counter += 1
+            await moveMessage(msg2, webhook, thread=thread)
+
+        # Send a temporary confirmation message (to cancel typing status)
+        await dest.send(
+            embed=discord.Embed(
+                description=await self.bot._(
+                    ctx.guild.id, "message_manager.moveall.completed", counter=counter
+                ),
+                colour=discord.Colour.green(),
+            ),
+            delete_after=5
+        )
 
         if counter == 0:
             await ctx.send(
@@ -319,17 +327,20 @@ class MessageManager(commands.Cog):
                 )
             )
             await confirmation.edit(embed=embed)
-            await ctx.message.delete()
+            # Deletes the command message if it is not a slash command
+            if not ctx.interaction:
+                await ctx.message.delete()
 
         await webhook.delete()
 
 
 # The End.
 config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+
+
+async def setup(bot: Gunibot = None, plugin_config: dict = None):
     if bot is not None:
         await bot.add_cog(MessageManager(bot), icon="📋")
     if plugin_config is not None:
         global config
         config.update(plugin_config)
-
