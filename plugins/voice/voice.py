@@ -221,23 +221,30 @@ class VoiceChannels(commands.Cog):
             self.db_delete_channel(channel)
 
     async def get_names(self, source="random"):
+        # If we have some names in cache, we use one of them
         if len(self.names[source]) != 0:
             return self.names[source].pop()
-        async with aiohttp.ClientSession() as session:
-            h = {"X-Api-Key": self.bot.config["random_api_token"]}
-            if source == "asterix":
-                with open(
-                    "plugins/voice/rsrc/asterix_names.txt", "r", encoding="utf-8"
-                ) as file:
-                    self.names["asterix"] = file.readlines()
-                    random.shuffle(self.names[source])
-            else:
+
+        # Otherwise, we get some new ones
+        # Using local file for asterix names
+        if source == "asterix":
+            with open(
+                "plugins/voice/rsrc/asterix_names.txt", "r", encoding="utf-8"
+            ) as file:
+                self.names["asterix"] = file.readlines()
+                random.shuffle(self.names[source])
+            return self.names[source].pop()
+
+        # Using randommer.io for random names
+        else:
+            headers = {"X-Api-Key": self.bot.config["random_api_token"]}
+            async with aiohttp.ClientSession() as session:
                 async with session.get(
                     "https://randommer.io/api/Name?nameType=surname&quantity=20",
-                    headers=h,
+                    headers=headers,
                 ) as resp:
                     self.names[source] = await resp.json()
-        return self.names[source].pop()
+                return self.names[source].pop()
 
     @commands.command(name="voice-clean")
     @commands.guild_only()
