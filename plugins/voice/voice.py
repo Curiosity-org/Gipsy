@@ -12,6 +12,8 @@ import discord
 from discord.ext import commands
 from utils import Gunibot, MyContext
 
+from core import config
+
 
 class VoiceChannels(commands.Cog):
     def __init__(self, bot: Gunibot):
@@ -26,6 +28,7 @@ class VoiceChannels(commands.Cog):
             "voices_category",
         ]
         self.db_get_channels()
+        self.config = config.get("voice") or {}
 
         bot.get_command("config").add_command(self.config_voice_channel_format)
         bot.get_command("config").add_command(self.config_voice_roles)
@@ -225,28 +228,27 @@ class VoiceChannels(commands.Cog):
         if len(self.names[source]) != 0:
             return self.names[source].pop()
 
-        # Otherwise, we get some new ones
-        # Using local file for asterix names
-        if True or source == "asterix":
+        # If we don't have any names in cache, we get some new ones
+        randommer_api_key = self.config.get("randommer_api_key")
+        if source != "asterix" and randommer_api_key is not None:
+            headers = {"X-Api-Key": randommer_api_key}
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    "https://randommer.io/api/Name?nameType=surname&quantity=20",
+                    headers=headers,
+                ) as resp:
+                    self.names[source] = await resp.json()
+                return self.names[source].pop()
+
+        # If asked, or as fallback if API key isn't defined, we use Asterix names
+        else:
             with open(
                 "plugins/voice/rsrc/asterix_names.txt", "r", encoding="utf-8"
             ) as file:
                 self.names["asterix"] = file.readlines()
-                random.shuffle(self.names[source])
-            return self.names[source].pop()
+                random.shuffle(self.names["asterix"])
+            return self.names["asterix"].pop()
 
-        # TODO : This part is fully broken, should be rewritten.
-        #  In the meantime, we use Asterix names for everything
-        # Using randommer.io for random names
-        #else:
-            #headers = {"X-Api-Key": self.bot.config["randommer_api_key"]}
-            #async with aiohttp.ClientSession() as session:
-            #    async with session.get(
-            #        "https://randommer.io/api/Name?nameType=surname&quantity=20",
-            #        headers=headers,
-            #    ) as resp:
-            #        self.names[source] = await resp.json()
-            #    return self.names[source].pop()
 
     @commands.command(name="voice-clean")
     @commands.guild_only()
@@ -272,11 +274,6 @@ class VoiceChannels(commands.Cog):
         await ctx.send(await self.bot._(ctx.guild.id, "voices.result", count=i))
 
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
     if bot is not None:
         await bot.add_cog(VoiceChannels(bot), icon="🎙️")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)
-
