@@ -31,7 +31,7 @@ jobs:
           curl $GIPSY_RESTART_BETA_ENDPOINT \
             -H 'Accept: application/json' \
             -H 'Content-Type: application/json' \
-            -H 'Authorization: Bearer $GIPSY_RESTART_BETA_BEARER' \
+            -H "Authorization: Bearer $GIPSY_RESTART_BETA_BEARER" \
             -X POST \
             -d '{
             "signal": "restart"
