@@ -276,8 +276,7 @@ class Wormholes(commands.Cog):
     async def on_message_edit(self, message:discord.Message, newmessage:discord.Message):
         """Executed every time a message is edited"""
         if (
-            message.author.bot
-            or "wormhole unlink" in message.content
+            "wormhole unlink" in message.content
             or "wh unlink" in message.content
         ):
             return
@@ -290,7 +289,16 @@ class Wormholes(commands.Cog):
             return  # Check if there is a wormhole linked to the current channel
         if "w" not in wh_channel[1]:
             return  # Check if the current channel as Write permission
+        
         wh_name = wh_channel[0]
+        
+        # If the sender is a webhook used by the wormhole, then we don't want to send the message
+        query = "SELECT * FROM wormhole_channel WHERE name = ? AND channelID = ?"
+        wh_local = self.bot.db_query(query, (wh_name, message.channel.id), astuple=True)[0]
+        # come as: (name, channelID, guildID, type, webhookID, webhookTOKEN)
+        if message.author.id == wh_local[4]: # sender id is the webhook used here
+            return
+
         query = "SELECT * FROM wormhole_channel WHERE name = ? AND type LIKE '%r%' AND NOT channelID = ?"
         wh_targets = self.bot.db_query(
             query, (wh_name, message.channel.id), astuple=True
@@ -396,17 +404,10 @@ class Wormholes(commands.Cog):
 
         # If the sender is a webhook used by the wormhole, then we don't want to send the message
         query = "SELECT * FROM wormhole_channel WHERE name = ? AND channelID = ?"
-        wh_targets = self.bot.db_query(query, (wh_name, message.channel.id), astuple=True)
-        async with ClientSession() as session:
-            # Logically the query return only one channel
-            if len(wh_targets) > 1:
-                raise ValueError("Euh, there is more than one channel with the same ID on this wormhole... this is supposed to never happend")
-            # Get wormhole webhook associated to this channel
-            connected_channel = wh_targets[0]
-            webhook = discord.Webhook.partial(connected_channel[4], connected_channel[5], session=session)
-            # Check if the sender is this webhook
-            if message.author.id == webhook.id:
-                return
+        wh_local = self.bot.db_query(query, (wh_name, message.channel.id), astuple=True)[0]
+        # come as: (name, channelID, guildID, type, webhookID, webhookTOKEN)
+        if message.author.id == wh_local[4]: # sender id is the webhook used here
+            return
 
         # Getting all the other channels linked to the wormhole
         query = "SELECT * FROM wormhole_channel WHERE name = ? AND type LIKE '%r%' AND NOT channelID = ?"
@@ -457,12 +458,6 @@ class Wormholes(commands.Cog):
                             ).set_footer(
                                 text=content, icon_url=reply.author.display_avatar
                             )
-                        username = (
-                            wormhole[0]
-                            .replace("{user}", message.author.name, 10)
-                            .replace("{guild}", message.guild.name, 10)
-                            .replace("{channel}", message.channel.name, 10)
-                        )
                     
                     try:
                         await sendMessage(
