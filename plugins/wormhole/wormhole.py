@@ -304,9 +304,44 @@ class Wormholes(commands.Cog):
                 # We're starting to send the message in all the channels linked
                 # to that wormhole
                 channel: discord.abc.Messageable = self.bot.get_channel(row[1])
+                embeds = newmessage.embeds.copy()
+
                 if channel:
                     webhook = discord.Webhook.partial(row[4], row[5], session=session)
-                    embed_reply = None
+
+                    if message.reference is not None:
+                        reply = await message.channel.fetch_message(
+                            message.reference.message_id
+                        )
+                        reply = await get_corresponding_answer(channel, reply)
+                        if reply is None:
+                            embeds.append(
+                                discord.Embed(
+                                    # "https://gunivers.net"), #
+                                    description=await self.bot._(
+                                        message.guild.id, "wormhole.reply_notfound"
+                                    ),
+                                    colour=0x2F3136,  # 2F3136
+                                )
+                            )
+                        else:
+                            content = reply.content.replace("\n", " ")
+                            if len(content) > 80:
+                                content = content[:80] + "..."
+                            embeds.append(
+                                discord.Embed(
+                                    # "https://gunivers.net"), #
+                                    description=await self.bot._(
+                                        message.guild.id,
+                                        "wormhole.reply_to",
+                                        link=reply.jump_url,
+                                    ),
+                                    colour=0x2F3136,  # 2F3136
+                                ).set_footer(
+                                    text=content, icon_url=reply.author.display_avatar
+                                )
+                            )
+
                     oldmessage = await get_corresponding_answer(channel, message)
 
                     try:
@@ -314,7 +349,7 @@ class Wormholes(commands.Cog):
                             await webhook.edit_message(
                                 oldmessage.id,
                                 content=newmessage.content,
-                                embeds=newmessage.embeds,
+                                embeds=embeds,
                                 allowed_mentions=None,
                                 thread = channel,
                             )
@@ -322,7 +357,7 @@ class Wormholes(commands.Cog):
                             await webhook.edit_message(
                                 oldmessage.id,
                                 content=newmessage.content,
-                                embeds=newmessage.embeds,
+                                embeds=embeds,
                                 allowed_mentions=None,
                             )
                     except discord.NotFound: # the webhook has been deleted
