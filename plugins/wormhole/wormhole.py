@@ -408,7 +408,7 @@ class Wormholes(commands.Cog):
                                 colour=0x2F3136,  # 2F3136
                             )
                         else:
-                            content = content.replace("\n", " ")
+                            content = reply.content.replace("\n", " ")
                             if len(content) > 80:
                                 content = content[:80] + "..."
                             embed_reply = discord.Embed(
