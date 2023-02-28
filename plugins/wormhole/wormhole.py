@@ -595,12 +595,12 @@ class Wormholes(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "wormhole.error.not-linked"))
             return
         query = "DELETE FROM wormhole_channel WHERE channelID = ? AND name = ?"
+        self.bot.db_query(query, (ctx.channel.id, wh_channel[0]))
         async with ClientSession() as session:
             webhook = discord.Webhook.partial(
                 wh_channel[4], wh_channel[5], session=session
             )
             await webhook.delete()
-        self.bot.db_query(query, (wh_channel[0], ctx.channel.id))
         await ctx.send(
             await self.bot._(ctx.guild.id, "wormhole.success.channel-unlinked")
         )
