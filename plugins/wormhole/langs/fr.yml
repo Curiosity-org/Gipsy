@@ -8,7 +8,7 @@ fr:
     error:
       already-exists: "Le trou de ver %{name} existe déjà"
       already-linked: "Le salon %{c} est déjà lié à ce trou de ver"
-      not-exists: "Le trou de ver %{name} n'exisste pas"
+      not-exists: "Le trou de ver %{name} n'existe pas"
       not-linked: "Le salon %{c} n'est lié à aucun trou de ver"
       not-admin: "Vous devez être administrateur de ce trou de ver"
       not-privacy: L'option de visibilité doit être définie sur "public" ou "private"
