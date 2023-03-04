@@ -282,12 +282,12 @@ CONFIG_OPTIONS.update(
         "prefix": {
             "default": config.get("bot.default_prefix"),
             "type": "text",
-            "command": None,
+            "command": 'prefix',
         },
         "language": {
             "default": config.get("bot.default_language"),
             "type": "text",
-            "command": None,
+            "command": 'language',
         },
         "admins": {
             "default": config.get("bot.admins"),
