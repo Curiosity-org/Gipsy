@@ -114,7 +114,7 @@ class XP(commands.Cog):
 
     @commands.command(name="reaction_emoji")
     async def config_levelup_reaction_emoji(
-        self, ctx: MyContext, emote: discord.Emoji = None
+        self, ctx: MyContext, emote: Union[discord.Emoji, str] = None
     ):
         """Set the emoji wich one the bot will react to message when levelup"""
         # check if emoji is valid
