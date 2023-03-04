@@ -25,4 +25,4 @@ class Template(commands.Cog):
     @commands.command(name="hello")
     @commands.guild_only()
     async def hello(self, ctx: MyContext):
-        await ctx.send(self.bot._(ctx.guild.id, "template.hello"))
+        await ctx.send(await self.bot._(ctx.guild.id, "template.hello"))
