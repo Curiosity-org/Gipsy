@@ -1,7 +1,7 @@
 ::::{grid} 2
 
 :::{grid-item-card} 🎁 Giveways
-:link: plugins/xp/user_documentation
+:link: plugins/giveaways/user_documentation
 :link-type: doc
 :margin: 0 3 0 0
 
@@ -9,7 +9,7 @@ Create giveaways to reward your community!
 :::
 
 :::{grid-item-card} 🎖️ XP System
-:link: plugins/giveaways/user_documentation
+:link: plugins/xp/user_documentation
 :link-type: doc 
 :margin: 0 3 0 0
 
