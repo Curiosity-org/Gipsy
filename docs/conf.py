@@ -52,6 +52,11 @@ html_theme_options = {
     },
     "icon_links": [
         {
+            "name": "Support us",
+            "url": "https://utip.io/gunivers",
+            "icon": "fa fa-heart",
+        },
+        {
             "name": "Gunivers",
             "url": "https://gunivers.net",
             "icon": "_static/logo-gunivers.png",
