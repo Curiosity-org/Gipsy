@@ -1,4 +1,8 @@
-# 🤝 Contributing
+---
+html_theme.sidebar_secondary.remove: true
+---
+
+# 🤝 Contribute
 
 ## Commit Message Format
 We do not have a strict policy regarding commit messages, however we tend to apply a consistent style looking like this:

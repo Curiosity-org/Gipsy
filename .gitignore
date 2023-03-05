@@ -13,7 +13,8 @@ config.json
 .idea/
 venv/
 env/
-docs/_*
+docs/_templates
+docs/_build
 docs/build
 require.json
 docs/plugins
