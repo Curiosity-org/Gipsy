@@ -4,7 +4,7 @@ html_theme.sidebar_primary.remove: true
 sd_hide_title: true
 ---
 
-# Gipsy's documentation
+# Home page
 
 ## 🔎 What is it?
 
