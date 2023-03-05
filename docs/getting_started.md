@@ -1,3 +1,8 @@
+---
+html_theme.sidebar_secondary.remove: true
+html_theme.sidebar_primary.remove: true
+---
+
 # 👋 Getting Started
 
 ## 📥 Get it on your Discord server

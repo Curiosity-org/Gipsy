@@ -1,3 +1,6 @@
+---
+html_theme.sidebar_secondary.remove: true
+---
 
 <!--
 Ce programme est régi par la licence CeCILL soumise au droit français et

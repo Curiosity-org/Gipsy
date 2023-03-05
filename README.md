@@ -15,7 +15,7 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 Gipsy is modular, free and open-source Discord bot whose focus on accessibility and customization. It maintained with ❤️ by volunteers inside the [Gunivers](https://gunivers.net/) community. It is written in Python and uses the Discord.py library and the project is open to experimented people as well as beginners!
 
 <a href="https://gipsy.rtfd.io">
-<img src="docs/img/meet_gipsy.png" width="200" alt="Meet Gipsy">
+<img src="docs/_static/meet_gipsy.png" width="200" alt="Meet Gipsy">
 </a>
 
 *This button redirect you to a more complete presentation with invitation links, list of features, self-hosting instructions and more.*
