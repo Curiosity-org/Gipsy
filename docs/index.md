@@ -8,7 +8,7 @@ sd_hide_title: true
 
 ## 🔎 What is it?
 
-Gipsy is modular, free and open-source Discord bot whose focus on accessibility and customization. It is written in Python and uses the Discord.py library and is managed by the `Gunivers <https://gunivers.net>`_ community.
+Gipsy is modular, free and open-source Discord bot whose focus on accessibility and customization. It is written in Python and uses the Discord.py library and is managed by the [Gunivers](https://gunivers.net) community.
 
 ::::{grid} 2
 
