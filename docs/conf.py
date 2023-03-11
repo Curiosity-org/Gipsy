@@ -35,16 +35,8 @@ html_theme = 'pydata_sphinx_theme'
 #     'credits.css',
 # ]
 
-html_context = {
-    "github_user": "Gunivers",
-    "github_repo": "Gipsy",
-    "github_version": "beta",
-    "doc_path": "docs",
-}
-
 html_theme_options = {
     "github_url": "https://github.com/Gunivers/Gipsy",
-    "use_edit_page_button": True,
     "announcement": "⚠️ You are reading a doc of an undergoing development version. Information can be out of date and/or change at any time. ⚠️",
     "logo": {
         "image_dark": "_static/logo.png",
@@ -74,6 +66,10 @@ html_theme_options = {
 html_logo = "_static/logo.png"
 
 html_static_path = ['_static']
+
+html_css_files = [
+    'css/stylesheet.css',
+]
 
 myst_enable_extensions = [
     "amsmath",
