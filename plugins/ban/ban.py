@@ -264,7 +264,10 @@ class Ban(commands.Cog):
         show_error: whether to show an error message if the ban fails
         """
 
-        channel = ctx.channel.parent or ctx.channel
+        try:
+            channel = ctx.channel.parent
+        except AttributeError:
+            channel = ctx.channel
 
         # send the invitation to allow the user to rejoin the guild
         try:
