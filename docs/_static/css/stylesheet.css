@@ -1,15 +1,15 @@
 html[data-theme="light"] {
     --pst-color-primary: #fa9632;
     --pst-color-secondary: #3296fa;
-    --sd-color-card-border-hover: #fa9632;
-    --pst-color-primary-highlight: #3296fa;
+    --sd-color-card-border-hover: var(--pst-color-primary);
+    --pst-color-primary-highlight: var(--pst-color-secondary);
 }
 
 html[data-theme="dark"] {
     --pst-color-primary: #fa9632;
     --pst-color-secondary: #3296fa;
-    --sd-color-card-border-hover: #fa9632;
-    --pst-color-primary-highlight: #3296fa;
+    --sd-color-card-border-hover: var(--pst-color-primary);
+    --pst-color-primary-highlight: var(--pst-color-secondary);
 }
 
 a.headerlink {
