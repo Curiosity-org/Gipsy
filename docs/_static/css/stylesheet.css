@@ -1,9 +1,17 @@
 html[data-theme="light"] {
     --pst-color-primary: #fa9632;
     --pst-color-secondary: #3296fa;
+    --sd-color-card-border-hover: #fa9632;
+    --pst-color-primary-highlight: #3296fa;
 }
 
 html[data-theme="dark"] {
     --pst-color-primary: #fa9632;
     --pst-color-secondary: #3296fa;
+    --sd-color-card-border-hover: #fa9632;
+    --pst-color-primary-highlight: #3296fa;
+}
+
+a.headerlink {
+    color: var(--pst-color-secondary);
 }
