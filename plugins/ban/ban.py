@@ -263,10 +263,12 @@ class Ban(commands.Cog):
         user: the user to ban
         show_error: whether to show an error message if the ban fails
         """
-        
+
+        channel = ctx.channel.parent or ctx.channel
+
         # send the invitation to allow the user to rejoin the guild
         try:
-            invitation = await ctx.channel.create_invite(
+            invitation = await channel.create_invite(
                 reason="Friendly ban",
                 max_uses=1,
                 unique=True,
@@ -282,7 +284,7 @@ class Ban(commands.Cog):
         except discord.Forbidden:
             if show_error:
                 await ctx.send(await ctx.bot._(ctx, 'ban.gunivers.whoups'))
-        
+
         # store the roles somewhere to give them back to the user
         self.roles_backup[user.id] = ctx.guild.get_member(
             user.id
