@@ -4,6 +4,12 @@ html_theme.sidebar_secondary.remove: true
 
 # 🤝 Contribute
 
+```{admonition} 🤝 Help us building this project!
+:class: note
+
+This part of the documentation is still under construction. If you want to help us, you can contribute to the project on [GitHub](https://github.com/Gunivers/Gipsy) or come on our [Discord server](https://discord.gg/E8qq6tN).
+```
+
 ## Commit Message Format
 We do not have a strict policy regarding commit messages, however we tend to apply a consistent style looking like this:
 `:emote: [type](scope): <subject>`
