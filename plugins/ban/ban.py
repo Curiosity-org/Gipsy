@@ -264,9 +264,9 @@ class Ban(commands.Cog):
         show_error: whether to show an error message if the ban fails
         """
 
-        try:
+        if isinstance(ctx.channel, discord.Thread):
             channel = ctx.channel.parent
-        except AttributeError:
+        else:
             channel = ctx.channel
 
         # send the invitation to allow the user to rejoin the guild
