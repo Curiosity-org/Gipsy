@@ -61,7 +61,7 @@ Move messages between channels or imitate another user!
 :link-type: doc
 :margin: 0 0 0 0
 
-Let members create private groups with associated rôle and channel!
+Let members create private groups with associated role and channel!
 :::
 
 ::::
