@@ -141,10 +141,10 @@ class VoiceChannels(commands.Cog):
         """Check if a member joined/left a voice channel"""
         if before.channel == after.channel:
             return
-        config = self.bot.server_configs[member.guild.id]
-        if config["voice_channel"] is None:  # si rien n'a été configuré
+        voice_config = self.bot.server_configs[member.guild.id]
+        if voice_config["voice_channel"] is None:  # si rien n'a été configuré
             return
-        if after.channel is not None and after.channel.id == config["voice_channel"]:
+        if after.channel is not None and after.channel.id == voice_config["voice_channel"]:
             if (
                 before.channel is not None and len(before.channel.members) == 0
             ):  # move from another channel which is now empty
@@ -155,7 +155,7 @@ class VoiceChannels(commands.Cog):
                     # if the channel is now empty
                     await member.move_to(before.channel)
                     return
-            await self.create_channel(member, config)
+            await self.create_channel(member, voice_config)
         if (
             (before.channel is not None)
             and (member.guild.id in self.channels)
@@ -167,13 +167,13 @@ class VoiceChannels(commands.Cog):
         if before.channel is None:
             await self.give_roles(member)
 
-    async def create_channel(self, member: discord.Member, config: dict):
+    async def create_channel(self, member: discord.Member, voice_config: dict):
         """Create a new voice channel
         The member will get "Manage channel" permissions automatically"""
-        if config["voices_category"] is None:  # si rien n'a été configuré
+        if voice_config["voices_category"] is None:  # si rien n'a été configuré
             return
         voice_category: discord.CategoryChannel = self.bot.get_channel(
-            config["voices_category"]
+            voice_config["voices_category"]
         )
         if not isinstance(voice_category, discord.CategoryChannel):
             return
@@ -193,7 +193,7 @@ class VoiceChannels(commands.Cog):
         # remove manage roles cuz DISCOOOOOOOOOOORD
         over[member].manage_roles = None
         # build channel name from config and random
-        chan_name = config["voice_channel_format"]
+        chan_name = voice_config["voice_channel_format"]
         args = {"user": str(member)}
         if "{random}" in chan_name:
             args["random"] = await self.get_names()
@@ -222,15 +222,12 @@ class VoiceChannels(commands.Cog):
         # If we have some names in cache, we use one of them
         if len(self.names[source]) != 0:
             return self.names[source].pop()
-        async with aiohttp.ClientSession() as session:
-            headers = {"X-Api-Key": self.bot.config["random_api_token"]}
-            if source == "asterix":
-                with open(
-                    "plugins/voice/rsrc/asterix_names.txt", "r", encoding="utf-8"
-                ) as file:
-                    self.names["asterix"] = file.readlines()
-                    random.shuffle(self.names[source])
-            else:
+
+        # If we don't have any names in cache, we get some new ones
+        randommer_api_key = self.config.get("randommer_api_key")
+        if source != "asterix" and randommer_api_key != '':
+            headers = {"X-Api-Key": randommer_api_key}
+            async with aiohttp.ClientSession() as session:
                 async with session.get(
                     "https://randommer.io/api/Name?nameType=surname&quantity=20",
                     headers=headers,
