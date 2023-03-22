@@ -93,7 +93,7 @@ class Gunibot(commands.bot.AutoShardedBot):
 
         :return: La configuration du serveur
         """
-        return self.get_cog("ConfigCog").confManager
+        return self.get_cog("ConfigCog").conf_manager
 
     @property
     def sconfig(self) -> "Sconfig":

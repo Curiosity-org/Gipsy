@@ -26,7 +26,9 @@ class Thanks(commands.Cog):
 
         bot.get_command("config").add_command(self.config_thanks_allowed_roles)
         bot.get_command("config").add_command(self.config_thanks_duration)
-        bot.get_command("config").add_command(self.thanks_main)
+        self.thanks_config_main.name = "thanks"
+        self.thanks_config_main.aliases = ['thk']
+        bot.get_command("config").add_command(self.thanks_config_main)
 
     @commands.command(name="thanks_allowed_roles")
     async def config_thanks_allowed_roles(
@@ -59,13 +61,13 @@ class Thanks(commands.Cog):
         )
         await ctx.send(message)
 
-    @commands.group(name="thanks", aliases=["thx"], enabled=False)
-    async def thanks_main(self, ctx: MyContext):
+    @commands.group(enabled=False)
+    async def thanks_config_main(self, ctx: MyContext):
         """Edit your thanks-levels settings"""
         if ctx.subcommand_passed is None:
             await ctx.send_help("config thanks")
 
-    @thanks_main.command(name="list")
+    @thanks_config_main.command(name="list")
     async def thanks_list(self, ctx: MyContext):
         """List your current thanks levels"""
         await self.bot.get_cog("Thanks").thankslevels_list(ctx)
