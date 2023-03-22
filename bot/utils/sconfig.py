@@ -5,23 +5,14 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-from utils import CONFIG_OPTIONS, Gunibot, MyContext
-from discord.ext import commands
+from typing import Any, List, Union
+
 import emoji
 import discord
+from discord.ext import commands
+
 from bot import checks
-from bot import args
-import asyncio
-import io
-import json
-import re
-from typing import Any, List, Union
-import numpy as np
-
-import sys
-
-sys.path.append("./bot")
-sys.path.append("./bot")
+from utils import CONFIG_OPTIONS, Gunibot, MyContext
 
 SERVER_CONFIG = None
 
@@ -223,7 +214,7 @@ class Sconfig(commands.Cog):
                     )
 
                 if hasattr(self.bot.get_cog(module), "_create_config"):
-                    for extra in await self.bot.get_cog(module)._create_config(ctx):
+                    for extra in await self.bot.get_cog(module)._create_config(ctx): # pylint: disable=protected-access
                         module_config += (
                             (f"[{extra[0]}]").ljust(max_key_length)
                             + f" {extra[1]}".ljust(max_value_length)
@@ -334,51 +325,11 @@ class Sconfig(commands.Cog):
     # --------------------------------------------------
     # Backup
     # --------------------------------------------------
-    """
-    @config_backup.command(name="get", aliases=["create"])
-    async def backup_create(self, ctx: MyContext):
-        "Create a backup of your configuration"
-        data = json.dumps(self.bot.server_configs[ctx.guild.id])
-        data = io.BytesIO(data.encode("utf8"))
-        txt = await self.bot._(ctx.guild.id, "sconfig.backup.ended")
-        await ctx.send(txt, file=discord.File(data, filename="config-backup.json"))
-
-    @config_backup.command(name="load")
-    async def backup_load(self, ctx: MyContext):
-        "Load a backup of your configuration (in attached file) and apply it"
-        if not (ctx.message.attachments and ctx.message.attachments[0].filename.endswith(".json")):
-            await ctx.send(await self.bot._(ctx.guild.id, "sconfig.backup.nofile"))
-            return
-        data = json.loads(await ctx.message.attachments[0].read())
-        conf = self.bot.server_configs[ctx.guild.id]
-        for k in data.keys():
-            if not k in conf.keys():
-                await ctx.send(await self.bot._(ctx.guild.id, "sconfig.backup.invalidfile"))
-                return
-        merge = {k: v for k, v in data.items() if v != conf[k]}
-        if len(merge) == 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "sconfig.backup.noedit"))
-            return
-        msg = await ctx.send(await self.bot._(ctx.guild.id, "sconfig.backup.check", count=len(merge)))
-        await msg.add_reaction("✅")
-
-        def check(reaction, user):
-            return user == ctx.author and str(reaction.emoji) == "✅" and reaction.message.id == msg.id
-        try:
-            await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
-        except asyncio.TimeoutError:
-            await ctx.send(await self.bot._(ctx.guild.id, "sconfig.backup.timeout"))
-        else:
-            d = dict(self.bot.server_configs[ctx.guild.id])
-            d.update(merge)
-            self.bot.server_configs[ctx.guild.id] = d
-            await ctx.send('👍')
-    """
 
     # --------------------------------------------------
     # Archives
     # --------------------------------------------------
 
 
-async def setup(bot: Gunibot = None, plugin_config: dict = None):
+async def setup(bot: Gunibot):
     await bot.add_cog(Sconfig(bot))
