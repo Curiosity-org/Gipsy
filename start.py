@@ -8,21 +8,23 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-import setup  # do not remove this import, it also check the dependencies
 
 import os
 import asyncio
-from utils import Gunibot
-import argparse
+
 import discord
 from LRFutils import color
 from LRFutils import logs
+
+from utils import Gunibot
+from core import config
+
+import setup  # do not remove this import, it also check the dependencies pylint: disable=unused-import
 
 if not os.path.isdir("plugins"):
     os.mkdir("plugins")
 
 # Check and dispatch the config to all plugins
-from core import config
 
 config.check()
 
@@ -128,13 +130,6 @@ def main():
         client.remove_listener(on_ready)
 
     client.add_listener(on_ready)
-
-    # Check if the bot must run in beta
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-b", "--beta", help="Run with the beta bot token", action="store_true"
-    )
-    args = parser.parse_args()
 
     # Launch bot
     try:

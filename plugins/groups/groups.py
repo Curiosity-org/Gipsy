@@ -5,34 +5,33 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-from utils import Gunibot, MyContext
-from discord.ext import commands
-import discord
-from bot import checks
-import asyncio
 from typing import List
+import asyncio
 
-import sys
+import discord
+from discord.ext import commands
 
-sys.path.append("./bot")
+from utils import Gunibot, MyContext
+from bot import checks
 
 
 class Group:
     def __init__(
         self,
         bot: Gunibot,
-        guildID: int,
-        roleID: int,
-        ownerID: int,
-        channelID: int,
+        guild_id: int,
+        role_id: int,
+        owner_id: int,
+        channel_id: int,
         privacy: bool,
     ):
-        self.roleID = roleID
-        self.ownerID = ownerID
-        self.channelID = channelID
+        self.bot = bot
+        self.role_id = role_id
+        self.owner_id = owner_id
+        self.channel_id = channel_id
         self.privacy = privacy
-        self.guildID = guildID
-        self.id = None
+        self.guild_id = guild_id
+        self.group_id = None
         self._role = None
         self._channel = None
 
@@ -94,40 +93,43 @@ class Group:
     def role(self, bot: Gunibot) -> discord.Role:
         """Get the Discord Role attached to that group"""
         if self._role is None:
-            self._role = bot.get_guild(self.guildID).get_role(self.roleID)
+            self._role = bot.get_guild(self.guild_id).get_role(self.role_id)
         return self._role
 
     def channel(self, bot: Gunibot) -> discord.TextChannel:
         """Get the Discord Text Channel attached to that group"""
-        if self.channelID is None:
+        if self.channel_id is None:
             return None
         if self._channel is None:
-            self._channel = bot.get_guild(self.guildID).get_channel(self.channelID)
+            self._channel = bot.get_guild(self.guild_id).get_channel(self.channel_id)
         return self._channel
 
     def member_is_in(self, member: discord.Member) -> bool:
         """Check if a member is part of that group (ie has the attached role)"""
-        for x in member.roles:
-            if x.id == self.roleID:
+        for role in member.roles:
+            if role.id == self.role_id:
                 return True
         return False
 
     def to_str(self) -> str:
         """Transform the group to a human-readable string"""
-        channel = f"<#{self.channelID}>" if self.channelID else "None"
+        channel = f"<#{self.channel_id}>" if self.channel_id else "None"
         private = "True" if self.privacy == 1 else "False"
-        return f"Group: <@&{self.roleID}> (*id : {self.roleID}*)\n┗━▷ Owner: <@{self.ownerID}> - Channel: {channel} - Private: {private}"
+        return f"Group: <@&{self.role_id}> (*id : {self.role_id}*)\n"\
+            f"┗━▷ Owner: <@{self.owner_id}> - Channel: {channel} - Private: {private}"
 
 
 class GroupConverter(commands.Converter):
-    """Convert a user argument to the corresponding group, by looking for the Role name/id/mention"""
+    """
+    Convert a user argument to the corresponding group, by looking for the Role name/id/mention
+    """
 
     async def convert(self, ctx: MyContext, arg: str) -> Group:
         try:
             # try to convert it to a role
             role = await commands.RoleConverter().convert(ctx, arg)
-        except commands.BadArgument:
-            raise commands.BadArgument(f'Group "{arg}" not found.')
+        except commands.BadArgument as exception:
+            raise commands.BadArgument(f'Group "{arg}" not found.') from exception
         # make sure the cog is actually loaded, let's not break everything
         if cog := ctx.bot.get_cog("Groups"):
             if res := cog.db_get_group(ctx.guild.id, role.id):
@@ -146,73 +148,73 @@ class Groups(commands.Cog):
             "max_group",
         ]
 
-    def db_get_config(self, guildID: int) -> List[Group]:
+    def db_get_config(self, guild_id: int) -> List[Group]:
         """Get every group of a specific guild"""
         query = "SELECT rowid, * FROM groups WHERE guild=?"
-        liste = self.bot.db_query(query, (guildID,), astuple=True)
+        liste = self.bot.db_query(query, (guild_id,), astuple=True)
         # comes as: (rowid, guild, roleID, ownerID, channelID, privacy)
         res: List[Group] = list()
         for row in liste:
             res.append(Group(self.bot, *row[1:]))
-            res[-1].id = row[0]
+            res[-1].group_id = row[0]
         return res if len(res) > 0 else None
 
-    def db_get_group(self, guildID: int, roleID: int) -> Group:
+    def db_get_group(self, guild_id: int, role_id: int) -> Group:
         """Get a specific group from its role ID"""
         query = "SELECT rowid, * FROM groups WHERE guild=? AND roleID=?;"
-        res = self.bot.db_query(query, (guildID, roleID), fetchone=True, astuple=True)
+        res = self.bot.db_query(query, (guild_id, role_id), fetchone=True, astuple=True)
         # comes as: (rowid, guild, roleID, ownerID, channelID, privacy)
         if not res:
             return None
         group = Group(self.bot, *res[1:])
-        group.id = res[0]
+        group.group_id = res[0]
         return group
 
-    def db_get_n_group(self, guildID: int, ownerID) -> int:
+    def db_get_n_group(self, guild_id: int, owner_id) -> int:
         """Get the number of groups owned by someone in a specific guild"""
         query = "SELECT COUNT(*) as count FROM groups WHERE guild=? AND ownerID=?"
-        res = self.bot.db_query(query, (guildID, ownerID), fetchone=True)
+        res = self.bot.db_query(query, (guild_id, owner_id), fetchone=True)
         return res["count"]
 
-    def db_add_groups(self, guild, roleID, ownerID, privacy) -> int:
+    def db_add_groups(self, guild, role_id, owner_id, privacy) -> int:
         """Add a group into a guild
         Return the inserted row ID"""
         query = (
             "INSERT INTO groups (guild, roleID, ownerID, privacy) VALUES (?, ?, ?, ?)"
         )
-        self.bot.db_query(query, (guild, roleID, ownerID, privacy))
+        self.bot.db_query(query, (guild, role_id, owner_id, privacy))
 
-    def db_delete_group(self, guildID: int, toDelete) -> bool:
+    def db_delete_group(self, guild_id: int, to_delete) -> bool:
         """Delete a group from a guild, based on its row ID
         Return True if a row was deleted, False else"""
         query = "DELETE FROM groups WHERE guild=? AND roleID=?"
-        rowcount = self.bot.db_query(query, (guildID, toDelete), returnrowcount=True)
+        rowcount = self.bot.db_query(query, (guild_id, to_delete), returnrowcount=True)
         return rowcount == 1
 
-    def db_update_group_owner(self, guildID: int, roleID, ownerID) -> bool:
+    def db_update_group_owner(self, guild_id: int, role_id, owner_id) -> bool:
         """Update a group from a guild, based on its row ID
         Return True if a row was updated, False else"""
         query = "UPDATE groups SET ownerID=? WHERE roleID=? AND guild=? "
         rowcount = self.bot.db_query(
-            query, (ownerID, roleID, guildID), returnrowcount=True
+            query, (owner_id, role_id, guild_id), returnrowcount=True
         )
         return rowcount == 1
 
-    def db_update_group_privacy(self, guildID: int, roleID, privacy) -> bool:
+    def db_update_group_privacy(self, guild_id: int, role_id, privacy) -> bool:
         """Update a group from a guild, based on its row ID
         Return True if a row was updated, False else"""
         query = "UPDATE groups SET privacy=? WHERE roleID=? AND guild=? "
         rowcount = self.bot.db_query(
-            query, (privacy, roleID, guildID), returnrowcount=True
+            query, (privacy, role_id, guild_id), returnrowcount=True
         )
         return rowcount == 1
 
-    def db_update_group_channel(self, guildID: int, roleID, channelID) -> bool:
+    def db_update_group_channel(self, guild_id: int, role_id, channel_id) -> bool:
         """Update a group from a guild, based on its row ID
         Return True if a row was updated, False else"""
         query = "UPDATE groups SET channelID=? WHERE roleID=? AND guild=? "
         rowcount = self.bot.db_query(
-            query, (channelID, roleID, guildID), returnrowcount=True
+            query, (channel_id, role_id, guild_id), returnrowcount=True
         )
         return rowcount == 1
 
@@ -312,12 +314,12 @@ class Groups(commands.Cog):
     async def group_register(self, ctx: MyContext, role: discord.Role):
         """Register a group from an existing role
         Use the ID, name or mention of the role you want to add to the group system"""
-        roleName = role.name
-        roleID = role.id
-        self.db_add_groups(ctx.guild.id, roleID, ctx.author.id, 1)
+        role_name = role.name
+        role_id = role.id
+        self.db_add_groups(ctx.guild.id, role_id, ctx.author.id, 1)
         await ctx.author.add_roles(role)
         await ctx.send(
-            await self.bot._(ctx.guild.id, "groups.registred", name=roleName)
+            await self.bot._(ctx.guild.id, "groups.registred", name=role_name)
         )
 
     @group_main.command(name="unregister")
@@ -325,12 +327,12 @@ class Groups(commands.Cog):
     async def group_unregister(self, ctx: MyContext, group: GroupConverter):
         """Unregister a group without deleting the role
         Use his ID, name or mention"""
-        roleID = group.roleID
-        deleted = self.db_delete_group(ctx.guild.id, roleID)
+        role_id = group.roleID
+        deleted = self.db_delete_group(ctx.guild.id, role_id)
         if deleted:  # deletion confirmed
-            roleName = group.role(self.bot).name
+            role_name = group.role(self.bot).name
             await ctx.send(
-                await self.bot._(ctx.guild.id, "groups.unregistred", name=roleName)
+                await self.bot._(ctx.guild.id, "groups.unregistred", name=role_name)
             )
         else:  # https://youtu.be/t3otBjVZzT0
             await ctx.send(
@@ -375,7 +377,7 @@ class Groups(commands.Cog):
                 and reaction.message.id == msg.id
             )
 
-        roleID = group.roleID
+        role_id = group.roleID
         msg = await ctx.send(
             await self.bot._(
                 ctx.guild.id,
@@ -394,7 +396,7 @@ class Groups(commands.Cog):
             )
         else:
             # update the database
-            update = self.db_update_group_owner(ctx.guild.id, roleID, user.id)
+            update = self.db_update_group_owner(ctx.guild.id, role_id, user.id)
             if update:
                 await ctx.send(
                     await self.bot._(
@@ -415,15 +417,15 @@ class Groups(commands.Cog):
         ):
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.no-update"))
             return
-        roleName = group.role(self.bot).name
+        role_name = group.role(self.bot).name
         # let's edit role accordingly
         await group.role(self.bot).edit(name=name)
         # if we should also update the channel name
-        if roleName.lower() == group.channel(self.bot).name:
+        if role_name.lower() == group.channel(self.bot).name:
             await group.channel(self.bot).edit(name=name)
         await ctx.send(
             await self.bot._(
-                ctx.guild.id, "groups.update_name", name=name, group=roleName
+                ctx.guild.id, "groups.update_name", name=name, group=role_name
             )
         )
 
@@ -473,7 +475,7 @@ class Groups(commands.Cog):
             )
             return
         txt = "**" + await self.bot._(ctx.guild.id, "groups.list") + "**\n"
-        for group in groups:
+        for group in groups: # pylint: disable=not-an-iterable
             txt += group.to_str() + "\n\n"
         if ctx.can_send_embed:
             embed = discord.Embed(description=txt)
@@ -736,10 +738,6 @@ class Groups(commands.Cog):
                     )
                 )
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
     if bot is not None:
         await bot.add_cog(Groups(bot), icon="🎭")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)

@@ -7,10 +7,11 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 
 import datetime
 import time
-from utils import Gunibot
 
 import discord
 from discord.ext import tasks
+
+from utils import Gunibot
 
 fr_months = [
     "Janvier",
@@ -71,20 +72,18 @@ class TimeCog(discord.ext.commands.Cog):
             if task.current_loop != 0:
                 await self.bot.wait_until_ready()
                 self.bot.log.info(
-                    "[TaskManager] Tâche {} arrivée à terme".format(coro.__func__)
+                    f"[TaskManager] Tâche {coro.__func__} arrivée à terme"
                 )
                 try:
                     await coro(*args, **kwargs)
-                except Exception as e:
-                    self.bot.get_cog("Errors").on_error(e)
+                except Exception as exc: # pylint: disable=broad-exception-caught
+                    self.bot.get_cog("Errors").on_error(exc)
 
         a = tasks.loop(seconds=delay, count=2)(launch)
         a.error(self.bot.get_cog("Errors").on_error)
         a.start(a, coro, *args, **kwargs)
         self.bot.log.info(
-            "[TaskManager] Nouvelle tâche {} programmée pour dans {}s".format(
-                coro.__func__, delay
-            )
+            f"[TaskManager] Nouvelle tâche {coro.__func__} programmée pour dans {delay}s"
         )
         return a
 
@@ -142,41 +141,45 @@ class TimeCog(discord.ext.commands.Cog):
         if date2 is not None:
             if isinstance(date2, datetime.datetime):
                 delta = abs(date2 - date1)
-                t = await self.time_interval(delta, precision)
+                inputed_time = await self.time_interval(delta, precision)
             else:
                 raise ValueError
         else:
-            t = self.timedelta(total_seconds=date1, precision=precision)
-            t.set_from_seconds()
+            inputed_time = self.timedelta(total_seconds=date1, precision=precision)
+            inputed_time.set_from_seconds()
         if form == "digital":
             if hour:
-                h = "{}:{}:{}".format(t.hours, t.minutes, t.seconds)
+                inputed_hours = f"{inputed_time.hours}:{inputed_time.minutes}:"\
+                    f"{inputed_time.seconds}"
             else:
-                h = ""
+                inputed_hours = ""
             if lang == "fr":
-                text = "{}/{}{} {}".format(
-                    t.days, t.months, "/" + str(t.years) if year else "", h
+                text = "{}/{}{} {}".format( # pylint: disable=consider-using-f-string
+                    inputed_time.days, inputed_time.months, "/" + str(inputed_time.years) if year\
+                        else "", inputed_hours
                 )
             else:
-                text = "{}/{}{} {}".format(
-                    t.months, t.days, "/" + str(t.years) if year else "", h
+                text = "{}/{}{} {}".format( # pylint: disable=consider-using-f-string
+                    inputed_time.months, inputed_time.days, "/" + str(inputed_time.years) if year\
+                        else "", inputed_hours
                 )
         elif form == "temp":
             text = str()
-            if t.days + t.months * 365 / 12 + t.years * 365 > 0:
-                d = round(t.days + t.months * 365 / 12)
+            if inputed_time.days + inputed_time.months * 365 / 12 + inputed_time.years * 365 > 0:
+                inputed_days = round(inputed_time.days + inputed_time.months * 365 / 12)
                 if not year:
-                    d += round(t.years * 365)
-                elif year and t.years > 0:
-                    text += str(t.years) + "a " if lang == "fr" else str(t.years) + "y "
-                text += str(d) + "j " if lang == "fr" else str(d) + "d "
+                    inputed_days += round(inputed_time.years * 365)
+                elif year and inputed_time.years > 0:
+                    text += str(inputed_time.years) + "a " if lang == "fr"\
+                        else str(inputed_time.years) + "y "
+                text += str(inputed_days) + "j " if lang == "fr" else str(inputed_days) + "d "
             if hour:
-                if t.hours > 0:
-                    text += str(t.hours) + "h "
-                if t.minutes > 0:
-                    text += str(t.minutes) + "m "
-                if t.seconds > 0:
-                    text += str(t.seconds) + "s "
+                if inputed_time.hours > 0:
+                    text += str(inputed_time.hours) + "h "
+                if inputed_time.minutes > 0:
+                    text += str(inputed_time.minutes) + "m "
+                if inputed_time.seconds > 0:
+                    text += str(inputed_time.seconds) + "s "
             text = text.strip()
         else:
             text = str()
@@ -240,47 +243,50 @@ class TimeCog(discord.ext.commands.Cog):
                     "seconds",
                     "second",
                 ]
-            if year and t.years != 0:
-                if t.years > 1:
-                    text += str(t.years) + " " + lib[0]
+            if year and inputed_time.years != 0:
+                if inputed_time.years > 1:
+                    text += str(inputed_time.years) + " " + lib[0]
                 else:
-                    text += str(t.years) + " " + lib[1]
+                    text += str(inputed_time.years) + " " + lib[1]
                 text += " "
-            if t.months > 1:
-                text += str(t.months) + " " + lib[2]
-            elif t.months == 1:
-                text += str(t.months) + " " + lib[3]
+            if inputed_time.months > 1:
+                text += str(inputed_time.months) + " " + lib[2]
+            elif inputed_time.months == 1:
+                text += str(inputed_time.months) + " " + lib[3]
             text += " "
-            if t.days > 1:
-                text += str(t.days) + " " + lib[4]
-            elif t.days == 1:
-                text += str(t.days) + " " + lib[5]
+            if inputed_time.days > 1:
+                text += str(inputed_time.days) + " " + lib[4]
+            elif inputed_time.days == 1:
+                text += str(inputed_time.days) + " " + lib[5]
             if hour:
-                if t.hours > 1:
-                    text += " " + str(t.hours) + " " + lib[6]
-                elif t.hours == 1:
-                    text += " " + str(t.hours) + " " + lib[7]
+                if inputed_time.hours > 1:
+                    text += " " + str(inputed_time.hours) + " " + lib[6]
+                elif inputed_time.hours == 1:
+                    text += " " + str(inputed_time.hours) + " " + lib[7]
                 text += " "
-                if t.minutes > 1:
-                    text += str(t.minutes) + " " + lib[8]
-                elif t.minutes == 1:
-                    text += str(t.minutes) + " " + lib[9]
+                if inputed_time.minutes > 1:
+                    text += str(inputed_time.minutes) + " " + lib[8]
+                elif inputed_time.minutes == 1:
+                    text += str(inputed_time.minutes) + " " + lib[9]
                 text += " "
-                if t.seconds > 1:
-                    text += str(t.seconds) + " " + lib[10]
-                elif t.seconds == 1:
-                    text += str(t.seconds) + " " + lib[11]
+                if inputed_time.seconds > 1:
+                    text += str(inputed_time.seconds) + " " + lib[10]
+                elif inputed_time.seconds == 1:
+                    text += str(inputed_time.seconds) + " " + lib[11]
         return text.strip()
 
     async def time_interval(self, tmd, precision=2):
         """Crée un objet de type timedelta à partir d'un objet datetime.timedelta"""
-        t = tmd.total_seconds()
-        obj = self.timedelta(total_seconds=t, precision=precision)
+        inputed_time = tmd.total_seconds()
+        obj = self.timedelta(total_seconds=inputed_time, precision=precision)
         obj.set_from_seconds()
         return obj
 
     async def date(self, date, lang="fr", year=False, hour=True, digital=False):
-        """Traduit un objet de type datetime.datetime en chaine de caractère lisible. Renvoie un str"""
+        """
+        Traduit un objet de type datetime.datetime en chaine de caractère lisible.
+        Renvoie un str
+        """
         if isinstance(date, time.struct_time):
             date = datetime.datetime(*date[:6])
         if isinstance(date, datetime.datetime):
@@ -288,7 +294,7 @@ class TimeCog(discord.ext.commands.Cog):
                 jour = "0" + str(date.day)
             else:
                 jour = str(date.day)
-            h = []
+            times = []
             if lang == "fr":
                 month = fr_months
             elif lang == "fi":
@@ -296,11 +302,11 @@ class TimeCog(discord.ext.commands.Cog):
             else:
                 month = en_months
             for i in ["hour", "minute", "second"]:
-                a = eval(str("date." + i))
-                if len(str(a)) == 1:
-                    h.append("0" + str(a))
+                argument = getattr(date, i)
+                if len(str(argument)) == 1:
+                    times.append("0" + str(argument))
                 else:
-                    h.append(str(a))
+                    times.append(str(argument))
             if digital:
                 if date.month < 10:
                     month = "0" + str(date.month)
@@ -308,31 +314,31 @@ class TimeCog(discord.ext.commands.Cog):
                     month = str(date.month)
                 separator = "/"
                 if lang == "fr":
-                    df = "{d}/{m}{y}  {h}"
+                    formated_date = "{d}/{m}{y}  {h}"
                 elif lang == "fi":
-                    df = "{d}.{m}{y}  {h}"
+                    formated_date = "{d}.{m}{y}  {h}"
                     separator = "."
                 else:
-                    df = "{m}/{d}{y}  {h}"
-                df = df.format(
+                    formated_date = "{m}/{d}{y}  {h}"
+                formated_date = formated_date.format(
                     d=jour,
                     m=month,
                     y=separator + str(date.year) if year else "",
-                    h=":".join(h) if hour else "",
+                    h=":".join(times) if hour else "",
                 )
             else:
                 if lang == "fr" or lang == "fi":
-                    df = "{d} {m} {y}  {h}"
+                    formated_date = "{d} {m} {y}  {h}"
                 else:
-                    df = "{m} {d}, {y}  {h}"
-                df = df.format(
+                    formated_date = "{m} {d}, {y}  {h}"
+                formated_date = formated_date.format(
                     d=jour,
                     m=month[date.month - 1],
                     y=str(date.year) if year else "",
-                    h=":".join(h) if hour else "",
+                    h=":".join(times) if hour else "",
                 )
-            return df.strip()
+            return formated_date.strip()
 
 
-async def setup(bot: Gunibot = None, plugin_config: dict = None):
+async def setup(bot: Gunibot = None):
     await bot.add_cog(TimeCog(bot))

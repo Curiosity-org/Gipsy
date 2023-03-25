@@ -5,24 +5,21 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-from utils import Gunibot
-from discord.ext import commands
-import discord
-from bot import checks
-import args
-import asyncio
-from marshal import dumps, loads
 from typing import List, Union
+from marshal import dumps, loads
+import asyncio
 
-import sys
+import discord
+from discord.ext import commands
 
-sys.path.append("./bot")
-sys.path.append("./bot")
+from bot import args
+from utils import Gunibot
 
 # /rolelink <grant/revoke> <role> when <get/loose> <one/all> <roles>
 
 
 class ActionType(commands.Converter):
+    """Converter for grant or revoke action types."""
     types = ["grant", "revoke"]
 
     def __init__(self, action: Union[str, int] = None):
@@ -34,13 +31,14 @@ class ActionType(commands.Converter):
             return
         self.name = self.types[self.type]
 
-    async def convert(self, ctx: commands.Context, argument: str):
+    async def convert(self, ctx: commands.Context, argument: str): # pylint: disable=unused-argument
         if argument in self.types:
             return ActionType(argument)
         raise commands.errors.BadArgument("Unknown dependency action type")
 
 
 class TriggerType(commands.Converter):
+    """Converter for trigger type like `get-one` or `loose-all`."""
     types = ["get-one", "get-all", "loose-one", "loose-all"]
 
     def __init__(self, trigger: Union[str, int] = None):
@@ -52,7 +50,7 @@ class TriggerType(commands.Converter):
             return
         self.name = self.types[self.type]
 
-    async def convert(self, ctx: commands.Context, argument: str):
+    async def convert(self, ctx: commands.Context, argument: str): # pylint: disable=unused-argument
         if argument in self.types:
             return TriggerType(argument)
         raise commands.errors.BadArgument("Unknown dependency trigger type")
@@ -73,19 +71,18 @@ class Dependency:
         self.trigger_roles = trigger_roles
         self.b_trigger_roles = dumps(trigger_roles)
         self.guild = guild
-        self.id = None
+        self.dependency_id = None
 
-    def to_str(self, useID: bool = True) -> str:
+    def to_str(self, user_id: bool = True) -> str:
         triggers = " ".join([f"<@&{r}>" for r in self.trigger_roles])
         target = f"<@&{self.target_role}>"
-        ID = f"{self.id}. " if useID else ""
-        return f"{ID}{self.action.name} {target} when {self.trigger.name.replace('-', ' ')} of {triggers}"
+        depedency_id = f"{self.dependency_id}. " if user_id else ""
+        return f"{depedency_id}{self.action.name} {target} when"\
+            f"{self.trigger.name.replace('-', ' ')} of {triggers}"
 
 
 class ConflictingCyclicDependencyError(Exception):
     """Used when a loop is found when analyzing a role dependencies system"""
-
-    pass
 
 
 class GroupRoles(commands.Cog):
@@ -93,12 +90,12 @@ class GroupRoles(commands.Cog):
         self.bot = bot
         self.file = ""
 
-    def db_get_config(self, guildID: int) -> List[Dependency]:
+    def db_get_config(self, guild_id: int) -> List[Dependency]:
         """Get every dependencies of a specific guild"""
         query = "SELECT rowid, * FROM group_roles WHERE guild=?"
         # comes as: (rowid, guild, action, target, trigger, trigger-roles)
         res = list()
-        liste = self.bot.db_query(query, (guildID,))
+        liste = self.bot.db_query(query, (guild_id,))
         for row in liste:
             temp = (
                 ActionType(row["action"]),
@@ -121,19 +118,20 @@ class GroupRoles(commands.Cog):
             action.trigger.type,
             action.b_trigger_roles,
         )
-        query = "INSERT INTO group_roles (guild, action, target, trigger, `trigger-roles`) VALUES (?, ?, ?, ?, ?)"
+        query = "INSERT INTO group_roles (guild, action, target, trigger, `trigger-roles`)"\
+            "VALUES (?, ?, ?, ?, ?)"
         lastrowid = self.bot.db_query(query, data)
         return lastrowid
 
-    def db_delete_action(self, guildID: int, actionID: int) -> bool:
+    def db_delete_action(self, guild_id: int, action_id: int) -> bool:
         """Delete an action from a guild, based on its row ID
         Return True if a row was deleted, False else"""
         query = "DELETE FROM group_roles WHERE guild=? AND rowid=?"
-        rowcount = self.bot.db_query(query, (guildID, actionID))
+        rowcount = self.bot.db_query(query, (guild_id, action_id))
         return rowcount == 1
 
     async def filter_allowed_roles(
-        self, guild: discord.Guild, roles: List[discord.Role]
+        self, guild: discord.Guild, roles: List[discord.Role],
     ) -> List[discord.Role]:
         """Return every role that the bot is allowed to give/remove
         IE: role exists, role is under bot's highest role
@@ -176,11 +174,11 @@ class GroupRoles(commands.Cog):
         actions = self.db_get_config(member.guild.id)
         if actions is None:
             return
-        for action in actions:
+        for action in actions: # pylint: disable=not-an-iterable
             if action.trigger.type == 0:  # if trigger is 'get-one'
-                for r in roles:
+                for role in roles:
                     if (
-                        r.id in action.trigger_roles
+                        role.id in action.trigger_roles
                     ):  # if one given role triggers that action
                         alwd_roles = await self.filter_allowed_roles(
                             member.guild, [action.target_role]
@@ -188,9 +186,9 @@ class GroupRoles(commands.Cog):
                         await self.give_remove_roles(member, alwd_roles, action.action)
                         break
             elif action.trigger.type == 1:  # if trigger is 'get-all'
-                for r in roles:
+                for role in roles:
                     if (
-                        r.id in action.trigger_roles
+                        role.id in action.trigger_roles
                     ):  # if one given role triggers that action
                         member_roles = [x.id for x in member.roles]
                         if all([(x in member_roles) for x in action.trigger_roles]):
@@ -207,11 +205,11 @@ class GroupRoles(commands.Cog):
         actions = self.db_get_config(member.guild.id)
         if actions is None:
             return
-        for action in actions:
+        for action in actions: # pylint: disable=not-an-iterable
             if action.trigger.type == 2:  # if trigger is 'loose-one'
-                for r in roles:
+                for role in roles:
                     if (
-                        r.id in action.trigger_roles
+                        role.id in action.trigger_roles
                     ):  # if one lost role triggers that action
                         alwd_roles = await self.filter_allowed_roles(
                             member.guild, [action.target_role]
@@ -219,9 +217,9 @@ class GroupRoles(commands.Cog):
                         await self.give_remove_roles(member, alwd_roles, action.action)
                         break
             elif action.trigger.type == 3:  # if trigger is 'loose-all'
-                for r in roles:
+                for role in roles:
                     if (
-                        r.id in action.trigger_roles
+                        role.id in action.trigger_roles
                     ):  # if one lost role triggers that action
                         member_roles = [x.id for x in member.roles]
                         if all([(x not in member_roles) for x in action.trigger_roles]):
@@ -239,20 +237,20 @@ class GroupRoles(commands.Cog):
         """Get every dependency which will directly trigger a selected action"""
         triggers = list()
         unwanted_action = 0 if action.trigger.type <= 1 else 1
-        for a in actions:
-            if a.id == action.id:
+        for action in actions:
+            if action.dependency_id == action.dependency_id:
                 continue
             # if a will trigger action
             if (
-                a.action.type == unwanted_action
-                and a.target_role in action.trigger_roles
+                action.action.type == unwanted_action
+                and action.target_role in action.trigger_roles
             ):
-                triggers.append(a)
+                triggers.append(action)
         if action.trigger.type in (1, 3):  # get-all or loose-all
             roles = list(action.trigger_roles)
-            for a in triggers:
-                if a in roles:
-                    roles.remove(a)
+            for action in triggers:
+                if action in roles:
+                    roles.remove(action)
             if len(roles) > 0:
                 return triggers
         return triggers
@@ -300,31 +298,31 @@ class GroupRoles(commands.Cog):
             all_actions = self.db_get_config(ctx.guild.id)
             if all_actions is not None:
                 await self.compute_actions(action, list(), all_actions + [action])
-        except ConflictingCyclicDependencyError as e:
+        except ConflictingCyclicDependencyError as exc:
             timeout = 20
             await ctx.send(
                 await self.bot._(
                     ctx.guild.id,
                     "grouproles.infinite",
-                    dep=e.args[0].to_str(False),
+                    dep=exc.args[0].to_str(False),
                     t=timeout,
                 )
             )
 
-            def check(m: discord.Message):
+            def check(msg: discord.Message):
                 return (
-                    m.author == ctx.author
-                    and m.channel == ctx.channel
-                    and m.content.lower() in ("oui", "yes")
+                    msg.author == ctx.author
+                    and msg.channel == ctx.channel
+                    and msg.content.lower() in ("oui", "yes")
                 )
 
             try:
                 await self.bot.wait_for("message", check=check, timeout=timeout)
             except asyncio.TimeoutError:
                 return
-        actionID = self.db_add_action(action)
+        action_id = self.db_add_action(action)
         await ctx.send(
-            await self.bot._(ctx.guild.id, "grouproles.dep-added", id=actionID)
+            await self.bot._(ctx.guild.id, "grouproles.dep-added", id=action_id)
         )
 
     @rolelink_main.command(name="list")
@@ -339,15 +337,15 @@ class GroupRoles(commands.Cog):
             )
             return
         txt = "**" + await self.bot._(ctx.guild.id, "grouproles.list") + "**\n"
-        for action in actions:
+        for action in actions: # pylint: disable=not-an-iterable
             txt += action.to_str() + "\n"
         await ctx.send(txt)
 
     @rolelink_main.command(name="remove")
     @commands.has_permissions(manage_guild=True)
-    async def rolelink_delete(self, ctx: commands.Context, id: int):
+    async def rolelink_delete(self, ctx: commands.Context, rolelink_id: int):
         """Delete one of your roles-links"""
-        deleted = self.db_delete_action(ctx.guild.id, id)
+        deleted = self.db_delete_action(ctx.guild.id, rolelink_id)
         if deleted:
             await ctx.send(await self.bot._(ctx.guild.id, "grouproles.dep-deleted"))
         else:
@@ -356,11 +354,12 @@ class GroupRoles(commands.Cog):
             )
 
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
+    """
+    Fonction d'initialisation du plugin
+
+    :param bot: Le bot
+    :type bot: Gunibot
+    """
     if bot is not None:
         await bot.add_cog(GroupRoles(bot), icon="🔰")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)
-

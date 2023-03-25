@@ -5,15 +5,13 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-from utils import Gunibot, MyContext
-from discord.ext import commands
-from discord.channel import TextChannel
 import discord
-from bot import checks
-import sys
+from discord.channel import TextChannel
+from discord.ext import commands
 
-sys.path.append("./bot")
+from utils import Gunibot, MyContext
 
+# pylint: disable=line-too-long
 WELCOME_MESSAGE = """(FR) Bienvenue sur {server} {user} !
 Vous n'avez accès qu'au salon Lobby pour le moment. Pour débloquer l'accès au reste du Discord, lisez les instructions présentes dans le salon {channel} :wink:
 
@@ -61,7 +59,7 @@ class Antikikoo(commands.Cog):
         verif_channel: TextChannel = self.bot.get_channel(
             config["verification_channel"]
         )
-        info_channel = "<#{}>".format(config["info_channel"])
+        info_channel = f"<#{config['info_channel']}>"
         # if config is None, we use the default one
         welcome_msg: str = config["verification_info_message"] or WELCOME_MESSAGE
         await verif_channel.send(
@@ -79,11 +77,11 @@ class Antikikoo(commands.Cog):
         config = self.bot.server_configs[message.guild.id]
         if message.channel.id != config["verification_channel"]:
             return
-        
+
         if config["pass_message"] is None: # not set
             return
-        
-        info_channel = "<#{}>".format(config["info_channel"])
+
+        info_channel = f"<#{config['info_channel']}>"
         if message.content.lower() == config["pass_message"].lower():
             emb = discord.Embed(
                 description=CONFIRM_MESSAGE.format(
@@ -93,7 +91,7 @@ class Antikikoo(commands.Cog):
             await message.channel.send(embed=emb)
             try:
                 await message.delete()
-            except BaseException:
+            except (discord.Forbidden, discord.NotFound):
                 self.bot.log.exception("Cannot delete the verification message")
             verif_role = message.guild.get_role(config["verification_role"])
             if verif_role is None:
@@ -103,7 +101,7 @@ class Antikikoo(commands.Cog):
                     await message.author.add_roles(verif_role)
                 else:
                     await message.author.remove_roles(verif_role)
-            except BaseException:
+            except (discord.Forbidden, discord.NotFound):
                 self.bot.log.exception(
                     f"Cannot give or take away verification role from member {message.author}"
                 )
@@ -134,11 +132,9 @@ class Antikikoo(commands.Cog):
     async def ak_msg(self, ctx: MyContext, *, message: str = None):
         """Modifies the informative message sent in the verification channel
         Put nothing to reset it, or "None" for no message"""
-        if message.lower() == "none":
-            value = "None"  # no message
         self.bot.server_configs[ctx.guild.id]["verification_info_message"] = message
         await ctx.send(await self.bot._(ctx.guild.id, "antikikoo.msg-edited"))
-    
+
     @commands.command(name='pass_message')
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
@@ -156,7 +152,7 @@ class Antikikoo(commands.Cog):
                 context.guild.id, "antikikoo.pass-edited",
             )
         )
-    
+
     @commands.command(name='info_channel')
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
@@ -176,7 +172,7 @@ class Antikikoo(commands.Cog):
                 channel=channel.mention,
             )
         )
-    
+
     @commands.command(name='verification_role')
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
@@ -198,7 +194,7 @@ class Antikikoo(commands.Cog):
             ),
             allowed_mentions=discord.AllowedMentions.none(),
         )
-    
+
     @commands.command(name='verification_add_role')
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
@@ -222,10 +218,6 @@ class Antikikoo(commands.Cog):
         )
 
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
     if bot is not None:
         await bot.add_cog(Antikikoo(bot), icon="⛔")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)

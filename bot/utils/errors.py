@@ -5,17 +5,15 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-from utils import CheckException, Gunibot, MyContext
-from discord.ext import commands
-import discord
-from bot import checks
 import re
 import traceback
+
+import discord
+from discord.ext import commands
+
+from utils import CheckException, Gunibot, MyContext
+from bot import checks
 from core import config
-
-import sys
-
-sys.path.append("./bot")
 
 
 class Errors(commands.Cog):
@@ -83,89 +81,89 @@ class Errors(commands.Cog):
                 )
             # Could not convert "limit" into int. OR Converting to "int" failed
             # for parameter "number".
-            r = re.search(
+            result = re.search(
                 r"Could not convert \"(?P<arg>[^\"]+)\" into (?P<type>[^.\n]+)",
                 raw_error,
             )
-            if r is None:
-                r = re.search(
+            if result is None:
+                result = re.search(
                     r"Converting to \"(?P<type>[^\"]+)\" failed for parameter \"(?P<arg>[^.\n]+)\"",
                     raw_error,
                 )
-            if r is not None:
+            if result is not None:
                 return await ctx.send(
                     await self.bot._(
                         ctx.channel,
                         "errors.unknown-arg",
-                        p=r.group("arg"),
-                        t=r.group("type"),
+                        p=result.group("arg"),
+                        t=result.group("type"),
                     )
                 )
             # zzz is not a recognised boolean option
-            r = re.search(
+            result = re.search(
                 r"(?P<arg>[^\"]+) is not a recognised (?P<type>[^.\n]+) option",
                 raw_error,
             )
-            if r is not None:
+            if result is not None:
                 return await ctx.send(
                     await self.bot._(
                         ctx.channel,
                         "errors.invalid-type",
-                        p=r.group("arg"),
-                        t=r.group("type"),
+                        p=result.group("arg"),
+                        t=result.group("type"),
                     )
                 )
             # Member "Z_runner" not found
-            r = re.search(r"Member \"([^\"]+)\" not found", raw_error)
-            if r is not None:
+            result = re.search(r"Member \"([^\"]+)\" not found", raw_error)
+            if result is not None:
                 return await ctx.send(
-                    await self.bot._(ctx.channel, "errors.unknown-member", m=r.group(1))
+                    await self.bot._(ctx.channel, "errors.unknown-member", m=result.group(1))
                 )
             # User "Z_runner" not found
-            r = re.search(r"User \"([^\"]+)\" not found", raw_error)
-            if r is not None:
+            result = re.search(r"User \"([^\"]+)\" not found", raw_error)
+            if result is not None:
                 return await ctx.send(
-                    await self.bot._(ctx.channel, "errors.unknown-user", u=r.group(1))
+                    await self.bot._(ctx.channel, "errors.unknown-user", u=result.group(1))
                 )
             # Role "Admin" not found
-            r = re.search(r"Role \"([^\"]+)\" not found", raw_error)
-            if r is not None:
+            result = re.search(r"Role \"([^\"]+)\" not found", raw_error)
+            if result is not None:
                 return await ctx.send(
-                    await self.bot._(ctx.channel, "errors.unknown-role", r=r.group(1))
+                    await self.bot._(ctx.channel, "errors.unknown-role", r=result.group(1))
                 )
             # Emoji ":shock:" not found
-            r = re.search(r"Emoji \"([^\"]+)\" not found", raw_error)
-            if r is not None:
+            result = re.search(r"Emoji \"([^\"]+)\" not found", raw_error)
+            if result is not None:
                 return await ctx.send(
-                    await self.bot._(ctx.channel, "errors.unknown-emoji", e=r.group(1))
+                    await self.bot._(ctx.channel, "errors.unknown-emoji", e=result.group(1))
                 )
             # Colour "blue" is invalid
-            r = re.search(r"Colour \"([^\"]+)\" is invalid", raw_error)
-            if r is not None:
+            result = re.search(r"Colour \"([^\"]+)\" is invalid", raw_error)
+            if result is not None:
                 return await ctx.send(
-                    await self.bot._(ctx.channel, "errors.invalid-color", c=r.group(1))
+                    await self.bot._(ctx.channel, "errors.invalid-color", c=result.group(1))
                 )
             # Channel "twitter" not found.
-            r = re.search(r"Channel \"([^\"]+)\" not found", raw_error)
-            if r is not None:
+            result = re.search(r"Channel \"([^\"]+)\" not found", raw_error)
+            if result is not None:
                 return await ctx.send(
                     await self.bot._(
-                        ctx.channel, "errors.unknown-channel", c=r.group(1)
+                        ctx.channel, "errors.unknown-channel", c=result.group(1)
                     )
                 )
             # Message "1243" not found.
-            r = re.search(r"Message \"([^\"]+)\" not found", raw_error)
-            if r is not None:
+            result = re.search(r"Message \"([^\"]+)\" not found", raw_error)
+            if result is not None:
                 return await ctx.send(
                     await self.bot._(
-                        ctx.channel, "errors.unknown-message", m=r.group(1)
+                        ctx.channel, "errors.unknown-message", m=result.group(1)
                     )
                 )
             # Group "twitter" not found.
-            r = re.search(r"Group \"([^\"]+)\" not found", raw_error)
-            if r is not None:
+            result = re.search(r"Group \"([^\"]+)\" not found", raw_error)
+            if result is not None:
                 return await ctx.send(
-                    await self.bot._(ctx.channel, "errors.unknown-group", g=r.group(1))
+                    await self.bot._(ctx.channel, "errors.unknown-group", g=result.group(1))
                 )
             # Too many text channels
             if raw_error == "Too many text channels":
@@ -173,34 +171,34 @@ class Errors(commands.Cog):
                     await self.bot._(ctx.channel, "errors.too-many-text-channels")
                 )
             # Invalid duration: 2d
-            r = re.search(r"Invalid duration: ([^\" ]+)", raw_error)
-            if r is not None:
+            result = re.search(r"Invalid duration: ([^\" ]+)", raw_error)
+            if result is not None:
                 return await ctx.send(
                     await self.bot._(
-                        ctx.channel, "errors.invalid-duration", d=r.group(1)
+                        ctx.channel, "errors.invalid-duration", d=result.group(1)
                     )
                 )
             # Invalid invite: nope
-            r = re.search(r"Invalid invite: (\S+)", raw_error)
-            if r is not None:
+            result = re.search(r"Invalid invite: (\S+)", raw_error)
+            if result is not None:
                 return await ctx.send(
                     await self.bot._(ctx.channel, "errors.invalid-invite")
                 )
             # Invalid guild: test
-            r = re.search(r"Invalid guild: (\S+)", raw_error)
-            if r is not None:
+            result = re.search(r"Invalid guild: (\S+)", raw_error)
+            if result is not None:
                 return await ctx.send(
                     await self.bot._(ctx.channel, "errors.unknown-server")
                 )
             # Invalid url: nou
-            r = re.search(r"Invalid url: (\S+)", raw_error)
-            if r is not None:
+            result = re.search(r"Invalid url: (\S+)", raw_error)
+            if result is not None:
                 return await ctx.send(
                     await self.bot._(ctx.channel, "errors.invalid-url")
                 )
             # Invalid emoji: lmao
-            r = re.search(r"Invalid emoji: (\S+)", raw_error)
-            if r is not None:
+            result = re.search(r"Invalid emoji: (\S+)", raw_error)
+            if result is not None:
                 return await ctx.send(
                     await self.bot._(ctx.channel, "errors.invalid-emoji")
                 )
@@ -223,7 +221,7 @@ class Errors(commands.Cog):
         # All other Errors not returned come here... And we can just print the
         # default TraceBack.
         self.bot.log.warning(
-            "Ignoring exception in command {}:".format(ctx.message.content),
+            f"Ignoring exception in command {ctx.message.content}:",
             exc_info=(type(error), error, error.__traceback__),
         )
         await self.on_error(error, ctx)
@@ -233,8 +231,8 @@ class Errors(commands.Cog):
         try:
             if isinstance(ctx, discord.Message):
                 ctx = await self.bot.get_context(ctx)
-            tr = traceback.format_exception(type(error), error, error.__traceback__)
-            msg = "```python\n{}\n```".format(" ".join(tr)[:1900])
+            trace = traceback.format_exception(type(error), error, error.__traceback__)
+            msg = f"```python\n{' '.join(trace)[:1900]}\n```"
             if ctx is None:
                 await self.senf_err_msg(f"Internal Error\n{msg}")
             elif ctx.guild is None:
@@ -245,8 +243,8 @@ class Errors(commands.Cog):
                 await self.senf_err_msg(
                     ctx.guild.name + " | " + ctx.channel.name + "\n" + msg
                 )
-        except Exception as e:
-            self.bot.log.warn(f"[on_error] {e}", exc_info=True)
+        except Exception as exc: # pylint: disable=broad-exception-caught
+            self.bot.log.warn(f"[on_error] {exc}", exc_info=True)
 
     async def senf_err_msg(self, msg):
         """Sends a message to the error channel"""
@@ -257,5 +255,5 @@ class Errors(commands.Cog):
         return True
 
 
-async def setup(bot: Gunibot = None, plugin_config: dict = None):
+async def setup(bot: Gunibot = None):
     await bot.add_cog(Errors(bot))

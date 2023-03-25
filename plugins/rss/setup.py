@@ -8,28 +8,29 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 from LRFutils import color
 import core
 
-def run(save=False):
+def run():
 
     blue = color.fg.blue
-    NC = color.stop
+    stop = color.stop
 
     accept = ["yes", "y", "yeah","yep"]
     decline = ["no", "n", "nah", "nope"]
-    
+
     config = core.config.get("rss")
-    
-    choice = input(f"\n{blue}🔄️ Do you want to enable the RSS loop? [Y/n]:{NC} ")
+
+    choice = input(f"\n{blue}🔄️ Do you want to enable the RSS loop? [Y/n]:{stop} ")
     if choice not in decline:
         config["rss_loop_enabled"] = True
 
         # Consumer key
-        
+
         def set_consumer_key():
-            if c := input(f"\n🔑 {blue}Twitter consumer key (let empty to ignore):{NC} ") != "":
-                config["twitter"]["consumer_key"] = c
+            if key := input(f"\n🔑 {blue}Twitter consumer key (let empty to ignore):{stop} ") != "":
+                config["twitter"]["consumer_key"] = key
 
         if config["twitter"]["consumer_key"] is not None:
-            choice = input(f"\n{blue}A consumer kkey is already set. Do you want to edit it? [y/N]:{NC} ")
+            choice = input(f"\n{blue}A consumer kkey is already set."\
+                f"Do you want to edit it? [y/N]:{stop} ")
             if choice in accept:
                 set_consumer_key()
         else:
@@ -38,11 +39,14 @@ def run(save=False):
         #  Consumer secret
 
         def set_consumer_secret():
-            if c := input(f"\n🔑 {blue}Twitter consumer secret (let empty to ignore):{NC} ") != "":
-                config["twitter"]["consumer_secret"] = c
-        
+            if secret := input(
+                f"\n🔑 {blue}Twitter consumer secret (let empty to ignore):{stop} "
+            ) != "":
+                config["twitter"]["consumer_secret"] = secret
+
         if config["twitter"]["consumer_secret"] is not None:
-            choice = input(f"\n{blue}A consumer secret is already set. Do you want to edit it? [y/N]:{NC} ")
+            choice = input(f"\n{blue}A consumer secret is already set."\
+                f"Do you want to edit it? [y/N]:{stop} ")
             if choice in accept:
                 set_consumer_secret()
         else:
@@ -51,11 +55,14 @@ def run(save=False):
         # Access token key
 
         def set_access_token_key():
-            if c := input(f"\n🔑 {blue}Twitter access token key (let empty to ignore):{NC} ") != "":
-                    config["twitter"]["access_token_key"] = c
+            if key := input(
+                f"\n🔑 {blue}Twitter access token key (let empty to ignore):{stop} "
+            ) != "":
+                config["twitter"]["access_token_key"] = key
 
         if config["twitter"]["access_token_key"] is not None:
-            choice = input(f"\n{blue}An access token key is already set. Do you want to edit it? [y/N]:{NC} ")
+            choice = input(f"\n{blue}An access token key is already set."\
+                f"Do you want to edit it? [y/N]:{stop} ")
             if choice in accept:
                 set_access_token_key()
         else:
@@ -63,12 +70,14 @@ def run(save=False):
 
         # Access token secret
 
-        def set_access_token_secret():  
-            if c := input(f"\n🔑 {blue}Twitter access token secret (let empty to ignore):{NC} ") != "":
-                config["twitter"]["access_token_secret"] = c
-        
-        if config["twitter"]["access_token_secret"] is not None:   
-            choice = input(f"\n{blue}An access token secret is already set. Do you want to edit it? [y/N]:{NC} ")
+        def set_access_token_secret():
+            if secret := input(f"\n🔑 {blue}Twitter access token secret"\
+                f"(let empty to ignore):{stop} ") != "":
+                config["twitter"]["access_token_secret"] = secret
+
+        if config["twitter"]["access_token_secret"] is not None:
+            choice = input(f"\n{blue}An access token secret is already set."\
+                f"Do you want to edit it? [y/N]:{stop} ")
             if choice in accept:
                 set_access_token_secret()
         else:

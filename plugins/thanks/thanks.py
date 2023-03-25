@@ -5,18 +5,15 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-import args
-from utils import Gunibot, MyContext
-from discord.ext import commands
-import discord
-from bot import checks
+from typing import Dict, List, Optional, Tuple
 import asyncio
 import datetime
-from typing import Dict, List, Optional, Tuple
 
-import sys
+import discord
+from discord.ext import commands
 
-sys.path.append("./bot")
+from bot import checks, args
+from utils import Gunibot, MyContext
 
 
 class Thanks(commands.Cog):
@@ -29,7 +26,9 @@ class Thanks(commands.Cog):
 
         bot.get_command("config").add_command(self.config_thanks_allowed_roles)
         bot.get_command("config").add_command(self.config_thanks_duration)
-        bot.get_command("config").add_command(self.thanks_main)
+        self.thanks_config_main.name = "thanks"
+        self.thanks_config_main.aliases = ['thk']
+        bot.get_command("config").add_command(self.thanks_config_main)
 
     @commands.command(name="thanks_allowed_roles")
     async def config_thanks_allowed_roles(
@@ -57,38 +56,21 @@ class Thanks(commands.Cog):
                 )
                 return
             duration = None
-        x = await self.bot.sconfig.edit_config(
+        message = await self.bot.sconfig.edit_config(
             ctx.guild.id, "thanks_duration", duration
         )
-        await ctx.send(x)
+        await ctx.send(message)
 
-    @commands.group(name="thanks", aliases=["thx"], enabled=False)
-    async def thanks_main(self, ctx: MyContext):
+    @commands.group(enabled=False)
+    async def thanks_config_main(self, ctx: MyContext):
         """Edit your thanks-levels settings"""
         if ctx.subcommand_passed is None:
             await ctx.send_help("config thanks")
 
-    @thanks_main.command(name="list")
+    @thanks_config_main.command(name="list")
     async def thanks_list(self, ctx: MyContext):
         """List your current thanks levels"""
         await self.bot.get_cog("Thanks").thankslevels_list(ctx)
-
-    '''
-    @thanks_main.command(name="add")
-    async def thanks_add(self, ctx: MyContext, amount: int, role: discord.Role):
-        """Add a role to give when someone reaches a certain amount of thanks"""
-        #await self.bot.get_cog("Thanks").thankslevel_add(ctx, amount, role)
-        pass
-
-    @thanks_main.command(name="reset")
-    async def thanks_reset(self, ctx: MyContext, amount: int = None):
-        """Remove every role given for a certain amount of thanks
-        If no amount is specified, it will reset the whole configuration"""
-        if amount is None:
-            await self.bot.get_cog("Thanks").thankslevel_reset(ctx)
-        else:
-            await self.bot.get_cog("Thanks").thankslevel_remove(ctx, amount)
-    '''
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -105,12 +87,12 @@ class Thanks(commands.Cog):
             delta = (task[2] - now).total_seconds()
             delta += self.bot.server_configs[task[0]]["thanks_duration"]
             if delta > 0:
-                T = self.bot.get_cog("TimeCog").add_task(
+                time_cog = self.bot.get_cog("TimeCog").add_task(
                     delta, self.reload_roles, *task
                 )
-                self.tasks.append(T)
+                self.tasks.append(time_cog)
 
-    def cog_unload(self):
+    async def cog_unload(self):
         for task in self.tasks:
             task.cancel()
         if self.bot.get_cog("Sconfig"):
@@ -121,71 +103,72 @@ class Thanks(commands.Cog):
     ) -> List[Tuple[str, str]]:
         """Create a list of (key,value) for the /config command"""
         roles: dict = self.db_get_roles(ctx.guild.id)
-        result = list()
-        for k, v in sorted(roles.items()):
-            subroles = [ctx.guild.get_role(r) for r in v]
+        result = []
+        for key, value in sorted(roles.items()):
+            subroles = [ctx.guild.get_role(r) for r in value]
             if mentions:
                 subroles = [r.mention for r in subroles if r is not None]
             else:
                 subroles = [r.name for r in subroles if r is not None]
-            result.append((f"{k} remerciements", " ".join(subroles)))
+            result.append((f"{key} remerciements", " ".join(subroles)))
         return result
 
-    def db_get_user(self, guildID: int, userID: int) -> Optional[dict]:
+    def db_get_user(self, guild_id: int, user_id: int) -> Optional[dict]:
         query = "SELECT * FROM thanks WHERE guild=? AND user=?"
-        res = self.bot.db_query(query, (guildID, userID))
+        res = self.bot.db_query(query, (guild_id, user_id))
         return res if len(res) > 0 else None
 
     def db_get_last(
-        self, guildID: int, userID: int, authorID: int = None
+        self, guild_id: int, user_id: int, author_id: int = None
     ) -> Optional[dict]:
-        if authorID is None:
-            res = self.db_get_user(guildID, userID)
+        if author_id is None:
+            res = self.db_get_user(guild_id, user_id)
         else:
             query = "SELECT * FROM thanks WHERE guild=? AND user=? AND author=?"
-            res = self.bot.db_query(query, (guildID, userID, authorID))
+            res = self.bot.db_query(query, (guild_id, user_id, author_id))
         return res[-1] if len(res) > 0 else None
 
-    def db_get_amount(self, guildID: int, userID: int, duration: int = None) -> int:
+    def db_get_amount(self, guild_id: int, user_id: int, duration: int = None) -> int:
         query = "SELECT COUNT(*) as count FROM thanks WHERE guild=? AND user=?"
         if duration:
             query += f" AND timestamp >= datetime('now','-{duration} seconds')"
-        res = self.bot.db_query(query, (guildID, userID), fetchone=True)
+        res = self.bot.db_query(query, (guild_id, user_id), fetchone=True)
         return res["count"]
 
-    def db_add_thanks(self, guildID: int, userID: int, authorID: int):
+    def db_add_thanks(self, guild_id: int, user_id: int, author_id: int):
         query = "INSERT INTO thanks (guild,user,author) VALUES (?, ?, ?)"
-        self.bot.db_query(query, (guildID, userID, authorID))
+        self.bot.db_query(query, (guild_id, user_id, author_id))
 
-    def db_cleanup_thanks(self, guildID: int, duration: int):
+    def db_cleanup_thanks(self, guild_id: int, duration: int):
         if not isinstance(duration, (int, float)):
             return
-        query = f"DELETE FROM thanks WHERE guild=? AND timestamp < datetime('now','-{duration} seconds')"
-        self.bot.db_query(query, (guildID,))
+        query = "DELETE FROM thanks WHERE guild=? AND"\
+            f"timestamp < datetime('now','-{duration} seconds')"
+        self.bot.db_query(query, (guild_id,))
 
-    def db_set_role(self, guildID: int, roleID: int, level: int):
+    def db_set_role(self, guild_id: int, role_id: int, level: int):
         query = "INSERT INTO thanks_levels (guild, role, level) VALUES (?, ?, ?)"
-        self.bot.db_query(query, (guildID, roleID, level))
+        self.bot.db_query(query, (guild_id, role_id, level))
 
-    def db_get_roles(self, guildID: int, level: int = None):
+    def db_get_roles(self, guild_id: int, level: int = None):
         if level:
             query = "SELECT role, level FROM thanks_levels WHERE guild=? AND level=?"
-            liste = self.bot.db_query(query, (guildID, level))
+            liste = self.bot.db_query(query, (guild_id, level))
         else:
             query = "SELECT role, level FROM thanks_levels WHERE guild=?"
-            liste = self.bot.db_query(query, (guildID,))
-        res = dict()
+            liste = self.bot.db_query(query, (guild_id,))
+        res = {}
         for lvl in liste:
             res[lvl["level"]] = res.get(lvl["level"], list()) + [lvl["role"]]
         return res
 
-    def db_remove_level(self, guildID: int, level: int):
+    def db_remove_level(self, guild_id: int, level: int):
         query = "DELETE FROM thanks_levels WHERE guild=? AND level=?"
-        self.bot.db_query(query, (guildID, level))
+        self.bot.db_query(query, (guild_id, level))
 
-    def db_reset_level(self, guildID: int):
+    def db_reset_level(self, guild_id: int):
         query = "DELETE FROM thanks_levels WHERE guild=?"
-        self.bot.db_query(query, (guildID,))
+        self.bot.db_query(query, (guild_id,))
 
     async def has_allowed_roles(
         self, guild: discord.Guild, member: discord.Member
@@ -194,8 +177,8 @@ class Thanks(commands.Cog):
         if config is None:
             return False
         roles = [guild.get_role(x) for x in config]
-        for r in member.roles:
-            if r in roles:
+        for role in member.roles:
+            if role in roles:
                 return True
         return False
 
@@ -212,19 +195,19 @@ class Thanks(commands.Cog):
                 f'Module - Thanks: Missing "manage_roles" permission on guild "{member.guild.name}"'
             )
             return False
-        g: discord.Guild = member.guild
-        pos: int = g.me.top_role.position
+        guild: discord.Guild = member.guild
+        pos: int = guild.me.top_role.position
         if roles_conf is None:
-            roles_conf = self.db_get_roles(g.id)
-        for k, v in roles_conf.items():
-            if all(isinstance(x, discord.Role) for x in v):  # roles already initialized
+            roles_conf = self.db_get_roles(guild.id)
+        for key, value in roles_conf.items():
+            if all(isinstance(x, discord.Role) for x in value):  # roles already initialized
                 continue
-            r = [g.get_role(x) for x in v]
-            roles_conf[k] = list(
-                filter(lambda x: (x is not None) and (x.position < pos), r)
+            role = [guild.get_role(x) for x in value]
+            roles_conf[key] = list(
+                filter(lambda x: (x is not None) and (x.position < pos), role)
             )
-            if len(roles_conf[k]) == 0:
-                del roles_conf[k]
+            if len(roles_conf[key]) == 0:
+                del roles_conf[key]
         if duration is None:
             duration = self.bot.server_configs[member.guild.id]["thanks_duration"]
         amount = self.db_get_amount(member.guild.id, member.id, duration)
@@ -235,9 +218,7 @@ class Thanks(commands.Cog):
                 if len(roles) > 0:
                     await member.add_roles(*roles, reason="Thanks system")
                     self.bot.log.debug(
-                        "[Thanks] Rôles {0} ajoutés à {1} ({1.id})".format(
-                            roles, member
-                        )
+                        f"[Thanks] Rôles {roles} ajoutés à {member} ({member.id})"
                     )
                     gave_anything = True
             else:  # should remove roles
@@ -245,22 +226,20 @@ class Thanks(commands.Cog):
                 if len(roles) > 0:
                     await member.remove_roles(*roles, reason="Thanks system")
                     self.bot.log.debug(
-                        "[Thanks] Rôles {0} enlevés à {1} ({1.id})".format(
-                            roles, member
-                        )
+                        f"[Thanks] Rôles {roles} enlevés à {member} ({member.id})"
                     )
                     gave_anything = True
         return gave_anything
 
-    async def reload_roles(self, guildID: int, memberID: int, date: datetime.datetime):
+    async def reload_roles(self, guild_id: int, member_id: int, date: datetime.datetime):
         """Remove roles if needed"""
-        delta = self.bot.server_configs[guildID]["thanks_duration"]
+        delta = self.bot.server_configs[guild_id]["thanks_duration"]
         if (datetime.datetime.now() - date).total_seconds() < delta:
             return
-        guild: discord.Guild = self.bot.get_guild(guildID)
+        guild: discord.Guild = self.bot.get_guild(guild_id)
         if guild is None:
             return
-        member = guild.get_member(memberID)
+        member = guild.get_member(member_id)
         if member is None:
             return
         await self.give_remove_roles(member, duration=delta)
@@ -294,21 +273,21 @@ class Thanks(commands.Cog):
         await ctx.send(
             await self.bot._(ctx.guild.id, "thanks.add.done", user=user, amount=amount)
         )
-        T = self.bot.get_cog("TimeCog").add_task(
+        time_cog = self.bot.get_cog("TimeCog").add_task(
             duration,
             self.reload_roles,
             ctx.guild.id,
             user.id,
             datetime.datetime.utcnow(),
         )
-        self.tasks.append(T)
+        self.tasks.append(time_cog)
         member = ctx.guild.get_member(user.id)
         if member is not None:
             await self.give_remove_roles(member)
 
     @commands.command(name="thankslist", aliases=["thanks-list", "thxlist"])
     @commands.guild_only()
-    async def thanks_list(self, ctx: MyContext, *, user: discord.User = None):
+    async def thankslist(self, ctx: MyContext, *, user: discord.User = None):
         """Get the list of thanks given to a user (or you by default)"""
         you = user is None
         if you:
@@ -321,12 +300,12 @@ class Thanks(commands.Cog):
                 txt = await self.bot._(ctx.guild.id, "thanks.list.nothing-them")
             await ctx.send(txt)
             return
-        for e, l in enumerate(liste):
-            liste[e] = [
-                self.bot.get_guild(l["guild"]),
-                self.bot.get_user(l["user"]),
-                self.bot.get_user(l["author"]),
-                datetime.datetime.strptime(l["timestamp"], "%Y-%m-%d %H:%M:%S"),
+        for index, value in enumerate(liste):
+            liste[index] = [
+                self.bot.get_guild(value["guild"]),
+                self.bot.get_user(value["user"]),
+                self.bot.get_user(value["author"]),
+                datetime.datetime.strptime(value["timestamp"], "%Y-%m-%d %H:%M:%S"),
             ]
         duration = self.bot.server_configs[ctx.guild.id]["thanks_duration"]
         current = [
@@ -341,11 +320,11 @@ class Thanks(commands.Cog):
                 ctx.guild.id, "thanks.list.active", count=len(current)
             )
             if len(current) > 0:
-                t = [
-                    "• {} ({})".format(x[2].mention, x[3].strftime("%d/%m/%y %HH%M"))
-                    for x in current
+                users = [
+                    f"• {user[2].mention} ({user[3].strftime('%d/%m/%y %HH%M')})"
+                    for user in current
                 ]
-                emb.add_field(name=_active, value="\n".join(t))
+                emb.add_field(name=_active, value="\n".join(users))
             else:
                 emb.add_field(name=_active, value="0")
             old = len(liste) - len(current)
@@ -358,14 +337,14 @@ class Thanks(commands.Cog):
         else:
             txt = "```md\n"
             if len(current) > 0:
-                t = [
-                    "- {} ({})".format(str(x[2]), x[3].strftime("%d/%m/%y %HH%M"))
-                    for x in current
+                users = [
+                    f"- {str(user[2])} ({user[3].strftime('%d/%m/%y %HH%M')})"
+                    for user in current
                 ]
                 _active = await self.bot._(
                     ctx.guild.id, "thanks.list.active", count=len(current)
                 )
-                txt += "# " + _active + "\n{}\n".format(len(current), "\n".join(t))
+                txt += "# " + _active + "\n{}\n".format("\n".join(users))
             old = len(liste) - len(current)
             if old > 0:
                 _inactive = await self.bot._(
@@ -386,10 +365,10 @@ class Thanks(commands.Cog):
         if len(users) == 0:
             await ctx.send(await self.bot._(ctx.guild.id, "thanks.reload.no-member"))
             return
-        rolesID = self.db_get_roles(ctx.guild.id)
+        roles_id = self.db_get_roles(ctx.guild.id)
         roles = list()
-        for r in rolesID.values():
-            roles += [ctx.guild.get_role(x) for x in r]
+        for role in roles_id.values():
+            roles += [ctx.guild.get_role(x) for x in role]
         roles = list(filter(None, roles))
         if not roles:
             await ctx.send(await self.bot._(ctx.guild.id, "thanks.reload.no-role"))
@@ -400,8 +379,8 @@ class Thanks(commands.Cog):
         del roles
         delta = self.bot.server_configs[ctx.guild.id]["thanks_duration"]
         i = 0
-        for m in users:
-            if await self.give_remove_roles(m, rolesID, delta):
+        for thanks_user in users:
+            if await self.give_remove_roles(thanks_user, roles_id, delta):
                 i += 1
         if i == 0:
             txt = await self.bot._(
@@ -418,11 +397,11 @@ class Thanks(commands.Cog):
     async def thankslevels_list(self, ctx: MyContext):
         roles: dict = self.db_get_roles(ctx.guild.id)
 
-        async def g(k: int) -> str:
+        async def get_level(k: int) -> str:
             return await self.bot._(ctx.guild.id, "thanks.thanks", count=k)
 
         text = "\n".join(
-            [await g(k) + " ".join([f"<@&{r}>" for r in v]) for k, v in roles.items()]
+            [await get_level(k) + " ".join([f"<@&{r}>" for r in v]) for k, v in roles.items()]
         )
         if text == "":
             text = await self.bot._(ctx.guild.id, "thanks.no-role")
@@ -487,12 +466,11 @@ class Thanks(commands.Cog):
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "thanks.went-wrong"))
 
+async def setup(bot:Gunibot):
+    """
+    Fonction d'initialisation du plugin
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
-    if bot is not None:
-        await bot.add_cog(Thanks(bot), icon="❤️")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)
-
+    :param bot: Le bot
+    :type bot: Gunibot
+    """
+    await bot.add_cog(Thanks(bot), icon="❤️")

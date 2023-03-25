@@ -5,14 +5,17 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-import discord
-from discord.ext import commands
 import logging
 import sqlite3
 import json
 import sys
 from typing import Any, Callable, Coroutine, Dict, Union, List, TYPE_CHECKING
 import os
+
+import discord
+from discord.ext import commands
+
+from core import config
 
 if TYPE_CHECKING:
     from bot.utils.sconfig import Sconfig
@@ -28,9 +31,8 @@ class MyContext(commands.Context):
         if self.guild:
             # message in a guild
             return self.channel.permissions_for(self.guild.me)
-        else:
-            # message in DM
-            return self.channel.permissions_for(self.bot)
+        # message in DM
+        return self.channel.permissions_for(self.bot)
 
     @property
     def user_permissions(self) -> discord.Permissions:
@@ -42,13 +44,15 @@ class MyContext(commands.Context):
         """If the bot has the right permissions to send an embed in the current context"""
         return self.bot_permissions.embed_links
 
+# defining allowed default mentions
+ALLOWED = discord.AllowedMentions(everyone=False, roles=False)
 
 class Gunibot(commands.bot.AutoShardedBot):
-    """Bot class, with everything needed to run it"""
+    """
+    Classe principale du bot
+    """
 
     def __init__(self, case_insensitive=None, status=None, beta=False):
-        # defining allowed default mentions
-        ALLOWED = discord.AllowedMentions(everyone=False, roles=False)
         # defining intents usage
         intents = discord.Intents.default()
         intents.message_content = True
@@ -68,8 +72,15 @@ class Gunibot(commands.bot.AutoShardedBot):
         self.cog_icons = {}  # icons for cogs
         self._update_database_structure()
 
+    # pylint: disable=arguments-differ
     async def get_context(self, message: discord.Message, *, cls=MyContext):
-        """Get a custom context class when creating one from a message"""
+        """
+        Récupérer le contexte d'une commande
+
+        :param message: Le message
+        :param cls: La classe du contexte
+        :return: Le contexte
+        """
         # when you override this method, you pass your new Context
         # subclass to the super() method, which tells the bot to
         # use the new MyContext class
@@ -77,46 +88,76 @@ class Gunibot(commands.bot.AutoShardedBot):
 
     @property
     def server_configs(self):
-        """Guilds configuration manager"""
-        return self.get_cog("ConfigCog").confManager
+        """
+        Récupérer la configuration du serveur
+
+        :return: La configuration du serveur
+        """
+        return self.get_cog("ConfigCog").conf_manager
 
     @property
     def sconfig(self) -> "Sconfig":
-        """Return sconfig configuration manager"""
+        """
+        Récupérer le gestionnaire de configuration du serveur
+
+        :return: Le gestionnaire de configuration du serveur
+        """
         return self.get_cog("Sconfig")
 
     def _update_database_structure(self):
-        """Create tables and indexes from 'data/model.sql' file"""
-        c = self.database.cursor()
-        with open("data/model.sql", "r", encoding="utf-8") as f:
-            c.executescript(f.read())
+        """
+        Mettre à jour la structure de la base de données
+
+        :return: None
+        """
+        cursor = self.database.cursor()
+        with open("data/model.sql", "r", encoding="utf-8") as file:
+            cursor.executescript(file.read())
+
+        # pylint: disable=redefined-outer-name
         for plugin in os.listdir("./plugins/"):
             if plugin[0] != "_":
                 if os.path.isfile("./plugins/" + plugin + "/data/model.sql"):
                     with open(
                         "./plugins/" + plugin + "/data/model.sql", "r", encoding="utf-8"
-                    ) as f:
-                        c.executescript(f.read())
-        c.close()
+                    ) as file:
+                        cursor.executescript(file.read())
+        cursor.close()
 
     async def user_avatar_as(
         self,
         user: Union[discord.User, discord.Member],
         size=512,
     ):
-        """Get the avatar of an user, format gif or png (as webp isn't supported by some browsers)"""
-        avatar = user.display_avatar.with_size(size) # the avatar always exist, returns the URL to the default one
+        """
+        Récupérer l'avatar d'un utilisateur au format PNG ou GIF
+
+        :param user: L'utilisateur
+        :param size: La taille de l'avatar
+        :return: L'avatar
+        """
+        # the avatar always exist, returns the URL to the default one
+        avatar = user.display_avatar.with_size(size)
         if avatar.is_animated():
             return avatar.with_format("gif")
         else:
             return avatar.with_format("png")
 
     class SafeDict(dict):
+        """
+        ???
+        """
         def __missing__(self, key):
             return "{" + key + "}"
 
+    # pylint: disable=arguments-differ
     async def get_prefix(self, msg):
-        """Get a prefix from a message... what did you expect?"""
+        """
+        Récupérer le préfixe du bot pour un message donné
+
+        :param msg: Le message
+        :return: Le préfixe
+        """
         prefix = None
         if msg.guild is not None:
             prefix = self.server_configs[msg.guild.id]["prefix"]
@@ -133,17 +174,30 @@ class Gunibot(commands.bot.AutoShardedBot):
         returnrowcount: bool = False,
         astuple: bool = False,
     ) -> Union[int, List[dict], dict]:
-        """Do any query to the bot database
-        If SELECT, it will return a list of results, or only the first result (if fetchone)
-        For any other query, it will return the affected row ID if returnrowscount, or the amount of affected rows (if returnrowscount)"""
+        """
+        Faire une requête à la base de données du bot
+
+        Si SELECT, retourne une liste de résultats, ou seulement le premier résultat (si fetchone)
+        Pour toute autre requête, retourne l'ID de la ligne affectée, ou le nombre de lignes
+        affectées (si returnrowscount)
+
+        :param query: La requête à faire
+        :param args: Les arguments de la requête
+        :param fetchone: Si la requête est un SELECT, retourne seulement le premier résultat
+        :param returnrowcount: Si la requête est un INSERT, UPDATE ou DELETE, retourne le nombre
+            de lignes affectées
+        :param astuple: Si la requête est un SELECT, retourne les résultats sous forme de tuple
+        :return: Le résultat de la requête
+        """
+
         cursor = self.database.cursor()
         try:
             cursor.execute(query, args)
             if query.startswith("SELECT"):
                 _type = tuple if astuple else dict
                 if fetchone:
-                    v = cursor.fetchone()
-                    result = _type() if v is None else _type(v)
+                    row = cursor.fetchone()
+                    result = _type() if row is None else _type(row)
                 else:
                     result = list(map(_type, cursor.fetchall()))
             else:
@@ -152,39 +206,38 @@ class Gunibot(commands.bot.AutoShardedBot):
                     result = cursor.rowcount
                 else:
                     result = cursor.lastrowid
-        except Exception as e:
+        except Exception as exception:
             cursor.close()
-            raise e
+            raise exception
         cursor.close()
         return result
 
     @property
     def _(self) -> Callable[[Any, str], Coroutine[Any, Any, str]]:
-        """Translate something"""
+        """
+        Traduire un texte
+
+        :return: La fonction de traduction
+        """
         cog = self.get_cog("Languages")
         if cog is None:
             self.log.error("Unable to load Languages cog")
             return lambda *args, **kwargs: args[1]
         return cog.tr
 
+    # pylint: disable=arguments-differ
     async def add_cog(self, cog: commands.Cog, icon=None):
-        """Adds a "cog" to the bot.
-        A cog is a class that has its own event listeners and commands.
-
-        Parameters
-        -----------
-        cog: :class:`Cog`
-            The cog to register to the bot.
-
-        Raises
-        -------
-        TypeError
-            The cog does not inherit from :class:`Cog`.
-
-        CommandError
-            An error happened during loading.
         """
+        Ajouter un cog au bot
 
+        :param cog: Le cog à ajouter
+        :param icon: L'icône du cog
+
+        :return: None
+
+        :raises TypeError: Le cog n'hérite pas de commands.Cog
+        :raises CommandError: Une erreur est survenue lors du chargement
+        """
         self.cog_icons.update({cog.qualified_name.lower(): icon})
 
         await super().add_cog(cog)
@@ -193,25 +246,27 @@ class Gunibot(commands.bot.AutoShardedBot):
                 if hasattr(module, "on_anycog_load"):
                     try:
                         module.on_anycog_load(cog)
+                    # pylint: disable=broad-exception-caught
                     except BaseException:
-                        self.log.warning(f"[add_cog]", exc_info=True)
+                        self.log.warning("[add_cog]", exc_info=True)
 
     def get_cog_icon(self, cog_name):
-        """Get a cog icon"""
+        """
+        Récupérer l'icône d'un cog
+
+        :param cog_name: Le nom du cog
+        :return: L'icône du cog
+        """
         return self.cog_icons.get(cog_name.lower())
 
     async def remove_cog(self, cog: str):
-        """Removes a cog from the bot.
+        """
+        Supprimer un cog du bot
 
-        All registered commands and event listeners that the
-        cog has registered will be removed as well.
+        Toutes les commandes et listeners enregistrés par le cog seront supprimés
 
-        If no cog is found then this method has no effect.
-
-        Parameters
-        -----------
-        name: :class:`str`
-            The name of the cog to remove.
+        :param cog: Le cog à supprimer
+        :return: None
         """
         await super().remove_cog(cog)
         for module in self.cogs.values():
@@ -219,24 +274,30 @@ class Gunibot(commands.bot.AutoShardedBot):
                 if hasattr(module, "on_anycog_unload"):
                     try:
                         module.on_anycog_unload(cog)
+                    # pylint: disable=broad-exception-caught
                     except BaseException:
-                        self.log.warning(f"[remove_cog]", exc_info=True)
+                        self.log.warning("[remove_cog]", exc_info=True)
 
 
 class CheckException(commands.CommandError):
-    """Exception raised when a custom check failed, to send errors when needed"""
-
-    def __init__(self, id, *args):
-        super().__init__(message=f"Custom check '{id}' failed", *args)
-        self.id = id
+    """
+    Exception personnalisée pour les checks
+    """
+    def __init__(self, check_id, *args):
+        super().__init__(message=f"Custom check '{check_id}' failed", *args)
+        self.id = check_id # pylint: disable=invalid-name
 
 
 def setup_logger():
-    """Create the logger module, used for logs"""
+    """
+    Initialiser le logger
+
+    :return: None
+    """
     # on chope le premier logger
     log = logging.getLogger("runner")
-    # on défini un formatteur
-    format = logging.Formatter(
+    # on définit un formatteur
+    formatter = logging.Formatter(
         "%(asctime)s %(levelname)s: %(message)s", datefmt="[%d/%m/%Y %H:%M]"
     )
     # ex du format : [08/11/2018 14:46] WARNING RSSCog fetch_rss_flux l.288 :
@@ -247,17 +308,17 @@ def setup_logger():
     file_handler = logging.FileHandler("logs/debug.log")
     # tous les logs de niveau DEBUG et supérieur sont evoyés dans le fichier
     file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(format)
+    file_handler.setFormatter(formatter)
 
     # log vers la console
     stream_handler = logging.StreamHandler(sys.stdout)
     # tous les logs de niveau INFO et supérieur sont evoyés dans le fichier
     stream_handler.setLevel(logging.INFO)
-    stream_handler.setFormatter(format)
+    stream_handler.setFormatter(formatter)
 
-    # supposons que tu veuille collecter les erreurs sur ton site d'analyse d'erreurs comme sentry
+    # supposons que nous voulions collecter les erreurs sur un site d'analyse d'erreurs comme sentry
     # sentry_handler = x
-    # sentry_handler.setLevel(logging.ERROR)  # on veut voir que les erreurs et au delà, pas en dessous
+    # sentry_handler.setLevel(logging.ERROR)
     # sentry_handler.setFormatter(format)
 
     # log.debug("message de debug osef")
@@ -274,8 +335,6 @@ def setup_logger():
 
 
 CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {}
-
-from core import config
 
 CONFIG_OPTIONS.update(
     {
@@ -300,5 +359,9 @@ CONFIG_OPTIONS.update(
 for plugin in os.listdir("./plugins/"):
     if plugin[0] != "_":
         if os.path.isfile("./plugins/" + plugin + "/config/options.json"):
-            with open("./plugins/" + plugin + "/config/options.json") as config:
+            with open(
+                "./plugins/" + plugin + "/config/options.json",
+                "r",
+                encoding="utf8"
+            ) as config:
                 CONFIG_OPTIONS.update(json.load(config))

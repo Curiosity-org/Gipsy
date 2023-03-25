@@ -6,17 +6,20 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
 import typing
+
 import discord
 from discord.ext import tasks, commands
+
 from utils import Gunibot, MyContext
-import bot.args as args
+from bot import args
 
 
 class ChannelArchive(commands.Cog):
+
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.config_options = ["archive_category", "archive_duration"]
-        self.update_loop.start()
+        self.update_loop.start() # pylint: disable=no-member
 
         bot.get_command("config").add_command(self.config_archive_category)
         bot.get_command("config").add_command(self.config_archive_duration)
@@ -33,7 +36,7 @@ class ChannelArchive(commands.Cog):
 
     @commands.command(name="archive_duration")
     async def config_archive_duration(
-        self, ctx: MyContext, duration: commands.Greedy[args.tempdelta]
+        self, ctx: MyContext, duration: commands.Greedy[args.tempdelta],
     ):
         duration = sum(duration)
         if duration == 0:
@@ -43,13 +46,13 @@ class ChannelArchive(commands.Cog):
                 )
                 return
             duration = None
-        x = await self.bot.sconfig.edit_config(
+        msg = await self.bot.sconfig.edit_config(
             ctx.guild.id, "archive_duration", duration
         )
-        await ctx.send(x)
+        await ctx.send(msg)
 
-    def cog_unload(self):
-        self.update_loop.cancel()
+    async def cog_unload(self):
+        self.update_loop.cancel() # pylint: disable=no-member
 
     async def add_to_archive(self, guild: discord.Guild, channel: discord.TextChannel):
         # Get archive category
@@ -83,11 +86,11 @@ class ChannelArchive(commands.Cog):
         records = self.bot.db_query(query, ())
 
         # Adding manually archived channels
-        channelIds = []
+        channel_ids = []
         added = 0
         for channel in self.bot.get_channel(archive_category).channels:
             listed = False
-            channelIds.append(channel.id)
+            channel_ids.append(channel.id)
             for record in records:
                 if channel.id == record["channel"]:
                     listed = True
@@ -104,7 +107,8 @@ class ChannelArchive(commands.Cog):
                     self.bot.get_channel(record["channel"]).category.id
                     != archive_category
                 ):
-                    query = f"DELETE FROM archive WHERE channel = {record['channel']} AND guild = {guild.id}"
+                    query = f"DELETE FROM archive WHERE channel = {record['channel']}"\
+                        f"AND guild = {guild.id}"
                     unarchived += 1
                     self.bot.db_query(query, ())
 
@@ -113,11 +117,13 @@ class ChannelArchive(commands.Cog):
         for record in records:
             if self.bot.get_channel(record["channel"]) is None:
                 removed_records += 1
-                query = f"DELETE FROM archive WHERE channel = {record['channel']} AND guild = {guild.id}"
+                query = f"DELETE FROM archive WHERE channel = {record['channel']}"\
+                    f"AND guild = {guild.id}"
                 self.bot.db_query(query, ())
 
         # Get & delete old channels
-        query = f"SELECT * FROM archive WHERE timestamp <= datetime('now','-{duration} seconds') AND guild = {guild.id}"
+        query = f"SELECT * FROM archive WHERE timestamp <= datetime('now','-{duration} seconds')"\
+            f"AND guild = {guild.id}"
         records = self.bot.db_query(query, ())
 
         removed_channels = 0
@@ -130,7 +136,8 @@ class ChannelArchive(commands.Cog):
 
                     # Remove record
                     removed_records += 1
-                    query = f"DELETE FROM archive WHERE channel = {record['channel']} AND guild = {guild.id}"
+                    query = f"DELETE FROM archive WHERE channel = {record['channel']}"\
+                        f"AND guild = {guild.id}"
                     self.bot.db_query(query, ())
 
         # Send confirmation
@@ -283,10 +290,6 @@ class ChannelArchive(commands.Cog):
         await ctx.send(embed=embed)
 
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
     if bot is not None:
         await bot.add_cog(ChannelArchive(bot), icon="🗃️")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)

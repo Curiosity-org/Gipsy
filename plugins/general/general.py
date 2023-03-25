@@ -16,6 +16,11 @@ from git import Repo
 
 from utils import Gunibot, MyContext
 
+ChannelTypes = Union[
+    discord.Thread,
+    discord.abc.GuildChannel,
+]
+CPU_INTERVAL = 3.0
 CHANNEL_TYPES = Union[
     discord.Thread,
     discord.abc.GuildChannel,
@@ -34,21 +39,21 @@ class General(commands.Cog):
         """Count the number of lines for the whole project"""
         count = 0
         try:
-            for root, dirs, files in os.walk("."):
+            for root, dirs, files in os.walk("."): # pylint: disable=unused-variable
                 if "/lib/python" in root:
                     continue
                 for file in files:
                     if file.endswith(".py"):
-                        with open(os.path.join(root, file), "r", encoding="utf8") as f:
-                            for line in f.read().split("\n"):
+                        with open(os.path.join(root, file), "r", encoding="utf8") as file:
+                            for line in file.read().split("\n"):
                                 if len(line.strip()) > 2 and line[0] != "#":
                                     count += 1
-        except Exception as e:
-            await self.bot.get_cog("Errors").on_error(e, None)
+        except Exception as exception: # pylint: disable=broad-exception-caught
+            await self.bot.get_cog("Errors").on_error(exception, None)
         self.codelines = count
 
     @commands.command(name="hs")
-    async def hs(self, ctx: MyContext, channel: CHANNEL_TYPES = None):
+    async def hs(self, ctx: MyContext, channel: CHANNEL_TYPES = None): # pylint: disable=invalid-name
         if channel:
             msg = await self.bot._(
                 ctx.channel,
@@ -69,59 +74,58 @@ class General(commands.Cog):
     @commands.command(name="ping")
     async def rep(self, ctx: MyContext):
         """Get bot latency"""
-        m = await ctx.send("Ping...")
-        t = (m.created_at - ctx.message.created_at).total_seconds()
+        msg = await ctx.send("Ping...")
+        time = (msg.created_at - ctx.message.created_at).total_seconds()
         try:
-            p = round(self.bot.latency * 1000)
+            ping = round(self.bot.latency * 1000)
         except OverflowError:
-            p = "∞"
-        await m.edit(
-            content=":ping_pong:  Pong !\nBot ping: {}ms\nDiscord ping: {}ms".format(
-                round(t * 1000), p
-            )
+            ping = "∞"
+        await msg.edit(
+            content=f":ping_pong:  Pong !\nBot ping: {round(time * 1000)}ms\nDiscord ping: {ping}ms"
         )
 
     @commands.command(name="stats")
     @commands.cooldown(2, 60, commands.BucketType.guild)
     async def stats(self, ctx: MyContext):
         """Display some statistics about the bot"""
-        v = sys.version_info
-        version = str(v.major) + "." + str(v.minor) + "." + str(v.micro)
+        v_info = sys.version_info
+        version = str(v_info.major) + "." + str(v_info.minor) + "." + str(v_info.micro)
         pid = os.getpid()
         try:
-            py = psutil.Process(pid)
-            ram_usage = round(py.memory_info()[0] / 2.0**30, 3)  # , py.cpu_percent()]
+            process = psutil.Process(pid)
+            ram_usage = round(process.memory_info()[0] / 2.0**30, 3)  # , py.cpu_percent()]
         except OSError:
             ram_usage = latency = "?"
-            py = None
+            process = None
+
         latency = round(self.bot.latency * 1000, 3)
-        CPU_INTERVAL = 3.0
+
         try:
             async with ctx.channel.typing():
                 branch = Repo(os.getcwd()).active_branch
                 len_servers = len(ctx.bot.guilds)
                 users = len(ctx.bot.users)
                 bots = len([None for u in ctx.bot.users if u.bot])
-                d = await self.bot._(ctx.channel, "general.stats.servs", c=len_servers)
-                d += "\n" + await self.bot._(
+                stats = await self.bot._(ctx.channel, "general.stats.servs", c=len_servers)
+                stats += "\n" + await self.bot._(
                     ctx.channel, "general.stats.members", c=users, bots=bots
                 )
-                d += "\n" + await self.bot._(
+                stats += "\n" + await self.bot._(
                     ctx.channel, "general.stats.codelines", c=self.codelines
                 )
-                d += "\n" + await self.bot._(
+                stats += "\n" + await self.bot._(
                     ctx.channel, "general.stats.pyver", v=version
                 )
-                d += "\n" + await self.bot._(
+                stats += "\n" + await self.bot._(
                     ctx.channel, "general.stats.diver", v=discord.__version__
                 )
-                d += "\n" + await self.bot._(ctx.channel, "general.stats.git", b=branch)
-                d += "\n" + await self.bot._(
+                stats += "\n" + await self.bot._(ctx.channel, "general.stats.git", b=branch)
+                stats += "\n" + await self.bot._(
                     ctx.channel, "general.stats.ram", c=ram_usage
                 )
                 cpu_txt = await self.bot._(ctx.channel, "general.stats.cpu-loading")
-                d += "\n" + cpu_txt
-                d += "\n" + await self.bot._(
+                stats += "\n" + cpu_txt
+                stats += "\n" + await self.bot._(
                     ctx.channel, "general.stats.ping", c=latency
                 )
             if ctx.can_send_embed:
@@ -132,45 +136,41 @@ class General(commands.Cog):
                     title=title,
                     color=8311585,
                     timestamp=ctx.message.created_at,
-                    description=d,
+                    description=stats,
                 )
                 embed.set_thumbnail(url=self.bot.user.display_avatar)
                 msg: discord.Message = await ctx.send(embed=embed)
-                if py is None:  # PSUtil can't be used
+                if process is None:  # PSUtil can't be used
                     cpu_usage = "?"
                 else:
-                    cpu_usage = py.cpu_percent(CPU_INTERVAL)
+                    cpu_usage = process.cpu_percent(CPU_INTERVAL)
                 cpu_ended = await self.bot._(
                     ctx.channel, "general.stats.cpu-ended", c=cpu_usage
                 )
                 embed.description = embed.description.replace(cpu_txt, cpu_ended)
                 await msg.edit(embed=embed)
             else:
-                msg = await ctx.send(d)
-                if py is None:  # PSUtil can't be used
+                msg = await ctx.send(stats)
+                if process is None:  # PSUtil can't be used
                     cpu_usage = "?"
                 else:
-                    cpu_usage = py.cpu_percent(CPU_INTERVAL)
+                    cpu_usage = process.cpu_percent(CPU_INTERVAL)
                 cpu_ended = await self.bot._(
                     ctx.channel, "general.stats.cpu-ended", c=cpu_usage
                 )
-                d = d.replace(cpu_txt, cpu_ended)
-                await msg.edit(content=d)
-        except Exception as e:
-            await ctx.bot.get_cog("Errors").on_command_error(ctx, e)
+                stats = stats.replace(cpu_txt, cpu_ended)
+                await msg.edit(content=stats)
+        except Exception as exception: # pylint: disable=broad-exception-caught
+            await ctx.bot.get_cog("Errors").on_command_error(ctx, exception)
 
     @commands.command(name="halp", enabled=False)
     async def halp(self, ctx):
-        embed = discord.Embed(name="Help", colour=discord.Colour.green())
-        embed.set_author(name=f"Gunibot commands")
+        embed = discord.Embed(title="Help", colour=discord.Colour.green())
+        embed.set_author(name="Gunibot commands")
         embed.add_field(name="admin", value="Affiche les commandes admin disponibles")
         embed.add_field(name="admin", value="Affiche les commandes admin disponibles")
         await ctx.send(embed=embed)
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
     if bot is not None:
         await bot.add_cog(General(bot), icon="🌍")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)

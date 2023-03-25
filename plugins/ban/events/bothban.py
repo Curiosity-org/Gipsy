@@ -5,17 +5,17 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
+import random
+
 import discord
 from discord.ext import commands
-
-import random
 
 
 async def execute(
     ban_plugin,
     ctx: commands.Context,
     user: discord.User,
-    reason: str,
+    reason: str, # pylint: disable=unused-argument
 ) -> bool:
     """Ban both the executor and the targeted user."""
     if await ban_plugin.fake_ban(ctx, user):

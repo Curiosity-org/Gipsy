@@ -5,19 +5,17 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-import sqlite3
-from utils import Gunibot, MyContext
-from discord.utils import snowflake_time
-from discord.ext import commands
-import discord
-from bot import checks
 import typing
+import sqlite3
 from datetime import datetime, timedelta
 
+import discord
+from discord.utils import snowflake_time
+from discord.ext import commands
 import aiohttp
-import sys
 
-# sys.path.append("./bot")
+from bot import checks
+from utils import Gunibot, MyContext
 
 
 class Contact(commands.Cog):
@@ -83,7 +81,7 @@ class Contact(commands.Cog):
                 await self.bot._(self, ctx.guild.id, "contact.invalid-title")
             )
 
-    async def urlToByte(self, url: str) -> typing.Optional[bytes]:
+    async def url_to_byte(self, url: str) -> typing.Optional[bytes]:
         async with aiohttp.ClientSession(
             timeout=aiohttp.ClientTimeout(total=10)
         ) as session:
@@ -94,23 +92,23 @@ class Contact(commands.Cog):
                     res = None
         return res
 
-    def db_get_channels(self, guildID: int):
+    def db_get_channels(self, guild_id: int):
         query = "SELECT * FROM contact_channels WHERE guild=?"
-        res = self.bot.db_query(query, (guildID,))
+        res = self.bot.db_query(query, (guild_id,))
         return res
 
-    def db_add_channel(self, channel: discord.TextChannel, authorID):
+    def db_add_channel(self, channel: discord.TextChannel, author_id):
         try:
             query = (
                 "INSERT INTO contact_channels (guild,channel, author) VALUES (?, ?, ?)"
             )
-            self.bot.db_query(query, (channel.guild.id, channel.id, authorID))
-        except sqlite3.OperationalError as e:
-            print(e)
+            self.bot.db_query(query, (channel.guild.id, channel.id, author_id))
+        except sqlite3.OperationalError as exc:
+            print(exc)
 
-    def db_delete_channel(self, guildID: int, channelID: int):
+    def db_delete_channel(self, guild_id: int, channel_id: int):
         query = "DELETE FROM contact_channels WHERE guild=? AND channel=?"
-        self.bot.db_query(query, (guildID, channelID))
+        self.bot.db_query(query, (guild_id, channel_id))
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -164,9 +162,9 @@ class Contact(commands.Cog):
                 )
             self.db_add_channel(channel, message.author.id)
 
-        except discord.errors.Forbidden as e:
+        except discord.errors.Forbidden as exc:
             await self.bot.get_cog("Errors").on_error(
-                e, await self.bot.get_context(message)
+                exc, await self.bot.get_context(message)
             )
             return
         try:
@@ -204,8 +202,8 @@ class Contact(commands.Cog):
                     try:
                         await chan.delete(reason="Channel too old")
                         i += 1
-                    except discord.DiscordException as e:
-                        errors.append(str(e))
+                    except discord.DiscordException as exc:
+                        errors.append(str(exc))
                     else:
                         self.db_delete_channel(ctx.guild.id, data["channel"])
         answer = await self.bot._(ctx.guild.id, "contact.deleted", count=i)
@@ -217,10 +215,6 @@ class Contact(commands.Cog):
         await ctx.send(answer)
 
 
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
     if bot is not None:
         await bot.add_cog(Contact(bot), icon="💬")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)

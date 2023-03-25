@@ -6,6 +6,7 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
 import discord
+
 from utils import MyContext, CheckException
 from core import config
 
@@ -48,9 +49,9 @@ async def is_roles_manager(ctx: MyContext):
 
 
 async def can_group(ctx: MyContext):
-    config = ctx.bot.server_configs[ctx.guild.id]
-    if config["group_allowed_role"] is None:
+    server_config = ctx.bot.server_configs[ctx.guild.id]
+    if server_config["group_allowed_role"] is None:
         return True
-    role = discord.utils.get(ctx.message.guild.roles, id=config["group_allowed_role"])
+    role = discord.utils.get(ctx.message.guild.roles, id=server_config["group_allowed_role"])
     if role in ctx.author.roles:
         return True

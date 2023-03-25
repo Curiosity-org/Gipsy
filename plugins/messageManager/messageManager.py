@@ -5,21 +5,31 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
+from typing import Union
+
 import discord
 from discord.ext import commands
+
 from utils import Gunibot
-from typing import Union
 
 
 # Moves a message from its original channel to a parameterized channel
 # using a given webhook
-async def moveMessage(msg: discord.Message, webhook: discord.Webhook, thread: discord.Thread = None):
+async def move_message(
+    msg: discord.Message,
+    webhook: discord.Webhook,
+    thread: discord.Thread = None,
+):
+    """
+    Copy the discord message `msg` to a new channel (or thread if `thread` is specified) using
+    `webhook`.
+    """
     files = [await x.to_file() for x in msg.attachments]
     # grab mentions from the source message
     mentions = discord.AllowedMentions(
         everyone=msg.mention_everyone, users=msg.mentions, roles=msg.role_mentions
     )
-    
+
     kargs = {
         "content": msg.content,
         "files": files,
@@ -41,6 +51,8 @@ async def moveMessage(msg: discord.Message, webhook: discord.Webhook, thread: di
 
 
 class MessageManager(commands.Cog):
+    """Imitate someone, copy messages or an entire conversation with one or two commands."""
+
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "messageManager"
@@ -90,12 +102,12 @@ class MessageManager(commands.Cog):
         if isinstance(channel, str):
             try:
                 channel = self.bot.get_channel(int(channel.replace("<#", "").replace(">", "")))
-            except BaseException:
+            except ValueError:
                 await ctx.send(
                     await self.bot._(ctx.guild.id, "message_manager.no-channel")
                 )
                 return
-        
+
         if not isinstance(channel, discord.abc.Messageable):
             await ctx.send(await self.bot._(ctx.guild.id, "message_manager.no-channel"))
             return
@@ -121,7 +133,7 @@ class MessageManager(commands.Cog):
             return
 
         # Check permission
-        if (not channel.permissions_for(author).manage_messages):
+        if not channel.permissions_for(author).manage_messages:
             embed = discord.Embed(
                 description=await self.bot._(
                     ctx.guild.id, "message_manager.permission"
@@ -139,7 +151,7 @@ class MessageManager(commands.Cog):
 
         # Creates a webhook to resend the message to another channel
         webhook = await channel.create_webhook(name="Gunipy Hook")
-        await moveMessage(msg, webhook, thread=thread)
+        await move_message(msg, webhook, thread=thread)
         await webhook.delete()
 
         if confirm:
@@ -189,12 +201,12 @@ class MessageManager(commands.Cog):
         if isinstance(channel, str):
             try:
                 channel = self.bot.get_channel(int(channel.replace("<#", "").replace(">", "")))
-            except BaseException:
+            except ValueError:
                 await ctx.send(
                     await self.bot._(ctx.guild.id, "message_manager.no-channel")
                 )
                 return
-                
+
         if not isinstance(channel, discord.abc.Messageable):
             await ctx.send(await self.bot._(ctx.guild.id, "message_manager.no-channel"))
             return
@@ -221,7 +233,7 @@ class MessageManager(commands.Cog):
             return
 
         # Check member permissions
-        if (not channel.permissions_for(author).manage_messages):
+        if not channel.permissions_for(author).manage_messages:
             embed = discord.Embed(
                 description=await self.bot._(
                     ctx.guild.id, "message_manager.permission"
@@ -296,13 +308,13 @@ class MessageManager(commands.Cog):
         counter = 0
 
         # Retrieves the message list from msg1 to msg2
-        await moveMessage(msg1, webhook, thread=thread)
+        await move_message(msg1, webhook, thread=thread)
         async for msg in msg1.channel.history(
             limit=200, after=msg1.created_at, before=msg2, oldest_first=True
         ):
-            await moveMessage(msg, webhook, thread=thread)
+            await move_message(msg, webhook, thread=thread)
             counter += 1
-        await moveMessage(msg2, webhook, thread=thread)
+        await move_message(msg2, webhook, thread=thread)
 
         if confirm:
             # Creates an embed to notify that the messages have been moved
@@ -326,12 +338,12 @@ class MessageManager(commands.Cog):
         await webhook.delete()
 
 
-# The End.
-config = {}
-async def setup(bot:Gunibot=None, plugin_config:dict=None):
+async def setup(bot:Gunibot=None):
+    """
+    Fonction d'initialisation du plugin
+
+    :param bot: Le bot
+    :type bot: Gunibot
+    """
     if bot is not None:
         await bot.add_cog(MessageManager(bot), icon="📋")
-    if plugin_config is not None:
-        global config
-        config.update(plugin_config)
-

@@ -13,7 +13,7 @@ from utils import Gunibot, MyContext
 
 
 class Perms(commands.Cog):
-    """Cog with a single command, allowing you to see the permissions of a member or a role in a channel."""
+    """Cog with a command allowing you to see the permissions of a member or a role in a channel."""
 
     def __init__(self, bot: Gunibot):
         self.bot = bot
@@ -84,9 +84,9 @@ class Perms(commands.Cog):
         if perms is None:
             return
 
-        async def perms_tr(x) -> str:
+        async def perms_tr(perm) -> str:
             """Get the translation of a permission"""
-            return await self.bot._(ctx.guild.id, "perms.list." + x)
+            return await self.bot._(ctx.guild.id, "perms.list." + perm)
 
         # Get the perms translations
         if perms.administrator:
@@ -131,14 +131,10 @@ class Perms(commands.Cog):
             await ctx.send(embed=embed)
             # Thanks to Gio for the Command.
         else:
-            try:
-                await ctx.send(
-                    "**Permission de '{}' :**\n\n".format(name.replace("@", ""))
-                    + "\n".join(permsl)
-                )
-            except BaseException:
-                pass
+            await ctx.send(
+                f"**Permission de '{name.replace('@', '')}' :**\n\n" + "\n".join(permsl),
+            )
 
 
-async def setup(bot: Gunibot = None, plugin_config: dict = None):
+async def setup(bot: Gunibot = None):
     await bot.add_cog(Perms(bot))
