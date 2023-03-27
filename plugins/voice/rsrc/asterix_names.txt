@@ -8,12 +8,10 @@ Afnor
 Agecanonix
 Alafolix
 Alambix
-Alambix
 Allégorix
 Alpaga Quiquilfus
 Alpha
 Altotax
-Amnésix
 Amnésix
 Amonbofis
 Amoniake
@@ -30,9 +28,7 @@ Antrax
 Apeldjus
 Aplusbégalix
 Apollosix
-Apollosix
 Appatix
-Archéoptérix
 Archéoptérix
 Arnica
 Arrierboutix
@@ -56,7 +52,6 @@ Bainpublix
 Ballondebaudrus
 Barbecus
 Barométrix
-Barométrix
 Batdaf
 Bathyscaf
 Beaufix
@@ -74,7 +69,6 @@ Boetanix
 Bonemine
 Bonus Promoplus
 Bonusmalus
-Boufiltre
 Boufiltre
 Boulimix
 Briseradius
@@ -109,11 +103,9 @@ Calvados
 Camomilla
 Canabis
 Canalplus
-Canalplus
 Caraf
 Carferrix
 Carlus
-Cartapus
 Cartapus
 Casseurdebric
 Cassivellaunos
@@ -129,7 +121,6 @@ Chipolata
 Choléramorbus
 Chorus
 Choucroutgarnix
-Cicatrix
 Cicatrix
 Cimbres
 Cinématograf
@@ -180,7 +171,6 @@ Dactilograf
 Danlax
 Deprus
 Diagnostix
-Diagnostix
 Diorix
 Distributiondéprix
 Dithyrambix
@@ -207,7 +197,6 @@ Facederax
 Faimoiducuscus
 Faitexcus
 Falbala
-Falbala
 Falérius
 Fanzine
 Farfelus
@@ -226,11 +215,9 @@ Fredus
 Furax
 Fécarabos
 Galantine
-Galantine
 Garedefréjus
 Garmonparnas
 Garotiphus
-Gasdechix
 Gasdechix
 Gazpachoandalus
 Ginfis
@@ -269,7 +256,6 @@ Hållgerd
 Idéfix
 Imporexpor
 Industrichimix
-Informatix
 Informatix
 Invinoveritas
 Ipipourax
@@ -324,7 +310,6 @@ Mac Oloch
 Mac Quenoth
 Mac Reese
 Mac Robiotik
-Mac Robiotik
 Madamboevarix
 Madmax
 Maelencolix
@@ -353,7 +338,6 @@ Mixomatos
 Monosyllabix
 Montladsus
 Moralélastix
-Moralélastix
 Mordicus
 Motus
 Motussébouchecousus
@@ -375,7 +359,6 @@ Nexusis
 Nicotine
 Niphéniafer
 Nonantesix
-Nonantesix
 Numerusclausus
 Numéric
 Numérobis
@@ -393,7 +376,6 @@ Ohis
 Okéibos
 Olaf
 Olaf Grossebaf
-Olibrius
 Olibrius
 Olive Escartefix
 Olyunidislov
@@ -425,7 +407,6 @@ Pasunmotdeplus
 Patafix
 Pataquès
 Patologix
-Patologix
 Pectine
 Percaline
 Perclus
@@ -453,22 +434,16 @@ Pocatalitix
 Ponce Pénates
 Porc-Epix
 Porquépix
-Porquépix
 Pourkoipàh
 Praline
 Premiéprix
 Processus
 Prolix
 Pronostix
-Pronostix
 Prospectus
-Prospectus
-Prospectus
-Préfix
 Préfix
 Ptolémée XV
 Purmerinos
-Pyrotecnix
 Pyrotecnix
 Pépé
 Périféric
@@ -478,11 +453,9 @@ Quelquilfus
 Quintilius
 Racinecubix
 Radius
-Radius
 Rahàzade
 Ramollix
 Reflus
-Relax
 Relax
 Retraitarix
 Rictus
@@ -507,7 +480,6 @@ Schumix
 Sciencinfus
 Seinesaintdenis
 Selfservix
-Septantesix
 Septantesix
 Seurhàne
 Sinfonix
@@ -539,7 +511,6 @@ Tibérius Entreméfrancorus
 Ticketbus
 Tifus
 Tikedbus
-Tikedbus
 Tiramisus
 Titus Résidus
 Tohubohus
@@ -565,7 +536,6 @@ Tullius Stratocumulus
 Tumehéris
 Tumulus
 Téléféric
-Télégraf
 Télégraf
 Télégraphix
 Têtedepiaf
@@ -598,4 +568,4 @@ Zøødvinsen
 Épaf
 Épitaf
 Éponine
-Øbsen 
+Øbsen
