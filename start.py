@@ -118,6 +118,16 @@ def main():
             logs.info("Connected on " + str(len(client.guilds)) + " servers")
         loaded, failed = await load(client, global_systems, plugins)
         logs.info(f"{loaded} plugins loaded, {failed} plugins failed")
+
+        # Syncing slash commands
+        logs.info("♻️ Syncing app commands...")
+        try:
+            await client.tree.sync()
+        except discord.DiscordException as e:
+            logs.error(f"⚠️ Error while syncing app commands: {e}")
+        else:
+            logs.info("✅ App commands synced")
+
         print(
             "--------------------------------------------------------------------------------"
         )
