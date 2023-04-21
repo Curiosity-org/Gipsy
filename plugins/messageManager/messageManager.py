@@ -71,7 +71,11 @@ class MessageManager(commands.Cog):
 
         if (member is not None and text is not None): # c'est python, autant être verbeux
             # Create a webhook in the image of the targeted member
-            webhook = await ctx.channel.create_webhook(name=member.display_name)
+            if isinstance(ctx.channel, discord.Thread):
+                channel = ctx.channel.parent
+            else:
+                channel = ctx.channel
+            webhook = await channel.create_webhook(name=member.display_name)
             await webhook.send(content=text, avatar_url=member.display_avatar)
 
             # Deletes the original message as well as the webhook
