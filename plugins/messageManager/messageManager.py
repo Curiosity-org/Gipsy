@@ -69,18 +69,17 @@ class MessageManager(commands.Cog):
     ):
         """Say something with someone else's appearance"""
 
-        if (member is not None and text is not None): # c'est python, autant être verbeux
-            # Create a webhook in the image of the targeted member
-            if isinstance(ctx.channel, discord.Thread):
-                channel = ctx.channel.parent
-            else:
-                channel = ctx.channel
-            webhook = await channel.create_webhook(name=member.display_name)
-            await webhook.send(content=text, avatar_url=member.display_avatar)
+        # Create a webhook in the image of the targeted member
+        if isinstance(ctx.channel, discord.Thread):
+            channel = ctx.channel.parent
+        else:
+            channel = ctx.channel
+        webhook = await channel.create_webhook(name=member.display_name)
+        await webhook.send(content=text, avatar_url=member.display_avatar)
 
             # Deletes the original message as well as the webhook
-            await webhook.delete()
-            await ctx.message.delete()
+        await webhook.delete()
+        await ctx.message.delete()
 
     # ----------------#
     # Command /move #
