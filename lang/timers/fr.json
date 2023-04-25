@@ -1,0 +1,32 @@
+{
+    "rmd": {
+        "cancelled": "Abandon de la procédure",
+        "cleared": "Vos rappels ont bien été supprimés !",
+        "confirm": "Êtes-vous sûr de vouloir supprimer tous vos rappels ? (%{count} en cours)",
+        "custom-duration": {
+            "button": "Autre durée",
+            "title": "Durée personnalisée de rappel",
+            "input": "Entrez une durée pour votre rappel"
+        },
+        "delete": {
+            "error": "Un problème est survenu lors de la suppression de vos rappels. Veuillez réessayer ou contacter notre support.",
+            "success": {
+                "one": "Votre rappel a bien été supprimé !",
+                "other": "%{count} de vos rappels ont bien été supprimés !"
+            },
+            "title": "Choisissez quel(s) rappel(s) vous souhaitez supprimer"
+        },
+        "embed-asked": "%{user}, vous m'avez demandé il y a %{duration} de vous rappeler ceci :",
+        "embed-date": "Date de la demande",
+        "embed-link": "Message d'origine",
+        "embed-title": "Rappel",
+        "empty": "Oups, vous n'avez aucun rappel en cours...",
+        "item": "ID : `{id}` | Dans : {duration} | Salon : {channel} | Message : {msg}",
+        "recreated": "Un nouveau rappel a bien été créé pour dans %{duration}!",
+        "saved": "C'est noté ! Je vous le rappelerai dans %{duration}",
+        "select-placeholder": "Sélectionnez un ou plusieurs rappels",
+        "title": "Liste de vos rappels",
+        "too-long": "Impossible de mettre une durée aussi longue",
+        "too-short": "Vous avez saisi une durée invalide"
+    }
+}

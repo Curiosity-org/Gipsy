@@ -1,0 +1,62 @@
+{
+    "activity": {
+        "listen": "écoute",
+        "nothing": "rien",
+        "play": "joue à",
+        "stream": "stream",
+        "watch": "regarde"
+    },
+    "added_at": "Ajouté le",
+    "beginning": "début",
+    "bot": "bot",
+    "btn": {
+        "cancel": {
+            "answer": "Choix annulé",
+            "label": "Annuler"
+        },
+        "confirm": {
+            "answer": "Choix confirmé",
+            "label": "Confirmer"
+        },
+        "delete": {
+            "answer": "Supprimé !",
+            "label": "Supprimer"
+        }
+    },
+    "case": "casier",
+    "category": "catégorie",
+    "click_here": "Cliquez ici",
+    "dnd": "ne pas déranger",
+    "doc": "Documentation",
+    "done!": "Fait !",
+    "duration": "durée",
+    "end": "fin",
+    "example": {
+        "one": "exemple",
+        "other": "exemples"
+    },
+    "extreme": "extrême",
+    "ghost": "Fantôme",
+    "high": "élevé",
+    "highest": "très élevé",
+    "idle": "inactif",
+    "low": "faible",
+    "medium": "moyen",
+    "member": "membre",
+    "membres": "membres",
+    "name": "nom",
+    "no": "non",
+    "none": "aucun",
+    "offline": "hors ligne",
+    "online": "en ligne",
+    "quit": "quitter",
+    "reason": "raison",
+    "request_by": "Demandé par %{user}",
+    "server": "serveur",
+    "servers": "serveurs",
+    "since": "depuis",
+    "unknown": "Inconnu",
+    "verified": "vérifié",
+    "version": "version",
+    "yes": "oui"
+}

@@ -1,0 +1,38 @@
+# Python executables
+*.pyc
+__pycache__
+fcts/tokens.py
+fcts/cryptage.py
+fcts/test.py
+fcts/libs_testing.py
+fcts/requirements
+fcts/secret.py
+backup/*
+start2.py
+env/
+
+# Mac folders
+.DS_Store
+
+# VScode properties
+.vscode
+
+# Miscellaneous
+*.log
+*.log.*
+._*
+translation/*
+docs/_*
+rankcards_update.json
+*-cache.json
+*.tar
+libs/*/data/*.pkl
+libs/*/data/base_websites.csv
+
+# private assets
+assets/card-models/*.png
+assets/cards/*.png
+assets/images/*
+
+# SonarQube
+.scannerwork/

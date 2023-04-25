@@ -1,0 +1,7 @@
+{
+    "deleted": {
+        "many": "%{count} salons supprimés",
+        "one": "1 salon supprimé"
+    },
+    "no-channel": "Il n'y a aucun salon vocal généré dans ce serveur"
+}

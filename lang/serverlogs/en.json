@@ -1,0 +1,30 @@
+{
+    "categories": {
+        "automod": "Automod",
+        "bot": "Bot",
+        "members": "Members",
+        "messages": "Messages",
+        "moderation": "Moderation",
+        "other": "Other",
+        "roles": "Roles",
+        "tickets": "Tickets"
+    },
+    "disabled": {
+        "current": "Logs of type %{kind} will no longer be sent to this channel",
+        "other": "Logs of type %{kind} will no longer be sent to %{channel}"
+    },
+    "embed-warning": "To send logs, the bot needs the \"Embed links\" permission!",
+    "enabled": {
+        "current": "Logs of type %{kind} will now be sent to this channel",
+        "other": "Logs of type %{kind} will now be sent to %{channel}"
+    },
+    "list": {
+        "all": "List of available logs",
+        "channel": "List of logs used in %{channel}",
+        "emojis": "%{enabled} are for modlogs enabled in your server\n%{disabled} are for other available modlogs",
+        "guild": "List of logs used in this server",
+        "none": "No log is used here. Use `%{cmd}` to start getting logs"
+    },
+    "none-added": "This channel is already subscribed to all these logs!",
+    "none-removed": "This channel was already subscribed to none of these logs!"
+}

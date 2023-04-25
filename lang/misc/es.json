@@ -1,0 +1,9 @@
+{
+    "activity": {
+        "listen": "escuchando",
+        "nothing": "nada",
+        "play": "jugando",
+        "stream": "transmitiendo",
+        "watch": "viendo"
+    }
+}
