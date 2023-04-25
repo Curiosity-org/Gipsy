@@ -65,7 +65,7 @@ class MessageManager(commands.Cog):
     @commands.guild_only()
     @commands.has_permissions(manage_messages=True, manage_nicknames=True)
     async def imitate(
-        self, ctx: commands.Context, member: discord.Member = None, *, text=None
+        self, ctx: commands.Context, member: discord.Member, *, text: str
     ):
         """Say something with someone else's appearance"""
 
