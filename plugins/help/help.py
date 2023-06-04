@@ -388,7 +388,7 @@ class Help(commands.HelpCommand):
                 inline=False,
             )
 
-    async def send_bot_help(self, mappings) -> None: # pylint: disable=not-accessed
+    async def send_bot_help(self, mappings) -> None: # pylint: disable=unused-argument
         """Send the help message for the bot in the context channel"""
         ctx = self.context
         bot: Gunibot = ctx.bot
