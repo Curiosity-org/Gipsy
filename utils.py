@@ -5,12 +5,12 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-import logging
-import sqlite3
 import json
-import sys
-from typing import Any, Callable, Coroutine, Dict, Union, List, TYPE_CHECKING
+import logging
 import os
+import sqlite3
+import sys
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, List, Union
 
 import discord
 from discord.ext import commands
@@ -213,13 +213,16 @@ class Gunibot(commands.bot.AutoShardedBot):
         return result
 
     @property
-    def _(self) -> Callable[[Any, str], Coroutine[Any, Any, str]]:
-        """
-        Traduire un texte
+    def _(self) -> Callable[..., Awaitable[str]]:
+        """Translate something
+        
+        :param context: The guild, channel or user for which to translate
+        :param key: The key to translate
+        :param kwargs: The arguments to pass to the translation
 
-        :return: La fonction de traduction
+        :return: The translated string
         """
-        cog = self.get_cog("Languages")
+        cog = self.get_cog('Languages')
         if cog is None:
             self.log.error("Unable to load Languages cog")
             return lambda *args, **kwargs: args[1]
