@@ -175,9 +175,7 @@ def advanced_setup():
         if choice != "":
             admins = choice.replace(" ", "").split(",")
             try:
-                for admin in admins:
-                    admin = int(admin)
-                _global_config["bot"]["admins"] = admins
+                _global_config["bot"]["admins"] = [int(admin_id) for admin_id in admins]
             except ValueError:
                 print(
                     f"{color.fg.red}👑 Invalid entry. Only user ID (integers),"\
