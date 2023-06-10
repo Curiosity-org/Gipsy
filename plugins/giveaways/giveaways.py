@@ -12,7 +12,6 @@ from marshal import dumps, loads
 from typing import Any, Optional, Sequence, Union
 
 import discord
-import emoji
 from discord import app_commands
 from discord.ext import commands, tasks
 
@@ -25,8 +24,6 @@ class Giveaways(commands.Cog):
 
     def __init__(self, bot: Gunibot):
         self.bot = bot
-        self.config_options = ["giveaways_emojis"]
-        bot.get_command("config").add_command(self.giveaways_emojis)
 
     async def cog_load(self):
         self.internal_task.start() # pylint: disable=no-member
@@ -46,36 +43,6 @@ class Giveaways(commands.Cog):
             winners = await self.pick_winners(serv, giveaway)
             await self.send_results(giveaway, winners)
             self.db_stop_giveaway(giveaway["rowid"])
-
-
-    @commands.command(name="giveaways_emojis")
-    async def giveaways_emojis(
-        self, ctx: MyContext, emojis: commands.Greedy[Union[discord.Emoji, str]]
-    ):
-        """Set a list of usable emojis for giveaways
-        Only these emojis will be usable to participate in a giveaway
-        If no emoji is specified, every emoji will be usable"""
-        # check if every emoji is valid
-        filtered_emojis = [
-            x for x in emojis if isinstance(x, discord.Emoji) or emoji.is_emoji(x)
-        ]
-        # if one or more emojis were invalid (couldn't be converted)
-        if len(ctx.args[2]) != len(filtered_emojis):
-            await ctx.send(await self.bot._(ctx.guild.id, "sconfig.invalid-emoji"))
-            return
-        # if user didn't specify any emoji
-        if len(filtered_emojis) == 0:
-            filtered_emojis = None
-        else:
-            # convert discord emojis to IDs if needed
-            filtered_emojis = [
-                str(x.id) if isinstance(x, discord.Emoji) else x
-                for x in filtered_emojis
-            ]
-        # save result
-        await ctx.send(
-            await self.bot.sconfig.edit_config(ctx.guild.id, "giveaways_emojis", filtered_emojis)
-        )
 
     def db_add_giveaway(
         self,
@@ -133,19 +100,19 @@ class Giveaways(commands.Cog):
             data["ends_at"] = datetime.datetime.strptime(data["ends_at"], "%Y-%m-%d %H:%M:%S")
         return res
 
-    def db_get_users(self, row_id: int) -> list[int] | None:
+    def db_get_users(self, giveaway_id: int) -> list[int] | None:
         """
         Get the users participating into a giveaway via command
         rowID: the ID of the giveaway to edit
         Returns: list of users IDs
         """
         query = "SELECT users FROM giveaways WHERE rowid=?"
-        res: list[dict[str, bytes]] = self.bot.db_query(query, (row_id,))
+        res: list[dict[str, bytes]] = self.bot.db_query(query, (giveaway_id,))
         if len(res) == 0:
             return None
         return loads(res[0]["users"])
 
-    def db_edit_participant(self, row_id: int, user_id: int, add: bool = True) -> bool:
+    def db_edit_participant(self, giveaway_id: int, user_id: int, add: bool = True) -> bool:
         """
         Add a participant to a giveaway
         rowID: the ID of the giveaway to edit
@@ -153,7 +120,7 @@ class Giveaways(commands.Cog):
         add: if we should add or remove the user
         Returns: if the operation succeed
         """
-        current_participants = self.db_get_users(row_id)
+        current_participants = self.db_get_users(giveaway_id)
         if current_participants is None:
             # means that the giveaway doesn't exist
             return False
@@ -170,47 +137,29 @@ class Giveaways(commands.Cog):
                 return False
             current_participants = dumps(current_participants)
         query = "UPDATE giveaways SET users=? WHERE rowid=?"
-        rowcount = self.bot.db_query(query, (row_id, user_id), returnrowcount=True)
+        rowcount = self.bot.db_query(query, (giveaway_id, user_id), returnrowcount=True)
         return rowcount != 0
 
-    def db_stop_giveaway(self, row_id: int) -> bool:
+    def db_stop_giveaway(self, giveaway_id: int) -> bool:
         """
         Stop a giveaway
         rowID: the ID of the giveaway to stop
         Returns: if the giveaway has successfully been stopped
         """
         query = "UPDATE giveaways SET running=0 WHERE rowid=?"
-        rowcount = self.bot.db_query(query, (row_id,), returnrowcount=True)
+        rowcount = self.bot.db_query(query, (giveaway_id,), returnrowcount=True)
         return rowcount == 1
 
-    def db_delete_giveaway(self, row_id: int) -> bool:
+    def db_delete_giveaway(self, giveaway_id: int) -> bool:
         """
         Delete a giveaway from the database
         rowID: the ID of the giveaway to delete
         Returns: if the giveaway has successfully been deleted
         """
         query = "DELETE FROM giveaways WHERE rowid=?"
-        rowcount = self.bot.db_query(query, (row_id,), returnrowcount=True)
+        rowcount = self.bot.db_query(query, (giveaway_id,), returnrowcount=True)
         return rowcount == 1
 
-    async def get_allowed_emojis(self, guild_id: int) -> list[discord.Emoji | str] | None:
-        """Get a list of allowed emojis for a specific guild"""
-        value: str | list[str] = self.bot.server_configs[guild_id]["giveaways_emojis"]
-        if value is None:
-            return None
-
-        def emojis_convert(s_emoji: str) -> Union[str, discord.Emoji]:
-            if s_emoji.isnumeric():
-                d_em = discord.utils.get(self.bot.emojis, id=int(s_emoji))
-                if d_em is not None:
-                    return d_em
-            return emoji.emojize(s_emoji, language="alias")
-
-        value = [value] if isinstance(value, str) else value
-        result = list(filter(None, [emojis_convert(x) for x in value]))
-        if len(result) >= 0:
-            return result
-        return None
 
     @commands.hybrid_group(aliases=["gaw", "giveaways"])
     @commands.guild_only()
@@ -356,18 +305,6 @@ class Giveaways(commands.Cog):
             await ctx.send(
                 await self.bot._(ctx.guild.id, "giveaways.something-went-wrong")
             )
-        allowed_emojis = await self.get_allowed_emojis(ctx.guild.id)
-        if allowed_emojis is None:
-            return
-        if msg.channel.permissions_for(ctx.guild.me).add_reactions:
-            try:
-                for allowed_emoji in allowed_emojis:
-                    try:
-                        await msg.add_reaction(allowed_emoji)
-                    except discord.NotFound:
-                        pass
-            except discord.Forbidden:
-                pass
 
     @giveaway.command(name="stop")
     @commands.check(checks.is_server_manager)
@@ -463,10 +400,7 @@ class Giveaways(commands.Cog):
                 )
             )
             return
-        allowed_reactions = await self.get_allowed_emojis(ctx.guild.id)
-        users = set(giveaway["users"]) | await self.get_users(
-            giveaway["channel"], giveaway["message"], allowed_reactions
-        )
+        users = set(giveaway["users"])
         if len(users) == 0:
             await ctx.send(
                 await self.bot._(ctx.guild.id, "giveaways.picking.no-participant")
@@ -627,13 +561,7 @@ class Giveaways(commands.Cog):
             )
             return
         giveaway = fileterd_giveaway[0]
-        allowed_reactions = await self.get_allowed_emojis(ctx.guild.id)
-        entries = len(
-            set(giveaway["users"])
-            | await self.get_users(
-                giveaway["channel"], giveaway["message"], allowed_reactions
-            )
-        )
+        entries = len(set(giveaway["users"]))
         start, end = datetime.datetime.now(), giveaway["ends_at"]
         if start < end:
             time_left = await self.bot.get_cog("TimeCog").time_delta(
@@ -707,23 +635,19 @@ class Giveaways(commands.Cog):
 
         Returns a list of members
         """
-        allowed_reactions = await self.get_allowed_emojis(guild.id)
-        users = set(giveaway["users"]) | await self.get_users(
-            giveaway["channel"], giveaway["message"], allowed_reactions
-        )
+        users = set(giveaway["users"])
         if len(users) == 0:
             return []
-        else:
-            amount = min(giveaway["max_entries"], len(users))
-            winners = []
-            trials = 0
-            users = list(users)
-            while len(winners) < amount and trials < 20:
-                winner = discord.utils.get(guild.members, id=random.choice(users))
-                if winner is not None:
-                    winners.append(winner)
-                else:
-                    trials += 1
+        amount = min(giveaway["max_entries"], len(users))
+        winners = []
+        trials = 0
+        users = list(users)
+        while len(winners) < amount and trials < 20:
+            winner = discord.utils.get(guild.members, id=random.choice(users))
+            if winner is not None:
+                winners.append(winner)
+            else:
+                trials += 1
         return winners
 
     async def send_results(self, giveaway: dict, winners: list[discord.Member]):
