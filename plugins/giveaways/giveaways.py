@@ -13,6 +13,7 @@ from typing import Any, Optional, Sequence, Union
 
 import discord
 import emoji
+from discord import app_commands
 from discord.ext import commands, tasks
 
 from bot import args, checks
@@ -211,15 +212,16 @@ class Giveaways(commands.Cog):
             return result
         return None
 
-    @commands.group(aliases=["gaw", "giveaways"])
+    @commands.hybrid_group(aliases=["gaw", "giveaways"])
     @commands.guild_only()
+    @app_commands.default_permissions(manage_guild=True)
     async def giveaway(self, ctx: MyContext):
         """Start or stop giveaways."""
         if ctx.subcommand_passed is None:
             await ctx.send_help("giveaways")
 
-    @giveaway.command()
-    @commands.check(checks.is_admin)
+    @giveaway.command(name="start")
+    @commands.check(checks.is_server_manager)
     async def gw_start(self, ctx: MyContext, *, settings: str):
         """Start a giveaway
         Usage"
@@ -367,8 +369,8 @@ class Giveaways(commands.Cog):
             except discord.Forbidden:
                 pass
 
-    @giveaway.command()
-    @commands.check(checks.is_admin)
+    @giveaway.command(name="stop")
+    @commands.check(checks.is_server_manager)
     async def gw_stop(self, ctx: MyContext, *, giveaway_name: str):
         """Stops a giveaway early so you can pick a winner
         Example:
@@ -396,8 +398,8 @@ class Giveaways(commands.Cog):
         self.db_stop_giveaway(giveaway["rowid"])
         await self.send_results(giveaway, await self.pick_winners(ctx.guild, giveaway))
 
-    @giveaway.command()
-    @commands.check(checks.is_admin)
+    @giveaway.command(name="delete")
+    @commands.check(checks.is_server_manager)
     async def gw_delete(self, ctx: MyContext, *, giveaway_name: str):
         """
         Delete a giveaway from the database
@@ -426,12 +428,12 @@ class Giveaways(commands.Cog):
                 await self.bot._(ctx.guild.id, "giveaways.something-went-wrong")
             )
 
-    @giveaway.command()
+    @giveaway.command(name="pick-winners", aliases=["pick"])
     @commands.check(checks.is_admin)
     async def gw_pick(self, ctx: MyContext, *, giveaway_name: str):
         """Picks winners for the giveaway, which usually should be 1
         Example:
-        [p]giveaway pick Minecraft account
+        [p]giveaway pick-winners Minecraft account
         (This will pick winners from all the people who entered the Minecraft account giveaway)
         """
         giveaways = self.db_get_giveaways(ctx.guild.id)
@@ -492,93 +494,93 @@ class Giveaways(commands.Cog):
             )
             await status.edit(content=txt)
 
-    @giveaway.command()
-    @commands.cooldown(2, 40, commands.BucketType.user)
-    async def gw_enter(self, ctx: MyContext, *, giveaway: str):
-        """Enter a giveaway.
-        Example:
-        [p]giveaway enter Minecraft account"""
-        if ctx.author.bot:
-            await ctx.send("Les bots ne peuvent pas participer à un giveaway !")
-            return
-        author = ctx.message.author
+    # @giveaway.command()
+    # @commands.cooldown(2, 40, commands.BucketType.user)
+    # async def gw_enter(self, ctx: MyContext, *, giveaway: str):
+    #     """Enter a giveaway.
+    #     Example:
+    #     [p]giveaway enter Minecraft account"""
+    #     if ctx.author.bot:
+    #         await ctx.send("Les bots ne peuvent pas participer à un giveaway !")
+    #         return
+    #     author = ctx.message.author
 
-        giveaways = self.db_get_giveaways(ctx.guild.id)
-        if len(giveaways) == 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
-            return
-        giveaways = [
-            x for x in giveaways if x["name"] == giveaway or str(x["rowid"]) == giveaway
-        ]
-        if len(giveaways) == 0:
-            await ctx.send(
-                await self.bot._(
-                    ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix
-                )
-            )
-            return
-        giveaway_data = giveaways[0]
-        if author.id in giveaway_data["users"]:
-            await ctx.send(
-                await self.bot._(ctx.guild.id, "giveaways.already-participant")
-            )
-        elif not giveaway_data["running"]:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.been-stopped"))
-        else:
-            if self.db_edit_participant(giveaway_data["rowid"], author.id):
-                await ctx.send(
-                    await self.bot._(
-                        ctx.guild.id, "giveaways.subscribed", name=giveaway_data["name"]
-                    )
-                )
-            else:
-                await ctx.send(
-                    await self.bot._(ctx.guild.id, "giveaways.something-went-wrong")
-                )
+    #     giveaways = self.db_get_giveaways(ctx.guild.id)
+    #     if len(giveaways) == 0:
+    #         await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
+    #         return
+    #     giveaways = [
+    #         x for x in giveaways if x["name"] == giveaway or str(x["rowid"]) == giveaway
+    #     ]
+    #     if len(giveaways) == 0:
+    #         await ctx.send(
+    #             await self.bot._(
+    #                 ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix
+    #             )
+    #         )
+    #         return
+    #     giveaway_data = giveaways[0]
+    #     if author.id in giveaway_data["users"]:
+    #         await ctx.send(
+    #             await self.bot._(ctx.guild.id, "giveaways.already-participant")
+    #         )
+    #     elif not giveaway_data["running"]:
+    #         await ctx.send(await self.bot._(ctx.guild.id, "giveaways.been-stopped"))
+    #     else:
+    #         if self.db_edit_participant(giveaway_data["rowid"], author.id):
+    #             await ctx.send(
+    #                 await self.bot._(
+    #                     ctx.guild.id, "giveaways.subscribed", name=giveaway_data["name"]
+    #                 )
+    #             )
+    #         else:
+    #             await ctx.send(
+    #                 await self.bot._(ctx.guild.id, "giveaways.something-went-wrong")
+    #             )
 
-    @giveaway.command()
-    @commands.cooldown(2, 40, commands.BucketType.user)
-    async def gw_leave(self, ctx: MyContext, *, giveaway: str):
-        """Leave a giveaway.
-        Example:
-        [p]giveaway leave Minecraft account"""
-        if ctx.author.bot:
-            await ctx.send("Les bots ne peuvent pas participer à un giveaway !")
-            return
-        author = ctx.message.author
+    # @giveaway.command()
+    # @commands.cooldown(2, 40, commands.BucketType.user)
+    # async def gw_leave(self, ctx: MyContext, *, giveaway: str):
+    #     """Leave a giveaway.
+    #     Example:
+    #     [p]giveaway leave Minecraft account"""
+    #     if ctx.author.bot:
+    #         await ctx.send("Les bots ne peuvent pas participer à un giveaway !")
+    #         return
+    #     author = ctx.message.author
 
-        giveaways = self.db_get_giveaways(ctx.guild.id)
-        if len(giveaways) == 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
-            return
-        giveaways = [
-            x for x in giveaways if x["name"] == giveaway or str(x["rowid"]) == giveaway
-        ]
-        if len(giveaways) == 0:
-            await ctx.send(
-                await self.bot._(
-                    ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix
-                )
-            )
-            return
-        giveaway_data = giveaways[0]
-        if author.id not in giveaway_data["users"]:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.already-left"))
-        elif not giveaway_data["running"]:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.been-stopped"))
-        else:
-            if self.db_edit_participant(giveaway_data["rowid"], author.id, add=False):
-                await ctx.send(
-                    await self.bot._(
-                        ctx.guild.id, "giveaways.success-left", name=giveaway_data["name"]
-                    )
-                )
-            else:
-                await ctx.send(
-                    await self.bot._(ctx.guild.id, "giveaways.something-went-wrong")
-                )
+    #     giveaways = self.db_get_giveaways(ctx.guild.id)
+    #     if len(giveaways) == 0:
+    #         await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
+    #         return
+    #     giveaways = [
+    #         x for x in giveaways if x["name"] == giveaway or str(x["rowid"]) == giveaway
+    #     ]
+    #     if len(giveaways) == 0:
+    #         await ctx.send(
+    #             await self.bot._(
+    #                 ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix
+    #             )
+    #         )
+    #         return
+    #     giveaway_data = giveaways[0]
+    #     if author.id not in giveaway_data["users"]:
+    #         await ctx.send(await self.bot._(ctx.guild.id, "giveaways.already-left"))
+    #     elif not giveaway_data["running"]:
+    #         await ctx.send(await self.bot._(ctx.guild.id, "giveaways.been-stopped"))
+    #     else:
+    #         if self.db_edit_participant(giveaway_data["rowid"], author.id, add=False):
+    #             await ctx.send(
+    #                 await self.bot._(
+    #                     ctx.guild.id, "giveaways.success-left", name=giveaway_data["name"]
+    #                 )
+    #             )
+    #         else:
+    #             await ctx.send(
+    #                 await self.bot._(ctx.guild.id, "giveaways.something-went-wrong")
+    #             )
 
-    @giveaway.command()
+    @giveaway.command(name="list-giveaways", alias=["list"])
     async def gw_list(self, ctx: MyContext):
         """lists all giveaways running in this server"""
         server = ctx.message.guild
@@ -603,7 +605,7 @@ class Giveaways(commands.Cog):
                 text = await self.bot._(ctx.guild.id, "giveaways.no-giveaway")
             await ctx.send(text)
 
-    @giveaway.command()
+    @giveaway.command(name="info")
     async def gw_info(self, ctx: MyContext, *, giveaway_name: str):
         """Get information for a giveaway
         Example:
