@@ -16,6 +16,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 
 from bot import args, checks
+from .src.view import GiveawayView
 from utils import Gunibot, MyContext
 
 
@@ -42,7 +43,7 @@ class Giveaways(commands.Cog):
                 continue
             winners = await self.pick_winners(serv, giveaway)
             await self.send_results(giveaway, winners)
-            self.db_stop_giveaway(giveaway["rowid"])
+            self.db_delete_giveaway(giveaway["rowid"])
 
     def db_add_giveaway(
         self,
@@ -88,6 +89,19 @@ class Giveaways(commands.Cog):
             data["ends_at"] = datetime.datetime.strptime(data["ends_at"], "%Y-%m-%d %H:%M:%S")
         return res
 
+    def db_get_giveaway(self, giveaway_id: int) -> Optional[dict]:
+        """
+        Get a giveaway from its ID
+        guildID: the guild (server) ID
+        Returns: a list of dicts containing the giveaways info
+        """
+        query = "SELECT rowid, * FROM giveaways WHERE rowid=?"
+        res: list[dict[str, Any]] = self.bot.db_query(query, (giveaway_id,))
+        for data in res:
+            data["users"] = loads(data["users"])
+            data["ends_at"] = datetime.datetime.strptime(data["ends_at"], "%Y-%m-%d %H:%M:%S")
+        return res[0] if res else None
+
     def db_get_expired_giveaways(self) -> list[dict]:
         """
         Get every running giveaway
@@ -123,6 +137,7 @@ class Giveaways(commands.Cog):
         current_participants = self.db_get_users(giveaway_id)
         if current_participants is None:
             # means that the giveaway doesn't exist
+            self.bot.log.warning(f"[gaw] Giveaway {giveaway_id} doesn't exist")
             return False
         if add:
             if user_id in current_participants:
@@ -137,7 +152,7 @@ class Giveaways(commands.Cog):
                 return False
             current_participants = dumps(current_participants)
         query = "UPDATE giveaways SET users=? WHERE rowid=?"
-        rowcount = self.bot.db_query(query, (giveaway_id, user_id), returnrowcount=True)
+        rowcount = self.bot.db_query(query, (current_participants, giveaway_id), returnrowcount=True)
         return rowcount != 0
 
     def db_stop_giveaway(self, giveaway_id: int) -> bool:
@@ -160,6 +175,22 @@ class Giveaways(commands.Cog):
         rowcount = self.bot.db_query(query, (giveaway_id,), returnrowcount=True)
         return rowcount == 1
 
+
+    @commands.Cog.listener()
+    async def on_interaction(self, interaction: discord.Interaction):
+        """Called when *any* interaction from the bot is created
+        We use it to detect interactions with the Enter button of any giveaway"""
+        if not interaction.guild:
+            # DM: not interesting
+            return
+        if interaction.type != discord.InteractionType.component:
+            # Not button: not interesting
+            return
+        if not interaction.data or not interaction.data.get("custom_id", '').startswith("gaw_"):
+            # Not a giveaway: not interesting
+            return
+        await interaction.response.defer(ephemeral=True)
+        await self.enter_giveaway(interaction)
 
     @commands.hybrid_group(aliases=["gaw", "giveaways"])
     @commands.guild_only()
@@ -192,6 +223,7 @@ class Giveaways(commands.Cog):
             g["name"]
             for g in self.db_get_giveaways(ctx.guild.id)
         }
+        await ctx.defer()
 
         # Setting all of the settings.
         settings_map = {"name": "", "duration": -1, "channel": ctx.channel, "entries": 1}
@@ -301,6 +333,12 @@ class Giveaways(commands.Cog):
                     id=rowid,
                 )
             )
+            view = GiveawayView(
+                self.bot,
+                await self.bot._(ctx.guild.id, "giveaways.view.enter_btn"),
+                custom_id=f"gaw_{rowid}",
+            )
+            await msg.edit(view=view)
         else:
             await ctx.send(
                 await self.bot._(ctx.guild.id, "giveaways.something-went-wrong")
@@ -332,8 +370,8 @@ class Giveaways(commands.Cog):
         if not giveaway["running"]:
             await ctx.send(await self.bot._(ctx.guild.id, "giveaways.already-stopped"))
             return
-        self.db_stop_giveaway(giveaway["rowid"])
         await self.send_results(giveaway, await self.pick_winners(ctx.guild, giveaway))
+        self.db_delete_giveaway(giveaway["rowid"])
 
     @giveaway.command(name="delete")
     @commands.check(checks.is_server_manager)
@@ -365,112 +403,53 @@ class Giveaways(commands.Cog):
                 await self.bot._(ctx.guild.id, "giveaways.something-went-wrong")
             )
 
-    @giveaway.command(name="pick-winners", aliases=["pick"])
-    @commands.check(checks.is_admin)
-    async def gw_pick(self, ctx: MyContext, *, giveaway_name: str):
-        """Picks winners for the giveaway, which usually should be 1
-        Example:
-        [p]giveaway pick-winners Minecraft account
-        (This will pick winners from all the people who entered the Minecraft account giveaway)
-        """
-        giveaways = self.db_get_giveaways(ctx.guild.id)
-        if len(giveaways) == 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
+    async def enter_giveaway(self, interaction: discord.Interaction):
+        "Called when a user press the Enter button"
+        # get back giveaway ID from custom button ID
+        if not interaction.data or not interaction.data["custom_id"]:
             return
-        filtered_giveaway = [
-            x
-            for x in giveaways
-            if x["name"].lower() == giveaway_name.lower() or str(x["rowid"]) == giveaway_name
-        ]
-        if len(filtered_giveaway) == 0:
-            await ctx.send(
+        if not (custom_id := interaction.data["custom_id"]).startswith("gaw_"):
+            return
+        giveaway_id = int(custom_id.replace("gaw_", "", 1))
+        # check if giveaway exists
+        giveaway = self.db_get_giveaway(giveaway_id)
+        if not giveaway:
+            await interaction.followup.send(
+                await self.bot._(interaction.guild_id, "giveaways.something-went-wrong"),
+                ephemeral=True,
+            )
+            raise RuntimeError(f"Unable to find giveaway {giveaway_id}")
+        # check if user is already participating
+        if interaction.user.id in giveaway["users"]:
+            await interaction.followup.send(
+                await self.bot._(interaction.guild_id, "giveaways.already-participant"),
+                ephemeral=True,
+            )
+            return
+        # check if giveaway is still running
+        if not giveaway["running"]:
+            await interaction.followup.send(
+                await self.bot._(interaction.guild_id, "giveaways.been-stopped"),
+                ephemeral=True,
+            )
+            return
+        # try to add user to giveaway
+        if self.db_edit_participant(giveaway["rowid"], interaction.user.id, add=True):
+            await interaction.followup.send(
                 await self.bot._(
-                    ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix
-                )
+                    interaction.guild_id, "giveaways.subscribed", name=giveaway["name"]
+                ),
+                ephemeral=True,
             )
             return
-        giveaway = filtered_giveaway[0]
-        if giveaway["running"]:
-            await ctx.send(
-                await self.bot._(
-                    ctx.guild.id,
-                    "giveaways.not-stopped",
-                    p=ctx.prefix,
-                    id=giveaway["rowid"],
-                )
-            )
-            return
-        users = set(giveaway["users"])
-        if len(users) == 0:
-            await ctx.send(
-                await self.bot._(ctx.guild.id, "giveaways.picking.no-participant")
-            )
-            self.db_delete_giveaway(giveaway["rowid"])
-        else:
-            amount = min(giveaway["max_entries"], len(users))
-            status = await ctx.send("Choix des gagnants...")
-            winners = []
-            trials = 0
-            users = list(users)
-            while len(winners) < amount and trials < 20:
-                winner = discord.utils.get(ctx.guild.members, id=random.choice(users))
-                if winner is not None:
-                    winners.append(winner.mention)
-                else:
-                    trials += 1
-            self.db_delete_giveaway(giveaway["rowid"])
-            txt = await self.bot._(
-                ctx.guild.id,
-                "giveaways.picking.winners",
-                count=amount,
-                users=" ".join(winners),
-                price=giveaway,
-            )
-            await status.edit(content=txt)
-
-    # @giveaway.command()
-    # @commands.cooldown(2, 40, commands.BucketType.user)
-    # async def gw_enter(self, ctx: MyContext, *, giveaway: str):
-    #     """Enter a giveaway.
-    #     Example:
-    #     [p]giveaway enter Minecraft account"""
-    #     if ctx.author.bot:
-    #         await ctx.send("Les bots ne peuvent pas participer à un giveaway !")
-    #         return
-    #     author = ctx.message.author
-
-    #     giveaways = self.db_get_giveaways(ctx.guild.id)
-    #     if len(giveaways) == 0:
-    #         await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
-    #         return
-    #     giveaways = [
-    #         x for x in giveaways if x["name"] == giveaway or str(x["rowid"]) == giveaway
-    #     ]
-    #     if len(giveaways) == 0:
-    #         await ctx.send(
-    #             await self.bot._(
-    #                 ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix
-    #             )
-    #         )
-    #         return
-    #     giveaway_data = giveaways[0]
-    #     if author.id in giveaway_data["users"]:
-    #         await ctx.send(
-    #             await self.bot._(ctx.guild.id, "giveaways.already-participant")
-    #         )
-    #     elif not giveaway_data["running"]:
-    #         await ctx.send(await self.bot._(ctx.guild.id, "giveaways.been-stopped"))
-    #     else:
-    #         if self.db_edit_participant(giveaway_data["rowid"], author.id):
-    #             await ctx.send(
-    #                 await self.bot._(
-    #                     ctx.guild.id, "giveaways.subscribed", name=giveaway_data["name"]
-    #                 )
-    #             )
-    #         else:
-    #             await ctx.send(
-    #                 await self.bot._(ctx.guild.id, "giveaways.something-went-wrong")
-    #             )
+        # adding failed
+        await interaction.followup.send(
+            await self.bot._(interaction.guild_id, "giveaways.something-went-wrong"),
+            ephemeral=True,
+        )
+        raise RuntimeError(
+            f"Something went wrong when adding a participant to giveaway {giveaway_id}"
+        )
 
     # @giveaway.command()
     # @commands.cooldown(2, 40, commands.BucketType.user)
@@ -673,7 +652,6 @@ class Giveaways(commands.Cog):
             title="Giveaway is over!", description=desc, color=emb_color
         )
         await channel.send(embed=emb)
-        self.db_delete_giveaway(giveaway["rowid"])
 
 
 async def setup(bot: Gunibot | None = None):
