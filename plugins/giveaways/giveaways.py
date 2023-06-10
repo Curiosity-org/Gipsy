@@ -86,7 +86,7 @@ class Giveaways(commands.Cog):
         res: list[dict[str, Any]] = self.bot.db_query(query, (guild_id,))
         for data in res:
             data["users"] = loads(data["users"])
-            data["ends_at"] = datetime.datetime.strptime(data["ends_at"], "%Y-%m-%d %H:%M:%S")
+            data["ends_at"] = datetime.datetime.strptime(data["ends_at"], "%Y-%m-%d %H:%M:%S.%f")
         return res
 
     def db_get_giveaway(self, guild_id: int, giveaway_id: int) -> Optional[dict]:
@@ -99,7 +99,7 @@ class Giveaways(commands.Cog):
         res: list[dict[str, Any]] = self.bot.db_query(query, (guild_id, giveaway_id))
         for data in res:
             data["users"] = loads(data["users"])
-            data["ends_at"] = datetime.datetime.strptime(data["ends_at"], "%Y-%m-%d %H:%M:%S")
+            data["ends_at"] = datetime.datetime.strptime(data["ends_at"], "%Y-%m-%d %H:%M:%S.%f")
         return res[0] if res else None
 
     def db_get_expired_giveaways(self) -> list[dict]:
@@ -111,7 +111,7 @@ class Giveaways(commands.Cog):
         res: list[dict[str, Any]] = self.bot.db_query(query, (datetime.datetime.now(),))
         for data in res:
             data["users"] = loads(data["users"])
-            data["ends_at"] = datetime.datetime.strptime(data["ends_at"], "%Y-%m-%d %H:%M:%S")
+            data["ends_at"] = datetime.datetime.strptime(data["ends_at"], "%Y-%m-%d %H:%M:%S.%f")
         return res
 
     def db_get_users(self, giveaway_id: int) -> list[int] | None:
@@ -234,7 +234,7 @@ class Giveaways(commands.Cog):
                 ephemeral=True
             )
             return
-        end_date = datetime.datetime.fromtimestamp(round(time.time()) + parsed_duration)
+        end_date = datetime.datetime.now() + datetime.timedelta(seconds=parsed_duration)
         # check channel validity
         parsed_channel: discord.abc.MessageableChannel = channel or interaction.channel
         perms = parsed_channel.permissions_for(interaction.guild.me)
@@ -254,8 +254,7 @@ class Giveaways(commands.Cog):
             emb = discord.Embed(
                 title=title,
                 description=name,
-                timestamp=datetime.datetime.utcnow()
-                + datetime.timedelta(seconds=parsed_duration),
+                timestamp=end_date.astimezone(datetime.timezone.utc),
                 color=discord.Colour.random(),
             ).set_footer(text=ends_at)
             msg: discord.Message = await parsed_channel.send(embed=emb)
