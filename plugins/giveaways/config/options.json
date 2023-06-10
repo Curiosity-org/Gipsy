@@ -1,7 +1,2 @@
 {
-    "giveaways_emojis": {
-        "default": null,
-        "type": "emojis",
-        "command": "giveaways_emoji"
-    }
 }
