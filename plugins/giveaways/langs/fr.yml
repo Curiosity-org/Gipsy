@@ -34,6 +34,8 @@ fr:
       winners:
         one: "Le gagnant est : %{users} ! Félicitations, vous avez gagné %{price} !"
         many: "Les gagnants sont : %{users} ! Félicitations, vous avez gagné %{price} !"
+    view:
+      enter_btn: Participer
     already-left: Vous ne participez déjà pas à ce giveaway !
     already-stopped: Ce giveaway est déjà arrêté
     already-participant: Vous participez déjà à ce giveaway

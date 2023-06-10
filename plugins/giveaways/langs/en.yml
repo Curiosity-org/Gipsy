@@ -34,9 +34,11 @@ en:
       winners:
         one: "The winner is: %{users}! Congratulations, you have won %{price}!"
         many: "The winners are : %{users}! Congratulations, you have won %{price}!"
-    already-left: You are already not participating in this giveaway!
+    view:
+      enter_btn: Enter
+    already-left: You're already not part of this giveaway!
     already-stopped: This giveaway is already stopped
-    already-participant: You already participate in this giveaway
+    already-participant: You are already participating in this giveaway!
     been-stopped: This giveaway has been stopped
     list-active: "The currently active giveaways:"
     list-inactive: "The already completed giveaways :"
