@@ -10,9 +10,10 @@ import logging
 import os
 import sqlite3
 import sys
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, List, Union
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, List, Optional, Union
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 from core import config
@@ -71,6 +72,8 @@ class Gunibot(commands.bot.AutoShardedBot):
         self.database.row_factory = sqlite3.Row
         self.cog_icons = {}  # icons for cogs
         self._update_database_structure()
+        # app commands
+        self.app_commands_list: Optional[list[discord.app_commands.AppCommand]] = None
 
     # pylint: disable=arguments-differ
     async def get_context(self, message: discord.Message, *, cls=MyContext):
@@ -227,6 +230,30 @@ class Gunibot(commands.bot.AutoShardedBot):
             self.log.error("Unable to load Languages cog")
             return lambda *args, **kwargs: args[1]
         return cog.tr
+
+    async def fetch_app_commands(self):
+        "Populate the app_commands_list attribute from the Discord API"
+        self.app_commands_list = await self.tree.fetch_commands(guild=None)
+
+    async def fetch_app_command_by_name(self, name: str) -> Optional[app_commands.AppCommand]:
+        "Get a specific app command from the Discord API"
+        if self.app_commands_list is None:
+            await self.fetch_app_commands()
+        for command in self.app_commands_list:
+            if command.name == name:
+                return command
+        return None
+
+    async def get_command_mention(self, command_name: str):
+        """
+        Get how a command should be mentionned (either app-command mention or raw name)
+        """
+        if command := await self.fetch_app_command_by_name(command_name.split(' ')[0]):
+            return f"</{command_name}:{command.id}>"
+        if command := self.get_command(command_name):
+            return f"`{command.qualified_name}`"
+        self.log.error("Trying to mention invalid command: %s", command_name)
+        return f"`{command_name}`"
 
     # pylint: disable=arguments-differ
     async def add_cog(self, cog: commands.Cog, icon=None):
