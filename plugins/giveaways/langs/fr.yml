@@ -6,11 +6,8 @@
 fr:
   giveaways:
     creation:
-      empty-name: Le paramètre 'nom' ne peut pas être vide !
-      empty-duration: Le paramètre 'durée' ne peut pas être vide !
+      invalid-duration: Vous devez spécifier une durée valide !
       invalid-name: Il y a déjà un giveaway en cours avec ce nom !
-      invalid-winners: Le nombre de gagnants doit être un nombre entier !
-      invalid-channel: Le paramètre 'salon' n'est pas un salon valide
       invalid-perms: Je ne peux pas envoyer d'embeds dans le salon spécifié
       success: J'ai correctement créé le giveaway **%{name}** avec l'ID %{id}
       httpexception: Impossible d'envoyer le message dans %{channel}
@@ -27,7 +24,7 @@ fr:
     info:
       soon: Imminent
       ended: Déjà terminé
-      summary: "Nom : **%{name}**\nTemps restant : **%{time}**\nEntrées : **%{nbr}**\nSalon : <#%{channel}>"
+      summary: "Nom : **%{name}**\nTemps restant : **%{time}**\nEntrées : **%{nbr}**\nMessage : %{msg_url}"
     picking:
       no-participant: Personne n'a participé à ce concours ! Je vais le détruire
       selecting: Choix des gagnants...
@@ -40,8 +37,12 @@ fr:
     already-stopped: Ce giveaway est déjà arrêté
     already-participant: Vous participez déjà à ce giveaway
     been-stopped: Ce giveaway a été arrêté
-    list-active: "Les giveaways actuellement actifs :"
-    list-inactive: "Les giveaways déjà terminés :"
+    list:
+      title: Les giveaways actuellement actifs
+      row:
+        zero: "%{id}\\. %{name} - aucun participant"
+        one: "%{id}\\. %{name} - %{count} participant"
+        many: "%{id}\\. %{name} - %{count} participants"
     no-giveaway: Il n'y a aucun giveaway dans ce serveur
     not-stopped: Ce giveaway est toujours d'actualité, vous pouvez l'arrêter avec `%{p}giveaway stop %{id}`
     subscribed: Vous participez maintenant au giveaway **%{name}**, bonne chance !
