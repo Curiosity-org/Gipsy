@@ -5,11 +5,11 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-# pylint: disable=unused-import
 import discord
-from discord.ext import tasks, commands
+from discord.ext import commands
 
 from utils import Gunibot, MyContext
+# pylint: disable=relative-beyond-top-level
 from .abbreviations import abbreviations
 
 
