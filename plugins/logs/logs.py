@@ -224,8 +224,8 @@ class Logs(commands.Cog):
         if invite.inviter:  # sometimes Discord doesn't send that info
             embed.set_author(
                 name=f'{invite.inviter.name}#{invite.inviter.discriminator}',
-                icon_url=invite.inviter.display_avatar.url_as(
-                    static_format='png'))
+                icon_url=invite.inviter.display_avatar.with_static_format('png')
+            )
             _footer = await self.bot._(invite.guild.id, "logs.footer2", author=invite.inviter.id)
             embed.set_footer(text=_footer)
         _duration = await self.bot._(invite.guild.id, "logs.invite_created.duration")
@@ -262,8 +262,7 @@ class Logs(commands.Cog):
         if invite.inviter:
             embed.set_author(
                 name=f'{invite.inviter.name}#{invite.inviter.discriminator}',
-                icon_url=invite.inviter.display_avatar.url_as(
-                    static_format='png'))
+                icon_url=invite.inviter.display_avatar.with_static_format('png'))
             _footer = await self.bot._(invite.guild.id, "logs.footer2", author=invite.inviter.id)
             embed.set_footer(text=_footer)
         embed.add_field(name="URL", value=invite.url)
@@ -352,7 +351,7 @@ class Logs(commands.Cog):
             colour=discord.Colour.green()
         )
         embed.set_author(
-            name=str(user), icon_url=user.display_avatar.url_as(static_format='png'))
+            name=str(user), icon_url=user.display_avatar.with_static_format('png'))
         _footer = await self.bot._(guild.id, "logs.footer3", member=user.id)
         embed.set_footer(text=_footer)
         await self.send_embed(guild, embed)
@@ -578,7 +577,7 @@ class Logs(commands.Cog):
         if len(embed.fields) == 0:
             return
         embed.set_author(name=str(before),
-                         icon_url=before.display_avatar.url_as(static_format='png'))
+                         icon_url=before.display_avatar.with_static_format('png'))
         _footer = await self.bot._(after.guild.id, "logs.footer3", member=before.id)
         embed.set_footer(text=_footer)
         await self.send_embed(before.guild, embed)
