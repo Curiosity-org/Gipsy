@@ -143,10 +143,10 @@ class Admin(commands.Cog):
         errors_cog = self.bot.get_cog("Errors")
         if len(cogs) == 1 and cogs[0] == "all":
             cogs = sorted([x.file for x in self.bot.cogs.values()])
-        reloaded_cogs = list()
+        reloaded_cogs = []
         for cog in cogs:
             try:
-                self.bot.reload_extension("plugins." + cog + ".bot.main")
+                await self.bot.reload_extension("plugins." + cog + '.' + cog)
             except ModuleNotFoundError:
                 await ctx.send(f"Cog {cog} can't be found")
             except commands.errors.ExtensionNotLoaded:
@@ -167,7 +167,7 @@ class Admin(commands.Cog):
     async def add_cog(self, ctx: commands.Context, name: str):
         """Ajouter un cog au bot"""
         try:
-            self.bot.load_extension("plugins." + name)
+            await self.bot.load_extension("plugins." + name + '.' + name)
             await ctx.send(f"Module '{name}' ajouté !")
             self.bot.log.info(f"Module {name} ajouté")
         except Exception as exc: # pylint: disable=broad-exception-caught
@@ -177,7 +177,7 @@ class Admin(commands.Cog):
     async def rm_cog(self, ctx: commands.Context, name: str):
         """Enlever un cog au bot"""
         try:
-            self.bot.unload_extension("plugins." + name)
+            await self.bot.unload_extension("plugins." + name + '.' + name)
             await ctx.send(f"Module '{name}' désactivé !")
             self.bot.log.info(f"Module {name} désactivé")
         except Exception as exc: # pylint: disable=broad-exception-caught
