@@ -332,10 +332,6 @@ class Giveaways(commands.Cog):
             await self.bot._(interaction.guild_id, "giveaways.success-stopped")
         )
 
-    @gw_stop.autocomplete("giveaway_name")
-    async def gw_stop_autocomplete(self, interaction: discord.Interaction, current: str):
-        return await self._giveaway_name_autocompletion(interaction, current)
-
     @giveaway.command(name="cancel")
     async def gw_cancel(self, interaction: discord.Interaction, *, giveaway_name: str):
         """
@@ -369,10 +365,6 @@ class Giveaways(commands.Cog):
             await interaction.response.send_message(
                 await self.bot._(interaction.guild_id, "giveaways.something-went-wrong")
             )
-
-    @gw_cancel.autocomplete("giveaway_name")
-    async def gw_cancel_autocomplete(self, interaction: discord.Interaction, current: str):
-        return await self._giveaway_name_autocompletion(interaction, current)
 
     @giveaway.command(name="list-giveaways")
     async def gw_list(self, interaction: discord.Interaction):
@@ -451,10 +443,9 @@ class Giveaways(commands.Cog):
         )
         await interaction.response.send_message(embed=embed)
 
+    @gw_stop.autocomplete("giveaway_name")
+    @gw_cancel.autocomplete("giveaway_name")
     @gw_info.autocomplete("giveaway_name")
-    async def gw_info_autocomplete(self, interaction: discord.Interaction, current: str):
-        return await self._giveaway_name_autocompletion(interaction, current)
-
     async def _giveaway_name_autocompletion(self, interaction: discord.Interaction, current: str):
         "Autocompletion to select a giveaway in an app command"
         current = current.lower()
