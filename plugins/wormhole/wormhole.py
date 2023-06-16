@@ -106,6 +106,9 @@ class PermissionType(commands.Converter):
             return
         self.name = self.types[self.type]
 
+    def __repr__(self):
+        return self.name
+
     async def convert(self, ctx: commands.Context, argument: str): # pylint: disable=unused-argument
         if argument in self.types:
             return PermissionType(argument)
