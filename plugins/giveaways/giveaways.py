@@ -483,48 +483,6 @@ class Giveaways(commands.Cog):
             f"Something went wrong when adding a participant to giveaway {giveaway_id}"
         )
 
-    # @giveaway.command()
-    # @commands.cooldown(2, 40, commands.BucketType.user)
-    # async def gw_leave(self, ctx: MyContext, *, giveaway: str):
-    #     """Leave a giveaway.
-    #     Example:
-    #     [p]giveaway leave Minecraft account"""
-    #     if ctx.author.bot:
-    #         await ctx.send("Les bots ne peuvent pas participer à un giveaway !")
-    #         return
-    #     author = ctx.message.author
-
-    #     giveaways = self.db_get_giveaways(ctx.guild.id)
-    #     if len(giveaways) == 0:
-    #         await ctx.send(await self.bot._(ctx.guild.id, "giveaways.no-giveaway"))
-    #         return
-    #     giveaways = [
-    #         x for x in giveaways if x["name"] == giveaway or str(x["rowid"]) == giveaway
-    #     ]
-    #     if len(giveaways) == 0:
-    #         await ctx.send(
-    #             await self.bot._(
-    #                 ctx.guild.id, "giveaways.unknown-giveaway", p=ctx.prefix
-    #             )
-    #         )
-    #         return
-    #     giveaway_data = giveaways[0]
-    #     if author.id not in giveaway_data["users"]:
-    #         await ctx.send(await self.bot._(ctx.guild.id, "giveaways.already-left"))
-    #     elif not giveaway_data["running"]:
-    #         await ctx.send(await self.bot._(ctx.guild.id, "giveaways.been-stopped"))
-    #     else:
-    #         if self.db_edit_participant(giveaway_data["rowid"], author.id, add=False):
-    #             await ctx.send(
-    #                 await self.bot._(
-    #                     ctx.guild.id, "giveaways.success-left", name=giveaway_data["name"]
-    #                 )
-    #             )
-    #         else:
-    #             await ctx.send(
-    #                 await self.bot._(ctx.guild.id, "giveaways.something-went-wrong")
-    #             )
-
     async def get_users(
         self,
         channel_id: int,
