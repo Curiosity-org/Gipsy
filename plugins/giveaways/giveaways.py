@@ -50,7 +50,7 @@ class Giveaways(commands.Cog):
         name: str,
         message_id: int,
         max_entries: int,
-        ends_at: Optional[datetime.datetime] = None,
+        ends_at: datetime.datetime,
     ) -> int:
         """
         Add a giveaway into the database
@@ -193,7 +193,7 @@ class Giveaways(commands.Cog):
     async def gw_start(self, interaction: discord.Interaction,
                        name: app_commands.Range[str, 1, 60],
                        duration: str,
-                       entries: Optional[app_commands.Range[int, 1]]=1,
+                       entries: app_commands.Range[int, 1]=1,
                        channel: Optional[discord.TextChannel]=None):
         """Start a giveaway
 
