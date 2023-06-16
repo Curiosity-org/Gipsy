@@ -106,7 +106,7 @@ class Logs(commands.Cog):
 
     def get_flags(self, guild_id):
         """Return the log flags for a the given `guild_id`."""
-        flags = self.bot.get_cog('ConfigCog').LogsFlags().int_to_flags()
+        flags = self.bot.get_cog('ConfigCog').LogsFlags().int_to_flags
         return flags(self.bot.server_configs[guild_id]['modlogs_flags'])
 
     @commands.Cog.listener()
