@@ -9,7 +9,9 @@ import typing
 
 import discord
 from discord.ext import commands
+
 from utils import Gunibot, MyContext
+from core import setup_logger
 
 
 class Perms(commands.Cog):
@@ -29,6 +31,7 @@ class Perms(commands.Cog):
         self.perms_name["common_channel"] = [
             x for x in chan_perms if x in self.perms_name["general"]
         ]
+        self.logger = setup_logger('perms')
 
     @commands.command(name="perms", aliases=["permissions"])
     @commands.guild_only()
@@ -109,7 +112,7 @@ class Perms(commands.Cog):
                 if "perms.list." in perm:
                     # missing translation
                     perm = perm.replace("_", " ").title()
-                    self.bot.log.warn(f"[perms] missing permission translation: {perm}")
+                    self.logger.warn(f"[perms] missing permission translation: {perm}")
                 if value:
                     permsl.append(":white_check_mark: " + perm)
                 else:
