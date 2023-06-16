@@ -29,6 +29,7 @@ fr:
       soon: Imminent
       ended: Déjà terminé
       summary: "Nom : **%{name}**\nTemps restant : **%{time}**\nEntrées : **%{nbr}**\nMessage : %{msg_url}"
+      title: Informations du giveaway
     picking:
       no-participant: Personne n'a participé à ce concours ! Je vais le détruire
       selecting: Choix des gagnants...
