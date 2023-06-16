@@ -12,7 +12,7 @@ import sys
 import discord
 import psutil
 from discord.ext import commands
-from git import Repo
+from git import Repo, InvalidGitRepositoryError
 
 from utils import Gunibot, MyContext
 
@@ -102,7 +102,6 @@ class General(commands.Cog):
 
         try:
             async with ctx.channel.typing():
-                branch = Repo(os.getcwd()).active_branch
                 len_servers = len(ctx.bot.guilds)
                 users = len(ctx.bot.users)
                 bots = len([None for u in ctx.bot.users if u.bot])
@@ -119,7 +118,11 @@ class General(commands.Cog):
                 stats += "\n" + await self.bot._(
                     ctx.channel, "general.stats.diver", v=discord.__version__
                 )
-                stats += "\n" + await self.bot._(ctx.channel, "general.stats.git", b=branch)
+                try:
+                    branch = Repo(os.getcwd()).active_branch
+                    stats += "\n" + await self.bot._(ctx.channel, "general.stats.git", b=branch)
+                except InvalidGitRepositoryError:
+                    pass
                 stats += "\n" + await self.bot._(
                     ctx.channel, "general.stats.ram", c=ram_usage
                 )
