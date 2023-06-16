@@ -531,7 +531,7 @@ class Giveaways(commands.Cog):
             value=winners_list,
             inline=False
         )
-        await message.edit(embed=emb)
+        await message.edit(embed=emb, view=None)
         return emb.color.value if emb.color else None
 
     async def pick_winners(
@@ -553,6 +553,7 @@ class Giveaways(commands.Cog):
             winner = discord.utils.get(guild.members, id=random.choice(users))
             if winner is not None:
                 winners.append(winner)
+                users.remove(winner.id)
             else:
                 trials += 1
         return winners
