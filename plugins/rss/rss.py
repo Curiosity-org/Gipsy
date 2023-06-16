@@ -5,7 +5,13 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
+import asyncio
+import datetime
+import html
+import re
+import time
 import typing
+from marshal import dumps, loads
 import async_timeout
 import datetime
 
