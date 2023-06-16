@@ -104,7 +104,10 @@ class Admin(commands.Cog):
         await self.bot.close()
 
     async def cleanup_workspace(self):
+        "Delete python cache files"
         for folder_name, _, filenames in os.walk(".."):
+            if folder_name.startswith("./env") or folder_name.startswith("./venv"):
+                continue
             for filename in filenames:
                 if filename.endswith(".pyc"):
                     os.unlink(folder_name + "/" + filename)
