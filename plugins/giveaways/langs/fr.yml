@@ -53,6 +53,7 @@ fr:
     subscribed: Vous participez maintenant au giveaway **%{name}**, bonne chance !
     success-deleted: Ce giveaway a bien été supprimé !
     success-left: Vous ne participez plus au giveaway **%{name}** !
+    success-stopped: Le giveaway a été clôturé avec succès et le(s) gagnant(s) a (ont) été sélectionné(s) !
     something-went-wrong: Oups, quelque chose s'est mal passé !
     too-many-members: Ce salon a trop de membres, et le giveaway risque de ne pas y fonctionner ! Veuillez utiliser un autre salon
     unknown-giveaway: "Ce giveaway n'existe pas. Pour voir tous les giveaways vous pouvez utiliser `%{p}giveaway list`"
