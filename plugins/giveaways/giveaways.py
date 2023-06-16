@@ -7,7 +7,6 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 
 import datetime
 import random
-import time
 from marshal import dumps, loads
 from typing import Any, Optional, Sequence, Union
 
@@ -70,9 +69,9 @@ class Giveaways(commands.Cog):
             message_id,
             dumps([]),
         )
-        query = "INSERT INTO giveaways"\
-            "(guild, channel, name, max_entries, ends_at, message, users)"\
-            "VALUES (?, ?, ?, ?, ?, ?, ?)"
+        query = "INSERT INTO `giveaways` \
+            (guild, channel, name, max_entries, ends_at, message, users) \
+            VALUES (?, ?, ?, ?, ?, ?, ?)"
         rowid: int = self.bot.db_query(query, data)
         return rowid
 
@@ -82,7 +81,7 @@ class Giveaways(commands.Cog):
         guildID: the guild (server) ID
         Returns: a list of dicts containing the giveaways info
         """
-        query = "SELECT rowid, * FROM giveaways WHERE guild=?"
+        query = "SELECT rowid, * FROM `giveaways` WHERE `guild` = ?"
         res: list[dict[str, Any]] = self.bot.db_query(query, (guild_id,))
         for data in res:
             data["users"] = loads(data["users"])
@@ -95,7 +94,7 @@ class Giveaways(commands.Cog):
         guildID: the guild (server) ID
         Returns: a list of dicts containing the giveaways info
         """
-        query = "SELECT rowid, * FROM giveaways WHERE guild=? AND rowid=?"
+        query = "SELECT `rowid`, * FROM `giveaways` WHERE `guild` = ? AND `rowid` = ?"
         res: list[dict[str, Any]] = self.bot.db_query(query, (guild_id, giveaway_id))
         for data in res:
             data["users"] = loads(data["users"])
@@ -107,7 +106,7 @@ class Giveaways(commands.Cog):
         Get every giveaway that should have ended
         Returns: a list of dicts containing the giveaways info
         """
-        query = "SELECT rowid, * FROM giveaways WHERE ends_at <= ?"
+        query = "SELECT `rowid`, * FROM `giveaways` WHERE `ends_at` <= ?"
         res: list[dict[str, Any]] = self.bot.db_query(query, (datetime.datetime.now(),))
         for data in res:
             data["users"] = loads(data["users"])
@@ -120,7 +119,7 @@ class Giveaways(commands.Cog):
         rowID: the ID of the giveaway to edit
         Returns: list of users IDs
         """
-        query = "SELECT users FROM giveaways WHERE rowid=?"
+        query = "SELECT `users` FROM `giveaways` WHERE `rowid` = ?"
         res: list[dict[str, bytes]] = self.bot.db_query(query, (giveaway_id,))
         if len(res) == 0:
             return None
@@ -151,8 +150,9 @@ class Giveaways(commands.Cog):
                 # user was not participating
                 return False
             current_participants = dumps(current_participants)
-        query = "UPDATE giveaways SET users=? WHERE rowid=?"
-        rowcount = self.bot.db_query(query, (current_participants, giveaway_id), returnrowcount=True)
+        query = "UPDATE `giveaways` SET `users`=? WHERE `rowid` = ?"
+        rowcount = self.bot.db_query(query, (current_participants, giveaway_id),
+                                     returnrowcount=True)
         return rowcount != 0
 
     def db_delete_giveaway(self, giveaway_id: int) -> bool:
@@ -161,7 +161,7 @@ class Giveaways(commands.Cog):
         rowID: the ID of the giveaway to delete
         Returns: if the giveaway has successfully been deleted
         """
-        query = "DELETE FROM giveaways WHERE rowid=?"
+        query = "DELETE FROM giveaways WHERE `rowid` = ?"
         rowcount = self.bot.db_query(query, (giveaway_id,), returnrowcount=True)
         return rowcount == 1
 
@@ -190,7 +190,8 @@ class Giveaways(commands.Cog):
     )
 
     @giveaway.command(name="start")
-    async def gw_start(self, interaction: discord.Interaction, name: app_commands.Range[str, 1, 60],
+    async def gw_start(self, interaction: discord.Interaction,
+                       name: app_commands.Range[str, 1, 60],
                        duration: str,
                        entries: Optional[app_commands.Range[int, 1]]=1,
                        channel: Optional[discord.TextChannel]=None):
@@ -201,7 +202,7 @@ class Giveaways(commands.Cog):
                     name: The public giveaway name
                     duration: How long the giveaway should last
                     entries: How many winners there should be (default 1)
-                    channel: In which channel the giveaway should be posted (default current channel)
+                    channel: In which channel the giveaway should be sent (default current channel)
         Giveaway name is mandatory.
         Duration is mandatory.
         Winners count is optional (default 1).
@@ -250,13 +251,12 @@ class Giveaways(commands.Cog):
         # Send embed now
         try:
             title = await self.bot._(interaction.guild.id, "giveaways.embed.title")
-            ends_at = await self.bot._(interaction.guild.id, "giveaways.embed.ends-at")
             emb = discord.Embed(
                 title=title,
                 description=name,
                 timestamp=end_date.astimezone(datetime.timezone.utc),
                 color=discord.Colour.random(),
-            ).set_footer(text=ends_at)
+            )
             msg: discord.Message = await parsed_channel.send(embed=emb)
         except discord.HTTPException as err:
             self.bot.dispatch("error", err, interaction)  # send error logs
@@ -290,6 +290,10 @@ class Giveaways(commands.Cog):
                 await self.bot._(interaction.guild.id, "giveaways.view.enter_btn"),
                 custom_id=f"gaw_{rowid}",
             )
+            ends_at = await self.bot._(interaction.guild.id, "giveaways.embed.ends-at")
+            id_footer = await self.bot._(interaction.guild.id, "giveaways.embed.id-footer",
+                                         id=rowid)
+            emb.set_footer(text=id_footer + ' | ' + ends_at)
             await msg.edit(view=view)
         else:
             await interaction.followup.send(
@@ -543,7 +547,8 @@ class Giveaways(commands.Cog):
         return users
 
     async def edit_embed(
-        self, channel: discord.TextChannel, message_id: int, winners: list[discord.Member]
+        self, channel: discord.TextChannel, gaw_id: int, message_id: int,
+        winners: list[discord.Member]
     ) -> Optional[int]:
         """Edit the embed to display results
         Returns the embed color if the embed was found, None else"""
@@ -555,12 +560,18 @@ class Giveaways(commands.Cog):
         ):
             return None
         emb: discord.Embed = message.embeds[0]
-        emb.set_footer(text=await self.bot._(channel, "giveaways.embed.ended-at"))
-        emb.description = await self.bot._(
-            channel,
-            "giveaways.embed.desc",
-            price=emb.description,
-            winners=" ".join([x.mention for x in winners]),
+        ended_at = await self.bot._(channel, "giveaways.embed.ends-at")
+        id_footer = await self.bot._(channel, "giveaways.embed.id-footer",
+                                        id=gaw_id)
+        emb.set_footer(text=id_footer + ' | ' + ended_at)
+        if winners:
+            winners_list = " ".join(x.mention for x in winners)
+        else:
+            winners_list = await self.bot._(channel, "giveaways.embed.winners", count=0)
+        emb.add_field(
+            name=await self.bot._(channel, "giveaways.embed.winners-count", count=len(winners)),
+            value=winners_list,
+            inline=False
         )
         await message.edit(embed=emb)
         return emb.color.value if emb.color else None
@@ -594,7 +605,7 @@ class Giveaways(commands.Cog):
         channel: discord.TextChannel = self.bot.get_channel(giveaway["channel"])
         if channel is None:
             return None
-        emb_color = await self.edit_embed(channel, giveaway["message"], winners)
+        emb_color = await self.edit_embed(channel, giveaway["rowid"], giveaway["message"], winners)
         if emb_color is None:
             # old embed wasn't found, we select a new color
             emb_color = discord.Colour.random()
@@ -604,9 +615,7 @@ class Giveaways(commands.Cog):
             count=len(winners),
             winner=" ".join([x.mention for x in winners]),
         )
-        desc = "{}: {} \n\n{}".format( # pylint: disable=consider-using-f-string
-            await self.bot._(channel, "giveaways.embed.price"), giveaway["name"], win
-        )
+        desc = giveaway["name"] + "\n\n" + win
         emb = discord.Embed(
             title="Giveaway is over!", description=desc, color=emb_color
         )
