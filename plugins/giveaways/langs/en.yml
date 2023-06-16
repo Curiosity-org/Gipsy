@@ -12,11 +12,15 @@ en:
       success: I have successfully created the giveaway **%{name}** with the ID %{id}
       httpexception: Unable to send the message in %{channel}
     embed:
-      desc: "Price: %{price}\nWon by: %{winners}"
-      ends-at: Ends at
-      ended-at: Ended at
+      id-footer: "ID: %{id}"
+      ends-at: Ends on
+      ended-at: Ended on
       price: Price
       title: New giveaway!
+      winners-count:
+        zero: Winners
+        one: Winner
+        many: Winners
       winners:
         zero: "There were no participants :confused:"
         one: The winner is %{winner}
