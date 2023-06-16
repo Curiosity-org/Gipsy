@@ -305,7 +305,7 @@ class Giveaways(commands.Cog):
         """Stops a giveaway early so you can pick a winner
         
         Example:
-        [p]giveaway stop Minecraft account"""
+        /giveaway stop Minecraft account"""
         giveaways = self.db_get_giveaways(interaction.guild_id)
         if len(giveaways) == 0:
             await interaction.response.send_message(
@@ -401,7 +401,7 @@ class Giveaways(commands.Cog):
         """Get information for a giveaway
         
         Example:
-        [p]giveaway info Minecraft account"""
+        /giveaway info Minecraft account"""
         giveaways = self.db_get_giveaways(interaction.guild_id)
         if len(giveaways) == 0:
             await interaction.response.send_message(
