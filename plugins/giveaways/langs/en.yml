@@ -28,7 +28,7 @@ en:
     info:
       soon: Imminent
       ended: Already finished
-      summary: "Name: **%{name}**\nRemaining time: **%{time}**\nParticipants: **%{nbr}**\nMessage: %{msg_url}"
+      summary: "Name: **%{name}**\nRemaining time: **%{time}**\nParticipants: **%{nbr}**\nMax winners: **%{max_entries}**\nMessage: %{msg_url}"
       title: Giveaway information
     picking:
       no-participant: No one has participated in this contest! I will destroy it

@@ -332,6 +332,10 @@ class Giveaways(commands.Cog):
             await self.bot._(interaction.guild_id, "giveaways.success-stopped")
         )
 
+    @gw_stop.autocomplete("giveaway_name")
+    async def gw_stop_autocomplete(self, interaction: discord.Interaction, current: str):
+        return await self._giveaway_name_autocompletion(interaction, current)
+
     @giveaway.command(name="cancel")
     async def gw_cancel(self, interaction: discord.Interaction, *, giveaway_name: str):
         """
@@ -365,6 +369,10 @@ class Giveaways(commands.Cog):
             await interaction.response.send_message(
                 await self.bot._(interaction.guild_id, "giveaways.something-went-wrong")
             )
+
+    @gw_cancel.autocomplete("giveaway_name")
+    async def gw_cancel_autocomplete(self, interaction: discord.Interaction, current: str):
+        return await self._giveaway_name_autocompletion(interaction, current)
 
     @giveaway.command(name="list-giveaways")
     async def gw_list(self, interaction: discord.Interaction):
@@ -433,6 +441,7 @@ class Giveaways(commands.Cog):
             name=name,
             time=time_left,
             nbr=entries,
+            max_entries=giveaway["max_entries"],
             msg_url=msg_url,
         )
         embed = discord.Embed(
@@ -441,6 +450,24 @@ class Giveaways(commands.Cog):
             color=self.embed_color,
         )
         await interaction.response.send_message(embed=embed)
+
+    @gw_info.autocomplete("giveaway_name")
+    async def gw_info_autocomplete(self, interaction: discord.Interaction, current: str):
+        return await self._giveaway_name_autocompletion(interaction, current)
+
+    async def _giveaway_name_autocompletion(self, interaction: discord.Interaction, current: str):
+        "Autocompletion to select a giveaway in an app command"
+        current = current.lower()
+        giveaways = self.db_get_giveaways(interaction.guild_id)
+        filtered = sorted([
+            (not x["name"].lower().startswith(current), x["name"], x["rowid"])
+            for x in giveaways
+            if current in x["name"].lower() or x["rowid"] == current
+        ])
+        return [
+            app_commands.Choice(name=name, value=str(rowid))
+            for _, name, rowid in filtered
+        ]
 
     async def enter_giveaway(self, interaction: discord.Interaction):
         "Called when a user press the Enter button"
