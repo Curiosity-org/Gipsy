@@ -13,6 +13,7 @@ from discord.ext import commands, tasks
 
 from bot.checks import is_roles_manager
 from utils import Gunibot, MyContext
+from core import setup_logger
 
 
 class Hypesquad(commands.Cog):
@@ -27,6 +28,7 @@ class Hypesquad(commands.Cog):
             "hs_none_role",
         ]
         self.roles_loop.start() # pylint: disable=no-member
+        self.logger = setup_logger('hypesquad')
 
         bot.get_command("config").add_command(self.hs_main)
 
@@ -71,7 +73,7 @@ class Hypesquad(commands.Cog):
     async def roles_loop(self):
         """Check every 12h the members roles"""
         start = time.time()
-        self.bot.log.debug("[hypesquad] Started roles check")
+        self.logger.debug("Started roles check")
         count = 0  # count of edited members
         for guild in self.bot.guilds:
             try:
@@ -81,12 +83,12 @@ class Hypesquad(commands.Cog):
                         count += await self.edit_roles(member, roles)
             except discord.Forbidden:
                 # missing a perm
-                self.bot.log.warn(
-                    f"[hypesquad] Unable to give roles in guild {guild.id} ({guild.name})"
+                self.logger.warn(
+                    f"Unable to give roles in guild {g.id} ({g.name})"
                 )
         delta = round(time.time() - start, 2)
-        self.bot.log.info(
-            f"[hypesquad] Finished roles check in {delta}s with {count} editions"
+        self.logger.info(
+            f"Finished roles check in {delta}s with {count} editions"
         )
 
     @roles_loop.before_loop

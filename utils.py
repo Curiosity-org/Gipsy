@@ -6,7 +6,7 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
 import json
-import logging
+from typing import Any, Callable, Coroutine, Dict, Union, List, TYPE_CHECKING
 import os
 import sqlite3
 import sys
@@ -17,6 +17,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from core import config
+from core import setup_logger
 
 if TYPE_CHECKING:
     from bot.utils.sconfig import Sconfig
@@ -66,7 +67,7 @@ class Gunibot(commands.bot.AutoShardedBot):
             allowed_mentions=ALLOWED,
             intents=intents,
         )
-        self.log = logging.getLogger("runner")  # logs module
+        self.log = setup_logger('core')  # logs module
         self.beta: bool = beta  # if the bot is in beta mode
         self.database = sqlite3.connect("data/database.db")  # database connection
         self.database.row_factory = sqlite3.Row
@@ -318,12 +319,8 @@ class CheckException(commands.CommandError):
         self.id = check_id # pylint: disable=invalid-name
 
 
-def setup_logger():
-    """
-    Initialiser le logger
-
-    :return: None
-    """
+""" def setup_logger():
+    "\""Create the logger module, used for logs"\""
     # on chope le premier logger
     log = logging.getLogger("runner")
     # on définit un formatteur
@@ -361,7 +358,7 @@ def setup_logger():
     log.addHandler(stream_handler)
     # log.addHandler(sentry_handler)
 
-    return log
+    return log """
 
 
 CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {}

@@ -11,18 +11,21 @@ import importlib
 import yaml
 
 from LRFutils import color
-from LRFutils import logs
+
+from core import setup_logger
 
 accept = ["y", "yes", "yeah", "ye"]
 decline = ["n", "no", "nope", "nah"]
 
 _global_config = {}
 
+logger = setup_logger('config')
+
 # Check basic requirements and start this script if something is missing
 def check():
     if not os.path.isfile("config.yaml"):
         print(" ")
-        logs.warn("⛔ The bot is not correctly setup. Running setup script...")
+        logger.warn("⛔ The bot is not correctly setup. Running setup script...")
         os.system("python3 setup.py")
         exit()
 

@@ -19,10 +19,13 @@ from discord.ext import commands, tasks
 
 from utils import Gunibot, MyContext
 
+from core import setup_logger
 
 class XP(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
+        self.logger = setup_logger('xp')
+
         self.cooldown = 30
         self.minimal_size = 5
         self.spam_rate = 0.20
@@ -32,6 +35,7 @@ class XP(commands.Cog):
         self.levels = [0]  # xp required per level
         self.xp_channels_cache = dict()  # no-xp channels
         self.embed_color = discord.Colour(0xFFCF50)
+
         self.config_options = [
             "enable_xp",
             "noxp_channels",
@@ -41,7 +45,6 @@ class XP(commands.Cog):
             "levelup_reaction",
             "reaction_emoji",
         ]
-
         bot.get_command("config").add_command(self.config_enable_xp)
         bot.get_command("config").add_command(self.config_noxp_channels)
         bot.get_command("config").add_command(self.config_xp_reduction)
@@ -512,7 +515,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
         """Load the xp cache for a specific guild
         Set guild=None for global leaderboard"""
         try:
-            self.bot.log.info(f"Loading XP cache (guild {guild})")
+            self.logger.info(f"Loading XP cache (guild {guild})")
             query = "SELECT `userid`,`xp` FROM xp WHERE `guild` = ?"
             liste = self.bot.db_query(query, (guild,))
             if guild not in self.cache:

@@ -7,12 +7,14 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 
 import discord
 from discord.ext import commands
-from utils import Gunibot, MyContext
 
+from utils import Gunibot, MyContext
+from core import setup_logger
 
 class Welcome(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
+        self.logger = setup_logger('welcome')
         self.config_options = ["welcome_roles"]
 
         bot.get_command("config").add_command(self.config_welcome_roles)
@@ -43,7 +45,7 @@ class Welcome(commands.Cog):
     async def on_member_join(self, member: discord.Member):
         """Called when a member joins a guild"""
         if not member.guild.me.guild_permissions.manage_roles:  # if not allowed to manage roles
-            self.bot.log.info(
+            self.logger.info(
                 'Module - Welcome: Missing "manage_roles" permission'\
                     f'on guild "{member.guild.name}"'
             )

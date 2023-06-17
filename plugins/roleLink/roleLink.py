@@ -9,11 +9,12 @@ from typing import List, Union
 from marshal import dumps, loads
 import asyncio
 
-import discord
 from discord.ext import commands
+import discord
 
 from bot import args
 from utils import Gunibot
+from core import setup_logger
 
 # /rolelink <grant/revoke> <role> when <get/loose> <one/all> <roles>
 
@@ -88,6 +89,7 @@ class ConflictingCyclicDependencyError(Exception):
 class GroupRoles(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
+        self.logger = setup_logger('rolelink')
         self.file = ""
 
     def db_get_config(self, guild_id: int) -> List[Dependency]:
@@ -163,10 +165,10 @@ class GroupRoles(commands.Cog):
             return
         names = [x.name for x in roles]
         if action.type == 0:
-            self.bot.log.debug(f"Giving {names} to {member}")
+            self.logger.debug(f"Giving {names} to {member}")
             await member.add_roles(*roles, reason="Linked roles")
         else:
-            self.bot.log.debug(f"Removing {names} to {member}")
+            self.logger.debug(f"Removing {names} to {member}")
             await member.remove_roles(*roles, reason="Linked roles")
 
     async def check_got_roles(self, member: discord.Member, roles: List[discord.Role]):

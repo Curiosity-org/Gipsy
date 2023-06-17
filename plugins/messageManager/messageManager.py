@@ -11,7 +11,7 @@ import discord
 from discord.ext import commands
 
 from utils import Gunibot
-
+from core import setup_logger
 
 # Moves a message from its original channel to a parameterized channel
 # using a given webhook
@@ -56,6 +56,7 @@ class MessageManager(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "messageManager"
+        self.logger = setup_logger('messagemanager')
 
     # -------------------#
     # Command /imitate #
@@ -130,8 +131,8 @@ class MessageManager(commands.Cog):
             await ctx.send(
                 await self.bot._(ctx.guild.id, "message_manager.moveall.missing-perm")
             )
-            self.bot.log.info(
-                f'Alakon - /move: Missing permissions on guild "{ctx.guild.name}"'
+            self.logger.info(
+                f'/move: Missing permissions on guild "{ctx.guild.name}"'
             )
             return
 
@@ -230,8 +231,8 @@ class MessageManager(commands.Cog):
             await ctx.send(
                 await self.bot._(ctx.guild.id, "message_manager.moveall.missing-perm")
             )
-            self.bot.log.info(
-                f'messageManager - /moveall: Missing permissions on guild "{ctx.guild.name}"'
+            self.logger.info(
+                f'/moveall: Missing permissions on guild "{ctx.guild.name}"'
             )
             return
 
