@@ -52,7 +52,7 @@ class Antikikoo(commands.Cog):
     async def on_member_join(self, member: discord.Member):
         """Called when a member joins a guild
         Sends a message in the verification channel to inform new users"""
-        self.logger.info(f"{member} ({member.id}) joined the server")
+        self.logger.info("%s (%i) joined the server", repr(member), member.id)
         config = self.bot.server_configs[member.guild.id]
         # if nothing has been configured
         if (
@@ -107,7 +107,7 @@ class Antikikoo(commands.Cog):
                     await message.author.remove_roles(verif_role)
             except BaseException:
                 self.logger.exception(
-                    f"Cannot give or take away verification role from member {message.author}"
+                    "Cannot give or take away verification role from member %s", repr(message.author),
                 )
 
     @commands.group(name="antikikoo", aliases=["ak", "antitroll"])

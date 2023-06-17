@@ -353,7 +353,10 @@ class Rss(commands.Cog):
                 )
             )
             self.logger.info(
-                f"RSS feed added into server {ctx.guild.id} ({link} - {feed_id})"
+                "RSS feed added into server %i (%s - %i)",
+                ctx.guild.ig,
+                link,
+                feed_id,
             )
             await self.send_log(
                 f"Feed added into server {ctx.guild.id} ({feed_id})", ctx.guild,
@@ -386,7 +389,9 @@ class Rss(commands.Cog):
             return
         await ctx.send(await self.bot._(ctx.guild, "rss.delete-success"))
         self.logger.info(
-            f"RSS feed deleted into server {ctx.guild.id} ({flow[0]['ID']})"
+            "RSS feed deleted into server %i (%i)",
+            ctx.guild.id,
+            flow[0]['ID'],
         )
         await self.send_log(
             f"Feed deleted into server {ctx.guild.id} ({flow[0]['ID']})",
@@ -1591,7 +1596,9 @@ class Rss(commands.Cog):
                         statscog.rss_stats["messages"] += 1
             except Exception as exc: # pylint: disable=broad-exception-caught
                 self.logger.info(
-                    f"[send_rss_msg] Cannot send message on channel {channel.id}: {exc}"
+                    "[send_rss_msg] Cannot send message on channel %i: %s",
+                    channel.id,
+                    repr(exc),
                 )
 
     async def check_flow(
@@ -1625,15 +1632,15 @@ class Rss(commands.Cog):
                     guild = self.bot.get_guild(flow["guild"])
                     if guild is None:
                         self.logger.info(
-                            f"[send_rss_msg] Can not send message on server {flow['guild']}"\
-                                "(unknown)"
+                            "[send_rss_msg] Can not send message on server %i (unknown)",
+                            flow['guild'],
                         )
                         return False
                     chan = guild.get_channel(flow["channel"])
                     if guild is None:
                         self.logger.info(
-                            f"[send_rss_msg] Can not send message on channel {flow['channel']}"\
-                                "(unknown)"
+                            "[send_rss_msg] Can not send message on channel %i (unknown)",
+                            flow['channel']
                         )
                         return False
                     obj.format = flow["structure"]
@@ -1668,7 +1675,7 @@ class Rss(commands.Cog):
             self.loop_processing = True
             liste = await self.db_get_all_flows()
         else:
-            self.logger.info(f"Check RSS lancé pour le serveur {guild_id}")
+            self.logger.info("Check RSS lancé pour le serveur %i", guild_id)
             liste = await self.db_get_guild_flows(guild_id)
         check = 0
         errors = []
@@ -1717,7 +1724,7 @@ class Rss(commands.Cog):
         # await self.bot.get_cog("Embeds").send([emb],url="loop")
         self.logger.debug(done[0])
         if len(errors) > 0:
-            self.logger.warn("[Rss loop] " + done[1])
+            self.logger.warning("[Rss loop] %s", done[1])
         if guild_id is None:
             self.loop_processing = False
         self.twitter_over_capacity = False
@@ -1729,7 +1736,8 @@ class Rss(commands.Cog):
         start = time.time()
         await self.bot.get_cog("Rss").main_loop()
         self.logger.info(
-            f" Boucle rss terminée en {round(time.time() - start, 2)}s!"
+            " Boucle rss terminée en %f s!",
+            round(time.time() - start, 2),
         )
 
     @loop_child.before_loop

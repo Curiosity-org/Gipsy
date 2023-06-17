@@ -98,7 +98,7 @@ def main():
                 await bot_client.load_extension(extension)
                 loaded += 1
             except Exception:  # pylint: disable=broad-except
-                client.log.error(f"Failed to load extension: {extension}")
+                client.log.error("Failed to load extension: %s", extension)
                 notloaded += "\n - " + extension
                 failed += 1
         return loaded, failed
@@ -106,28 +106,31 @@ def main():
     # Printing info when the bot is started
     async def on_ready():
         """Called when the bot is connected to Discord API"""
-        client.log.info(f"{color.fg.green}✅ Bot connected")
-        client.log.info("Nom : " + client.user.name)
-        client.log.info("ID : " + str(client.user.id))
+        client.log.info("%s✅ Bot connected", color.fg.green)
+        client.log.info("Nom : %s", client.user.name)
+        client.log.info("ID : %i", client.user.id)
         if len(client.guilds) < 200:
-            serveurs = [x.name for x in client.guilds]
+            servers = [x.name for x in client.guilds]
             client.log.info(
-                "Connected on "
-                + str(len(client.guilds))
-                + " servers:\n - "
-                + "\n - ".join(serveurs)
+                "Connected on %i server:\n - %s",
+                len(client.guilds),
+                "\n - ".join(servers),
             )
         else:
-            client.log.info("Connected on " + str(len(client.guilds)) + " servers")
+            client.log.info("Connected on %i server", len(client.guilds))
         loaded, failed = await load(client, global_systems, plugins)
-        client.log.info(f"{loaded} plugins loaded, {failed} plugins failed")
+        client.log.info(
+            "%i plugins loaded, %i plugins failed",
+            loaded,
+            failed,
+        )
 
         # Syncing slash commands
         client.log.info("♻️ Syncing app commands...")
         try:
             await client.tree.sync()
         except discord.DiscordException as e:
-            client.log.error(f"⚠️ Error while syncing app commands: {e}")
+            client.log.error("⚠️ Error while syncing app commands: %s", repr(e))
         else:
             client.log.info("✅ App commands synced")
 

@@ -160,7 +160,7 @@ class Admin(commands.Cog):
                 await errors_cog.on_error(exc, ctx)
                 await ctx.send(f"**`ERROR:`** {type(exc).__name__} - {exc}")
             else:
-                self.logger.info("Module {} rechargé".format(cog))
+                self.logger.info("Module %s rechargé", cog)
                 reloaded_cogs.append(cog)
         if len(reloaded_cogs) > 0:
             await ctx.bot.get_cog("General").count_lines_code()
@@ -174,7 +174,7 @@ class Admin(commands.Cog):
         try:
             await self.bot.load_extension("plugins." + name)
             await ctx.send("Module '{}' ajouté !".format(name))
-            self.logger.info("Module {} ajouté".format(name))
+            self.logger.info("Module %s ajouté", name)
         except Exception as exc:
             await ctx.send(str(exc))
 
@@ -184,7 +184,7 @@ class Admin(commands.Cog):
         try:
             await self.bot.unload_extension("plugins." + name)
             await ctx.send("Module '{}' désactivé !".format(name))
-            self.logger.info("Module {} désactivé".format(name))
+            self.logger.info("Module %s désactivé", name)
         except Exception as exc: # pylint: disable=broad-exception-caught
             await ctx.send(str(exc))
 

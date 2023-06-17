@@ -112,7 +112,7 @@ class Perms(commands.Cog):
                 if "perms.list." in perm:
                     # missing translation
                     perm = perm.replace("_", " ").title()
-                    self.logger.warn(f"[perms] missing permission translation: {perm}")
+                    self.logger.warning("[perms] missing permission translation: %s", perm)
                 if value:
                     permsl.append(":white_check_mark: " + perm)
                 else:

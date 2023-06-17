@@ -132,7 +132,7 @@ class MessageManager(commands.Cog):
                 await self.bot._(ctx.guild.id, "message_manager.moveall.missing-perm")
             )
             self.logger.info(
-                f'/move: Missing permissions on guild "{ctx.guild.name}"'
+                '/move: Missing permissions on guild "%s"', ctx.guild.name,
             )
             return
 
@@ -232,7 +232,7 @@ class MessageManager(commands.Cog):
                 await self.bot._(ctx.guild.id, "message_manager.moveall.missing-perm")
             )
             self.logger.info(
-                f'/moveall: Missing permissions on guild "{ctx.guild.name}"'
+                '/moveall: Missing permissions on guild "%s"', ctx.guild.name,
             )
             return
 
