@@ -515,7 +515,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
         """Load the xp cache for a specific guild
         Set guild=None for global leaderboard"""
         try:
-            self.logger.info(f"Loading XP cache (guild {guild})")
+            self.logger.info("Loading XP cache (guild %s)", repr(guild))
             query = "SELECT `userid`,`xp` FROM xp WHERE `guild` = ?"
             liste = self.bot.db_query(query, (guild,))
             if guild not in self.cache:

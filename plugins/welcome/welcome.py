@@ -47,7 +47,8 @@ class Welcome(commands.Cog):
         if not member.guild.me.guild_permissions.manage_roles:  # if not allowed to manage roles
             self.logger.info(
                 'Module - Welcome: Missing "manage_roles" permission'\
-                    f'on guild "{member.guild.name}"'
+                    'on guild "%s"',
+                member.guild.name,
             )
             return
         if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features:

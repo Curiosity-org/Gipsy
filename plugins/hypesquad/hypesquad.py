@@ -83,12 +83,12 @@ class Hypesquad(commands.Cog):
                         count += await self.edit_roles(member, roles)
             except discord.Forbidden:
                 # missing a perm
-                self.logger.warn(
-                    f"Unable to give roles in guild {g.id} ({g.name})"
+                self.logger.warning(
+                    "Unable to give roles in guild %i (%s)", g.id, g.name,
                 )
         delta = round(time.time() - start, 2)
         self.logger.info(
-            f"Finished roles check in {delta}s with {count} editions"
+           "Finished roles check in %f s with %i editions", delta, count,
         )
 
     @roles_loop.before_loop

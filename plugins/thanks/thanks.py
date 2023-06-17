@@ -194,7 +194,8 @@ class Thanks(commands.Cog):
         Return True if roles were given/removed, else False"""
         if not member.guild.me.guild_permissions.manage_roles:
             self.logger.info(
-                f'Module - Thanks: Missing "manage_roles" permission on guild "{member.guild.name}"'
+                'Module - Thanks: Missing "manage_roles" permission on guild "%s"',
+                member.guild.name,
             )
             return False
         guild: discord.Guild = member.guild
@@ -220,7 +221,9 @@ class Thanks(commands.Cog):
                 if len(roles) > 0:
                     await member.add_roles(*roles, reason="Thanks system")
                     self.logger.debug(
-                        f"[Thanks] Rôles {roles} ajoutés à {member} ({member.id})"
+                        "[Thanks] Rôles {roles} ajoutés à %s (%i)",
+                        repr(member),
+                        member.id,
                     )
                     gave_anything = True
             else:  # should remove roles
@@ -228,7 +231,10 @@ class Thanks(commands.Cog):
                 if len(roles) > 0:
                     await member.remove_roles(*roles, reason="Thanks system")
                     self.logger.debug(
-                        f"[Thanks] Rôles {roles} enlevés à {member} ({member.id})"
+                        "[Thanks] Rôles %s enlevés à %s (%i)",
+                        ', '.join([role.name for role in roles]),
+                        repr(member),
+                        member.id,
                     )
                     gave_anything = True
         return gave_anything

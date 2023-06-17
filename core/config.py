@@ -25,7 +25,7 @@ logger = setup_logger('config')
 def check():
     if not os.path.isfile("config.yaml"):
         print(" ")
-        logger.warn("⛔ The bot is not correctly setup. Running setup script...")
+        logger.warning("⛔ The bot is not correctly setup. Running setup script...")
         os.system("python3 setup.py")
         exit()
 

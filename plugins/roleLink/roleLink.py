@@ -165,10 +165,10 @@ class GroupRoles(commands.Cog):
             return
         names = [x.name for x in roles]
         if action.type == 0:
-            self.logger.debug(f"Giving {names} to {member}")
+            self.logger.debug("Giving roles %s to %s", ', '.join(names), repr(member))
             await member.add_roles(*roles, reason="Linked roles")
         else:
-            self.logger.debug(f"Removing {names} to {member}")
+            self.logger.debug("Removing %s to %s", ', '.join(names), repr(member))
             await member.remove_roles(*roles, reason="Linked roles")
 
     async def check_got_roles(self, member: discord.Member, roles: List[discord.Role]):

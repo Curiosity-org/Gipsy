@@ -112,7 +112,8 @@ class VoiceChannels(commands.Cog):
     async def give_roles(self, member: discord.Member, remove=False):
         if not member.guild.me.guild_permissions.manage_roles:
             self.logger.info(
-                f'Module - Voice: Missing "manage_roles" permission on guild "{member.guild.name}"'
+                'Module - Voice: Missing "manage_roles" permission on guild "%i"',
+                member.guild.name,
             )
             return
         member_guild = member.guild
@@ -185,7 +186,8 @@ class VoiceChannels(commands.Cog):
         if not (perms.manage_channels and perms.move_members):
             self.logger.info(
                 'Module - Voice: Missing "manage_channels, move_members"'\
-                    f'permission on guild "{member.guild.name}"'
+                    'permission on guild "%s"',
+                member.guild.name,
             )
             return
         channels_len = len(voice_category.channels)
