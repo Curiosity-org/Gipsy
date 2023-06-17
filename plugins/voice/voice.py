@@ -10,7 +10,9 @@ import random
 import aiohttp
 import discord
 from discord.ext import commands
+
 from utils import Gunibot, MyContext
+from core import setup_logger
 
 from core import config
 
@@ -19,6 +21,7 @@ class VoiceChannels(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "voices"
+        self.logger = setup_logger('voicechannels')
         self.names = {"random": [], "asterix": []}
         self.channels = dict()
         self.config_options = [
@@ -108,7 +111,7 @@ class VoiceChannels(commands.Cog):
 
     async def give_roles(self, member: discord.Member, remove=False):
         if not member.guild.me.guild_permissions.manage_roles:
-            self.bot.log.info(
+            self.logger.info(
                 f'Module - Voice: Missing "manage_roles" permission on guild "{member.guild.name}"'
             )
             return
@@ -180,7 +183,7 @@ class VoiceChannels(commands.Cog):
         perms = voice_category.permissions_for(member.guild.me)
         # S'il manque des perms au bot: abort
         if not (perms.manage_channels and perms.move_members):
-            self.bot.log.info(
+            self.logger.info(
                 'Module - Voice: Missing "manage_channels, move_members"'\
                     f'permission on guild "{member.guild.name}"'
             )

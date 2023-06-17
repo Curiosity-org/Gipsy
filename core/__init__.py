@@ -7,3 +7,5 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 
 version = (1, 4)
 version_string = '1.4'
+
+from .logger import *

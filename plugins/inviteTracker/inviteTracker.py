@@ -12,7 +12,7 @@ from discord.ext import commands
 
 from utils import Gunibot, MyContext
 from bot import checks
-
+from core import setup_logger
 
 class DatabaseInvite:
     """Represent a database invitation object"""
@@ -162,6 +162,7 @@ class Invite(commands.Cog):
 
     def __init__(self, bot: Gunibot):
         self.bot = bot
+        self.logger = setup_logger('invitetracker')
         self.config_options = ["invite_log"]
         bot.get_command("config").add_command(self.invite_log)
 
@@ -267,7 +268,7 @@ class Invite(commands.Cog):
         for guild in self.bot.guilds:
             if guild.me.guild_permissions.manage_guild:
                 await self.check_invites(guild)
-        self.bot.log.info("Invitations successfully synced")
+        self.logger.info("Invitations successfully synced")
 
     async def check_invites(self, guild: discord.Guild) -> List[DatabaseInvite]:
         """Check for all guild invite and changes

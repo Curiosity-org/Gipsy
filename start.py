@@ -14,7 +14,8 @@ import asyncio
 
 import discord
 from LRFutils import color
-from LRFutils import logs
+
+from core import setup_logger
 
 from utils import Gunibot
 from core import config
@@ -68,19 +69,21 @@ def main():
     Main function
     """
 
+    setup_logger("discord")
+
     # Creating client
     client = Gunibot(
         case_insensitive=True,
         status=discord.Status.do_not_disturb,
-        beta=False
+        beta=False,
     )
 
-    # Writing logs + welcome message
-    if not os.path.isdir("logs"):
-        os.makedirs("logs")
+    # Writing client.log + welcome message
+    if not os.path.isdir("client.log"):
+        os.makedirs("client.log")
 
     print(" ")
-    logs.info("▶️ Starting Gipsy...")
+    client.log.info("▶️ Starting Gipsy...")
 
     # pylint: disable-next=anomalous-backslash-in-string
     print_ascii_art()
@@ -95,7 +98,7 @@ def main():
                 await bot_client.load_extension(extension)
                 loaded += 1
             except Exception:  # pylint: disable=broad-except
-                logs.error(f"Failed to load extension: {extension}")
+                client.log.error(f"Failed to load extension: {extension}")
                 notloaded += "\n - " + extension
                 failed += 1
         return loaded, failed
@@ -103,30 +106,30 @@ def main():
     # Printing info when the bot is started
     async def on_ready():
         """Called when the bot is connected to Discord API"""
-        logs.info(f"{color.fg.green}✅ Bot connected")
-        logs.info("Nom : " + client.user.name)
-        logs.info("ID : " + str(client.user.id))
+        client.log.info(f"{color.fg.green}✅ Bot connected")
+        client.log.info("Nom : " + client.user.name)
+        client.log.info("ID : " + str(client.user.id))
         if len(client.guilds) < 200:
             serveurs = [x.name for x in client.guilds]
-            logs.info(
+            client.log.info(
                 "Connected on "
                 + str(len(client.guilds))
                 + " servers:\n - "
                 + "\n - ".join(serveurs)
             )
         else:
-            logs.info("Connected on " + str(len(client.guilds)) + " servers")
+            client.log.info("Connected on " + str(len(client.guilds)) + " servers")
         loaded, failed = await load(client, global_systems, plugins)
-        logs.info(f"{loaded} plugins loaded, {failed} plugins failed")
+        client.log.info(f"{loaded} plugins loaded, {failed} plugins failed")
 
         # Syncing slash commands
-        logs.info("♻️ Syncing app commands...")
+        client.log.info("♻️ Syncing app commands...")
         try:
             await client.tree.sync()
         except discord.DiscordException as e:
-            logs.error(f"⚠️ Error while syncing app commands: {e}")
+            client.log.error(f"⚠️ Error while syncing app commands: {e}")
         else:
-            logs.info("✅ App commands synced")
+            client.log.info("✅ App commands synced")
 
         print(
             "--------------------------------------------------------------------------------"
@@ -143,9 +146,12 @@ def main():
 
     # Launch bot
     try:
-        client.run(config.get("bot.token"))
+        client.run(
+            config.get("bot.token"),
+            log_handler=None,
+        )
     except discord.errors.LoginFailure:
-        logs.error("⚠️ Invalid token")
+        client.log.error("⚠️ Invalid token")
         config.token_set(force_set=True)
         os.system("python3 start.py")
         exit()
