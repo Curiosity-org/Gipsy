@@ -5,8 +5,6 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-import sys
-
 import discord
 from discord.ext import commands
 from discord.channel import TextChannel
@@ -95,7 +93,7 @@ class Antikikoo(commands.Cog):
             await message.channel.send(embed=emb)
             try:
                 await message.delete()
-            except BaseException:
+            except BaseException: #pylint: disable=broad-exception-caught
                 self.logger.exception("Cannot delete the verification message")
             verif_role = message.guild.get_role(config["verification_role"])
             if verif_role is None:
@@ -105,7 +103,7 @@ class Antikikoo(commands.Cog):
                     await message.author.add_roles(verif_role)
                 else:
                     await message.author.remove_roles(verif_role)
-            except BaseException:
+            except BaseException: #pylint: disable=broad-exception-caught
                 self.logger.exception(
                     "Cannot give or take away verification role from member %s", repr(message.author),
                 )

@@ -39,6 +39,7 @@ class GipsyLogs(logging.Formatter):
     """Custom colored logging formatter."""
 
     def __init__(self, colored: bool = False):
+        super().__init__()
         if colored:
             self.log_format = LOG_FORMAT_COLOR
             self.datetime_format = DATETIME_FORMAT_COLOR
@@ -88,12 +89,12 @@ def setup_logger(
     return logger
 
 if __name__ == "__main__":
-    logger = setup_logger(__name__, level=logging.DEBUG, filename="logs/tests.log")
+    test_logger = setup_logger(__name__, level=logging.DEBUG, filename="logs/tests.log")
 
     import random
 
-    logger.debug("This is a debug message")
-    logger.info("This is an info message %i", random.randint(0, 10))
-    logger.warning("This is a warning")
-    logger.error("Something is wrong, error")
-    logger.critical("It's the end of the world")
+    test_logger.debug("This is a debug message")
+    test_logger.info("This is an info message %i", random.randint(0, 10))
+    test_logger.warning("This is a warning")
+    test_logger.error("Something is wrong, error")
+    test_logger.critical("It's the end of the world")

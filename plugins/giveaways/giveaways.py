@@ -26,10 +26,10 @@ class Giveaways(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.embed_color = 0x9933ff
+        self.logger = setup_logger('giveways')
 
     async def cog_load(self):
         self.internal_task.start() # pylint: disable=no-member
-        self.logger = setup_logger('giveways')
 
     async def cog_unload(self):
         self.internal_task.cancel() # pylint: disable=no-member
@@ -579,7 +579,7 @@ class Giveaways(commands.Cog):
 
     async def send_results(self, giveaway: dict, winners: list[discord.Member]):
         """Send the giveaway results in a new embed"""
-        self.logger.info(f"Giveaway '{giveaway['name']}' has stopped")
+        self.logger.info("Giveaway '%s' has stopped", giveaway['name'])
         channel: discord.TextChannel = self.bot.get_channel(giveaway["channel"])
         if channel is None:
             return None

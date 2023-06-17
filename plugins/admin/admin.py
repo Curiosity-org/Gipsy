@@ -175,7 +175,7 @@ class Admin(commands.Cog):
             await self.bot.load_extension("plugins." + name)
             await ctx.send("Module '{}' ajouté !".format(name))
             self.logger.info("Module %s ajouté", name)
-        except Exception as exc:
+        except Exception as exc: #pylint: disable=broad-exception-caught
             await ctx.send(str(exc))
 
     @main_msg.command(name="del_cog", aliases=["remove_cog"], hidden=True)

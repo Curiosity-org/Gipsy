@@ -6,10 +6,8 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
 import json
-from typing import Any, Callable, Coroutine, Dict, Union, List, TYPE_CHECKING
 import os
 import sqlite3
-import sys
 from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, List, Optional, Union
 
 import discord
@@ -319,6 +317,7 @@ class CheckException(commands.CommandError):
         self.id = check_id # pylint: disable=invalid-name
 
 
+# pylint: disable=pointless-string-statement
 """ def setup_logger():
     "\""Create the logger module, used for logs"\""
     # on chope le premier logger
