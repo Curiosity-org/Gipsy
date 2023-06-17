@@ -13,7 +13,6 @@ import time
 import typing
 from marshal import dumps, loads
 import async_timeout
-import datetime
 
 from feedparser.util import FeedParserDict
 import discord

@@ -84,7 +84,7 @@ class Hypesquad(commands.Cog):
             except discord.Forbidden:
                 # missing a perm
                 self.logger.warning(
-                    "Unable to give roles in guild %i (%s)", g.id, g.name,
+                    "Unable to give roles in guild %i (%s)", guild.id, guild.name,
                 )
         delta = round(time.time() - start, 2)
         self.logger.info(
