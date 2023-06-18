@@ -97,8 +97,12 @@ def main():
             try:
                 await bot_client.load_extension(extension)
                 loaded += 1
-            except Exception:  # pylint: disable=broad-except
-                client.log.error("Failed to load extension: %s", extension)
+            except Exception as exc:  # pylint: disable=broad-except
+                client.log.error(
+                    "Failed to load extension: %s",
+                    extension,
+                    exc_info=exc,
+                )
                 notloaded += "\n - " + extension
                 failed += 1
         return loaded, failed
