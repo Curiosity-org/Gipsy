@@ -6,7 +6,6 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
 import json
-import logging
 import os
 import sqlite3
 import sys
@@ -17,6 +16,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from core import config
+from core import setup_logger
 
 if TYPE_CHECKING:
     from bot.utils.sconfig import Sconfig
@@ -66,7 +66,7 @@ class Gunibot(commands.bot.AutoShardedBot):
             allowed_mentions=ALLOWED,
             intents=intents,
         )
-        self.log = logging.getLogger("runner")  # logs module
+        self.log = setup_logger('core')  # logs module
         self.beta: bool = beta  # if the bot is in beta mode
         self.database = sqlite3.connect("data/database.db")  # database connection
         self.database.row_factory = sqlite3.Row
@@ -316,53 +316,6 @@ class CheckException(commands.CommandError):
     def __init__(self, check_id, *args):
         super().__init__(message=f"Custom check '{check_id}' failed", *args)
         self.id = check_id # pylint: disable=invalid-name
-
-
-def setup_logger():
-    """
-    Initialiser le logger
-
-    :return: None
-    """
-    # on chope le premier logger
-    log = logging.getLogger("runner")
-    # on définit un formatteur
-    formatter = logging.Formatter(
-        "%(asctime)s %(levelname)s: %(message)s", datefmt="[%d/%m/%Y %H:%M]"
-    )
-    # ex du format : [08/11/2018 14:46] WARNING RSSCog fetch_rss_flux l.288 :
-    # Cannot get the RSS flux because of the following error: (suivi du
-    # traceback)
-
-    # log vers un fichier
-    file_handler = logging.FileHandler("logs/debug.log")
-    # tous les logs de niveau DEBUG et supérieur sont evoyés dans le fichier
-    file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(formatter)
-
-    # log vers la console
-    stream_handler = logging.StreamHandler(sys.stdout)
-    # tous les logs de niveau INFO et supérieur sont evoyés dans le fichier
-    stream_handler.setLevel(logging.INFO)
-    stream_handler.setFormatter(formatter)
-
-    # supposons que nous voulions collecter les erreurs sur un site d'analyse d'erreurs comme sentry
-    # sentry_handler = x
-    # sentry_handler.setLevel(logging.ERROR)
-    # sentry_handler.setFormatter(format)
-
-    # log.debug("message de debug osef")
-    # log.info("message moins osef")
-    # log.warn("y'a un problème")
-    # log.error("y'a un gros problème")
-    # log.critical("y'a un énorme problème")
-
-    log.addHandler(file_handler)
-    log.addHandler(stream_handler)
-    # log.addHandler(sentry_handler)
-
-    return log
-
 
 CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {}
 

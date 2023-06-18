@@ -14,11 +14,13 @@ from discord.ext import commands
 
 from bot import checks, args
 from utils import Gunibot, MyContext
+from core import setup_logger
 
 
 class Thanks(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
+        self.logger = setup_logger('thanks')
         self.tasks = list()
         if bot.is_ready():
             self.schedule_tasks()
@@ -191,8 +193,9 @@ class Thanks(commands.Cog):
         """Give or remove thanks roles if needed
         Return True if roles were given/removed, else False"""
         if not member.guild.me.guild_permissions.manage_roles:
-            self.bot.log.info(
-                f'Module - Thanks: Missing "manage_roles" permission on guild "{member.guild.name}"'
+            self.logger.info(
+                'Module - Thanks: Missing "manage_roles" permission on guild "%s"',
+                member.guild.name,
             )
             return False
         guild: discord.Guild = member.guild
@@ -217,16 +220,21 @@ class Thanks(commands.Cog):
                 roles = list(filter(lambda x: x not in member.roles, roles))
                 if len(roles) > 0:
                     await member.add_roles(*roles, reason="Thanks system")
-                    self.bot.log.debug(
-                        f"[Thanks] Rôles {roles} ajoutés à {member} ({member.id})"
+                    self.logger.debug(
+                        "[Thanks] Rôles {roles} ajoutés à %s (%i)",
+                        repr(member),
+                        member.id,
                     )
                     gave_anything = True
             else:  # should remove roles
                 roles = list(filter(lambda x: x in member.roles, roles))
                 if len(roles) > 0:
                     await member.remove_roles(*roles, reason="Thanks system")
-                    self.bot.log.debug(
-                        f"[Thanks] Rôles {roles} enlevés à {member} ({member.id})"
+                    self.logger.debug(
+                        "[Thanks] Rôles %s enlevés à %s (%i)",
+                        ', '.join([role.name for role in roles]),
+                        repr(member),
+                        member.id,
                     )
                     gave_anything = True
         return gave_anything

@@ -267,7 +267,7 @@ class Errors(commands.Cog):
                     ctx.guild.name + " | " + ctx.channel.name + "\n" + msg
                 )
         except Exception as exc: # pylint: disable=broad-exception-caught
-            self.bot.log.warn(f"[on_error] {exc}", exc_info=True)
+            self.bot.log.warning(f"[on_error] {exc}", exc_info=True)
 
     async def senf_err_msg(self, msg):
         """Sends a message to the error channel"""

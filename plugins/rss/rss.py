@@ -25,6 +25,7 @@ import feedparser
 from bot import checks, args
 from utils import Gunibot, MyContext
 import core
+from core import setup_logger
 
 async def setup(bot:Gunibot):
     await bot.add_cog(Rss(bot), icon="📰")
@@ -39,6 +40,7 @@ class Rss(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.config = core.config.get("rss")
         self.bot = bot
+        self.logger = setup_logger('rss')
         self.time_loop = 15  # min minutes between two rss loops
         # seconds between two rss checks within a loop
         self.time_between_flows_check = 0.15
@@ -349,8 +351,11 @@ class Rss(commands.Cog):
                     display_type, link, ctx.channel.mention
                 )
             )
-            self.bot.log.info(
-                f"RSS feed added into server {ctx.guild.id} ({link} - {feed_id})"
+            self.logger.info(
+                "RSS feed added into server %i (%s - %i)",
+                ctx.guild.ig,
+                link,
+                feed_id,
             )
             await self.send_log(
                 f"Feed added into server {ctx.guild.id} ({feed_id})", ctx.guild,
@@ -382,8 +387,10 @@ class Rss(commands.Cog):
             await self.bot.get_cog("Errors").on_error(exc, ctx)
             return
         await ctx.send(await self.bot._(ctx.guild, "rss.delete-success"))
-        self.bot.log.info(
-            f"RSS feed deleted into server {ctx.guild.id} ({flow[0]['ID']})"
+        self.logger.info(
+            "RSS feed deleted into server %i (%i)",
+            ctx.guild.id,
+            flow[0]['ID'],
         )
         await self.send_log(
             f"Feed deleted into server {ctx.guild.id} ({flow[0]['ID']})",
@@ -1587,8 +1594,10 @@ class Rss(commands.Cog):
                     if statscog := self.bot.get_cog("BotStats"):
                         statscog.rss_stats["messages"] += 1
             except Exception as exc: # pylint: disable=broad-exception-caught
-                self.bot.log.info(
-                    f"[send_rss_msg] Cannot send message on channel {channel.id}: {exc}"
+                self.logger.info(
+                    "[send_rss_msg] Cannot send message on channel %i: %s",
+                    channel.id,
+                    repr(exc),
                 )
 
     async def check_flow(
@@ -1621,16 +1630,16 @@ class Rss(commands.Cog):
                 for obj in objs:
                     guild = self.bot.get_guild(flow["guild"])
                     if guild is None:
-                        self.bot.log.info(
-                            f"[send_rss_msg] Can not send message on server {flow['guild']}"\
-                                "(unknown)"
+                        self.logger.info(
+                            "[send_rss_msg] Can not send message on server %i (unknown)",
+                            flow['guild'],
                         )
                         return False
                     chan = guild.get_channel(flow["channel"])
                     if guild is None:
-                        self.bot.log.info(
-                            f"[send_rss_msg] Can not send message on channel {flow['channel']}"\
-                                "(unknown)"
+                        self.logger.info(
+                            "[send_rss_msg] Can not send message on channel %i (unknown)",
+                            flow['channel']
                         )
                         return False
                     obj.format = flow["structure"]
@@ -1661,11 +1670,11 @@ class Rss(commands.Cog):
         if self.loop_processing:
             return
         if guild_id is None:
-            self.bot.log.info("Check RSS lancé")
+            self.logger.info("Check RSS lancé")
             self.loop_processing = True
             liste = await self.db_get_all_flows()
         else:
-            self.bot.log.info(f"Check RSS lancé pour le serveur {guild_id}")
+            self.logger.info("Check RSS lancé pour le serveur %i", guild_id)
             liste = await self.db_get_guild_flows(guild_id)
         check = 0
         errors = []
@@ -1712,9 +1721,9 @@ class Rss(commands.Cog):
         )
         emb.set_author(name=str(self.bot.user), icon_url=self.bot.user.display_avatar)
         # await self.bot.get_cog("Embeds").send([emb],url="loop")
-        self.bot.log.debug(done[0])
+        self.logger.debug(done[0])
         if len(errors) > 0:
-            self.bot.log.warn("[Rss loop] " + done[1])
+            self.logger.warning("[Rss loop] %s", done[1])
         if guild_id is None:
             self.loop_processing = False
         self.twitter_over_capacity = False
@@ -1722,11 +1731,12 @@ class Rss(commands.Cog):
 
     @tasks.loop(minutes=20)
     async def loop_child(self):
-        self.bot.log.info(" Boucle rss commencée !")
+        self.logger.info(" Boucle rss commencée !")
         start = time.time()
         await self.bot.get_cog("Rss").main_loop()
-        self.bot.log.info(
-            f" Boucle rss terminée en {round(time.time() - start, 2)}s!"
+        self.logger.info(
+            " Boucle rss terminée en %f s!",
+            round(time.time() - start, 2),
         )
 
     @loop_child.before_loop
@@ -1748,14 +1758,14 @@ class Rss(commands.Cog):
                 await ctx.send("Boucle rss relancée !")
         elif new_state == "stop":
             await self.loop_child.cancel() # pylint: disable=no-member
-            self.bot.log.info(" Boucle rss arrêtée de force par un admin")
+            self.logger.info(" Boucle rss arrêtée de force par un admin")
             await ctx.send("Boucle rss arrêtée de force !")
         elif new_state == "once":
             if self.loop_processing:
                 await ctx.send("Une boucle rss est déjà en cours !")
             else:
                 await ctx.send("Et hop ! Une itération de la boucle en cours !")
-                self.bot.log.info(" Boucle rss forcée")
+                self.logger.info(" Boucle rss forcée")
                 await self.main_loop()
         else:
             await ctx.send(

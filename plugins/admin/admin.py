@@ -18,6 +18,7 @@ from git import Repo, GitCommandError
 
 from utils import Gunibot
 from bot import checks
+from core import setup_logger
 
 
 def cleanup_code(content):
@@ -32,6 +33,7 @@ def cleanup_code(content):
 class Admin(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
+        self.logger = setup_logger('admin')
         self._last_result = None
 
     @commands.group(name="admin", hidden=True)
@@ -62,7 +64,7 @@ class Admin(commands.Cog):
             try:
                 repo.git.checkout(branch)
             except GitCommandError as exc:
-                self.bot.log.exception(exc)
+                self.logger.exception(exc)
                 if (
                     "Your local changes to the following files would be overwritten by checkout"
                     in str(exc)
@@ -100,7 +102,7 @@ class Admin(commands.Cog):
         await self.cleanup_workspace()
         await msg.edit(content="Bot en voie d'extinction")
         await self.bot.change_presence(status=discord.Status("offline"))
-        self.bot.log.info("Fermeture du bot")
+        self.logger.info("Fermeture du bot")
         await self.bot.close()
 
     async def cleanup_workspace(self):
@@ -119,7 +121,7 @@ class Admin(commands.Cog):
         """Relance le bot"""
         await ctx.send(content="Redémarrage en cours...")
         await self.cleanup_workspace()
-        self.bot.log.info("Redémarrage du bot")
+        self.logger.info("Redémarrage du bot")
         os.execl(sys.executable, sys.executable, *sys.argv)
 
     @main_msg.command(name="purge")
@@ -158,7 +160,7 @@ class Admin(commands.Cog):
                 await errors_cog.on_error(exc, ctx)
                 await ctx.send(f"**`ERROR:`** {type(exc).__name__} - {exc}")
             else:
-                self.bot.log.info(f"Module {cog} rechargé")
+                self.logger.info("Module %s rechargé", cog)
                 reloaded_cogs.append(cog)
         if len(reloaded_cogs) > 0:
             await ctx.bot.get_cog("General").count_lines_code()
@@ -170,19 +172,19 @@ class Admin(commands.Cog):
     async def add_cog(self, ctx: commands.Context, name: str):
         """Ajouter un cog au bot"""
         try:
-            await self.bot.load_extension("plugins." + name + '.' + name)
-            await ctx.send(f"Module '{name}' ajouté !")
-            self.bot.log.info(f"Module {name} ajouté")
-        except Exception as exc: # pylint: disable=broad-exception-caught
+            await self.bot.load_extension("plugins." + name)
+            await ctx.send("Module '{}' ajouté !".format(name))
+            self.logger.info("Module %s ajouté", name)
+        except Exception as exc: #pylint: disable=broad-exception-caught
             await ctx.send(str(exc))
 
     @main_msg.command(name="del_cog", aliases=["remove_cog"], hidden=True)
     async def rm_cog(self, ctx: commands.Context, name: str):
         """Enlever un cog au bot"""
         try:
-            await self.bot.unload_extension("plugins." + name + '.' + name)
-            await ctx.send(f"Module '{name}' désactivé !")
-            self.bot.log.info(f"Module {name} désactivé")
+            await self.bot.unload_extension("plugins." + name)
+            await ctx.send("Module '{}' désactivé !".format(name))
+            self.logger.info("Module %s désactivé", name)
         except Exception as exc: # pylint: disable=broad-exception-caught
             await ctx.send(str(exc))
 

@@ -1,4 +1,4 @@
-"""
+"""giveways
 Ce programme est régi par la licence CeCILL soumise au droit français et
 respectant les principes de diffusion des logiciels libres. Vous pouvez
 utiliser, modifier et/ou redistribuer ce programme sous les conditions
@@ -18,7 +18,10 @@ from bot import args
 from utils import Gunibot
 
 from .src.view import GiveawayView
+from core import setup_logger
 
+
+from .src.view import GiveawayView
 
 class Giveaways(commands.Cog):
     "Manage giveaways in your server"
@@ -26,6 +29,7 @@ class Giveaways(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.embed_color = 0x9933ff
+        self.logger = setup_logger('giveways')
 
     async def cog_load(self):
         self.internal_task.start() # pylint: disable=no-member
@@ -578,7 +582,7 @@ class Giveaways(commands.Cog):
 
     async def send_results(self, giveaway: dict, winners: list[discord.Member]):
         """Send the giveaway results in a new embed"""
-        self.bot.log.info(f"Giveaway '{giveaway['name']}' has stopped")
+        self.logger.info("Giveaway '%s' has stopped", giveaway['name'])
         channel: discord.TextChannel = self.bot.get_channel(giveaway["channel"])
         if channel is None:
             return None
