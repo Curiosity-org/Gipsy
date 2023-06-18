@@ -172,8 +172,8 @@ class Admin(commands.Cog):
     async def add_cog(self, ctx: commands.Context, name: str):
         """Ajouter un cog au bot"""
         try:
-            await self.bot.load_extension("plugins." + name)
-            await ctx.send("Module '{}' ajouté !".format(name))
+            await self.bot.load_extension("plugins." + name + '.' + name)
+            await ctx.send(f"Module '{name}' ajouté !")
             self.logger.info("Module %s ajouté", name)
         except Exception as exc: #pylint: disable=broad-exception-caught
             await ctx.send(str(exc))
@@ -182,8 +182,8 @@ class Admin(commands.Cog):
     async def rm_cog(self, ctx: commands.Context, name: str):
         """Enlever un cog au bot"""
         try:
-            await self.bot.unload_extension("plugins." + name)
-            await ctx.send("Module '{}' désactivé !".format(name))
+            await self.bot.unload_extension("plugins." + name + '.' + name)
+            await ctx.send(f"Module '{name}' désactivé !")
             self.logger.info("Module %s désactivé", name)
         except Exception as exc: # pylint: disable=broad-exception-caught
             await ctx.send(str(exc))
