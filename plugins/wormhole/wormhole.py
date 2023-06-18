@@ -177,12 +177,12 @@ class Wormholes(commands.Cog):
         # comes as: (name, privacy, webhook_name, webhook_pp)
         res: list[Wormhole] = []
         for (name, privacy, wh_name, wh_pp) in wormholes:
-            query = "SELECT rowid, * FROM wormhole_admin WHERE name = ?"
+            query = "SELECT admin FROM wormhole_admin WHERE name = ?"
             owners = self.bot.db_query(query, (name,), astuple=True)
-            # come as: (rowid, name, admin)
+            # come as: (admin,)
             owner_list: list[int] = []
             for owner in owners:
-                owner_list.append(owner[2])
+                owner_list.append(owner[0])
             query = "SELECT * FROM wormhole_channel WHERE name = ?"
             channels = len(self.bot.db_query(query, (name,), astuple=True))
             res.append(Wormhole(name, privacy, wh_name, wh_pp, owner_list, self.bot, channels))
