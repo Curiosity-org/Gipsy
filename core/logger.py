@@ -1,6 +1,7 @@
 import logging
 import datetime
 import os
+import traceback
 
 from LRFutils import color
 
@@ -60,7 +61,7 @@ class GipsyLogs(logging.Formatter):
             level=record.levelname,
             color_end=color.stop,
             message=record.getMessage(),
-        )
+        ) + ('\n'+''.join(traceback.format_exception(*record.exc_info)) if record.exc_info else '')
 
 
 def setup_logger(
