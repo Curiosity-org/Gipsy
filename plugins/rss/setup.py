@@ -29,7 +29,7 @@ def run():
                 config["twitter"]["consumer_key"] = key
 
         if config["twitter"]["consumer_key"] is not None:
-            choice = input(f"\n{blue}A consumer kkey is already set."\
+            choice = input(f"\n{blue}A Twitter consumer key is already set. "\
                 f"Do you want to edit it? [y/N]:{stop} ")
             if choice in accept:
                 set_consumer_key()
@@ -45,7 +45,7 @@ def run():
                 config["twitter"]["consumer_secret"] = secret
 
         if config["twitter"]["consumer_secret"] is not None:
-            choice = input(f"\n{blue}A consumer secret is already set."\
+            choice = input(f"\n{blue}A Twitter consumer secret is already set. "\
                 f"Do you want to edit it? [y/N]:{stop} ")
             if choice in accept:
                 set_consumer_secret()
@@ -61,7 +61,7 @@ def run():
                 config["twitter"]["access_token_key"] = key
 
         if config["twitter"]["access_token_key"] is not None:
-            choice = input(f"\n{blue}An access token key is already set."\
+            choice = input(f"\n{blue}A Twitter access token key is already set. "\
                 f"Do you want to edit it? [y/N]:{stop} ")
             if choice in accept:
                 set_access_token_key()
@@ -76,7 +76,7 @@ def run():
                 config["twitter"]["access_token_secret"] = secret
 
         if config["twitter"]["access_token_secret"] is not None:
-            choice = input(f"\n{blue}An access token secret is already set."\
+            choice = input(f"\n{blue}A Twitter access token secret is already set. "\
                 f"Do you want to edit it? [y/N]:{stop} ")
             if choice in accept:
                 set_access_token_secret()
