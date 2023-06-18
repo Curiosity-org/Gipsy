@@ -393,6 +393,8 @@ class Wormholes(commands.Cog):
                         )
 
                 oldmessage = await get_corresponding_answer(channel, old_message)
+                if oldmessage is None:
+                    continue
 
                 try:
                     if isinstance(channel, discord.Thread):
