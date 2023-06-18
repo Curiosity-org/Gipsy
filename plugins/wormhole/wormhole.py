@@ -7,6 +7,7 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 
 import difflib
 from typing import Union
+import re
 
 import discord
 from aiohttp import ClientSession
@@ -229,7 +230,7 @@ class Wormholes(commands.Cog):
         # comes as: (name, privacy, webhook_name, webhook_pp_guild)
         return len(query_res) > 0
 
-    async def update_webhook(
+    async def db_update_webhook(
         self,
         channel: Union[discord.TextChannel, discord.Thread],
         wormhole_name: str,
@@ -259,6 +260,14 @@ class Wormholes(commands.Cog):
         ) # update the webhook in the database
 
         return new_webhook
+
+    async def is_tenor_update(self, before: discord.Message, after: discord.Message):
+        "Check if a message update is only about adding the tenor embed"
+        if before.content != after.content:
+            return False
+        embed_added = len(before.embeds) == 0 and len(after.embeds) == 1
+        contains_only_tenor_url = re.match(r'https://tenor.com/view/\w*', after.content)
+        return embed_added and contains_only_tenor_url
 
     @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):
@@ -304,6 +313,8 @@ class Wormholes(commands.Cog):
             "wormhole unlink" in old_message.content
             or "wh unlink" in old_message.content
         ):
+            return
+        if await self.is_tenor_update(old_message, new_message):
             return
         wh_channel = self.db_get_wh_channel_from_channel(new_message.channel.id)
         if not wh_channel:
@@ -490,7 +501,7 @@ class Wormholes(commands.Cog):
                             thread = channel if isinstance(channel, discord.Thread) else None,
                         )
                     except discord.NotFound: # the webhook has been deleted
-                        new_webhook = await self.update_webhook(
+                        new_webhook = await self.db_update_webhook(
                             channel,
                             wh_name,
                         )
