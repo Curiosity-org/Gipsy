@@ -78,7 +78,7 @@ class Dependency:
         triggers = " ".join([f"<@&{r}>" for r in self.trigger_roles])
         target = f"<@&{self.target_role}>"
         depedency_id = f"{self.dependency_id}. " if user_id else ""
-        return f"{depedency_id}{self.action.name} {target} when"\
+        return f"{depedency_id}{self.action.name} {target} when "\
             f"{self.trigger.name.replace('-', ' ')} of {triggers}"
 
 
