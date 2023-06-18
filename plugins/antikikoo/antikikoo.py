@@ -93,7 +93,7 @@ class Antikikoo(commands.Cog):
             await message.channel.send(embed=emb)
             try:
                 await message.delete()
-            except BaseException: #pylint: disable=broad-exception-caught
+            except (discord.Forbidden, discord.NotFound):
                 self.logger.exception("Cannot delete the verification message")
             verif_role = message.guild.get_role(config["verification_role"])
             if verif_role is None:
@@ -103,7 +103,7 @@ class Antikikoo(commands.Cog):
                     await message.author.add_roles(verif_role)
                 else:
                     await message.author.remove_roles(verif_role)
-            except BaseException: #pylint: disable=broad-exception-caught
+            except (discord.Forbidden, discord.NotFound):
                 self.logger.exception(
                     "Cannot give or take away verification role from member %s", repr(message.author),
                 )
