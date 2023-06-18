@@ -10,6 +10,7 @@ import random
 from datetime import datetime
 
 import discord
+from discord.utils import MISSING
 from discord.ext import commands
 
 from utils import Gunibot, MyContext
@@ -64,8 +65,9 @@ class Misc(commands.Cog):
                 ctx.guild.id, "misc.cookie.self", to=ctx.author.mention
             )
 
+        root_channel = ctx.channel.parent if isinstance(ctx.channel, discord.Thread) else ctx.channel
         # # Creating a webhook that makes reference to villagers of Element Animation
-        webhook: discord.Webhook = await ctx.channel.create_webhook(
+        webhook: discord.Webhook = await root_channel.create_webhook(
             name=f"Villager #{random.randint(1, 9)}"
         )
 
@@ -74,6 +76,7 @@ class Misc(commands.Cog):
             content=message,
             avatar_url="https://d31sxl6qgne2yj.cloudfront.net/wordpress/wp-content/uploads/"\
                 "20190121140737/Minecraft-Villager-Head.jpg",
+            thread=ctx.channel if isinstance(ctx.channel, discord.Thread) else MISSING,
         )
 
         # Cleaning webhook & command
@@ -103,10 +106,13 @@ class Misc(commands.Cog):
         embed.set_thumbnail(url="http://gunivers.net/wp-content/uploads/2021/07/Logo-mTxServ.png")
 
         # Building the webhook that will take the appearance off the hoster
-        webhook: discord.Webhook = await ctx.channel.create_webhook(name="mTx Serv")
+        root_channel = ctx.channel.parent if isinstance(ctx.channel, discord.Thread) else ctx.channel
+        webhook: discord.Webhook = await root_channel.create_webhook(name="mTx Serv")
         await webhook.send(
             embed=embed,
             avatar_url="http://gunivers.net/wp-content/uploads/2021/07/Logo-mTxServ.png",
+            thread=ctx.channel if isinstance(ctx.channel, discord.Thread) else MISSING,
+
         )
 
         # Cleaning the webhook
