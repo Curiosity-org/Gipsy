@@ -8,7 +8,6 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 import json
 import os
 import sqlite3
-import sys
 from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, List, Optional, Union
 
 import discord

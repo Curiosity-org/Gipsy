@@ -16,10 +16,7 @@ from discord.ext import commands, tasks
 
 from bot import args
 from utils import Gunibot
-
-from .src.view import GiveawayView
 from core import setup_logger
-
 
 from .src.view import GiveawayView
 
