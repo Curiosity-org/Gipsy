@@ -5,11 +5,11 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-import os
 import importlib
+import os
+import sys
 
 import yaml
-
 from LRFutils import color
 
 from core import setup_logger
@@ -21,13 +21,20 @@ _global_config = {}
 
 logger = setup_logger('config')
 
-# Check basic requirements and start this script if something is missing
 def check():
+    "Check basic requirements and start the setup script if something is missing"
     if not os.path.isfile("config.yaml"):
         print(" ")
         logger.warning("⛔ The bot is not correctly setup. Running setup script...")
         os.system("python3 setup.py")
-        exit()
+        sys.exit()
+    try:
+        get("bot.token")
+    except KeyError:
+        print(" ")
+        logger.warning("⛔ The bot token is missing. Running setup script...")
+        os.system("python3 setup.py")
+        sys.exit()
 
 
 def get(config: str):
@@ -108,7 +115,7 @@ def token_set(force_set=False):
     """Check if the token is set, if not, ask for it. Return True if the token is set,
     False if not."""
 
-    if _global_config["bot"]["token"] is not None and not force_set:
+    if _global_config["bot"].get("token") is not None and not force_set:
         choice = input(
             f"\n🔑 {color.fg.blue}A token is already set."\
                 f"Do you want to edit it? [y/N]:{color.stop} "
