@@ -5,16 +5,16 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-from typing import List, Union
-from marshal import dumps, loads
 import asyncio
+from marshal import dumps, loads
+from typing import List, Optional, Union
 
-from discord.ext import commands
 import discord
+from discord.ext import commands
 
 from bot import args
-from utils import Gunibot
 from core import setup_logger
+from utils import Gunibot
 
 # /rolelink <grant/revoke> <role> when <get/loose> <one/all> <roles>
 
@@ -72,7 +72,7 @@ class Dependency:
         self.trigger_roles = trigger_roles
         self.b_trigger_roles = dumps(trigger_roles)
         self.guild = guild
-        self.dependency_id = None
+        self.dependency_id: Optional[int] = None
 
     def to_str(self, user_id: bool = True) -> str:
         triggers = " ".join([f"<@&{r}>" for r in self.trigger_roles])
@@ -92,11 +92,11 @@ class GroupRoles(commands.Cog):
         self.logger = setup_logger('rolelink')
         self.file = ""
 
-    def db_get_config(self, guild_id: int) -> List[Dependency]:
+    def db_get_config(self, guild_id: int):
         """Get every dependencies of a specific guild"""
         query = "SELECT rowid, * FROM group_roles WHERE guild=?"
         # comes as: (rowid, guild, action, target, trigger, trigger-roles)
-        res = list()
+        res: list[Dependency] = []
         liste = self.bot.db_query(query, (guild_id,))
         for row in liste:
             temp = (
@@ -107,7 +107,7 @@ class GroupRoles(commands.Cog):
                 row["guild"],
             )
             res.append(Dependency(*temp))
-            res[-1].id = row["rowid"]
+            res[-1].dependency_id = row["rowid"]
         return res if len(res) > 0 else None
 
     def db_add_action(self, action: Dependency) -> int:
