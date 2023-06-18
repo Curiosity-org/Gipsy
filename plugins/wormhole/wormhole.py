@@ -170,6 +170,11 @@ class Wormholes(commands.Cog):
         self.bot = bot
         self.file = "wormhole"
 
+    def db_get_channels_count(self, wh_name: str) -> int:
+        "Get the number of channels linked to a wormhole"
+        query = "SELECT 1 FROM wormhole_channel WHERE name = ?"
+        return len(self.bot.db_query(query, (wh_name,), astuple=True))
+
     def db_get_wormholes(self):
         "Get every wormhole"
         query = "SELECT * FROM wormhole_list"
@@ -183,8 +188,7 @@ class Wormholes(commands.Cog):
             owner_list: list[int] = []
             for owner in owners:
                 owner_list.append(owner[0])
-            query = "SELECT * FROM wormhole_channel WHERE name = ?"
-            channels = len(self.bot.db_query(query, (name,), astuple=True))
+            channels = self.db_get_channels_count(wh_name)
             res.append(Wormhole(name, privacy, wh_name, wh_pp, owner_list, self.bot, channels))
         return res
 
@@ -202,8 +206,7 @@ class Wormholes(commands.Cog):
         owner_list: list[int] = []
         for owner in owners:
             owner_list.append(owner[0])
-        query = "SELECT 1 FROM wormhole_channel WHERE name = ?"
-        channels = len(self.bot.db_query(query, (wh_name,), astuple=True))
+        channels = self.db_get_channels_count(wh_name)
         return Wormhole(name, privacy, wh_name, wh_pp, owner_list, self.bot, channels)
 
     def db_get_wh_channels_in_guild(self, guild_id: int):
@@ -247,7 +250,6 @@ class Wormholes(commands.Cog):
         """Check if a wormhole already exist with the provided name"""
         query = "SELECT 1 FROM wormhole_list WHERE name = ?"
         query_res = self.bot.db_query(query, (wormhole,), astuple=True)
-        # comes as: (name, privacy, webhook_name, webhook_pp_guild)
         return len(query_res) > 0
 
     async def db_update_webhook(
@@ -817,7 +819,7 @@ class Wormholes(commands.Cog):
 
     @list.command(name="wormholes", aliases=["wh"])
     async def list_wh(self, ctx: MyContext):
-        """list all wormholes"""
+        """List all wormholes"""
         wormholes = self.db_get_wormholes()
         if not wormholes:  # we can't send an empty list
             await ctx.send(
@@ -831,7 +833,7 @@ class Wormholes(commands.Cog):
 
     @list.command(name="channels")
     async def list_channel(self, ctx: MyContext):
-        """list all channels linked to a Wormhole in the current server"""
+        """List all channels linked to a Wormhole in the current server"""
         channels = self.db_get_wh_channels_in_guild(ctx.guild.id)
         if not channels:  # we can't send an empty list
             await ctx.send(
