@@ -5,29 +5,26 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-from typing import List, Union
 import difflib
+from typing import Union
 
 import discord
-from discord.ext import commands
-
-from LRFutils import logs
 from aiohttp import ClientSession
+from discord.ext import commands
+from LRFutils import logs
 
-from utils import Gunibot, MyContext
 from bot import checks
+from utils import Gunibot, MyContext
 
-# Check if a message is similar to another one with 80% similarity
 
-
-def similar(msg1, msg2):
+def similar(msg1: str, msg2: str):
+    "Check if a message is similar to another one with 80% similarity"
     return difflib.SequenceMatcher(a=msg1.lower(), b=msg2.lower()).ratio() > 0.8
 
-
-# Get the corresponding answered message in other channels
 async def get_corresponding_answer(
     channel: discord.abc.Messageable, message: discord.Message
 ) -> discord.Message:
+    "Get the corresponding answered message in other channels"
     date = message.created_at
     async for msg in channel.history(limit=20, after=date, oldest_first=True):
         if similar(message.content, msg.content):
@@ -37,7 +34,6 @@ async def get_corresponding_answer(
             return msg
     return None
 
-
 async def send_message(
     msg: discord.Message,
     webhook: discord.Webhook,
@@ -46,6 +42,7 @@ async def send_message(
     embed_reply: discord.Embed = None,
     thread: discord.Thread = None
 ):
+    "Send a message into a wormhole entry"
     files = [await x.to_file() for x in msg.attachments]
     # grab mentions from the source message
     mentions = discord.AllowedMentions(
@@ -95,6 +92,7 @@ async def send_message(
 
 
 class PermissionType(commands.Converter):
+    "Represents a wormhole entry permission (ie. write, read or both)"
     types = ["w", "r", "wr"]
 
     def __init__(self, action: Union[str, int] = None):
@@ -116,8 +114,9 @@ class PermissionType(commands.Converter):
 
 
 class Wormhole:
+    "Represents a wormhole into the 'wormhole_list' table"
     def __init__(
-        self, name: str, privacy: bool, owners: List[int], bot: Gunibot, channels: int
+        self, name: str, privacy: bool, owners: list[int], bot: Gunibot, channels: int
     ):
         self.bot = bot
         self.name = name
@@ -128,7 +127,7 @@ class Wormhole:
     def to_str(self) -> str:
         """Transform the Wormhole to a human-readable string"""
         private = self.privacy == 1
-        owners: List[str] = []
+        owners: list[str] = []
         for owner in self.owners:
             user = self.bot.get_user(owner)
             owners.append(user.name if user else "Unknown user")
@@ -137,11 +136,15 @@ class Wormhole:
 
 
 class WormholeChannel:
-    def __init__(self, name: str, channel_id: int, guild_id: int, perms: str):
-        self.wormhole = name
+    "Represents a wormhole entry into the 'wormhole_channel' table"
+    def __init__(self, name: str, channel_id: int, guild_id: int, perms: str, webhook_id: int,
+                 webhook_token: str):
+        self.name = name
         self.channel_id = channel_id
         self.guild_id = guild_id
         self.perms = perms
+        self.webhook_id = webhook_id
+        self.webhook_token = webhook_token
 
     def to_str(self) -> str:
         """Transform the Channel to a human-readable string"""
@@ -153,52 +156,73 @@ class WormholeChannel:
             else "Write"
         )
         return f"Channel: <#{self.channel_id}>\n┗━▷ Linked to"\
-            f"**{self.wormhole}** - Permissions: *{perms}*"
+            f"**{self.name}** - Permissions: *{perms}*"
 
 
 class Wormholes(commands.Cog):
+    "Wormhole management commands"
+
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "wormhole"
 
-    def db_get_wormholes(self) -> List[Wormhole]:
-        """Get every wormhole"""
+    def db_get_wormholes(self):
+        "Get every wormhole"
         query = "SELECT rowid, * FROM wormhole_list"
         wormholes = self.bot.db_query(query, (), astuple=True)
         # comes as: (rowid, name, privacy)
-        res: List[Wormhole] = list()
+        res: list[Wormhole] = []
         for row in wormholes:
             query = "SELECT rowid, * FROM wormhole_admin WHERE name = ?"
             owners = self.bot.db_query(query, (row[1],), astuple=True)
             # come as: (rowid, name, admin)
-            owner_list: List[int] = []
+            owner_list: list[int] = []
             for owner in owners:
                 owner_list.append(owner[2])
             query = "SELECT * FROM wormhole_channel WHERE name = ?"
             channels = len(self.bot.db_query(query, (row[1],), astuple=True))
             res.append(Wormhole(*row[1:3], owner_list, self.bot, channels))
             res[-1].id = row[0]
-        return res if len(res) > 0 else None
+        return res
 
-    def db_get_channels(self, guild_id: int):
-        """Get every channel linked to a wormhole in this channel"""
-        query = "SELECT rowid, * FROM wormhole_channel WHERE guildID = ?"
-        channels = self.bot.db_query(query, (guild_id,), astuple=True)
-        # come as: (rowid, name, channelID, guildID, type, webhookID,
-        # webhookTOKEN)
-        res: List[WormholeChannel] = []
-        for row in channels:
-            res.append(WormholeChannel(*row[1:5]))
+    def db_get_wh_channels_in_guild(self, guild_id: int):
+        "Get every channel linked to a wormhole in this channel"
+        query = "SELECT * FROM wormhole_channel WHERE guildID = ?"
+        query_res = self.bot.db_query(query, (guild_id,), astuple=True)
+        # come as: (name, channelID, guildID, type, webhookID, webhookTOKEN)
+        res: list[WormholeChannel] = []
+        for row in query_res:
+            res.append(WormholeChannel(*row))
             res[-1].id = row[0]
-        return res if len(res) > 0 else None
+        return res
 
-    def check_is_admin(self, wormhole: str, user: int):
+    def db_get_wh_channel_from_channel(self, channel_id: int):
+        "Get the wormhole linked to a channel"
+        query = "SELECT * FROM wormhole_channel WHERE channelID = ?"
+        query_res = self.bot.db_query(query, (channel_id,), astuple=True, fetchone=True)
+        # come as: (name, channelID, guildID, type, webhookID, webhookTOKEN)
+        if not query_res:
+            return None
+        return WormholeChannel(*query_res)
+
+    def db_get_wh_channels_from_name(self, wh_name: str):
+        "Get every channel linked to a wormhole"
+        query = "SELECT * FROM wormhole_channel WHERE name = ?"
+        query_res = self.bot.db_query(query, (wh_name,), astuple=True)
+        # come as: (name, channelID, guildID, type, webhookID, webhookTOKEN)
+        res: list[WormholeChannel] = []
+        for row in query_res:
+            res.append(WormholeChannel(*row))
+            res[-1].id = row[0]
+        return res
+
+    def db_check_is_admin(self, wormhole: str, user: int):
         """Check if the provided user is an admin of the provided wormhole"""
         query = "SELECT 1 FROM wormhole_admin WHERE name = ? AND admin = ?"
         query_res = self.bot.db_query(query, (wormhole, user))
         return len(query_res) > 0
 
-    def check_wh_exists(self, wormhole: str):
+    def db_check_wh_exists(self, wormhole: str):
         """Check if a wormhole already exist with the provided name"""
         query = "SELECT 1 FROM wormhole_list WHERE name = ?"
         query_res = self.bot.db_query(query, (wormhole,), astuple=True)
@@ -236,23 +260,18 @@ class Wormholes(commands.Cog):
 
         return new_webhook
 
-    @commands.Cog.listener(name="on_message_delete")
-    async def on_message_delete(self, message):
+    @commands.Cog.listener()
+    async def on_message_delete(self, message: discord.Message):
         """Executed every time a message is deleted"""
-        query = "SELECT name, type FROM wormhole_channel WHERE channelID = ?"
-        wh_channel = self.bot.db_query(
-            query, (message.channel.id,), astuple=True, fetchone=True
-        )
-        # come as: (name, type)
-        if len(wh_channel) == 0:
+        wh_channel = self.db_get_wh_channel_from_channel(message.channel.id)
+        if not wh_channel:
             return  # Check if there is a wormhole linked to the current channel
-        if "w" not in wh_channel[1]:
+        if "w" not in wh_channel.perms:
             return  # Check if the current channel as Write permission
-        wh_name = wh_channel[0]
         query = "SELECT * FROM wormhole_channel WHERE name = ? AND type"\
             "LIKE '%r%' AND NOT channelID = ?"
         wh_targets = self.bot.db_query(
-            query, (wh_name, message.channel.id), astuple=True
+            query, (wh_channel.name, message.channel.id), astuple=True
         )
         # come as: (name, channelID, guildID, type, webhookID, webhookTOKEN)
         query = "SELECT webhook_name, webhook_pp FROM wormhole_list WHERE name = ?"
@@ -278,114 +297,99 @@ class Wormholes(commands.Cog):
                         except (discord.errors.NotFound, discord.errors.Forbidden):
                             pass
 
-    @commands.Cog.listener(name="on_message_edit")
-    async def on_message_edit(self, message:discord.Message, newmessage:discord.Message):
+    @commands.Cog.listener()
+    async def on_message_edit(self, old_message: discord.Message, new_message: discord.Message):
         """Executed every time a message is edited"""
         if (
-            "wormhole unlink" in message.content
-            or "wh unlink" in message.content
+            "wormhole unlink" in old_message.content
+            or "wh unlink" in old_message.content
         ):
             return
-        query = "SELECT name, type FROM wormhole_channel WHERE channelID = ?"
-        wh_channel = self.bot.db_query(
-            query, (message.channel.id,), astuple=True, fetchone=True
-        )
-        # come as: (name, type)
-        if len(wh_channel) == 0:
+        wh_channel = self.db_get_wh_channel_from_channel(new_message.channel.id)
+        if not wh_channel:
             return  # Check if there is a wormhole linked to the current channel
-        if "w" not in wh_channel[1]:
+        if "w" not in wh_channel.perms:
             return  # Check if the current channel as Write permission
-        
-        wh_name = wh_channel[0]
-        
+
         # If the sender is a webhook used by the wormhole, then we don't want to send the message
-        query = "SELECT * FROM wormhole_channel WHERE name = ? AND channelID = ?"
-        wh_local = self.bot.db_query(query, (wh_name, message.channel.id), astuple=True)[0]
-        # come as: (name, channelID, guildID, type, webhookID, webhookTOKEN)
-        if message.author.id == wh_local[4]: # sender id is the webhook used here
+        if old_message.author.id == wh_channel.webhook_id: # sender id is the webhook used here
             return
 
-        query = "SELECT * FROM wormhole_channel WHERE name = ? AND type LIKE"\
-            "'%r%' AND NOT channelID = ?"
-        wh_targets = self.bot.db_query(
-            query, (wh_name, message.channel.id), astuple=True
-        )
-        # come as: (name, channelID, guildID, type, webhookID, webhookTOKEN)
-        query = "SELECT webhook_name, webhook_pp FROM wormhole_list WHERE name = ?"
+        wh_targets = self.db_get_wh_channels_from_name(wh_channel.name)
 
-        # come as: (webhook_name, webhook_pp)
         async with ClientSession() as session:
             for row in wh_targets:
                 # We're starting to send the message in all the channels linked
                 # to that wormhole
-                channel: discord.abc.Messageable = self.bot.get_channel(row[1])
-                embeds = newmessage.embeds.copy()
+                channel: discord.abc.Messageable = self.bot.get_channel(row.channel_id)
+                embeds = new_message.embeds.copy()
 
-                if channel:
-                    webhook = discord.Webhook.partial(row[4], row[5], session=session)
+                if not channel:
+                    continue
+                webhook = discord.Webhook.partial(
+                    row.webhook_id, row.webhook_token, session=session
+                )
 
-                    if message.reference is not None:
-                        reply = await message.channel.fetch_message(
-                            message.reference.message_id
+                if old_message.reference is not None:
+                    reply = await old_message.channel.fetch_message(
+                        old_message.reference.message_id
+                    )
+                    reply = await get_corresponding_answer(channel, reply)
+                    if reply is None:
+                        embeds.append(
+                            discord.Embed(
+                                description=await self.bot._(
+                                    old_message.guild.id, "wormhole.reply_notfound"
+                                ),
+                                colour=0x2F3136,
+                            )
                         )
-                        reply = await get_corresponding_answer(channel, reply)
-                        if reply is None:
-                            embeds.append(
-                                discord.Embed(
-                                    # "https://gunivers.net"), #
-                                    description=await self.bot._(
-                                        message.guild.id, "wormhole.reply_notfound"
-                                    ),
-                                    colour=0x2F3136,  # 2F3136
-                                )
+                    else:
+                        content = reply.content.replace("\n", " ")
+                        if len(content) > 80:
+                            content = content[:80] + "..."
+                        embeds.append(
+                            discord.Embed(
+                                description=await self.bot._(
+                                    old_message.guild.id,
+                                    "wormhole.reply_to",
+                                    link=reply.jump_url,
+                                ),
+                                colour=0x2F3136,
+                            ).set_footer(
+                                text=content, icon_url=reply.author.display_avatar
                             )
-                        else:
-                            content = reply.content.replace("\n", " ")
-                            if len(content) > 80:
-                                content = content[:80] + "..."
-                            embeds.append(
-                                discord.Embed(
-                                    # "https://gunivers.net"), #
-                                    description=await self.bot._(
-                                        message.guild.id,
-                                        "wormhole.reply_to",
-                                        link=reply.jump_url,
-                                    ),
-                                    colour=0x2F3136,  # 2F3136
-                                ).set_footer(
-                                    text=content, icon_url=reply.author.display_avatar
-                                )
-                            )
-
-                    oldmessage = await get_corresponding_answer(channel, message)
-
-                    try:
-                        if isinstance(channel, discord.Thread):
-                            await webhook.edit_message(
-                                oldmessage.id,
-                                content=newmessage.content,
-                                embeds=embeds,
-                                allowed_mentions=None,
-                                thread = channel,
-                            )
-                        else:
-                            await webhook.edit_message(
-                                oldmessage.id,
-                                content=newmessage.content,
-                                embeds=embeds,
-                                allowed_mentions=None,
-                            )
-                    except discord.NotFound: # the webhook has been deleted
-                        logs.info(
-                            f"The webhook for channel {row[1]} for wormhole {wh_name} has"\
-                                "been deleted and a message has not been edited."
                         )
-                    except discord.Forbidden: # the webhook has changed, should not be possible due
-                        # to checks before
-                        logs.info(
-                            f"The webhook for channel {row[1]} for wormhole {wh_name} has changed"\
-                                "and a message has not been edited."
+
+                oldmessage = await get_corresponding_answer(channel, old_message)
+
+                try:
+                    if isinstance(channel, discord.Thread):
+                        await webhook.edit_message(
+                            oldmessage.id,
+                            content=new_message.content,
+                            embeds=embeds,
+                            allowed_mentions=None,
+                            thread = channel,
                         )
+                    else:
+                        await webhook.edit_message(
+                            oldmessage.id,
+                            content=new_message.content,
+                            embeds=embeds,
+                            allowed_mentions=None,
+                        )
+                except discord.NotFound: # the webhook has been deleted
+                    logs.info(
+                        f"The webhook for channel {row.channel_id} for wormhole  {wh_channel.name} \
+                            has been deleted and a message has not been edited."
+                    )
+                except discord.Forbidden: # the webhook has changed, should not be possible due
+                    # to checks before
+                    logs.info(
+                        f"The webhook for channel {row.channel_id} for wormhole {wh_channel.name} \
+                            has changed and a message has not been edited."
+                    )
 
 
     @commands.Cog.listener()
@@ -420,8 +424,8 @@ class Wormholes(commands.Cog):
             return
 
         # Getting all the other channels linked to the wormhole
-        query = "SELECT * FROM wormhole_channel WHERE name = ? AND type LIKE '%r%' AND NOT"\
-            "channelID = ?"
+        query = "SELECT * FROM wormhole_channel WHERE name = ? AND type LIKE '%r%' AND NOT \
+            channelID = ?"
         wh_targets = self.bot.db_query(
             query, (wh_name, message.channel.id), astuple=True
         )
@@ -527,7 +531,7 @@ class Wormholes(commands.Cog):
         if True it will be the Guild from where it comes
         and if False it will be the User who sent the message
         """
-        if self.check_wh_exists(name):
+        if self.db_check_wh_exists(name):
             await ctx.send(
                 await self.bot._(
                     ctx.guild.id, "wormhole.error.already-exists", name=name
@@ -566,14 +570,14 @@ class Wormholes(commands.Cog):
                 )
             )
             return
-        if not self.check_wh_exists(wormhole):
+        if not self.db_check_wh_exists(wormhole):
             await ctx.send(
                 await self.bot._(
                     ctx.guild.id, "wormhole.error.not-exists", name=wormhole
                 )
             )
         else:
-            if not self.check_is_admin(wormhole, ctx.author.id):
+            if not self.db_check_is_admin(wormhole, ctx.author.id):
                 await ctx.send(
                     await self.bot._(ctx.guild.id, "wormhole.error.not-admin")
                 )
@@ -628,14 +632,14 @@ class Wormholes(commands.Cog):
     @wormhole.command(name="remove", aliases=["delete"])
     async def remove(self, ctx: MyContext, wormhole: str):
         """Delete a wormhole"""
-        if not self.check_wh_exists(wormhole):
+        if not self.db_check_wh_exists(wormhole):
             await ctx.send(
                 await self.bot._(
                     ctx.guild.id, "wormhole.error.not-exists", name=wormhole
                 )
             )
             return
-        if not self.check_is_admin(wormhole, ctx.author.id):
+        if not self.db_check_is_admin(wormhole, ctx.author.id):
             await ctx.send(await self.bot._(ctx.guild.id, "wormhole.error.not-admin"))
             return
         query = "DELETE FROM wormhole_channel WHERE name = ?"
@@ -661,13 +665,13 @@ class Wormholes(commands.Cog):
         if privacy.lower() not in ["public", "private"]:
             await ctx.send(await self.bot._(ctx.guild.id, "wormhole.error.not-privacy"))
             return
-        if not self.check_wh_exists(wormhole):
+        if not self.db_check_wh_exists(wormhole):
             return await ctx.send(
                 await self.bot._(
                     ctx.guild.id, "wormhole.error.not-exists", name=wormhole
                 )
             )
-        if not self.check_is_admin(wormhole, ctx.author.id):
+        if not self.db_check_is_admin(wormhole, ctx.author.id):
             await ctx.send(await self.bot._(ctx.guild.id, "wormhole.error.not-admin"))
             return
         query = "UPDATE wormhole_list SET privacy = ? WHERE name = ?"
@@ -692,13 +696,13 @@ class Wormholes(commands.Cog):
         "fantomitechno from Gunivers".
         """
 
-        if not self.check_wh_exists(wormhole):
+        if not self.db_check_wh_exists(wormhole):
             return await ctx.send(
                 await self.bot._(
                     ctx.guild.id, "wormhole.error.not-exists", name=wormhole
                 )
             )
-        if not self.check_is_admin(wormhole, ctx.author.id):
+        if not self.db_check_is_admin(wormhole, ctx.author.id):
             await ctx.send(await self.bot._(ctx.guild.id, "wormhole.error.not-admin"))
             return
         query = "UPDATE wormhole_list SET webhook_name = ? WHERE name = ?"
@@ -710,14 +714,14 @@ class Wormholes(commands.Cog):
         """webhook_pp_guild is for which avatar will be the profile picture of the webhook
         if True it will be the Guild from where it comes
         and if False it will be the User who sent the message"""
-        if not self.check_wh_exists(wormhole):
+        if not self.db_check_wh_exists(wormhole):
             await ctx.send(
                 await self.bot._(
                     ctx.guild.id, "wormhole.error.not-exists", name=wormhole
                 )
             )
             return
-        if not self.check_is_admin(wormhole, ctx.author.id):
+        if not self.db_check_is_admin(wormhole, ctx.author.id):
             await ctx.send(await self.bot._(ctx.guild.id, "wormhole.error.not-admin"))
             return
         query = "UPDATE wormhole_list SET webhook_pp = ? WHERE name = ?"
@@ -733,14 +737,14 @@ class Wormholes(commands.Cog):
     @admin.command(name="add")
     async def admin_add(self, ctx: MyContext, wormhole: str, user: discord.User):
         """Add a user as a wormhole admin"""
-        if not self.check_wh_exists(wormhole):
+        if not self.db_check_wh_exists(wormhole):
             await ctx.send(
                 await self.bot._(
                     ctx.guild.id, "wormhole.error.not-exists", name=wormhole
                 )
             )
             return
-        if not self.check_is_admin(wormhole, ctx.author.id):
+        if not self.db_check_is_admin(wormhole, ctx.author.id):
             await ctx.send(await self.bot._(ctx.guild.id, "wormhole.error.not-admin"))
             return
         query = "SELECT 1 FROM wormhole_admin WHERE name = ? AND admin = ?"
@@ -761,14 +765,14 @@ class Wormholes(commands.Cog):
     @admin.command(name="remove", aliases=["revoke"])
     async def admin_remove(self, ctx: MyContext, wormhole: str, user: discord.User):
         """Revoke an admin of a wormhole"""
-        if not self.check_wh_exists(wormhole):
+        if not self.db_check_wh_exists(wormhole):
             await ctx.send(
                 await self.bot._(
                     ctx.guild.id, "wormhole.error.not-exists", name=wormhole
                 )
             )
             return
-        if not self.check_is_admin(wormhole, ctx.author.id):
+        if not self.db_check_is_admin(wormhole, ctx.author.id):
             await ctx.send(await self.bot._(ctx.guild.id, "wormhole.error.not-admin"))
             return
         query = "SELECT 1 FROM wormhole_admin WHERE name = ? AND admin = ?"
@@ -792,9 +796,9 @@ class Wormholes(commands.Cog):
         if ctx.subcommand_passed is None:
             await ctx.send_help("wormhole list")
 
-    @list.command(name="wormhole", aliases=["wh"])
+    @list.command(name="wormholes", aliases=["wh"])
     async def list_wh(self, ctx: MyContext):
-        """List all wormholes"""
+        """list all wormholes"""
         wormholes = self.db_get_wormholes()
         if not wormholes:  # we can't send an empty list
             await ctx.send(
@@ -806,14 +810,14 @@ class Wormholes(commands.Cog):
         txt = "\n".join([w.to_str() for w in wormholes]) # pylint: disable=not-an-iterable
         await ctx.send(txt)
 
-    @list.command(name="channel")
+    @list.command(name="channels")
     async def list_channel(self, ctx: MyContext):
-        """List all channels linked to a Wormhole in the current server"""
-        channels = self.db_get_channels(ctx.guild.id)
+        """list all channels linked to a Wormhole in the current server"""
+        channels = self.db_get_wh_channels_in_guild(ctx.guild.id)
         if not channels:  # we can't send an empty list
             await ctx.send(
                 await self.bot._(
-                    ctx.guild.id, "wormhole.error.no-channels", p=ctx.prefix
+                    ctx.guild.id, "wormhole.error.no-channel", p=ctx.prefix
                 )
             )
             return
