@@ -283,13 +283,19 @@ class Wormholes(commands.Cog):
 
         return new_webhook
 
-    async def is_tenor_update(self, before: discord.Message, after: discord.Message):
-        "Check if a message update is only about adding the tenor embed"
-        if before.content != after.content:
+    async def is_media_embed_update(self, before: discord.Message, after: discord.Message):
+        "Check if a message update is only about adding any media embed"
+        if before.content != after.content or before.embeds == after.embeds:
             return False
-        embed_added = len(before.embeds) == 0 and len(after.embeds) == 1
-        contains_only_tenor_url = re.match(r'https://tenor.com/view/\w*', after.content)
-        return embed_added and contains_only_tenor_url
+        # check if the edited embeds are only rich embeds (the only ones sendable by bots)
+        new_rich_embeds = [
+            embed
+            for embed in after.embeds
+            if embed not in before.embeds
+            and embed.type == "rich"
+        ]
+        # if no rich embed has been edited, it's not a bot update, so it must be a media embed
+        return len(new_rich_embeds) == 0
 
     @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):
@@ -334,7 +340,7 @@ class Wormholes(commands.Cog):
             or "wh unlink" in old_message.content
         ):
             return
-        if await self.is_tenor_update(old_message, new_message):
+        if await self.is_media_embed_update(old_message, new_message):
             return
         wh_channel = self.db_get_wh_channel_from_channel(new_message.channel.id)
         if not wh_channel:
