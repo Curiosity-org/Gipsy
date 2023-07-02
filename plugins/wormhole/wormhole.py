@@ -6,7 +6,6 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
 import difflib
-import re
 from typing import Optional, Union
 
 import discord
