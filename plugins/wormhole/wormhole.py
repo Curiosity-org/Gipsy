@@ -182,13 +182,11 @@ class Wormholes(commands.Cog):
         res: list[Wormhole] = []
         for (name, privacy, wh_name, wh_pp) in wormholes:
             query = "SELECT admin FROM wormhole_admin WHERE name = ?"
-            owners = self.bot.db_query(query, (name,), astuple=True)
+            rows = self.bot.db_query(query, (name,), astuple=True)
             # come as: (admin,)
-            owner_list: list[int] = []
-            for owner in owners:
-                owner_list.append(owner[0])
+            owners: list[int] = [row[0] for row in rows]
             channels = self.db_get_channels_count(wh_name)
-            res.append(Wormhole(name, privacy, wh_name, wh_pp, owner_list, self.bot, channels))
+            res.append(Wormhole(name, privacy, wh_name, wh_pp, owners, self.bot, channels))
         return res
 
     def db_get_wh_from_name(self, wh_name: str):
@@ -200,13 +198,11 @@ class Wormholes(commands.Cog):
             return None
         name, privacy, wh_name, wh_pp = wormhole
         query = "SELECT admin FROM wormhole_admin WHERE name = ?"
-        owners = self.bot.db_query(query, (wh_name,), astuple=True)
+        rows = self.bot.db_query(query, (wh_name,), astuple=True)
         # come as: (admin,)
-        owner_list: list[int] = []
-        for owner in owners:
-            owner_list.append(owner[0])
+        owners: list[int] = [row[0] for row in rows]
         channels = self.db_get_channels_count(wh_name)
-        return Wormhole(name, privacy, wh_name, wh_pp, owner_list, self.bot, channels)
+        return Wormhole(name, privacy, wh_name, wh_pp, owners, self.bot, channels)
 
     def db_get_wh_channels_in_guild(self, guild_id: int):
         "Get every channel linked to a wormhole in this channel"
