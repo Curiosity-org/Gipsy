@@ -134,8 +134,10 @@ class Wormhole:
         for owner in self.owners:
             user = self.bot.get_user(owner)
             owners.append(user.name if user else "Unknown user")
-        return f"Wormhole: {self.name}\n┗━▷ Private: {private} - Admins: {', '.join(owners)} - "\
-            f"**{self.channels_count}** Discord channels are linked"
+        are_linked_ = 'is linked' if self.channels_count == 1 else 'are linked'
+        admins_ = 'Admin' if len(owners) == 1 else 'Admins'
+        return f"Wormhole: {self.name}\n┗━▷ Private: {private} - {admins_}: {', '.join(owners)} - "\
+            f"**{self.channels_count}** Discord channels {are_linked_}"
 
 
 class WormholeChannel:
@@ -180,13 +182,13 @@ class Wormholes(commands.Cog):
         wormholes = self.bot.db_query(query, (), astuple=True)
         # comes as: (name, privacy, webhook_name, webhook_pp)
         res: list[Wormhole] = []
-        for (name, privacy, wh_name, wh_pp) in wormholes:
+        for (name, privacy, wh_name_format, wh_pp) in wormholes:
             query = "SELECT admin FROM wormhole_admin WHERE name = ?"
             rows = self.bot.db_query(query, (name,), astuple=True)
             # come as: (admin,)
             owners: list[int] = [row[0] for row in rows]
-            channels = self.db_get_channels_count(wh_name)
-            res.append(Wormhole(name, privacy, wh_name, wh_pp, owners, self.bot, channels))
+            channels = self.db_get_channels_count(name)
+            res.append(Wormhole(name, privacy, wh_name_format, wh_pp, owners, self.bot, channels))
         return res
 
     def db_get_wh_from_name(self, wh_name: str):
