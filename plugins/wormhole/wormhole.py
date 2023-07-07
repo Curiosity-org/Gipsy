@@ -49,7 +49,7 @@ async def send_message(
         everyone=msg.mention_everyone, users=msg.mentions, roles=msg.role_mentions
     )
     username = (
-        username.replace("{user}", msg.author.name, 10)
+        username.replace("{user}", msg.author.global_name or msg.author.name, 10)
         .replace("{guild}", msg.guild.name, 10)
         .replace("{channel}", msg.channel.name, 10)
     )
