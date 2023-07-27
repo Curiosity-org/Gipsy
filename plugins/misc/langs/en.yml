@@ -49,7 +49,7 @@ en:
       "footer": "Death messages created by Aragorn1202"
     dataja: 
       title: "Don't ask to ask, just ask"
-      description: "Learn the best practices to ask question:\nhttps://zrunner.me/d-a-t-a/en.html"
+      description: "Learn the best practices to ask question:\nhttps://dontasktoask.com/"
     timestamp:
       read-result: "The date in %{source} is <t:%{timestamp}> (<t:%{timestamp}:R>) (timestamp: %{timestamp})"
       not-found: "Date not found in %{source} !"
