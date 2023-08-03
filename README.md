@@ -21,3 +21,7 @@ Gipsy is modular, free and open-source Discord bot whose focus on accessibility 
 *This button redirect you to a more complete presentation with invitation links, list of features, self-hosting instructions and more.*
 
 </div>
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=curiosity-org/gipsy&type=Date)](https://star-history.com/#curiosity-org/gipsy&Date)
