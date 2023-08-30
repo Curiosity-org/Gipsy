@@ -33,7 +33,6 @@ fr:
     unknown-role: "Impossible de trouver le rôle %{r} :confused:"
     unknown-server: Serveur introuvable
     unknown-user: "Impossible de trouver l'utilisateur %{u} :confused:"
-    unknown-group: "Impossible de trouver le groupe %{g} :confused:"
   general:
     stats:
       title: "Statistiques du bot"

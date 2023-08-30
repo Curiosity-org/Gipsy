@@ -35,6 +35,71 @@ class Group:
         self._role = None
         self._channel = None
 
+    def role(self, bot: Gunibot) -> discord.Role:
+        """Get the Discord Role attached to that group"""
+        if self._role is None:
+            self._role = bot.get_guild(self.guild_id).get_role(self.role_id)
+        return self._role
+
+    def channel(self, bot: Gunibot) -> discord.TextChannel:
+        """Get the Discord Text Channel attached to that group"""
+        if self.channel_id is None:
+            return None
+        if self._channel is None:
+            self._channel = bot.get_guild(self.guild_id).get_channel(self.channel_id)
+        return self._channel
+
+    def member_is_in(self, member: discord.Member) -> bool:
+        """Check if a member is part of that group (ie has the attached role)"""
+        for role in member.roles:
+            if role.id == self.role_id:
+                return True
+        return False
+
+    def to_str(self) -> str:
+        """Transform the group to a human-readable string"""
+        channel = f"<#{self.channel_id}>" if self.channel_id else "None"
+        private = "True" if self.privacy == 1 else "False"
+        return f"Group: <@&{self.role_id}> (*id : {self.role_id}*)\n"\
+            f"┗━▷ Owner: <@{self.owner_id}> - Channel: {channel} - Private: {private}"
+
+
+class GroupConverter(commands.Converter):
+    """
+    Convert a user argument to the corresponding group, by looking for the Role name/id/mention
+    """
+
+    async def convert(self, ctx: MyContext, arg: str) -> Group:
+        try:
+            # try to convert it to a role
+            role = await commands.RoleConverter().convert(ctx, arg)
+        except commands.BadArgument:
+            await ctx.send(
+                await ctx.bot._(ctx.channel, "groups.error.unknown-group", g=arg),
+                ephemeral=True
+            )
+            raise commands.BadArgument()
+        # make sure the cog is actually loaded, let's not break everything
+        if cog := ctx.bot.get_cog("Groups"):
+            if res := cog.db_get_group(ctx.guild.id, role.id):
+                # if group exists, we return it
+                return res
+        await ctx.send(
+            await ctx.bot._(ctx.channel, "groups.error.unknown-group", g=arg),
+            ephemeral=True
+        )
+        raise commands.BadArgument()
+
+
+class Groups(commands.Cog):
+    def __init__(self, bot: Gunibot):
+        self.bot = bot
+        self.config_options = [
+            "group_allowed_role",
+            "group_channel_category",
+            "group_over_role",
+            "max_group",
+        ]
         try:
             bot.get_command("config").add_command(self.config_group_allowed_role)
             bot.get_command("config").add_command(self.config_group_channel_category)
@@ -89,66 +154,6 @@ class Group:
         """Create or load your server configuration"""
         if ctx.subcommand_passed is None:
             await ctx.send_help("config-backup")
-
-    def role(self, bot: Gunibot) -> discord.Role:
-        """Get the Discord Role attached to that group"""
-        if self._role is None:
-            self._role = bot.get_guild(self.guild_id).get_role(self.role_id)
-        return self._role
-
-    def channel(self, bot: Gunibot) -> discord.TextChannel:
-        """Get the Discord Text Channel attached to that group"""
-        if self.channel_id is None:
-            return None
-        if self._channel is None:
-            self._channel = bot.get_guild(self.guild_id).get_channel(self.channel_id)
-        return self._channel
-
-    def member_is_in(self, member: discord.Member) -> bool:
-        """Check if a member is part of that group (ie has the attached role)"""
-        for role in member.roles:
-            if role.id == self.role_id:
-                return True
-        return False
-
-    def to_str(self) -> str:
-        """Transform the group to a human-readable string"""
-        channel = f"<#{self.channel_id}>" if self.channel_id else "None"
-        private = "True" if self.privacy == 1 else "False"
-        return (
-            f"Group: <@&{self.role_id}> (*id : {self.role_id}*)\n"
-            f"┗━▷ Owner: <@{self.owner_id}> - Channel: {channel} - Private: {private}"
-        )
-
-
-class GroupConverter(commands.Converter):
-    """
-    Convert a user argument to the corresponding group, by looking for the Role name/id/mention
-    """
-
-    async def convert(self, ctx: MyContext, arg: str) -> Group:
-        try:
-            # try to convert it to a role
-            role = await commands.RoleConverter().convert(ctx, arg)
-        except commands.BadArgument as exception:
-            raise commands.BadArgument(f'Group "{arg}" not found.') from exception
-        # make sure the cog is actually loaded, let's not break everything
-        if cog := ctx.bot.get_cog("Groups"):
-            if res := cog.db_get_group(ctx.guild.id, role.id):
-                # if group exists, we return it
-                return res
-        raise commands.BadArgument(f'Group "{arg}" not found.')
-
-
-class Groups(commands.Cog):
-    def __init__(self, bot: Gunibot):
-        self.bot = bot
-        self.config_options = [
-            "group_allowed_role",
-            "group_channel_category",
-            "group_over_role",
-            "max_group",
-        ]
 
     def db_get_config(self, guild_id: int) -> List[Group]:
         """Get every group of a specific guild"""
@@ -278,11 +283,11 @@ class Groups(commands.Cog):
         Use its name, role ID or mention"""
         # if user is not the group owner and neither a server admin, we abort
         if (
-            group.ownerID != ctx.author.id
+            group.owner_id != ctx.author.id
             and not ctx.author.guild_permissions.administrator
         ):
             return ctx.send(await self.bot._(ctx.guild.id, "groups.error.not-owner"))
-        deleted = self.db_delete_group(ctx.guild.id, group.roleID)
+        deleted = self.db_delete_group(ctx.guild.id, group.role_id)
         if deleted:  # if everything went fine
             role = group.role(self.bot)
             await ctx.send(
@@ -290,11 +295,11 @@ class Groups(commands.Cog):
             )
             await role.delete()
             # try to get the channel
-            if not (group.channelID and group.channel(self.bot)):
+            if not (group.channel_id and group.channel(self.bot)):
                 return
             else:
                 # remove the channel in the database
-                update = self.db_update_group_channel(ctx.guild.id, group.roleID, None)
+                update = self.db_update_group_channel(ctx.guild.id, group.role_id, None)
                 if update:
                     # delete the channel now
                     await group.channel(self.bot).delete()
@@ -328,7 +333,7 @@ class Groups(commands.Cog):
     async def group_unregister(self, ctx: MyContext, group: GroupConverter):
         """Unregister a group without deleting the role
         Use his ID, name or mention"""
-        role_id = group.roleID
+        role_id = group.role_id
         deleted = self.db_delete_group(ctx.guild.id, role_id)
         if deleted:  # deletion confirmed
             role_name = group.role(self.bot).name
@@ -354,7 +359,7 @@ class Groups(commands.Cog):
         """Edit the owner of a group"""
         # if user is not the group owner and neither a server admin, we abort
         if (
-            group.ownerID != ctx.author.id
+            group.owner_id != ctx.author.id
             and not ctx.author.guild_permissions.administrator
         ):
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.no-update"))
@@ -378,7 +383,7 @@ class Groups(commands.Cog):
                 and reaction.message.id == msg.id
             )
 
-        role_id = group.roleID
+        role_id = group.role_id
         msg = await ctx.send(
             await self.bot._(
                 ctx.guild.id,
@@ -413,7 +418,7 @@ class Groups(commands.Cog):
     async def group_modify_name(self, ctx: MyContext, group: GroupConverter, name):
         """Edit the name of a group"""
         if (
-            group.ownerID != ctx.author.id
+            group.owner_id != ctx.author.id
             and not ctx.author.guild_permissions.administrator
         ):
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.no-update"))
@@ -422,7 +427,7 @@ class Groups(commands.Cog):
         # let's edit role accordingly
         await group.role(self.bot).edit(name=name)
         # if we should also update the channel name
-        if role_name.lower() == group.channel(self.bot).name:
+        if group.channel_id != None and role_name.lower() == group.channel(self.bot).name:
             await group.channel(self.bot).edit(name=name)
         await ctx.send(
             await self.bot._(
@@ -441,7 +446,7 @@ class Groups(commands.Cog):
         Example: group modify privacy CoolGuys private"""
         # if user is nor group owner nor server admin, we abort
         if (
-            group.ownerID != ctx.author.id
+            group.owner_id != ctx.author.id
             and not ctx.author.guild_permissions.administrator
         ):
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.no-update"))
@@ -452,7 +457,7 @@ class Groups(commands.Cog):
             return
         # it's private if the user asked to (yes)
         private = privacy.lower() == "private"
-        update = self.db_update_group_privacy(ctx.guild.id, group.roleID, private)
+        update = self.db_update_group_privacy(ctx.guild.id, group.role_id, private)
         if update:
             await ctx.send(
                 await self.bot._(
@@ -511,7 +516,7 @@ class Groups(commands.Cog):
     async def group_leave(self, ctx: MyContext, group: GroupConverter):
         """Leave a group"""
         # the owner cannot leave its own group
-        if group.ownerID == ctx.author.id:
+        if group.owner_id == ctx.author.id:
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.owner"))
             return
         # if user is not even in the group
@@ -538,7 +543,7 @@ class Groups(commands.Cog):
         """Give the userlist of your group"""
         # if user is not the group owner and neither a server admin, we abort
         if (
-            group.ownerID != ctx.author.id
+            group.owner_id != ctx.author.id
             and not ctx.author.guild_permissions.administrator
         ):
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.not-owner"))
@@ -563,7 +568,7 @@ class Groups(commands.Cog):
         Use that if the group is set to private"""
         # if user is not the group owner and neither a server admin, we abort
         if (
-            group.ownerID != ctx.author.id
+            group.owner_id != ctx.author.id
             and not ctx.author.guild_permissions.administrator
         ):
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.not-owner"))
@@ -592,7 +597,7 @@ class Groups(commands.Cog):
         """Remove a user to a group (by force)"""
         # if user is not the group owner and neither a server admin, we abort
         if (
-            group.ownerID != ctx.author.id
+            group.owner_id != ctx.author.id
             and not ctx.author.guild_permissions.administrator
         ):
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.not-owner"))
@@ -623,18 +628,18 @@ class Groups(commands.Cog):
         """Remove a group channel"""
         # if user is not the group owner and neither a server admin, we abort
         if (
-            group.ownerID != ctx.author.id
+            group.owner_id != ctx.author.id
             and not ctx.author.guild_permissions.administrator
         ):
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.not-owner"))
             return
         # try to get the channel
-        if not (group.channelID and group.channel(self.bot)):
+        if not (group.channel_id and group.channel(self.bot)):
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.no-channel"))
             return
         else:
             # remove the channel in the database
-            update = self.db_update_group_channel(ctx.guild.id, group.roleID, None)
+            update = self.db_update_group_channel(ctx.guild.id, group.role_id, None)
             if update:
                 # delete the channel now
                 await group.channel(self.bot).delete()
@@ -659,13 +664,13 @@ class Groups(commands.Cog):
             name = group.role(self.bot).name
         # if user is not the group owner and neither a server admin, we abort
         if (
-            group.ownerID != ctx.author.id
+            group.owner_id != ctx.author.id
             and not ctx.author.guild_permissions.administrator
         ):
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.not-owner"))
             return
         # if channel already exists
-        if group.channelID and group.channel(self.bot):
+        if group.channel_id and group.channel(self.bot):
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.channel-exist"))
             return
         # if no category has been created
@@ -691,7 +696,7 @@ class Groups(commands.Cog):
         channel = await ctx.guild.create_text_channel(
             name=name, overwrites=overwrite, category=categ
         )
-        self.db_update_group_channel(ctx.guild.id, group.roleID, channel.id)
+        self.db_update_group_channel(ctx.guild.id, group.role_id, channel.id)
         await ctx.send(
             await self.bot._(
                 ctx.guild.id, "groups.channel-create", name=group.role(self.bot).name
@@ -707,11 +712,11 @@ class Groups(commands.Cog):
         """Register a channel as a group channel
         You'll have to edit the permissions yourself :/"""
         # if a channel already exists for that group
-        if group.channelID and group.channel(self.bot):
+        if group.channel_id and group.channel(self.bot):
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.channel-exist"))
             return
         # update database, say yeepee
-        self.db_update_group_channel(ctx.guild.id, group.roleID, channel.id)
+        self.db_update_group_channel(ctx.guild.id, group.role_id, channel.id)
         await ctx.send(
             await self.bot._(
                 ctx.guild.id, "groups.channel-registred", name=group.role(self.bot).name
@@ -725,11 +730,11 @@ class Groups(commands.Cog):
         """Unregister a channel as a group channel
         This action will not delete the channel!"""
         # if no channel can be found
-        if not (group.channelID and group.channel(self.bot)):
+        if not (group.channel_id and group.channel(self.bot)):
             await ctx.send(await self.bot._(ctx.guild.id, "groups.error.no-channel"))
             return
         else:
-            update = self.db_update_group_channel(ctx.guild.id, group.roleID, None)
+            update = self.db_update_group_channel(ctx.guild.id, group.role_id, None)
             if update:
                 await ctx.send(
                     await self.bot._(
