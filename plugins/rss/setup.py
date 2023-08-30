@@ -13,7 +13,6 @@ def run():
     blue = color.fg.blue
     stop = color.stop
 
-    accept = ["yes", "y", "yeah","yep"]
     decline = ["no", "n", "nah", "nope"]
 
     config = core.config.get("rss")

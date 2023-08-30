@@ -7,7 +7,6 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 
 import asyncio
 import datetime
-import html
 import re
 import time
 import typing
