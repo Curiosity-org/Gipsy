@@ -107,7 +107,7 @@ class ChannelArchive(commands.Cog):
                     self.bot.get_channel(record["channel"]).category.id
                     != archive_category
                 ):
-                    query = f"DELETE FROM archive WHERE channel = {record['channel']}"\
+                    query = f"DELETE FROM archive WHERE channel = {record['channel']} "\
                         f"AND guild = {guild.id}"
                     unarchived += 1
                     self.bot.db_query(query, ())
@@ -117,12 +117,12 @@ class ChannelArchive(commands.Cog):
         for record in records:
             if self.bot.get_channel(record["channel"]) is None:
                 removed_records += 1
-                query = f"DELETE FROM archive WHERE channel = {record['channel']}"\
+                query = f"DELETE FROM archive WHERE channel = {record['channel']} "\
                     f"AND guild = {guild.id}"
                 self.bot.db_query(query, ())
 
         # Get & delete old channels
-        query = f"SELECT * FROM archive WHERE timestamp <= datetime('now','-{duration} seconds')"\
+        query = f"SELECT * FROM archive WHERE timestamp <= datetime('now','-{duration} seconds') "\
             f"AND guild = {guild.id}"
         records = self.bot.db_query(query, ())
 
@@ -136,7 +136,7 @@ class ChannelArchive(commands.Cog):
 
                     # Remove record
                     removed_records += 1
-                    query = f"DELETE FROM archive WHERE channel = {record['channel']}"\
+                    query = f"DELETE FROM archive WHERE channel = {record['channel']} "\
                         f"AND guild = {guild.id}"
                     self.bot.db_query(query, ())
 
