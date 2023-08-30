@@ -46,3 +46,4 @@ en:
       no-delete-channel: "Cannot find a group with this identifier or name"
       channel-exist: "This group already have a channel"
       no-category: "You have to config a category for groups channels : `%{p}config group_channel_category`"
+      unknown-group: "Unable to find group %{g} :confused:"
