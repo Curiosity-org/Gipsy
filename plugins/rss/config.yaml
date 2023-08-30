@@ -3,9 +3,4 @@
 # utiliser, modifier et/ou redistribuer ce programme sous les conditions
 # de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 
-twitter:
-    consumer_key: null
-    consumer_secret: null
-    access_token_key: null
-    access_token_secret: null
 rss_loop_enabled: true

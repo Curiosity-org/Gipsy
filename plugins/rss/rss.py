@@ -19,7 +19,6 @@ import discord
 from aiohttp.client import ClientSession
 from aiohttp import client_exceptions
 from discord.ext import commands, tasks
-import twitter
 import feedparser
 
 from bot import checks, args
@@ -48,8 +47,6 @@ class Rss(commands.Cog):
 
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
-        self.twitter_api = twitter.Api(**self.config["twitter"], tweet_mode="extended")
-        self.twitter_over_capacity = False
         self.min_time_between_posts = {"web": 120, "tw": 15, "yt": 120}
         self.cache = {}
         self.table = "rss_flows"
@@ -168,10 +165,7 @@ class Rss(commands.Cog):
             if footer := self.embed_data.get("footer", None):
                 embed.set_footer(text=footer)
             if self.embed_data.get("title", None) is None:
-                if self.message_type != "tw":
-                    embed.title = self.title
-                else:
-                    embed.title = self.author
+                embed.title = self.title
             else:
                 embed.title = self.embed_data["title"]
             embed.add_field(name="URL", value=self.url, inline=False)
@@ -231,31 +225,6 @@ class Rss(commands.Cog):
                 await ctx.send(embed=obj)
             else:
                 await ctx.send(obj)
-
-    @rss_main.command(name="twitter", aliases=["tw"])
-    async def request_tw(self, ctx: MyContext, name):
-        """The last tweet of a Twitter account
-
-        ..Examples:
-            - rss twitter https://twitter.com/z_runnerr
-            - rss tw z_runnerr
-        """
-        if "twitter.com" in name:
-            name = await self.parse_tw_url(name)
-        try:
-            text = await self.rss_tw(ctx.channel, name)
-        except Exception as exc: # pylint: disable=broad-exception-caught
-            return await self.bot.get_cog("Errors").on_error(exc, ctx)
-        if isinstance(text, str):
-            await ctx.send(text)
-        else:
-            form = await self.bot._(ctx.channel, "rss.tw-form-last")
-            for single in text[:5]:
-                obj = await single.create_msg(await self.get_lang(ctx.guild), form)
-                if isinstance(obj, discord.Embed):
-                    await ctx.send(embed=obj)
-                else:
-                    await ctx.send(obj)
 
     @rss_main.command(name="web")
     async def request_web(self, ctx: MyContext, link):
@@ -318,11 +287,6 @@ class Rss(commands.Cog):
         if identifiant is not None:
             rss_type = "yt"
             display_type = "youtube"
-        if identifiant is None:
-            identifiant = await self.parse_tw_url(link)
-            if identifiant is not None:
-                rss_type = "tw"
-                display_type = "twitter"
         if identifiant is None:
             identifiant = await self.parse_twitch_url(link)
             if identifiant is not None:
@@ -492,13 +456,6 @@ class Rss(commands.Cog):
             for feed in guild_feeds:
                 if (not allow_mc) and feed["type"] == "mc":
                     continue
-                if feed["type"] == "tw" and feed["link"].isnumeric():
-                    try:
-                        feed["link"] = self.twitter_api.GetUser(
-                            user_id=int(feed["link"])
-                        ).screen_name
-                    except twitter.TwitterError:
-                        pass
                 feed_ids.append(feed["ID"])
                 channel = self.bot.get_channel(feed["channel"])
                 if channel is not None:
@@ -780,7 +737,7 @@ class Rss(commands.Cog):
         - `{channel}`: the channel name (usually the same as author)
         - `{date}`: the post date (UTC)
         - `{link}` or `{url}`: a link to the post
-        - `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
+        - `{logo}`: an emoji representing the type of post (web, YouTube...)
         - `{mentions}`: the list of mentioned roles
         - `{title}`: the title of the post
 
@@ -968,10 +925,7 @@ class Rss(commands.Cog):
                 txt = ["**__Analyse :__**", ""]
                 youtube = await self.parse_yt_url(feeds.feed["link"])
                 if youtube is None:
-                    tw_url = await self.parse_tw_url(feeds.feed["link"])
-                    if tw_url is not None:
-                        txt.append("<:twitter:437220693726330881>  " + tw_url)
-                    elif "link" in feeds.feed.keys():
+                    if "link" in feeds.feed.keys():
                         txt.append(":newspaper:  <" + feeds.feed["link"] + ">")
                     else:
                         txt.append(":newspaper:  No 'link' var")
@@ -1008,9 +962,6 @@ class Rss(commands.Cog):
         result = await self.parse_yt_url(url)
         if result is not None:
             return True
-        result = await self.parse_tw_url(url)
-        if result is not None:
-            return True
         result = await self.parse_twitch_url(url)
         if result is not None:
             return True
@@ -1032,19 +983,6 @@ class Rss(commands.Cog):
             return None
         else:
             return match.group(1)
-
-    async def parse_tw_url(self, url):
-        pattern = r"(?:http.*://)?(?:www.)?(?:twitter.com/)([^?\s]+)"
-        match = re.search(pattern, url)
-        if match is None:
-            return None
-        else:
-            name = match.group(1)
-            try:
-                user = self.twitter_api.GetUser(screen_name=name)
-            except twitter.TwitterError:
-                return None
-            return user.id
 
     async def parse_twitch_url(self, url):
         pattern = r"(?:http.*://)?(?:www.)?(?:twitch.tv/)([^?\s]+)"
@@ -1160,82 +1098,6 @@ class Rss(commands.Cog):
                     author=feed["author"],
                     channel=feed["author"],
                     image=img_url,
-                )
-                liste.append(obj)
-            liste.reverse()
-            return liste
-
-    async def rss_tw(
-        self, channel: discord.TextChannel, name: str, date: datetime.datetime = None
-    ):
-        if name == "help":
-            return await self.bot._(channel, "rss.tw-help")
-        try:
-            if name.isnumeric():
-                posts = self.twitter_api.GetUserTimeline(
-                    user_id=int(name), exclude_replies=True
-                )
-                username = self.twitter_api.GetUser(user_id=int(name)).screen_name
-            else:
-                posts = self.twitter_api.GetUserTimeline(
-                    screen_name=name, exclude_replies=True
-                )
-                username = name
-        except twitter.error.TwitterError as exc:
-            if exc.message == "Not authorized.":
-                return await self.bot._(channel, "rss.nothing")
-            if "Unknown error" in exc.message:
-                return await self.bot._(channel, "rss.nothing")
-            if "The twitter.Api instance must be authenticated." in exc.message:
-                return await self.bot._(channel, "rss.wrong-token")
-            if exc.message[0]["code"] == 34:
-                return await self.bot._(channel, "rss.nothing")
-            raise exc
-        if not date:
-            if len(posts) == 0:
-                return []
-            lastpost = posts[0]
-            text = html.unescape(getattr(lastpost, "full_text", lastpost.text))
-            url = f"https://twitter.com/{username.lower()}/status/{lastpost.id}"
-            img = None
-            if lastpost.media:  # if exists and is not empty
-                img = lastpost.media[0].media_url_https
-            obj = self.RSSMessage(
-                bot=self.bot,
-                message_type="tw",
-                url=url,
-                title=text,
-                date=datetime.datetime.fromtimestamp(lastpost.created_at_in_seconds),
-                author=lastpost.user.screen_name,
-                channel=lastpost.user.name,
-                image=img,
-            )
-            return [obj]
-        else:
-            liste = list()
-            for post in posts:
-                if len(liste) > 10:
-                    break
-                if (
-                    datetime.datetime.fromtimestamp(post.created_at_in_seconds) - date
-                ).total_seconds() < self.min_time_between_posts["tw"]:
-                    break
-                text = html.unescape(getattr(post, "full_text", post.text))
-                if result := re.search(r"https://t.co/([^\s]+)", text):
-                    text = text.replace(result.group(0), "")
-                url = f"https://twitter.com/{name.lower()}/status/{post.id}"
-                img = None
-                if post.media:  # if exists and is not empty
-                    img = post.media[0].media_url_https
-                obj = self.RSSMessage(
-                    bot=self.bot,
-                    message_type="tw",
-                    url=url,
-                    title=text,
-                    date=datetime.datetime.fromtimestamp(post.created_at_in_seconds),
-                    author=post.user.screen_name,
-                    channel=post.user.name,
-                    image=img,
                 )
                 liste.append(obj)
             liste.reverse()
@@ -1609,21 +1471,10 @@ class Rss(commands.Cog):
                 objs = self.cache[flow["link"]]
             else:
                 funct = getattr(self, f"rss_{flow['type']}")
-                if flow["type"] == "tw":
-                    objs = await funct(guild, flow["link"], flow["date"])
-                else:
-                    objs = await funct(
-                        guild, flow["link"], flow["date"], session=session
-                    )
-                if isinstance(objs, twitter.error.TwitterError):
-                    self.twitter_over_capacity = True
-                    return False
-                flow["link"] = objs
-            if isinstance(objs, twitter.TwitterError):
-                await self.bot.get_user(279568324260528128).send(
-                    f"[send_rss_msg] twitter error dans `await check_flow(): {objs}`"
+                objs = await funct(
+                    guild, flow["link"], flow["date"], session=session
                 )
-                raise objs
+                flow["link"] = objs
             if isinstance(objs, (str, type(None), int)) or len(objs) == 0:
                 return True
             elif isinstance(objs, list):
@@ -1684,8 +1535,6 @@ class Rss(commands.Cog):
         session = ClientSession()
         for flow in liste:
             try:
-                if flow["type"] == "tw" and self.twitter_over_capacity:
-                    continue
                 if flow["type"] == "mc":
                     if minecraft_cog := self.bot.get_cog("Minecraft"):
                         await minecraft_cog.check_flow(flow, send_stats=guild_id is None)
@@ -1726,7 +1575,6 @@ class Rss(commands.Cog):
             self.logger.warning("[Rss loop] %s", done[1])
         if guild_id is None:
             self.loop_processing = False
-        self.twitter_over_capacity = False
         self.cache = dict()
 
     @tasks.loop(minutes=20)

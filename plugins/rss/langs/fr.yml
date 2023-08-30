@@ -5,7 +5,7 @@
 
 fr:
   rss:
-    change-txt: "Le message actuel contient \n```\n{text}\n```\nVeuillez entrer le texte à utiliser lors d'un nouveau post. Vous pouvez utiliser plusieurs variables, dont voici la liste :\n- `{author}` : l'auteur du post\n- `{channel}` : le nom de la chaîne (généralement le même que l'auteur)\n- `{date}` : la date du post (UTC)\n- `{link}` ou `{url}` : un lien vers le post\n- `{logo}` : un emoji représentant le type de post (web, Twitter, YouTube...)\n- `{mentions}` : la liste des rôles mentionnés\n- `{title}` : le titre du post"
+    change-txt: "Le message actuel contient \n```\n{text}\n```\nVeuillez entrer le texte à utiliser lors d'un nouveau post. Vous pouvez utiliser plusieurs variables, dont voici la liste :\n- `{author}` : l'auteur du post\n- `{channel}` : le nom de la chaîne (généralement le même que l'auteur)\n- `{date}` : la date du post (UTC)\n- `{link}` ou `{url}` : un lien vers le post\n- `{logo}` : un emoji représentant le type de post (web, Twitch, YouTube...)\n- `{mentions}` : la liste des rôles mentionnés\n- `{title}` : le titre du post"
     choose-delete: "Veuillez choisir le flux à supprimer"
     choose-mentions-1: "Veuillez choisir le flux à modifier"
     choose-roles: "Quels seront les rôles à mentionner ?"
@@ -31,7 +31,6 @@ fr:
     no-feed2: "Ce serveur ne possède aucun flux rss !"
     no-roles: "Aucun rôle n'a été configuré pour l'instant."
     not-a-role: "Ce rôle est introuvable. Réessayez :"
-    wrong-token: "Le token d'API Twitter n'est pas bon"
     nothing: "Je n'ai rien trouvé sur cette recherche :confused:"
     research-timeout: "La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:"
     roles-0: "Ce flux a bien été modifié pour mentionner les rôles {}"
@@ -40,10 +39,6 @@ fr:
     success-add: "Le flux rss de type '{}' avec le lien <{}> a bien été ajouté dans le salon {} !"
     text-success: "Le texte du flux n°{} a bien été modifié ! Nouveau texte : \n```\n{}\n```"
     too-long: "Vous avez trop attendu, désolé :hourglass:"
-    tw: "Twitter"
-    tw-default-flow: "{logo}  | Nouveau tweet de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}"
-    tw-form-last: "{logo}  | Voici le dernier tweet de {author}:\nÉcrit le {date}\n\n{title}\n\nLien : {url}\n"
-    tw-help: "Pour rechercher une chaîne twitter, vous devez entrer l'identifiant de cette chaîne. Vous la trouverez à la fin de l'url de la chaîne, elle correspond généralement au nom de l'utilisateur. Par exemple, pour *https://twitter.com/Gunivers_*, il faut rentrer `Gunivers_`"
     twitch: "Twitch"
     twitch-default-flow: "{logo}  | Nouveau live de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}"
     twitch-form-last: "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}\n"

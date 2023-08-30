@@ -7,7 +7,7 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 
 # 📰 RSS
 
-Gipsy offers you the possibility to follow different content sources, from social networks like Youtube or Twitter to simple blogs equipped with an RSS feed system.
+Gipsy offers you the possibility to follow different content sources, from social networks like Youtube or Twitch to simple blogs equipped with an RSS feed system.
 
 ## Add or remove a feed
 
@@ -65,7 +65,7 @@ Modifies the text of the feed. Several variables can be used in the text:
 * `{channel}` : the name of the channel
 * `{date}` : the date of publication of the post (UTC)
 * `{link}` or `{url}` : the link to the post
-* `{logo}` : an emoji representing the type of post (web, Twitter, YouTube...)
+* `{logo}` : an emoji representing the type of post (web, YouTube, Twitch...)
 * `{mentions}` : the list of roles mentioned
 * `{title}` : the title of the post
 

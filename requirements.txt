@@ -5,7 +5,6 @@ python-i18n
 pyyaml
 emoji >= 2.0
 feedparser >= 6.0
-python-twitter >= 3.5
 async-timeout >= 3.0
 argparse
 numpy

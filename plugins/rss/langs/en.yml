@@ -5,7 +5,7 @@
 
 en:
   rss:
-    change-txt: "The current message contain \n```\n{text}\n```\nPlease enter the text to be used in a new post. You can use several variables, there is the list:\n- `{author}`: post author\n- `{channel}`: channel name (usually the same as the author)\n- `{date}`: post date (UTC)\n- `{link}` or `{url}`: a link to the post\n- `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)\n- `{mentions}`: list of mentionned roles\n- `{title}`: post title"
+    change-txt: "The current message contain \n```\n{text}\n```\nPlease enter the text to be used in a new post. You can use several variables, there is the list:\n- `{author}`: post author\n- `{channel}`: channel name (usually the same as the author)\n- `{date}`: post date (UTC)\n- `{link}` or `{url}`: a link to the post\n- `{logo}`: an emoji representing the type of post (web, Twitch, YouTube...)\n- `{mentions}`: list of mentionned roles\n- `{title}`: post title"
     choose-delete: "Chose a feed to delete"
     choose-mentions-1: "Chose a feed to edit"
     choose-roles: "Wich role do you want to mention?"
@@ -31,7 +31,6 @@ en:
     no-feed2: "This server has no rss feeds!"
     no-roles: "No roles have been configured yet."
     not-a-role: "This role cannot be found. Try again."
-    wrong-token: "Invalid twitter API token."
     nothing: "I couldn't find anything on this search :confused:"
     research-timeout: "The web page took too long to respond, I had to abort the process :eyes:"
     roles-0: "This feed has been modified to mention roles {}"
@@ -40,10 +39,6 @@ en:
     success-add: "The rss feed of type '{}' with the link <{}> has been added to the {} channel!"
     text-success: "The text of the feed n°{} has been modified! New text: \n```\n{}\n```"
     too-long: "You waited too long, sorry :hourglass:"
-    tw: "Twitter"
-    tw-default-flow: "{logo}  | New tweet of {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}"
-    tw-form-last: "{logo}  | Here is the latest tweet from {author}:\nWritten on {date}\n\n{title}\n\nLink: {url}\n"
-    tw-help: "To search for a twitter channel, you have to enter the id of this channel. You will find it at the end of the url of the channel, it usually corresponds to the name of the user. For example, for *https://twitter.com/Gunivers_*, you have to enter `Gunivers_`"
     twitch: "Twitch"
     twitch-default-flow: "{logo}  | {author} is live! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}"
     twitch-form-last: "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}\n"
