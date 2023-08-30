@@ -144,11 +144,11 @@ class XP(commands.Cog):
         roles = await self.rr_list_role(ctx.guild.id)
         sorted_dict = {}
         for role in roles:
-            if role := ctx.guild.get_role(role["role"]):
+            if discord_role := ctx.guild.get_role(role["role"]):
                 if role["level"] in sorted_dict:
-                    sorted_dict[role["level"]].append(role)
+                    sorted_dict[role["level"]].append(discord_role)
                 else:
-                    sorted_dict[role["level"]] = [role]
+                    sorted_dict[role["level"]] = [discord_role]
         if len(sorted_dict) == 0:
             return []
         _lvl = await self.bot._(ctx.guild.id, "xp.card.level")
