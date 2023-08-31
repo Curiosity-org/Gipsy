@@ -116,7 +116,9 @@ def setup_venv():
 def install_dependencies():
     """Install all dependencies needed for the bot to work."""
     opt_deps = ask_user(
-        "🏗️ Do you want to install dependencies on the actual environment?"
+        "Do you want to install dependencies on the actual environment?",
+        default=False,
+        emoji="🏗️"
     )
     if opt_deps:
         print("🏗️ Installing dependencies...")
