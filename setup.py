@@ -74,8 +74,10 @@ def check_libs(verbose=False):
 
 
 def setup_venv():
-    opt_venv = input(
-        "🏗️ Do you want to create a virtual environment?"
+    opt_venv = ask_user(
+        "Do you want to create a virtual environment?",
+        default=True,
+        emoji="🏗️"
     )
     if opt_venv:
         print("Creating virtual environment...")
