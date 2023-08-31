@@ -17,9 +17,31 @@ from core import setup_logger
 accept = ["y", "yes", "yeah", "ye"]
 decline = ["n", "no", "nope", "nah"]
 
+
+def ask_user(question: str, default: bool, emoji: str = "") -> bool:
+    if default:
+        question += " [Y/n]"
+    else:
+        question += " [y/N]"
+    if emoji:
+        emoji = emoji + " "
+    while True:
+        answer = input(f"{color.stop}{emoji}{color.fg.blue}{question}{color.stop}")
+        print(answer)
+        if not answer:
+            return default
+        if answer.lower() in accept:
+            return True
+        if answer.lower() in decline:
+            return False
+        print(f"{color.fg.red}Please answer by yes or no. "
+              f"You can also simply hit enter to use the default option.{color.stop}")
+
+
 _global_config = {}
 
 logger = setup_logger('config')
+
 
 def check():
     "Check basic requirements and start the setup script if something is missing"
@@ -77,6 +99,7 @@ def reload_config():
 if not _global_config:
     reload_config()
 
+
 ################
 # Plugin Setup #
 ################
@@ -92,11 +115,12 @@ def setup_plugins():
 
             plugin_setup = importlib.import_module("plugins." + plugin + ".setup")
 
-            choice = input(
-                f"\n{color.fg.blue}🔌 Do you want to configure {plugin} plugin? [Y/n]:{color.stop} "
+            opt_configure_plugin = ask_user(
+                f"Do you want to configure {plugin} plugin?",
+                default=True
             )
 
-            if choice.lower() not in decline:
+            if opt_configure_plugin:
                 plugin_config = plugin_setup.run()
                 if plugin_config is not None:
                     _global_config.update({plugin: plugin_config})
@@ -116,11 +140,12 @@ def token_set(force_set=False):
     False if not."""
 
     if _global_config["bot"].get("token") is not None and not force_set:
-        choice = input(
-            f"\n🔑 {color.fg.blue}A token is already set."\
-                f"Do you want to edit it? [y/N]:{color.stop} "
+        opt_change_token = ask_user(
+            "A token is already set. Do you want to edit it?",
+            default=False,
+            emoji="🔑"
         )
-        if choice.lower() not in accept:
+        if not opt_change_token:
             return
 
     # pylint: disable=line-too-long
@@ -150,7 +175,6 @@ def token_set(force_set=False):
 
 
 def advanced_setup():
-
     # Language
 
     lang = "Baguette de fromage"
@@ -179,8 +203,8 @@ def advanced_setup():
     while error:
         error = False
         choice = input(
-            f"\n{color.fg.blue}👑 Bot admins"\
-                f"(User ID separated with comma. Let empty to ignore):{color.stop} "
+            f"\n{color.fg.blue}👑 Bot admins" \
+            f"(User ID separated with comma. Let empty to ignore):{color.stop} "
         )
         if choice != "":
             admins = choice.replace(" ", "").split(",")
@@ -188,8 +212,8 @@ def advanced_setup():
                 _global_config["bot"]["admins"] = [int(admin_id) for admin_id in admins]
             except ValueError:
                 print(
-                    f"{color.fg.red}👑 Invalid entry. Only user ID (integers),"\
-                        f"comma and space are expected.{color.stop}"
+                    f"{color.fg.red}👑 Invalid entry. Only user ID (integers)," \
+                    f"comma and space are expected.{color.stop}"
                 )
                 error = True
 
@@ -207,8 +231,8 @@ def advanced_setup():
                 _global_config["bot"]["error_channels"] = channel
             except ValueError:
                 print(
-                    f"{color.fg.red}🤕 Invalid entry. Only channel ID (integers) are expected."\
-                        f"{color.stop}"
+                    f"{color.fg.red}🤕 Invalid entry. Only channel ID (integers) are expected." \
+                    f"{color.stop}"
                 )
                 error = True
 

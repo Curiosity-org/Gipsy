@@ -16,9 +16,7 @@ import pkg_resources
 from LRFutils import color
 
 from core import config
-
-accept = ["y", "yes", "yep", "yeah"]
-decline = ["n", "no", "nope", "nah"]
+from core.config import ask_user
 
 # ________________________________________________________________________________
 # check python version
@@ -28,6 +26,7 @@ if py_version.major != 3 or py_version.minor < 10:
     print("⚠️ \033[33mGipsy require Python 3.10 or more.\033[1m")
     sys.exit(1)
 
+
 # ________________________________________________________________________________
 # Detect virtual environment
 
@@ -35,9 +34,9 @@ if py_version.major != 3 or py_version.minor < 10:
 def get_base_prefix_compat():
     """Get base/real prefix, or sys.prefix if there is none."""
     return (
-        getattr(sys, "base_prefix", None)
-        or getattr(sys, "real_prefix", None)
-        or sys.prefix
+            getattr(sys, "base_prefix", None)
+            or getattr(sys, "real_prefix", None)
+            or sys.prefix
     )
 
 
@@ -60,7 +59,7 @@ def check_libs(verbose=False):
             print("\n🤕 \033[31mOops, there is a problem in the dependencies.\033[0m")
             print(f"\n⚠️ \033[33m{type(exc).__name__}: {exc}\033[0m\n ")
         return False
-    except Exception as exc: # pylint: disable=broad-exception-caught
+    except Exception as exc:  # pylint: disable=broad-exception-caught
         if verbose:
             print("\n🤕 \033[31mOops, there is a problem in the dependencies.\033[0m")
             print(
@@ -75,16 +74,16 @@ def check_libs(verbose=False):
 
 
 def setup_venv():
-    user_choice = input(
-        "\033[34m\n🏗️ Do you want to create a virtual environment? [Y/n]\033[0m"
+    opt_venv = input(
+        "🏗️ Do you want to create a virtual environment?"
     )
-    if user_choice.lower() not in decline:
+    if opt_venv:
         print("Creating virtual environment...")
         os.system("python3 -m venv venv")
         print("Done!")
         print(
-            "\n🔄️ \033[34mPlease activate the virtual environment using the command below that"\
-                "correspond to your system. Then restart the setup script.\033[0m\n"
+            "\n🔄️ \033[34mPlease activate the virtual environment using the command below that" \
+            "correspond to your system. Then restart the setup script.\033[0m\n"
         )
         print(
             "\033[32m  Linux or MacOS (bash shell)\t:\033[0m source venv/bin/activate"
@@ -98,9 +97,9 @@ def setup_venv():
         print("\033[32m  Windows (in cmd.exe)\t\t:\033[0m venv\\Scripts\\activate.bat")
         print("\033[32m  Windows (in PowerShell)\t:\033[0m venv\\Scripts\\Activate.ps1")
         print(
-            '      ⮩ If you have an error like "cannot run script", you may open a new Powershell'\
-                'in administrator mode and run the following command:'\
-                'Set-ExecutionPolicy RemoteSigned\n'
+            '      ⮩ If you have an error like "cannot run script", you may open a new Powershell' \
+            'in administrator mode and run the following command:' \
+            'Set-ExecutionPolicy RemoteSigned\n'
         )
         exit(0)
     else:
@@ -114,10 +113,10 @@ def setup_venv():
 
 def install_dependencies():
     """Install all dependencies needed for the bot to work."""
-    user_choice = input(
-        "\033[34m\n🏗️ Do you want to install dependencies on the actual environment? [y/N]\033[0m"
+    opt_deps = ask_user(
+        "🏗️ Do you want to install dependencies on the actual environment?"
     )
-    if user_choice.lower() in accept:
+    if opt_deps:
         print("🏗️ Installing dependencies...")
         os.system("python3 -m pip install -r requirements.txt")
         print("Done!")
@@ -134,8 +133,8 @@ else:
 
 if not check_libs(verbose=VERBOSE):
     print(
-        "\n🏗️ You need to install the bot dependencies. The automatic script will probably upgrade"\
-            "(or rarely downgrade) some python modules already installed on your machine."
+        "\n🏗️ You need to install the bot dependencies. The automatic script will probably upgrade" \
+        "(or rarely downgrade) some python modules already installed on your machine."
     )
     if not in_virtualenv():
         setup_venv()
@@ -144,13 +143,14 @@ if not check_libs(verbose=VERBOSE):
         os.system("python3 setup.py")
     else:
         print(
-            "\n⚠️ \033[33mThe bot can't run without it's dependencies. Please install"\
-                "all the required modules with the following command:\033[1m\n"
+            "\n⚠️ \033[33mThe bot can't run without it's dependencies. Please install" \
+            "all the required modules with the following command:\033[1m\n"
         )
         print(
             "       \u001b[47m\033[30mpython3 -m pip install -r requirements.txt\033[0m\n "
         )
         exit(1)
+
 
 # ________________________________________________________________________________
 # Setup script
@@ -163,10 +163,11 @@ def main():
 
     # Optional settings
 
-    user_choice = input(
-        f"\n{color.fg.blue}Do you want to configure optional bot settings? [Y/n]:{color.stop} "
+    opt_bot_settings = ask_user(
+        "Do you want to configure optional bot settings?",
+        default=False
     )
-    if user_choice.lower() not in decline:
+    if opt_bot_settings:
         config.advanced_setup()
 
     # End optional settings
@@ -175,6 +176,7 @@ def main():
 
     print(f"\n{color.fg.green}✅ Setup complete!{color.stop}")
 
+
 if __name__ == "__main__":
 
     main()
@@ -182,13 +184,16 @@ if __name__ == "__main__":
     # Start bot
 
     print(
-        f"\n{color.fg.yellow}⚠️ Before starting the bot, you should open the config.yaml file"\
-            f"and check that everything is correct.{color.stop} "
+        f"\n{color.fg.yellow}⚠️ Before starting the bot, you should open the config.yaml file" \
+        f"and check that everything is correct.{color.stop} "
     )
-    choice = input(f"{color.fg.blue}▶️ Do you want to start the bot? [Y/n]{color.stop} ")
-    if choice.lower() not in decline:
+    opt_start = ask_user(
+        "Do you want to start the bot?",
+        default=False,
+        emoji="▶️")
+    if opt_start:
         print(
             "   Starting the bot..."
         )
         print("-" * 80)
-        subprocess.run([sys.executable, "start.py"]) # pylint: disable=subprocess-run-check
+        subprocess.run([sys.executable, "start.py"])  # pylint: disable=subprocess-run-check
