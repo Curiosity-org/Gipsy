@@ -16,7 +16,7 @@ if not os.path.isdir('logs'):
 
 start = datetime.datetime.now()
 default_filename = "logs/{time}.log".format(
-    time=start.strftime("%d-%m-%Y_%H:%M:%S")
+    time=start.strftime("%d-%m-%Y_%Hh%Mm%S")
 )
 
 # For format reference, see https://strftime.org/
