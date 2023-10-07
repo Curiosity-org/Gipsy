@@ -14,6 +14,7 @@ from discord.ext import commands
 from utils import CheckException, Gunibot, MyContext
 from bot import checks
 from core import config
+import utils
 
 
 class Errors(commands.Cog):
@@ -22,6 +23,8 @@ class Errors(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "errors"
+
+        self.config: utils.GlobalConfig = self.bot.bot_config
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: MyContext, error: Exception):
@@ -271,7 +274,7 @@ class Errors(commands.Cog):
 
     async def senf_err_msg(self, msg):
         """Sends a message to the error channel"""
-        channel = self.bot.get_channel(config.get("bot.error_channels"))
+        channel = self.bot.get_channel(self.config.error_channel)
         if channel is None:
             return False
         await channel.send(msg)

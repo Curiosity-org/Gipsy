@@ -27,8 +27,25 @@ from utils import Gunibot, MyContext
 import core
 from core import setup_logger
 
+from core import configuration
+
 async def setup(bot:Gunibot):
     await bot.add_cog(Rss(bot), icon="📰")
+
+class TwitterConfiguration(configuration.Configuration):
+    namespace = "twitter"
+
+    consumer_key = configuration.ConfigurationField(type=str)
+    consumer_secret = configuration.ConfigurationField(type=str)
+    access_token_key = configuration.ConfigurationField(type=str)
+    access_token_secret = configuration.ConfigurationField(type=str)
+
+class RssConfiguration(configuration.Configuration):
+    namespace = "rss"
+
+    twitter = TwitterConfiguration()
+
+    rss_loop_enabled = configuration.ConfigurationField(type=bool, default=True)
 
 class Rss(commands.Cog):
     """
@@ -38,9 +55,12 @@ class Rss(commands.Cog):
     """
 
     def __init__(self, bot: Gunibot):
-        self.config = core.config.get("rss")
         self.bot = bot
         self.logger = setup_logger('rss')
+        
+        self.config = RssConfiguration()
+        self.bot.config.add_configuration_child(self.config)
+
         self.time_loop = 15  # min minutes between two rss loops
         # seconds between two rss checks within a loop
         self.time_between_flows_check = 0.15
@@ -48,12 +68,24 @@ class Rss(commands.Cog):
 
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
-        self.twitter_api = twitter.Api(**self.config["twitter"], tweet_mode="extended")
+
+        self.twitterAPI = twitter.Api(
+            consumer_key=self.config.twitter.consumer_key,
+            consumer_secret=self.config.twitter.consumer_secret,
+            access_token_key=self.config.twitter.access_token_key,
+            access_token_secret=self.config.twitter.access_token_secret,
+            tweet_mode="extended",
+        )
         self.twitter_over_capacity = False
         self.min_time_between_posts = {"web": 120, "tw": 15, "yt": 120}
         self.cache = {}
         self.table = "rss_flows"
 
+        try:
+            self.date = bot.get_cog("TimeCog").date
+        except BaseException:
+            pass
+            
         # launch rss loop
         self.loop_child.change_interval(minutes=self.time_loop) # pylint: disable=no-member
         self.loop_child.start() # pylint: disable=no-member
@@ -1664,7 +1696,7 @@ class Rss(commands.Cog):
             return False
 
     async def main_loop(self, guild_id: int = None):
-        if not self.config["rss_loop_enabled"]:
+        if not self.config.rss_loop_enabled:
             return
         start = time.time()
         if self.loop_processing:

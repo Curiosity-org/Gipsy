@@ -17,9 +17,40 @@ from discord.ext import commands
 from core import config
 from core import setup_logger
 
+from core import configuration
+
 if TYPE_CHECKING:
     from bot.utils.sconfig import Sconfig
 
+class GlobalConfig(configuration.Configuration):
+    namespace = "bot"
+
+    token = configuration.ConfigurationField(str)
+
+    # check if the token is valid, and raise an error if it's not
+    token.check(configuration.regex_check(
+        r"[MN][\w]{25}\.[\w]{6}\.[\w_]{38}$"
+    ))
+
+    default_language = configuration.ConfigurationField(str, default="en")
+    @default_language.check
+    def check_default_language(
+        value: str,
+        field: configuration.ConfigurationField,
+        instance: configuration.Configuration
+    ) -> bool:
+        available_languages = [file[:-4] for file in os.listdir("./langs/")] # we remove the ".yml" file extension
+        if value not in available_languages:
+            logging.error("The field `%s` is not a valid language.", field.full_name(instance))
+            logging.info("List of valid languages: %s", ", ".join(available_languages))
+            return False
+        return True
+    
+    default_prefix = configuration.ConfigurationField(str, default="!")
+
+    error_channel = configuration.ConfigurationField(int, default=None)
+
+    # TODO : add list support + admin list
 
 class MyContext(commands.Context):
     """Replacement for the official commands.Context class
@@ -73,6 +104,11 @@ class Gunibot(commands.bot.AutoShardedBot):
         self._update_database_structure()
         # app commands
         self.app_commands_list: Optional[list[discord.app_commands.AppCommand]] = None
+
+        self.config = configuration.Configuration(is_child=False) # bot configuration
+
+        self.bot_config = GlobalConfig() # global bot configuration
+        self.config.add_configuration_child(self.bot_config) # register the configuration fields
 
     # pylint: disable=arguments-differ
     async def get_context(self, message: discord.Message, *, cls=MyContext):
@@ -306,44 +342,21 @@ class Gunibot(commands.bot.AutoShardedBot):
                     # pylint: disable=broad-exception-caught
                     except BaseException:
                         self.log.warning("[remove_cog]", exc_info=True)
+    
+    def run(self):
+        """Runs the bot.
+        The token is grabed from the loaded configuration.
+        """
+        super().run(
+            self.bot_config.token,
+            log_handler=None,
+        )
 
 
 class CheckException(commands.CommandError):
-    """
-    Exception personnalisée pour les checks
-    """
-    def __init__(self, check_id, *args):
-        super().__init__(message=f"Custom check '{check_id}' failed", *args)
-        self.id = check_id # pylint: disable=invalid-name
+    """Exception raised when a custom check failed, to send errors when needed"""
 
-CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {}
+    def __init__(self, id, *args):
+        super().__init__(message=f"Custom check '{id}' failed", *args)
+        self.id = id
 
-CONFIG_OPTIONS.update(
-    {
-        "prefix": {
-            "default": config.get("bot.default_prefix"),
-            "type": "text",
-            "command": 'prefix',
-        },
-        "language": {
-            "default": config.get("bot.default_language"),
-            "type": "text",
-            "command": 'language',
-        },
-        "admins": {
-            "default": config.get("bot.admins"),
-            "type": "categories",
-            "command": None,
-        },
-    }
-)
-
-for plugin in os.listdir("./plugins/"):
-    if plugin[0] != "_":
-        if os.path.isfile("./plugins/" + plugin + "/config/options.json"):
-            with open(
-                "./plugins/" + plugin + "/config/options.json",
-                "r",
-                encoding="utf8"
-            ) as config:
-                CONFIG_OPTIONS.update(json.load(config))
