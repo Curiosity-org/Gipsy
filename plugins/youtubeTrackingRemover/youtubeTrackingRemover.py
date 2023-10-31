@@ -15,7 +15,6 @@ from utils import Gunibot, MyContext
 
 async def setup(bot: Gunibot = None):
     await bot.add_cog(YoutubeTrackingRemover(bot))
-    bot.add_view(YoutubeTrackingRemoverView(bot))
 
 
 class YoutubeTrackingRemover(commands.Cog):
@@ -31,7 +30,6 @@ class YoutubeTrackingRemover(commands.Cog):
         await ctx.send(
             await self.bot.sconfig.edit_config(ctx.guild.id, "enable_youtube_tracking_remover", value)
         )
-
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -51,7 +49,6 @@ class YoutubeTrackingRemover(commands.Cog):
         # check if message contains a youtube.com link
         regex = r'(https?://(?:www\.)?youtube\.com/watch\?[^\s]+)'
         matches = re.findall(regex, message.content)
-        print(matches)
 
         content = message.content
         for match in matches:
@@ -77,7 +74,6 @@ class YoutubeTrackingRemover(commands.Cog):
         # check for youtu.be links
         regex = r'(https?://(?:www\.)?youtu\.be/[^\s]+)'
         matches = re.findall(regex, message.content)
-        print(matches)
 
         for match in matches:
             parsed_url = urlparse(match)
@@ -104,26 +100,48 @@ class YoutubeTrackingRemover(commands.Cog):
         webhook = await message.channel.create_webhook(name="Youtube Tracking Remover")
 
         # send the message with the replaced links
-        await webhook.send(content,
-                           username=message.author.display_name,
-                           avatar_url=message.author.display_avatar.url,
-                           files=[await attachment.to_file() for attachment in message.attachments],
-                           view=YoutubeTrackingRemoverView(self.bot))
+        webhook_message = await webhook.send(content,
+                                             username=message.author.display_name,
+                                             avatar_url=message.author.display_avatar.url,
+                                             files=[await attachment.to_file() for attachment in message.attachments],
+                                             wait=True)
+
+        # add the view
+        await webhook_message.edit(view=YoutubeTrackingRemoverView(self.bot, webhook_message, webhook, message.author.id))
 
         # delete the original message
         await message.delete()
 
-        # delete the webhook
-        await webhook.delete()
-
 
 class YoutubeTrackingRemoverView(discord.ui.View):
-    def __init__(self, bot: Gunibot):
-        super().__init__(timeout=None)
+    def __init__(self, bot: Gunibot, message: discord.WebhookMessage, webhook: discord.Webhook, original_user_id: int):
+        super().__init__(timeout=300)
         self.bot = bot
+        self.message = message
+        self.webhook = webhook
+        self.original_user_id = original_user_id
 
     # pylint: disable=unused-argument
-    @discord.ui.button(emoji='❓', style=discord.ButtonStyle.green, custom_id="youtube_tracking_remover:button")
+    @discord.ui.button(emoji='❓', style=discord.ButtonStyle.green)
     async def button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message(await self.bot._(interaction.guild_id, "youtube_tracking_remover.message"),
-                                                ephemeral=True)
+        await interaction.response.send_message(
+            await self.bot._(interaction.guild_id, "youtube_tracking_remover.message"),
+            ephemeral=True)
+
+    # pylint: disable=unused-argument
+    @discord.ui.button(emoji='🗑️', style=discord.ButtonStyle.red)
+    async def delete(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # check if the user is the author of the message
+        if interaction.user.id != self.original_user_id:
+            return await interaction.response.send_message(
+                await self.bot._(interaction.guild_id, "youtube_tracking_remover.not_author"),
+                ephemeral=True)
+        else:
+            await interaction.message.delete()
+
+    async def on_timeout(self):
+        try:
+            await self.message.edit(view=None)
+            await self.webhook.delete()
+        except discord.NotFound:
+            pass
