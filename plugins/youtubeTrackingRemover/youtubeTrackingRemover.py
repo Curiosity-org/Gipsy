@@ -9,7 +9,6 @@ import discord
 from discord.ext import commands
 import re
 from urllib.parse import urlparse, parse_qs
-from typing import List, Tuple
 
 from utils import Gunibot, MyContext
 
@@ -123,6 +122,7 @@ class YoutubeTrackingRemoverView(discord.ui.View):
         super().__init__(timeout=None)
         self.bot = bot
 
+    # pylint: disable=unused-argument
     @discord.ui.button(emoji='❓', style=discord.ButtonStyle.green, custom_id="youtube_tracking_remover:button")
     async def button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message(await self.bot._(interaction.guild_id, "youtube_tracking_remover.message"),
