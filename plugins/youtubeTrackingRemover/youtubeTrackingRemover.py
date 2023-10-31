@@ -55,23 +55,42 @@ class YoutubeTrackingRemover(commands.Cog):
         print(matches)
 
         content = message.content
-        for matche in matches:
-            parsed_url = urlparse(matche)
+        for match in matches:
+            parsed_url = urlparse(match)
             query_params = parse_qs(parsed_url.query)
 
-            # replace the link with a link without tracking
+            # replace the link with a link with only the video id
             if 'v' in query_params:
                 video_id = query_params['v'][0]
-                content = content.replace(matche, f'https://www.youtube.com/watch?v={video_id}')
+                content = content.replace(match, f'https://www.youtube.com/watch?v={video_id}')
+
+            # re-add `time` and `t` parameters
+            if 't' in query_params:
+                time = query_params['t'][0]
+                content = content.replace(match, f'{match}&t={time}')
+            elif 'time' in query_params:
+                time = query_params['time'][0]
+                content = content.replace(match, f'{match}&time={time}')
 
         # check for youtu.be links
         regex = r'(https?://(?:www\.)?youtu\.be/[^\s]+)'
         matches = re.findall(regex, message.content)
         print(matches)
 
-        for matche in matches:
-            # remove every parameters since youtu.be do not use parameters for video id
-            content = content.replace(matche, f'{matche.split("?")[0]}')
+        for match in matches:
+            parsed_url = urlparse(match)
+            query_params = parse_qs(parsed_url.query)
+
+            # remove every parameters
+            match = match.split('?')[0]
+
+            # re-add `time` and `t` parameters
+            if 't' in query_params:
+                time = query_params['t'][0]
+                content = content.replace(match, f'{match}?t={time}')
+            elif 'time' in query_params:
+                time = query_params['time'][0]
+                content = content.replace(match, f'{match}?time={time}')
 
         if content == message.content:
             # no need to send a message if it will be the same
