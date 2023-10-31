@@ -1,0 +1,4 @@
+fr:
+  youtube_tracking_remover:
+    button_label: "C'est quoi ça ?"
+    message: "Depuis l'été 2023, certains liens YouTube contiennent des paramètres de suivi afin d'identifier la personne ayant envoyé chaque lien. Ce message a été renvoyé car il contenait un lien avec ces paramètres. Ils ont été supprimés et le lien peut désormais être cliqué en toute sécurité sans que YouTube ne sache qui l'a envoyé."

@@ -1,0 +1,4 @@
+en:
+  youtube_tracking_remover:
+    button_label: 'What is this?'
+    message: 'Since summer 2023, YouTube links may contain tracking parameters. This message was re-sent because it used to contain a link with tracking parameters. Those tracking parameters have been removed and the link is now safe to click without YouTube knowing who sent this link.'
