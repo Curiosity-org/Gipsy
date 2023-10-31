@@ -58,19 +58,22 @@ class YoutubeTrackingRemover(commands.Cog):
         for match in matches:
             parsed_url = urlparse(match)
             query_params = parse_qs(parsed_url.query)
+            new_match = match
 
             # replace the link with a link with only the video id
             if 'v' in query_params:
                 video_id = query_params['v'][0]
-                content = content.replace(match, f'https://www.youtube.com/watch?v={video_id}')
+                new_match = f'https://www.youtube.com/watch?v={video_id}'
 
             # re-add `time` and `t` parameters
             if 't' in query_params:
                 time = query_params['t'][0]
-                content = content.replace(match, f'{match}&t={time}')
+                new_match = new_match + f'&t={time}'
             elif 'time' in query_params:
                 time = query_params['time'][0]
-                content = content.replace(match, f'{match}&time={time}')
+                new_match = new_match + f'&time={time}'
+
+            content = content.replace(match, f'{new_match}')
 
         # check for youtu.be links
         regex = r'(https?://(?:www\.)?youtu\.be/[^\s]+)'
@@ -82,15 +85,17 @@ class YoutubeTrackingRemover(commands.Cog):
             query_params = parse_qs(parsed_url.query)
 
             # remove every parameters
-            match = match.split('?')[0]
+            new_match = match.split('?')[0]
 
             # re-add `time` and `t` parameters
             if 't' in query_params:
                 time = query_params['t'][0]
-                content = content.replace(match, f'{match}?t={time}')
+                new_match = new_match + f'?t={time}'
             elif 'time' in query_params:
                 time = query_params['time'][0]
-                content = content.replace(match, f'{match}?time={time}')
+                new_match = new_match + f'?time={time}'
+
+            content = content.replace(match, f'{new_match}')
 
         if content == message.content:
             # no need to send a message if it will be the same
