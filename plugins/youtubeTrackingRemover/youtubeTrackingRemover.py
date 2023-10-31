@@ -37,7 +37,7 @@ class YoutubeTrackingRemover(commands.Cog):
         if not message.guild:
             return
 
-        # check if server has enabled the abbreviation explainer
+        # check if server has enabled the youtube tracking remover
         if not self.bot.server_configs[message.guild.id].get("enable_youtube_tracking_remover", False):
             print("not enabled")
             return
