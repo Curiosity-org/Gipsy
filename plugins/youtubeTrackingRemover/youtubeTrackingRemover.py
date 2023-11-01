@@ -39,7 +39,6 @@ class YoutubeTrackingRemover(commands.Cog):
 
         # check if server has enabled the youtube tracking remover
         if not self.bot.server_configs[message.guild.id].get("enable_youtube_tracking_remover", False):
-            print("not enabled")
             return
 
         # check if message is not from a bot
