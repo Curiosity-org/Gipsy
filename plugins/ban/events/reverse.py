@@ -26,7 +26,7 @@ async def execute(
         msg = await ctx.bot._(ctx.channel, f"ban.gunivers.selfban.{choice}")
         await ctx.send(msg.format(ctx.author.mention, user.mention))
         await ctx.send(
-            "https://thumbs.gfycat.com/BackInsignificantAfricanaugurbuzzard-size_restricted.gif"
+            "https://tenor.com/view/self-ban-brooklyn99-brooklyn-nine-nine-pepperdrop-ban-gif-25644700"
         )
     else:
         # fallback to a normal ban
@@ -35,5 +35,5 @@ async def execute(
             msg = await ctx.bot._(ctx.channel, f"ban.gunivers.ban.{choice}")
             await ctx.send(msg.format(ctx.author.mention, user.mention))
             await ctx.send(
-                "https://thumbs.gfycat.com/PepperyEminentIndianspinyloach-size_restricted.gif"
+                "https://tenor.com/view/bongocat-banhammer-ban-hammer-bongo-gif-18219363"
             )
