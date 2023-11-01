@@ -22,6 +22,6 @@ async def execute(
         "Never gonna give you up,\nnever gonna let you down,\nnever gonna run around and ban you :musical_note:" # pylint: disable=line-too-long
     )
     await ctx.send(
-        "https://thumbs.gfycat.com/VengefulDesertedHalibut-size_restricted.gif"
+        "https://tenor.com/view/rickroll-roll-rick-never-gonna-give-you-up-never-gonna-gif-22954713"
     )
     return

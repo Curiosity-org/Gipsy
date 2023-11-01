@@ -27,7 +27,7 @@ async def execute(
             msg = await ctx.bot._(ctx.channel, f"ban.gunivers.autoban.{choice}")
             await ctx.send(msg.format(ctx.author.mention, user.mention))
             await ctx.send(
-                "https://thumbs.gfycat.com/CompleteLeafyAardwolf-size_restricted.gif"
+                "https://tenor.com/view/seriously-facepalm-fml-crazy-head-bang-gif-16492152"
             )
         return True
 

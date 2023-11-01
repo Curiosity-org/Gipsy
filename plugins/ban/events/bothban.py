@@ -26,7 +26,7 @@ async def execute(
             msg = await ctx.bot._(ctx.channel, f"ban.gunivers.bothban.{choice}")
             await ctx.send(msg.format(ctx.author.mention, user.mention))
             await ctx.send(
-                "https://thumbs.gfycat.com/BackInsignificantAfricanaugurbuzzard-size_restricted.gif"
+                "https://tenor.com/view/max-fosh-uno-reverse-uno-uno-reverse-card-football-gif-15997104819716648222"
             )
             return
         else:
@@ -35,5 +35,5 @@ async def execute(
             msg = await ctx.bot._(ctx.channel, f"ban.gunivers.ban.{choice}")
             await ctx.send(msg.format(ctx.author.mention, user.mention))
             await ctx.send(
-                "https://thumbs.gfycat.com/PepperyEminentIndianspinyloach-size_restricted.gif"
+                "https://tenor.com/view/bongocat-banhammer-ban-hammer-bongo-gif-18219363"
             )
