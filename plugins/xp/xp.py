@@ -5,21 +5,21 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-from typing import Dict, List, Optional, Tuple, Union
 import asyncio
 import re
 import string
 import time
 import typing
 from math import ceil
+from typing import Dict, List, Optional, Tuple, Union
 
 import discord
 import emoji
 from discord.ext import commands, tasks
 
+from core import setup_logger
 from utils import Gunibot, MyContext
 
-from core import setup_logger
 
 class XP(commands.Cog):
     "Handles the bot XP system, rewarding users for their activity in our servers"
