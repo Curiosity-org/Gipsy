@@ -5,7 +5,7 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 import asyncio
 import re
 import string
@@ -22,6 +22,8 @@ from utils import Gunibot, MyContext
 from core import setup_logger
 
 class XP(commands.Cog):
+    "Handles the bot XP system, rewarding users for their activity in our servers"
+
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.logger = setup_logger('xp')
@@ -31,9 +33,9 @@ class XP(commands.Cog):
         self.spam_rate = 0.20
         self.xp_per_char = 0.115
         self.max_xp_per_msg = 70
-        self.cache: Dict[Dict[int, int]] = dict()  # xp cache
+        self.cache: dict[int, dict[int, tuple[int, int]]] = {}  # xp cache
         self.levels = [0]  # xp required per level
-        self.xp_channels_cache = dict()  # no-xp channels
+        self.xp_channels_cache = {}  # no-xp channels
         self.embed_color = discord.Colour(0xFFCF50)
 
         self.config_options = [
@@ -108,7 +110,7 @@ class XP(commands.Cog):
         )
 
     @commands.command(name="levelup_reaction")
-    async def config_levelup_reaction(self, ctx: MyContext, *, enabled: bool = None):
+    async def config_levelup_reaction(self, ctx: MyContext, *, enabled: Optional[bool] = None):
         """If the bot add a reaction to the message or send a message
         Set to True for the reaction, False for the message"""
         await ctx.send(
@@ -192,12 +194,13 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
                         user_id=member.id,
                         points=xp_to_remove,
                         action_type="remove",
-                        guild=guild.id,
+                        guild_id=guild.id,
                     )
 
 
 
     async def get_lvlup_chan(self, msg: discord.Message):
+        "Get the correct levelup channel associated to a given message (thus guild)"
         value = self.bot.server_configs[msg.guild.id]["levelup_channel"]
         if value is None or value == "none":
             return None
@@ -213,11 +216,17 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
         """Check if this channel/user can get xp"""
         if message.guild is None:
             return False
-        
+
         # get the channel ID (or parent channel id for thread)
-        channel_id = message.channel.parent.id if isinstance(message.channel, discord.Thread) else message.channel.id
+        if isinstance(message.channel, discord.Thread):
+            channel_id = message.channel.parent.id
+        else:
+            channel_id = message.channel.id
         # get the category
-        category_id = message.channel.category.id if message.channel.category is not None else 0 # dumb ID
+        if message.channel.category is None:
+            category_id = 0 # dumb ID
+        else:
+            category_id = message.channel.category.id
 
         if message.guild.id in self.xp_channels_cache:
             if channel_id in self.xp_channels_cache[message.guild.id]:
@@ -230,14 +239,14 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
                 # convert to a list even if there's only one item
                 channels = [channels] if isinstance(channels, str) else channels
                 channels = [int(x) for x in channels]
-                
+
                 self.xp_channels_cache[message.guild.id] = channels
 
                 if channel_id in channels or category_id in channels:
                     return False
             else:
                 self.xp_channels_cache[message.guild.id] = []
-        
+
         return True
 
     async def check_cmd(self, msg: discord.Message):
@@ -277,12 +286,12 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
             and self.bot.server_configs[msg.guild.id]["enable_xp"]
         ):
             return
-        
+
         # if xp of that guild is not in cache yet
-        if msg.guild.id not in self.cache or len(self.cache[msg.guild.id]) == 0:
+        if not self.cache.get(msg.guild.id):
             await self.bdd_load_cache(msg.guild.id)
         # if xp of that member is in cache
-        if msg.author.id in self.cache[msg.guild.id].keys():
+        if msg.author.id in self.cache[msg.guild.id]:
             # we check cooldown
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.cooldown:
                 return
@@ -297,7 +306,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
         # we calcul xp amount
         giv_points = await self.calc_xp(msg)
         # we check in the cache for the previous xp
-        if msg.author.id in self.cache[msg.guild.id].keys():
+        if msg.author.id in self.cache[msg.guild.id]:
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
             # we check in the database for the previous xp
@@ -310,7 +319,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
         # we update database with the new xp amount
         await self.bdd_set_xp(msg.author.id, giv_points, "add", msg.guild.id)
         # we update cache with the new xp amount
-        self.cache.get(msg.guild.id)[msg.author.id] = [
+        self.cache[msg.guild.id][msg.author.id] = [
             round(time.time()),
             prev_points + giv_points,
         ]
@@ -447,13 +456,13 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
         return counter
 
     async def bdd_set_xp(
-        self, user_id: int, points: int, action_type: str = "add", guild: int = None
+        self, user_id: int, points: int, action_type: str = "add", guild_id: Optional[int] = None
     ):
         """Add/reset xp to a user in the database
         Set guild=None for global leaderboard"""
         try:
             try:
-                xp = await self.bdd_get_xp(user_id, guild) # pylint: disable=invalid-name
+                xp = await self.bdd_get_xp(user_id, guild_id) # pylint: disable=invalid-name
                 xp = xp[0]["xp"] # pylint: disable=invalid-name
             except IndexError:
                 xp = 0 # pylint: disable=invalid-name
@@ -473,23 +482,25 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
                 query = "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p)"\
                     "ON CONFLICT(guild, userid) DO UPDATE SET xp = :p;"
 
-            self.bot.db_query(query, {"g": guild, "u": user_id, "p": points})
+            self.bot.db_query(query, {"g": guild_id, "u": user_id, "p": points})
             return True
         except Exception as exc: # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_error(exc)
             return False
 
-    async def bdd_get_xp(self, user_id: int, guild: int = None):
+    async def bdd_get_xp(self, user_id: int, guild_id: Optional[int] = None):
         """Get the xp amount of a user in a guild
         Set guild=None for global leaderboard"""
         try:
             query = "SELECT `xp` FROM `xp` WHERE `userid` = :u AND `guild` = :g"
-            liste = self.bot.db_query(query, {"u": user_id, "g": guild})
+            liste = self.bot.db_query(query, {"u": user_id, "g": guild_id})
             if len(liste) == 1:
-                if user_id in self.cache[guild].keys():
-                    self.cache[guild][user_id][1] = liste[0]["xp"]
+                if guild_id not in self.cache:
+                    self.cache[guild_id] = {}
+                if user_id in self.cache[guild_id]:
+                    self.cache[guild_id][user_id][1] = liste[0]["xp"]
                 else:
-                    self.cache[guild][user_id] = [
+                    self.cache[guild_id][user_id] = [
                         round(time.time()) - 60,
                         liste[0]["xp"],
                     ]
@@ -498,12 +509,12 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
             await self.bot.get_cog("Errors").on_error(exc)
             return list()
 
-    async def bdd_get_nber(self, guild: int = None):
+    async def bdd_get_nber(self, guild_id: Optional[int] = None):
         """Get the number of ranked users in a guild
         Set guild=None for global leaderboard"""
         try:
             query = "SELECT COUNT(*) as count FROM xp WHERE `guild` = :g"
-            liste = self.bot.db_query(query, {"g": guild})
+            liste = self.bot.db_query(query, {"g": guild_id})
             if liste is not None and len(liste) == 1:
                 return liste[0]["count"]
             return 0
@@ -511,23 +522,23 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
             await self.bot.get_cog("Errors").on_error(exc)
             return 0
 
-    async def bdd_load_cache(self, guild: int = None):
+    async def bdd_load_cache(self, guild: Optional[int] = None):
         """Load the xp cache for a specific guild
         Set guild=None for global leaderboard"""
         try:
             self.logger.info("Loading XP cache (guild %s)", repr(guild))
             query = "SELECT `userid`,`xp` FROM xp WHERE `guild` = ?"
-            liste = self.bot.db_query(query, (guild,))
+            result_list = self.bot.db_query(query, (guild,))
             if guild not in self.cache:
                 self.cache[guild] = {}
-            for user_data in liste:
+            for user_data in result_list:
                 self.cache[guild][user_data["userid"]] = [
                     round(time.time()) - 60, int(user_data["xp"])
                 ]
         except Exception as exc: # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_error(exc)
 
-    async def bdd_get_rank(self, user_id: int, guild: discord.Guild = None):
+    async def bdd_get_rank(self, user_id: int, guild: Optional[discord.Guild] = None):
         """Get the rank of a user
         Set guild=None for global leaderboard"""
         try:
@@ -549,8 +560,8 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
         except Exception as exc: # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_error(exc)
 
-    async def bdd_get_top(self, top: int = None, guild: discord.Guild = None):
-        """"""
+    async def bdd_get_top(self, top: Optional[int] = None, guild: Optional[discord.Guild] = None):
+        """Get the leaderboard of a given guild (or global if no guild)"""
         try:
             query = "SELECT userid, xp FROM xp WHERE guild = ? ORDER BY `xp` DESC"
             if top is not None:
@@ -559,7 +570,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
         except Exception as exc: # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_error(exc)
 
-    async def get_xp(self, user: discord.User, guild_id: int = None):
+    async def get_xp(self, user: discord.User, guild_id: Optional[int] = None):
         """Get the xp amount of a user in a guild"""
         xp = await self.bdd_get_xp(user.id, guild_id) # pylint: disable=invalid-name
         if xp is None or (isinstance(xp, list) and len(xp) == 0):
@@ -613,7 +624,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
     @commands.guild_only()
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(3, 10, commands.BucketType.user)
-    async def rank(self, ctx: MyContext, *, user: discord.User = None):
+    async def rank(self, ctx: MyContext, *, user: Optional[discord.User] = None):
         """Display a user XP.
         If you don't target any user, I'll display your own XP"""
         if user is None:
@@ -884,5 +895,6 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
 
 
 async def setup(bot:Gunibot=None):
+    "Load the cog"
     if bot is not None:
         await bot.add_cog(XP(bot), icon="🪙")
