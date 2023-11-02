@@ -206,11 +206,6 @@ class Ban(commands.Cog):
                 "module_name": "autoban"
             },
             {
-                "name": "Baldban",
-                "chances": None, # systematic
-                "module_name": "baldban"
-            },
-            {
                 "name": "UnoReverse",
                 "chances": 1,
                 "module_name": "reverse"
