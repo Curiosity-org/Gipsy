@@ -121,7 +121,7 @@ class YoutubeTrackingRemoverView(discord.ui.View):
         self.original_user_id = original_user_id
 
     # pylint: disable=unused-argument
-    @discord.ui.button(emoji='❓', style=discord.ButtonStyle.green)
+    @discord.ui.button(emoji='❔', style=discord.ButtonStyle.blurple)
     async def button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message(
             await self.bot._(interaction.guild_id, "youtube_tracking_remover.message"),
