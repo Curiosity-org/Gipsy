@@ -10,3 +10,4 @@ argparse
 numpy
 discord.py ~= 2.3.2
 lrfutils == 0.1.2
+requests ~= 2.31.0
