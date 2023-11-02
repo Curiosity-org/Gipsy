@@ -22,13 +22,17 @@ class YoutubeTrackingRemover(commands.Cog):
         self.bot = bot
         self.file = "youtubeTrackingRemover"
         self.cache = {}
-        self.bot.get_command("config").add_command(self.config_enable_youtube_tracking_remover)
+        self.bot.get_command("config").add_command(
+            self.config_enable_youtube_tracking_remover
+        )
 
     @commands.command(name="enable_youtube_tracking_remover")
     async def config_enable_youtube_tracking_remover(self, ctx: MyContext, value: bool):
         """Enable or disable the YouTube tracking remover"""
         await ctx.send(
-            await self.bot.sconfig.edit_config(ctx.guild.id, "enable_youtube_tracking_remover", value)
+            await self.bot.sconfig.edit_config(
+                ctx.guild.id, "enable_youtube_tracking_remover", value
+            )
         )
 
     @commands.Cog.listener()
@@ -38,7 +42,9 @@ class YoutubeTrackingRemover(commands.Cog):
             return
 
         # check if server has enabled the youtube tracking remover
-        if not self.bot.server_configs[message.guild.id].get("enable_youtube_tracking_remover", False):
+        if not self.bot.server_configs[message.guild.id].get(
+            "enable_youtube_tracking_remover", False
+        ):
             return
 
         # check if message is not from a bot
@@ -46,9 +52,11 @@ class YoutubeTrackingRemover(commands.Cog):
             return
 
         # check if message contains a youtube.com link
-        regex_full = r'(https?://(?:www\.)?youtube\.com/watch\?[^\s]+)'
-        regex_short = r'(https?://(?:www\.)?youtu\.be/[^\s]+)'
-        matches = re.findall(regex_full, message.content) + re.findall(regex_short, message.content)
+        regex_full = r"(https?://(?:www\.)?youtube\.com/watch\?[^\s]+)"
+        regex_short = r"(https?://(?:www\.)?youtu\.be/[^\s]+)"
+        matches = re.findall(regex_full, message.content) + re.findall(
+            regex_short, message.content
+        )
 
         content = message.content
         for match in matches:
@@ -57,26 +65,37 @@ class YoutubeTrackingRemover(commands.Cog):
             new_match = match
 
             # retrieve videoid
-            if parsed_url.hostname in ['youtu.be','www.youtu.be']:
+            if parsed_url.hostname in ["youtu.be", "www.youtu.be"]:
                 video_id = parsed_url.path[1:]
-                new_match = parsed_url.scheme + '://' + parsed_url.hostname + '/' + video_id
-                separator = '?'
-            elif parsed_url.hostname in ['youtube.com','www.youtube.com'] and 'v' in query_params:
-                video_id = query_params['v'][0]
-                new_match = parsed_url.scheme + '://' + parsed_url.hostname + '/watch?v=' + video_id
-                separator = '&'
+                new_match = (
+                    parsed_url.scheme + "://" + parsed_url.hostname + "/" + video_id
+                )
+                separator = "?"
+            elif (
+                parsed_url.hostname in ["youtube.com", "www.youtube.com"]
+                and "v" in query_params
+            ):
+                video_id = query_params["v"][0]
+                new_match = (
+                    parsed_url.scheme
+                    + "://"
+                    + parsed_url.hostname
+                    + "/watch?v="
+                    + video_id
+                )
+                separator = "&"
             else:
                 continue
 
             # re-add `time` and `t` parameters
-            if 't' in query_params:
-                time = query_params['t'][0]
-                new_match += separator + f't={time}'
-            elif 'time' in query_params:
-                time = query_params['time'][0]
-                new_match += separator + f'time={time}'
+            if "t" in query_params:
+                time = query_params["t"][0]
+                new_match += separator + f"t={time}"
+            elif "time" in query_params:
+                time = query_params["time"][0]
+                new_match += separator + f"time={time}"
 
-            content = content.replace(match, f'{new_match}')
+            content = content.replace(match, f"{new_match}")
 
         if content == message.content:
             # no need to send a message if it will be the same
@@ -86,22 +105,33 @@ class YoutubeTrackingRemover(commands.Cog):
         webhook = await message.channel.create_webhook(name="Youtube Tracking Remover")
 
         # send the message with the replaced links
-        webhook_message = await webhook.send(content,
-                                             username=message.author.display_name,
-                                             avatar_url=message.author.display_avatar.url,
-                                             files=[await attachment.to_file() for attachment in message.attachments],
-                                             wait=True)
+        webhook_message = await webhook.send(
+            content,
+            username=message.author.display_name,
+            avatar_url=message.author.display_avatar.url,
+            files=[await attachment.to_file() for attachment in message.attachments],
+            wait=True,
+        )
 
         # add the view
         await webhook_message.edit(
-            view=YoutubeTrackingRemoverView(self.bot, webhook_message, webhook, message.author.id))
+            view=YoutubeTrackingRemoverView(
+                self.bot, webhook_message, webhook, message.author.id
+            )
+        )
 
         # delete the original message
         await message.delete()
 
 
 class YoutubeTrackingRemoverView(discord.ui.View):
-    def __init__(self, bot: Gunibot, message: discord.WebhookMessage, webhook: discord.Webhook, original_user_id: int):
+    def __init__(
+        self,
+        bot: Gunibot,
+        message: discord.WebhookMessage,
+        webhook: discord.Webhook,
+        original_user_id: int,
+    ):
         super().__init__(timeout=300)
         self.bot = bot
         self.message = message
@@ -109,20 +139,24 @@ class YoutubeTrackingRemoverView(discord.ui.View):
         self.original_user_id = original_user_id
 
     # pylint: disable=unused-argument
-    @discord.ui.button(emoji='❔', style=discord.ButtonStyle.blurple)
+    @discord.ui.button(emoji="❔", style=discord.ButtonStyle.blurple)
     async def button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message(
             await self.bot._(interaction.guild_id, "youtube_tracking_remover.message"),
-            ephemeral=True)
+            ephemeral=True,
+        )
 
     # pylint: disable=unused-argument
-    @discord.ui.button(emoji='🗑️', style=discord.ButtonStyle.red)
+    @discord.ui.button(emoji="🗑️", style=discord.ButtonStyle.red)
     async def delete(self, interaction: discord.Interaction, button: discord.ui.Button):
         # check if the user is the author of the message
         if interaction.user.id != self.original_user_id:
             return await interaction.response.send_message(
-                await self.bot._(interaction.guild_id, "youtube_tracking_remover.not_author"),
-                ephemeral=True)
+                await self.bot._(
+                    interaction.guild_id, "youtube_tracking_remover.not_author"
+                ),
+                ephemeral=True,
+            )
         else:
             await interaction.message.delete()
 

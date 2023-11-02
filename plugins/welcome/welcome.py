@@ -11,10 +11,11 @@ from discord.ext import commands
 from utils import Gunibot, MyContext
 from core import setup_logger
 
+
 class Welcome(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
-        self.logger = setup_logger('welcome')
+        self.logger = setup_logger("welcome")
         self.config_options = ["welcome_roles"]
 
         bot.get_command("config").add_command(self.config_welcome_roles)
@@ -44,10 +45,11 @@ class Welcome(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         """Called when a member joins a guild"""
-        if not member.guild.me.guild_permissions.manage_roles:  # if not allowed to manage roles
+        if (
+            not member.guild.me.guild_permissions.manage_roles
+        ):  # if not allowed to manage roles
             self.logger.info(
-                'Module - Welcome: Missing "manage_roles" permission'\
-                    'on guild "%s"',
+                'Module - Welcome: Missing "manage_roles" permission' 'on guild "%s"',
                 member.guild.name,
             )
             return
@@ -63,6 +65,6 @@ class Welcome(commands.Cog):
                 await self.give_welcome_roles(after)
 
 
-async def setup(bot:Gunibot=None):
+async def setup(bot: Gunibot = None):
     if bot is not None:
         await bot.add_cog(Welcome(bot), icon="👋")

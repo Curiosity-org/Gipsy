@@ -26,7 +26,7 @@ class XP(commands.Cog):
 
     def __init__(self, bot: Gunibot):
         self.bot = bot
-        self.logger = setup_logger('xp')
+        self.logger = setup_logger("xp")
 
         self.cooldown = 30
         self.minimal_size = 5
@@ -55,7 +55,7 @@ class XP(commands.Cog):
         bot.get_command("config").add_command(self.config_levelup_reaction)
         bot.get_command("config").add_command(self.config_levelup_reaction_emoji)
 
-        self.xp_reduction.start() # pylint: disable=no-member
+        self.xp_reduction.start()  # pylint: disable=no-member
 
     @commands.command(name="enable_xp")
     async def config_enable_xp(self, ctx: MyContext, value: bool):
@@ -73,12 +73,14 @@ class XP(commands.Cog):
             channels = None
         else:
             channels = [channel.id for channel in channels]
-        noxp_channels = await self.bot.sconfig.edit_config(ctx.guild.id, "noxp_channels", channels)
+        noxp_channels = await self.bot.sconfig.edit_config(
+            ctx.guild.id, "noxp_channels", channels
+        )
         self.xp_channels_cache[ctx.guild.id] = channels if channels is not None else []
         await ctx.send(noxp_channels)
 
     @commands.command(name="xp_reduction")
-    async def config_xp_reduction(self, ctx: MyContext, enabled:bool):
+    async def config_xp_reduction(self, ctx: MyContext, enabled: bool):
         """Enable or disable the xp reduction system"""
         await ctx.send(
             await self.bot.sconfig.edit_config(ctx.guild.id, "xp_reduction", enabled)
@@ -110,11 +112,15 @@ class XP(commands.Cog):
         )
 
     @commands.command(name="levelup_reaction")
-    async def config_levelup_reaction(self, ctx: MyContext, *, enabled: Optional[bool] = None):
+    async def config_levelup_reaction(
+        self, ctx: MyContext, *, enabled: Optional[bool] = None
+    ):
         """If the bot add a reaction to the message or send a message
         Set to True for the reaction, False for the message"""
         await ctx.send(
-            await self.bot.sconfig.edit_config(ctx.guild.id, "levelup_reaction", enabled)
+            await self.bot.sconfig.edit_config(
+                ctx.guild.id, "levelup_reaction", enabled
+            )
         )
 
     @commands.command(name="reaction_emoji")
@@ -163,17 +169,17 @@ class XP(commands.Cog):
             result.append((f"{_lvl} {key}", " ".join(subroles)))
         return result
 
-
     ################
     # XP reduction #
     ################
 
-    @tasks.loop(hours=24*7)
+    @tasks.loop(hours=24 * 7)
     async def xp_reduction(self):
         """Reduce the xp of all members each week"""
 
         # Compute the XP to remove each week
-        xp_to_remove = await self.calc_xp("""Vous savez, moi je ne crois pas qu’il y ait de bonne ou
+        xp_to_remove = await self.calc_xp(
+            """Vous savez, moi je ne crois pas qu’il y ait de bonne ou
 de mauvaise situation. Moi, si je devais résumer ma vie aujourd’hui avec vous, je dirais que c’est
 d’abord des rencontres. Des gens qui m’ont tendu la main, peut-être à un moment où je ne pouvais
 pas, où j’étais seul chez moi. Et c’est assez curieux de se dire que les hasards, les rencontres
@@ -184,7 +190,8 @@ pu ; et je dis merci à la vie, je lui dis merci, je chante la vie, je danse la 
 qu’amour ! Et finalement, quand des gens me disent « Mais comment fais-tu pour avoir cette
 humanité ? », je leur réponds très simplement que c’est ce goût de l’amour, ce goût donc qui m’a
 poussé aujourd’hui à entreprendre une construction mécanique... mais demain qui sait ? Peut-être
-simplement à me mettre au service de la communauté, à faire le don, le don de soi.""")
+simplement à me mettre au service de la communauté, à faire le don, le don de soi."""
+        )
 
         # xp_to_remove *= 1
         for guild in self.bot.guilds:
@@ -196,8 +203,6 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
                         action_type="remove",
                         guild_id=guild.id,
                     )
-
-
 
     async def get_lvlup_chan(self, msg: discord.Message):
         "Get the correct levelup channel associated to a given message (thus guild)"
@@ -224,7 +229,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
             channel_id = message.channel.id
         # get the category
         if message.channel.category is None:
-            category_id = 0 # dumb ID
+            category_id = 0  # dumb ID
         else:
             category_id = message.channel.category.id
 
@@ -233,7 +238,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
                 return False
             if category_id in self.xp_channels_cache[message.guild.id]:
                 return False
-        else: # load cache
+        else:  # load cache
             channels = self.bot.server_configs[message.guild.id]["noxp_channels"]
             if channels is not None:
                 # convert to a list even if there's only one item
@@ -350,7 +355,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
             content = content.replace(match.group(0), "")
         return min(round(len(content) * self.xp_per_char), self.max_xp_per_msg)
 
-    async def calc_level(self, xp: int): # pylint: disable=invalid-name
+    async def calc_level(self, xp: int):  # pylint: disable=invalid-name
         """Calculates the level corresponding to a xp amount
         Returns: Current level, Total XP for the next level, Total XP for the current level
 
@@ -421,7 +426,8 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
         has_roles = [role.id for role in member.roles]
         # for each role that should be given and not already owned by user
         for role in [
-            role_reward for role_reward in rr_list\
+            role_reward
+            for role_reward in rr_list
             if role_reward["level"] <= level and role_reward["role"] not in has_roles
         ]:
             try:
@@ -433,7 +439,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
                     member_role, reason=f"Role reward (lvl {role['level']})"
                 )
                 counter += 1
-            except Exception as exc: # pylint: disable=broad-exception-caught
+            except Exception as exc:  # pylint: disable=broad-exception-caught
                 await self.bot.get_cog("Errors").on_error(exc)
         # if we don't have to remove roles: stop
         if not remove:
@@ -451,40 +457,54 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
                     member_role, reason=f"Role reward (lvl {role['level']})"
                 )
                 counter += 1
-            except Exception as exc: # pylint: disable=broad-exception-caught
+            except Exception as exc:  # pylint: disable=broad-exception-caught
                 await self.bot.get_cog("Errors").on_error(exc)
         return counter
 
     async def bdd_set_xp(
-        self, user_id: int, points: int, action_type: str = "add", guild_id: Optional[int] = None
+        self,
+        user_id: int,
+        points: int,
+        action_type: str = "add",
+        guild_id: Optional[int] = None,
     ):
         """Add/reset xp to a user in the database
         Set guild=None for global leaderboard"""
         try:
             try:
-                xp = await self.bdd_get_xp(user_id, guild_id) # pylint: disable=invalid-name
-                xp = xp[0]["xp"] # pylint: disable=invalid-name
+                xp = await self.bdd_get_xp(
+                    user_id, guild_id
+                )  # pylint: disable=invalid-name
+                xp = xp[0]["xp"]  # pylint: disable=invalid-name
             except IndexError:
-                xp = 0 # pylint: disable=invalid-name
+                xp = 0  # pylint: disable=invalid-name
             if points < 0:
                 raise ValueError("You cannot add nor set negative xp")
             if action_type == "add":
-                query = "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p)"\
+                query = (
+                    "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p)"
                     "ON CONFLICT(guild, userid) DO UPDATE SET xp = (xp + :p);"
+                )
             elif action_type == "remove":
                 if xp < points:
-                    query = "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES"\
+                    query = (
+                        "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES"
                         "(:g, :u, :p) ON CONFLICT(guild, userid) DO UPDATE SET xp = 0;"
+                    )
                 else:
-                    query = "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p)"\
+                    query = (
+                        "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p)"
                         "ON CONFLICT(guild, userid) DO UPDATE SET xp = (xp - :p);"
+                    )
             else:
-                query = "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p)"\
+                query = (
+                    "INSERT INTO xp (`guild`, `userid`,`xp`) VALUES (:g, :u, :p)"
                     "ON CONFLICT(guild, userid) DO UPDATE SET xp = :p;"
+                )
 
             self.bot.db_query(query, {"g": guild_id, "u": user_id, "p": points})
             return True
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_error(exc)
             return False
 
@@ -505,7 +525,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
                         liste[0]["xp"],
                     ]
             return liste
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_error(exc)
             return list()
 
@@ -518,7 +538,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
             if liste is not None and len(liste) == 1:
                 return liste[0]["count"]
             return 0
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_error(exc)
             return 0
 
@@ -533,9 +553,10 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
                 self.cache[guild] = {}
             for user_data in result_list:
                 self.cache[guild][user_data["userid"]] = [
-                    round(time.time()) - 60, int(user_data["xp"])
+                    round(time.time()) - 60,
+                    int(user_data["xp"]),
                 ]
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_error(exc)
 
     async def bdd_get_rank(self, user_id: int, guild: Optional[discord.Guild] = None):
@@ -550,29 +571,33 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
             if guild is not None:
                 users = [member.id for member in guild.members]
             for user_data in liste:
-                if guild is None or (guild is not None and user_data["userid"] in users):
+                if guild is None or (
+                    guild is not None and user_data["userid"] in users
+                ):
                     i += 1
                 if user_data["userid"] == user_id:
                     userdata = dict(user_data)
                     userdata["rank"] = i
                     break
             return userdata
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_error(exc)
 
-    async def bdd_get_top(self, top: Optional[int] = None, guild: Optional[discord.Guild] = None):
+    async def bdd_get_top(
+        self, top: Optional[int] = None, guild: Optional[discord.Guild] = None
+    ):
         """Get the leaderboard of a given guild (or global if no guild)"""
         try:
             query = "SELECT userid, xp FROM xp WHERE guild = ? ORDER BY `xp` DESC"
             if top is not None:
                 query += f" LIMIT {top}"
             return self.bot.db_query(query, (guild.id if guild else None,))
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_error(exc)
 
     async def get_xp(self, user: discord.User, guild_id: Optional[int] = None):
         """Get the xp amount of a user in a guild"""
-        xp = await self.bdd_get_xp(user.id, guild_id) # pylint: disable=invalid-name
+        xp = await self.bdd_get_xp(user.id, guild_id)  # pylint: disable=invalid-name
         if xp is None or (isinstance(xp, list) and len(xp) == 0):
             return
         return xp[0]["xp"]
@@ -581,7 +606,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
         self,
         ctx: MyContext,
         user: discord.User,
-        xp, # pylint: disable=invalid-name
+        xp,  # pylint: disable=invalid-name
         rank,
         ranks_nb,
         levels_info,
@@ -604,7 +629,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
         self,
         ctx: MyContext,
         user: discord.User,
-        xp, # pylint: disable=invalid-name
+        xp,  # pylint: disable=invalid-name
         rank,
         ranks_nb,
         levels_info,
@@ -638,7 +663,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
         # if guild cache not done yet
         if ctx.guild.id not in self.cache:
             await self.bdd_load_cache(ctx.guild.id)
-        xp = await self.get_xp(user, ctx.guild.id) # pylint: disable=invalid-name
+        xp = await self.get_xp(user, ctx.guild.id)  # pylint: disable=invalid-name
         if xp is None:
             if ctx.author == user:
                 return await ctx.send(await self.bot._(ctx.channel, "xp.no-xp-author"))
@@ -681,7 +706,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
                 user_name = user
             level_data = await self.calc_level(user_data["xp"])
             txt.append(
-                "{} • **{} |** `lvl {}` **|** `xp {}`".format( # pylint: disable=consider-using-f-string
+                "{} • **{} |** `lvl {}` **|** `xp {}`".format(  # pylint: disable=consider-using-f-string
                     i,
                     "__" + user_name + "__" if user == ctx.author else user_name,
                     level_data[0],
@@ -747,7 +772,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
             lvl = lvl[0]
             your_rank = {
                 "name": "__" + await self.bot._(ctx.channel, "xp.top.your") + "__",
-                "value": "**#{} |** `lvl {}` **|** `xp {}`".format( # pylint: disable=consider-using-f-string
+                "value": "**#{} |** `lvl {}` **|** `xp {}`".format(  # pylint: disable=consider-using-f-string
                     rank["rank"] if "rank" in rank.keys() else "?", lvl, rank["xp"]
                 ),
             }
@@ -778,8 +803,10 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
         if level < 0:
             query = "SELECT rowid AS id, * FROM `roles_levels` WHERE guild = :g ORDER BY level;"
         else:
-            query = "SELECT rowid AS id, * FROM `roles_levels` WHERE guild=:g"\
+            query = (
+                "SELECT rowid AS id, * FROM `roles_levels` WHERE guild=:g"
                 "AND level=:l ORDER BY level;"
+            )
         liste = self.bot.db_query(query, {"g": guild, "l": level})
         return liste
 
@@ -811,7 +838,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
                     await self.bot._(ctx.guild.id, "xp.rr.already-exist")
                 )
             await self.rr_add_role(ctx.guild.id, role.id, level)
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_command_error(ctx, exc)
         else:
             await ctx.send(
@@ -827,16 +854,21 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
             return await ctx.send(await self.bot._(ctx.guild.id, "xp.cant-send-embed"))
         try:
             role_rewards = await self.rr_list_role(ctx.guild.id)
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_command_error(ctx, exc)
         else:
             level_field_name = await self.bot._(ctx.guild.id, "xp.card.level")
             desc = "\n".join(
-                [f"• <@&{x['role']}> : {level_field_name} {x['level']}" for x in role_rewards]
+                [
+                    f"• <@&{x['role']}> : {level_field_name} {x['level']}"
+                    for x in role_rewards
+                ]
             )
             if len(desc) == 0:
                 desc = await self.bot._(ctx.guild.id, "xp.rr.no-rr-2")
-            title = await self.bot._(ctx.guild.id, "xp.rr.list-title", nbr=len(role_rewards))
+            title = await self.bot._(
+                ctx.guild.id, "xp.rr.list-title", nbr=len(role_rewards)
+            )
             emb = discord.Embed(title=title, description=desc)
             await ctx.send(embed=emb)
 
@@ -850,7 +882,7 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
             if len(roles) == 0:
                 return await ctx.send(await self.bot._(ctx.guild.id, "xp.rr.no-rr"))
             await self.rr_remove_role(roles[0]["id"])
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_command_error(ctx, exc)
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "xp.rr.removed", level=level))
@@ -878,7 +910,9 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
                 discord_member = ctx.guild.get_member(member["user"])
                 if discord_member is not None:
                     level = (await self.calc_level(member["xp"]))[0]
-                    counter += await self.give_rr(discord_member, level, rr_list, remove=True)
+                    counter += await self.give_rr(
+                        discord_member, level, rr_list, remove=True
+                    )
             await ctx.send(
                 await self.bot._(
                     ctx.guild.id,
@@ -887,14 +921,14 @@ simplement à me mettre au service de la communauté, à faire le don, le don de
                     members=ctx.guild.member_count,
                 )
             )
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_command_error(ctx, exc)
 
     async def cog_unload(self):
-        self.xp_reduction.cancel() # pylint: disable=no-member
+        self.xp_reduction.cancel()  # pylint: disable=no-member
 
 
-async def setup(bot:Gunibot=None):
+async def setup(bot: Gunibot = None):
     "Load the cog"
     if bot is not None:
         await bot.add_cog(XP(bot), icon="🪙")

@@ -22,13 +22,12 @@ from utils import Gunibot, MyContext
 def permission_check(callback: callable):
     """Decorator used to check if the user has the permission to use the
     command and returns a "not found" message else.
-    
+
     This is used to prevent the user from seing commands he can't run.
     """
 
     async def decorator(
-        self: Help,
-        command: Union[commands.Command, commands.Group, commands.Cog]
+        self: Help, command: Union[commands.Command, commands.Group, commands.Cog]
     ):
         # to check if the user can run the command in the context, we use the
         # filter function of the helper class to remove the command if the user
@@ -40,7 +39,9 @@ def permission_check(callback: callable):
                     await self.command_not_found(command.qualified_name)
                 )
         else:
-            if len(await self.filter_commands([command])) == 0: # the user can't use the command
+            if (
+                len(await self.filter_commands([command])) == 0
+            ):  # the user can't use the command
                 return await self.send_error_message(
                     await self.command_not_found(command.qualified_name)
                 )
@@ -50,8 +51,10 @@ def permission_check(callback: callable):
 
     return decorator
 
+
 class Help(commands.HelpCommand):
     """Everything you need to know about this bot."""
+
     ANNOTATION_TRANSLATION = {
         discord.User: "annotation.user",
         discord.Member: "annotation.user",
@@ -91,7 +94,9 @@ class Help(commands.HelpCommand):
         """
 
         # load the config options
-        color = self.context.bot.server_configs[self.context.guild.id].get("help_embed_color", 0)
+        color = self.context.bot.server_configs[self.context.guild.id].get(
+            "help_embed_color", 0
+        )
 
         embed = discord.Embed(*args, **kwargs, color=color)
 
@@ -103,7 +108,9 @@ class Help(commands.HelpCommand):
 
         return embed
 
-    async def get_bot_command_formating(self, cmds: List[commands.Command], size:int=None) -> str:
+    async def get_bot_command_formating(
+        self, cmds: List[commands.Command], size: int = None
+    ) -> str:
         """Returns a string representing `commands_`
 
         Attributes
@@ -125,9 +132,7 @@ class Help(commands.HelpCommand):
 
         for command in cmds:
             output += await self.get_command_list_string(
-                command,
-                name_size=name_size,
-                total_size=size
+                command, name_size=name_size, total_size=size
             )
             output += "\n"
         output += "```"
@@ -196,7 +201,9 @@ class Help(commands.HelpCommand):
                 types.append(
                     await self.context.bot._(self.context, "help.greedy", type=type_)
                 )
-        elif isinstance(annotation, typing._UnionGenericAlias): # pylint: disable=protected-access
+        elif isinstance(
+            annotation, typing._UnionGenericAlias
+        ):  # pylint: disable=protected-access
             for arg in annotation.__args__:
                 type_ = await self.get_type_string(arg)
                 if type_ is not None:
@@ -240,7 +247,9 @@ class Help(commands.HelpCommand):
                 parameter_string = ""
 
             if (
-                parameter.default and parameter.default != inspect._empty # pylint: disable=protected-access
+                parameter.default
+                and parameter.default
+                != inspect._empty  # pylint: disable=protected-access
             ):  # parse default
                 if parameter.default in self.DEFAULT_TRANSLATION:
                     default = await bot._(
@@ -260,9 +269,7 @@ class Help(commands.HelpCommand):
         return result if len(result) > 0 else None
 
     async def get_command_list_string(
-        self, command: commands.Command,
-        name_size:int=0,
-        total_size:int=0
+        self, command: commands.Command, name_size: int = 0, total_size: int = 0
     ) -> str:
         """Returns a string representing `command` in a list of commands
 
@@ -277,13 +284,13 @@ class Help(commands.HelpCommand):
             The string representation of `command`
         """
         name = f"{command.name.ljust(name_size)} :: "
-        total_size += 4 # number of additionnal characters
+        total_size += 4  # number of additionnal characters
         if command.short_doc:
             short_doc = await self.context.bot._(
                 self.context,
                 "help.short_doc",
-                short_doc=command.short_doc#[:40]
-                #+ ("…" if len(command.short_doc) > 40 else ""),
+                short_doc=command.short_doc  # [:40]
+                # + ("…" if len(command.short_doc) > 40 else ""),
             )
             short_doc = short_doc[3:-1]
         else:
@@ -314,12 +321,12 @@ class Help(commands.HelpCommand):
         if isinstance(group, commands.Group):
             commands_ = sorted(
                 await self.filter_commands(group.commands),
-                key=lambda command: command.name
+                key=lambda command: command.name,
             )
         elif issubclass(type(group), commands.Cog):
             commands_ = sorted(
                 await self.filter_commands(group.get_commands()),
-                key=lambda command: command.name
+                key=lambda command: command.name,
             )
 
         for command in commands_:
@@ -388,7 +395,9 @@ class Help(commands.HelpCommand):
                 inline=False,
             )
 
-    async def send_bot_help(self, mappings) -> None: # pylint: disable=unused-argument, arguments-differ
+    async def send_bot_help(
+        self, mappings
+    ) -> None:  # pylint: disable=unused-argument, arguments-differ
         """Send the help message for the bot in the context channel"""
         ctx = self.context
         bot: Gunibot = ctx.bot
@@ -418,31 +427,35 @@ class Help(commands.HelpCommand):
 
             embeds.append(
                 await self.get_help_embed(
-                    title= f"{icon}   {category}",
-                    description=await self.get_bot_command_formating(commands_, size=max_lenght)
+                    title=f"{icon}   {category}",
+                    description=await self.get_bot_command_formating(
+                        commands_, size=max_lenght
+                    ),
                 )
             )
             if len(commands_) == 1:
                 embeds[-1].set_footer(
                     text=await bot._(
-                        ctx, "help.help-cog-tip",
+                        ctx,
+                        "help.help-cog-tip",
                         prefix=self.context.clean_prefix,
-                        cog=commands_[0].name
+                        cog=commands_[0].name,
                     )
                 )
             else:
                 embeds[-1].set_footer(
                     text=await bot._(
-                        ctx, "help.help-tip",
-                        prefix=self.context.clean_prefix
+                        ctx, "help.help-tip", prefix=self.context.clean_prefix
                     )
                 )
 
-        for i in range(int(math.ceil(len(embeds)/10))):
-            await ctx.send(embeds=embeds[i*10: min((i+1)*10, len(embeds))])
+        for i in range(int(math.ceil(len(embeds) / 10))):
+            await ctx.send(embeds=embeds[i * 10 : min((i + 1) * 10, len(embeds))])
 
     @permission_check
-    async def send_command_help(self, command: commands.Command) -> None: # pylint: disable=arguments-differ
+    async def send_command_help(
+        self, command: commands.Command
+    ) -> None:  # pylint: disable=arguments-differ
         """Send the help message for command in the context channel
 
         Attributes
@@ -456,9 +469,7 @@ class Help(commands.HelpCommand):
             title=await bot._(ctx, "help.command-help-title", command=command.name)
         )
 
-        description = (
-            "```autohotkey\n"  # include signature and description in the same code field
-        )
+        description = "```autohotkey\n"  # include signature and description in the same code field
         description += await bot._(
             ctx,
             "help.help-signature-format",
@@ -479,7 +490,9 @@ class Help(commands.HelpCommand):
         await ctx.send(embed=self.embed)
 
     @permission_check
-    async def send_group_help(self, group: commands.Group) -> None: # pylint: disable=arguments-differ
+    async def send_group_help(
+        self, group: commands.Group
+    ) -> None:  # pylint: disable=arguments-differ
         """Send the help message for a group in the context channel
 
         Attributes
@@ -518,7 +531,9 @@ class Help(commands.HelpCommand):
         await ctx.send(embed=self.embed)
 
     @permission_check
-    async def send_cog_help(self, cog: commands.Cog) -> None: # pylint: disable=arguments-differ
+    async def send_cog_help(
+        self, cog: commands.Cog
+    ) -> None:  # pylint: disable=arguments-differ
         """Send the help message for the cog in the context channel
 
         Attributes
@@ -544,7 +559,9 @@ class Help(commands.HelpCommand):
 
         await ctx.send(embed=self.embed)
 
-    async def command_not_found(self, command: str) -> str: # pylint: disable=invalid-overridden-method, arguments-differ
+    async def command_not_found(
+        self, command: str
+    ) -> str:  # pylint: disable=invalid-overridden-method, arguments-differ
         """Return the string for command not found error
 
         Attributes
@@ -554,7 +571,9 @@ class Help(commands.HelpCommand):
         """
         return await self.context.bot._(self.context, "help.not-found", command=command)
 
-    async def send_error_message(self, error: str) -> None: # pylint: disable=arguments-differ
+    async def send_error_message(
+        self, error: str
+    ) -> None:  # pylint: disable=arguments-differ
         """Raise the help error message in context channel
 
         Attributes
@@ -616,7 +635,8 @@ class HelpCog(commands.Cog):
             )
         )
 
-async def setup(bot:Gunibot=None):
+
+async def setup(bot: Gunibot = None):
     """
     Fonction d'initialisation du plugin
 
@@ -626,6 +646,7 @@ async def setup(bot:Gunibot=None):
     if bot is not None:
         bot.help_command = Help()
         await bot.add_cog(HelpCog(bot), icon="🤝")
+
 
 async def teardown(bot: Gunibot):
     """

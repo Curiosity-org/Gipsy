@@ -33,7 +33,7 @@ def cleanup_code(content):
 class Admin(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
-        self.logger = setup_logger('admin')
+        self.logger = setup_logger("admin")
         self._last_result = None
 
     @commands.group(name="admin", hidden=True)
@@ -70,8 +70,8 @@ class Admin(commands.Cog):
                     in str(exc)
                 ):
                     await msg.edit(
-                        content=msg.content + \
-                        "\nCertains fichiers ont été modifiés localement - abandon de la procédure"
+                        content=msg.content
+                        + "\nCertains fichiers ont été modifiés localement - abandon de la procédure"
                     )
                 else:
                     await msg.edit(
@@ -81,7 +81,8 @@ class Admin(commands.Cog):
                 return
             else:
                 await msg.edit(
-                    content=msg.content + f"\nBranche {branch} correctement sélectionnée"
+                    content=msg.content
+                    + f"\nBranche {branch} correctement sélectionnée"
                 )
         origin = repo.remotes.origin
         origin.pull()
@@ -137,9 +138,7 @@ class Admin(commands.Cog):
         else:
             await ctx.message.delete()
             deleted = await ctx.channel.purge(limit=limit)
-            await ctx.send(
-                f"{len(deleted)} messages supprimés !", delete_after=3.0
-            )
+            await ctx.send(f"{len(deleted)} messages supprimés !", delete_after=3.0)
 
     @main_msg.command(name="reload")
     async def reload_cog(self, ctx: commands.Context, *, cog: str):
@@ -151,12 +150,12 @@ class Admin(commands.Cog):
         reloaded_cogs = []
         for cog in cogs:
             try:
-                await self.bot.reload_extension("plugins." + cog + '.' + cog)
+                await self.bot.reload_extension("plugins." + cog + "." + cog)
             except ModuleNotFoundError:
                 await ctx.send(f"Cog {cog} can't be found")
             except commands.errors.ExtensionNotLoaded:
                 await ctx.send(f"Cog {cog} was never loaded")
-            except Exception as exc: # pylint: disable=broad-exception-caught
+            except Exception as exc:  # pylint: disable=broad-exception-caught
                 await errors_cog.on_error(exc, ctx)
                 await ctx.send(f"**`ERROR:`** {type(exc).__name__} - {exc}")
             else:
@@ -172,20 +171,20 @@ class Admin(commands.Cog):
     async def add_cog(self, ctx: commands.Context, name: str):
         """Ajouter un cog au bot"""
         try:
-            await self.bot.load_extension("plugins." + name + '.' + name)
+            await self.bot.load_extension("plugins." + name + "." + name)
             await ctx.send(f"Module '{name}' ajouté !")
             self.logger.info("Module %s ajouté", name)
-        except Exception as exc: #pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await ctx.send(str(exc))
 
     @main_msg.command(name="del_cog", aliases=["remove_cog"], hidden=True)
     async def rm_cog(self, ctx: commands.Context, name: str):
         """Enlever un cog au bot"""
         try:
-            await self.bot.unload_extension("plugins." + name + '.' + name)
+            await self.bot.unload_extension("plugins." + name + "." + name)
             await ctx.send(f"Module '{name}' désactivé !")
             self.logger.info("Module %s désactivé", name)
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await ctx.send(str(exc))
 
     @main_msg.command(name="cogs", hidden=True)
@@ -224,7 +223,8 @@ class Admin(commands.Cog):
     @commands.check(checks.is_bot_admin)
     async def _eval(self, ctx: commands.Context, *, body: str):
         """Evaluates a code
-        Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)"""
+        Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)
+        """
         env = {
             "bot": self.bot,
             "ctx": ctx,
@@ -240,19 +240,19 @@ class Admin(commands.Cog):
         stdout = io.StringIO()
         try:
             to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_error(exc, ctx)
             return
         try:
-            exec(to_compile, env) # pylint: disable=exec-used
-        except Exception as exc: # pylint: disable=broad-exception-caught
+            exec(to_compile, env)  # pylint: disable=exec-used
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             return await ctx.send(f"```py\n{exc.__class__.__name__}: {exc}\n```")
 
         func = env["func"]
         try:
             with redirect_stdout(stdout):
                 ret = await func()
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             value = stdout.getvalue()
             await ctx.send(f"```py\n{value}{traceback.format_exc()}\n```")
         else:
@@ -265,5 +265,6 @@ class Admin(commands.Cog):
                 self._last_result = ret
                 await ctx.send(f"```py\n{value}{ret}\n```")
 
-async def setup(bot:Gunibot):
+
+async def setup(bot: Gunibot):
     await bot.add_cog(Admin(bot), icon="🚨")

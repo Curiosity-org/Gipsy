@@ -17,6 +17,7 @@ from utils import Gunibot, MyContext
 # pylint: disable=relative-beyond-top-level
 from .quipyquizz import QuiPyQuizz
 
+
 def clean_question(question: str):
     """
     Retire les balises <p> et </p> de la question
@@ -73,6 +74,7 @@ class REACTIONS:
     :cvar NEXT_QUESTION: Réaction pour passer à la question suivante
     :vartype NEXT_QUESTION: str
     """
+
     ANSWER_TRUE = "✅"
     ANSWER_FALSE = "❎"
     ANSWER_SEPARATOR = "⬛"
@@ -115,6 +117,7 @@ class Quizz(commands.Cog):
     """
     Plugin "Quizz" pour le bot Gipsy
     """
+
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "quizz"
@@ -139,7 +142,6 @@ class Quizz(commands.Cog):
         """
         self.parties[party_id]["timestamp"] = time.time()
 
-
     def ez_set_author(self, embed: discord.Embed, party_id):
         """
         Ajoute les informations dans le champ "author" de l'embed
@@ -157,9 +159,9 @@ class Quizz(commands.Cog):
             name=self.quipyquizz.get_name(quizz_id),
             url=self.quipyquizz.get_url(quizz_id),
             icon_url="https://scontent.fcdg1-1.fna.fbcdn.net/v/t1.6435-1/p148x148"
-                     "/48416529_2354370714793494_5893141918379933696_n.png?_nc_cat=110&ccb=1-3&_nc_sid=1eb0c7&_nc_ohc"
-                     "=AI2a2_Vn0c4AX9pPIK8&_nc_ht=scontent.fcdg1-1.fna&tp=30&oh=f8c88dae60c23d52fe81b8264031bf9f&oe"
-                     "=60D6AFB7",
+            "/48416529_2354370714793494_5893141918379933696_n.png?_nc_cat=110&ccb=1-3&_nc_sid=1eb0c7&_nc_ohc"
+            "=AI2a2_Vn0c4AX9pPIK8&_nc_ht=scontent.fcdg1-1.fna&tp=30&oh=f8c88dae60c23d52fe81b8264031bf9f&oe"
+            "=60D6AFB7",
         )
         return embed
 
@@ -496,7 +498,9 @@ class Quizz(commands.Cog):
         new_value = ""
         for line in field_value:
             if str(player_id) in line:
-                new_value += f"\n{line.replace('<a:hourgalss:873200874636337172>', '✅')}"
+                new_value += (
+                    f"\n{line.replace('<a:hourgalss:873200874636337172>', '✅')}"
+                )
             else:
                 new_value += f"\n{line}"
         embed.clear_fields()
@@ -520,7 +524,9 @@ class Quizz(commands.Cog):
                         self.parties[party_id]["channel_id"]
                     )
                     if channel is not None:
-                        quiz_name = self.quipyquizz.get_name(self.parties[party_id]['quizz']['id'])
+                        quiz_name = self.quipyquizz.get_name(
+                            self.parties[party_id]["quizz"]["id"]
+                        )
                         await channel.send(
                             f"<@{self.parties[party_id]['author_id']}> ton quizz sur {quiz_name} s'est arrêté car "
                             f"inactif !"
@@ -570,7 +576,9 @@ class Quizz(commands.Cog):
                 ids = list(self.quipyquizz.data)
                 for index in range(15):
                     embed.add_field(
-                        name=self.quipyquizz.data[ids[index + ((param - 1) * 15)]]["name"],
+                        name=self.quipyquizz.data[ids[index + ((param - 1) * 15)]][
+                            "name"
+                        ],
                         value=f"ID du quizz: `{ids[index + ((param-1) * 15)]}`",
                     )
                 embed.set_footer(text=f"{param}/{len(self.quipyquizz.data) // 15}")
@@ -592,7 +600,9 @@ class Quizz(commands.Cog):
                 ids = list(self.quipyquizz.data)
                 for index in range(15):
                     embed.add_field(
-                        name=self.quipyquizz.data[ids[index + ((param - 1) * 15)]]["name"],
+                        name=self.quipyquizz.data[ids[index + ((param - 1) * 15)]][
+                            "name"
+                        ],
                         value=f"ID du quizz: `{ids[index + ((param-1) * 15)]}`",
                     )
                 embed.set_footer(text=f"{param}/{len(self.quipyquizz.data) // 15}")
@@ -616,7 +626,6 @@ class Quizz(commands.Cog):
                 if (
                     payload.emoji.name == REACTIONS.START_QUIZ
                 ):  # 🆗 => Commencer le quizz
-
                     # Génération de l'embed de question
                     embed = self.ez_question_embed(party_id)
                     prev_players_markdown = (
@@ -641,7 +650,7 @@ class Quizz(commands.Cog):
                     return await self.send_party_question(party_id)
 
                 if (
-                        payload.emoji.name == REACTIONS.STOP_QUIZ
+                    payload.emoji.name == REACTIONS.STOP_QUIZ
                 ):  # ❌ => annulation du quizz
                     embed = discord.Embed(title="Quizz annulé")
                     self.parties.pop(party_id)  # Supression dans le dict
@@ -649,7 +658,7 @@ class Quizz(commands.Cog):
                     return await message.edit(embed=embed)  # Feedback user
 
                 if (
-                        payload.emoji.name == REACTIONS.FORWARD_QUESTION
+                    payload.emoji.name == REACTIONS.FORWARD_QUESTION
                 ):  # on skip cette question
                     if not self.has_everyone_answered(party_id):
                         return await channel.send(
@@ -869,7 +878,8 @@ class Quizz(commands.Cog):
         ids = list(self.quipyquizz.data)
         for index in range(15):
             embed.add_field(
-                name=self.quipyquizz.data[ids[index]]["name"], value=f"ID du quizz: `{ids[index]}`"
+                name=self.quipyquizz.data[ids[index]]["name"],
+                value=f"ID du quizz: `{ids[index]}`",
             )
         embed.set_footer(text=f"1/{len(self.quipyquizz.data) // 15}")
         msg: discord.Message = await ctx.send(embed=embed)
@@ -880,7 +890,8 @@ class Quizz(commands.Cog):
         self.quick_quizz_channels.append(ctx.channel.id)
         return
 
-async def setup(bot:Gunibot=None):
+
+async def setup(bot: Gunibot = None):
     """
     Fonction d'initialisation du plugin
 

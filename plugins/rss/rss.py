@@ -25,8 +25,10 @@ from utils import Gunibot, MyContext
 import core
 from core import setup_logger
 
-async def setup(bot:Gunibot):
+
+async def setup(bot: Gunibot):
     await bot.add_cog(Rss(bot), icon="📰")
+
 
 class Rss(commands.Cog):
     """
@@ -38,7 +40,7 @@ class Rss(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.config = core.config.get("rss")
         self.bot = bot
-        self.logger = setup_logger('rss')
+        self.logger = setup_logger("rss")
         self.time_loop = 15  # min minutes between two rss loops
         # seconds between two rss checks within a loop
         self.time_between_flows_check = 0.15
@@ -51,11 +53,13 @@ class Rss(commands.Cog):
         self.table = "rss_flows"
 
         # launch rss loop
-        self.loop_child.change_interval(minutes=self.time_loop) # pylint: disable=no-member
-        self.loop_child.start() # pylint: disable=no-member
+        self.loop_child.change_interval(
+            minutes=self.time_loop
+        )  # pylint: disable=no-member
+        self.loop_child.start()  # pylint: disable=no-member
 
     async def cog_unload(self):
-        self.loop_child.cancel() # pylint: disable=no-member
+        self.loop_child.cancel()  # pylint: disable=no-member
 
     class RSSMessage:
         def __init__(
@@ -95,7 +99,7 @@ class Rss(commands.Cog):
         def fill_embed_data(self, flow: dict):
             if not flow["use_embed"]:
                 return
-            self.embed_data = { # pylint: disable=attribute-defined-outside-init
+            self.embed_data = {  # pylint: disable=attribute-defined-outside-init
                 "color": discord.Colour(0).default(),
                 "footer": "",
                 "title": None,
@@ -181,7 +185,7 @@ class Rss(commands.Cog):
     async def rss_main(self, ctx: MyContext):
         """See the last post of a rss feed"""
         if ctx.subcommand_passed is None:
-            await ctx.send_help('rss')
+            await ctx.send_help("rss")
 
     @rss_main.command(name="youtube", aliases=["yt"])
     async def request_yt(self, ctx: MyContext, video_id):
@@ -308,7 +312,9 @@ class Rss(commands.Cog):
         if rss_type is None or not await self.check_rss_url(link):
             return await ctx.send(await self.bot._(ctx.guild.id, "rss.invalid-flow"))
         try:
-            feed_id = await self.db_add_flow(ctx.guild.id, ctx.channel.id, rss_type, identifiant)
+            feed_id = await self.db_add_flow(
+                ctx.guild.id, ctx.channel.id, rss_type, identifiant
+            )
             await ctx.send(
                 str(await self.bot._(ctx.guild, "rss.success-add")).format(
                     display_type, link, ctx.channel.mention
@@ -321,9 +327,10 @@ class Rss(commands.Cog):
                 feed_id,
             )
             await self.send_log(
-                f"Feed added into server {ctx.guild.id} ({feed_id})", ctx.guild,
+                f"Feed added into server {ctx.guild.id} ({feed_id})",
+                ctx.guild,
             )
-        except Exception as exception: # pylint: disable=broad-exception-caught
+        except Exception as exception:  # pylint: disable=broad-exception-caught
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
             await self.bot.get_cog("Errors").on_error(exception, ctx)
 
@@ -345,7 +352,7 @@ class Rss(commands.Cog):
             return
         try:
             await self.db_remove_flow(flow[0]["ID"])
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
             await self.bot.get_cog("Errors").on_error(exc, ctx)
             return
@@ -353,7 +360,7 @@ class Rss(commands.Cog):
         self.logger.info(
             "RSS feed deleted into server %i (%i)",
             ctx.guild.id,
-            flow[0]['ID'],
+            flow[0]["ID"],
         )
         await self.send_log(
             f"Feed deleted into server {ctx.guild.id} ({flow[0]['ID']})",
@@ -404,14 +411,11 @@ class Rss(commands.Cog):
                     embed.add_field(name="\uFEFF", value=text, inline=False)
                 await ctx.send(embed=embed)
                 rss_feeds.clear()
-            rss_feeds.append(translation.format(
-                rss_type,
-                channel,
-                feed["link"],
-                roles,
-                feed["ID"],
-                feed["date"]
-            ))
+            rss_feeds.append(
+                translation.format(
+                    rss_type, channel, feed["link"], roles, feed["ID"], feed["date"]
+                )
+            )
         if len(rss_feeds) > 0:
             embed = discord.Embed(
                 title=title, color=self.embed_color, timestamp=ctx.message.created_at
@@ -562,7 +566,7 @@ class Rss(commands.Cog):
             flow = await self.ask_id(
                 flow_id, ctx, await self.bot._(ctx.guild.id, "rss.choose-mentions-1")
             )
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             flow = []
             await self.bot.get_cog("Errors").on_error(exc, ctx)
         if flow is None:
@@ -584,7 +588,9 @@ class Rss(commands.Cog):
                     else:
                         roles.append(item)
                 roles = ", ".join(roles)
-                text = str(await self.bot._(ctx.guild.id, "rss.roles-list")).format(roles)
+                text = str(await self.bot._(ctx.guild.id, "rss.roles-list")).format(
+                    roles
+                )
             # ask for roles
             embed = discord.Embed(
                 title=await self.bot._(ctx.guild.id, "rss.choose-roles"),
@@ -614,10 +620,14 @@ class Rss(commands.Cog):
                         for role in roles:
                             role = role.strip()
                             try:
-                                roles = await commands.RoleConverter().convert(ctx, role)
+                                roles = await commands.RoleConverter().convert(
+                                    ctx, role
+                                )
                                 id_list.append(str(roles.id))
                                 name_list.append(roles.name)
-                            except BaseException: # pylint: disable=broad-exception-caught
+                            except (
+                                BaseException
+                            ):  # pylint: disable=broad-exception-caught
                                 await ctx.send(err)
                                 id_list = []
                                 break
@@ -644,12 +654,14 @@ class Rss(commands.Cog):
                 await self.db_update_flow(flow["ID"], values=[("roles", None)])
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.roles-1"))
             else:
-                await self.db_update_flow(flow["ID"], values=[("roles", dumps(id_list))])
+                await self.db_update_flow(
+                    flow["ID"], values=[("roles", dumps(id_list))]
+                )
                 txt = ", ".join(name_list)
                 await ctx.send(
                     str(await self.bot._(ctx.guild.id, "rss.roles-0")).format(txt)
                 )
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
             await self.bot.get_cog("Errors").on_error(exc, ctx)
 
@@ -672,7 +684,7 @@ class Rss(commands.Cog):
                 )
             )
             await msg.delete()
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await ctx.send(
                 str(await self.bot._(ctx.guild.id, "rss.guild-error")).format(exc)
             )
@@ -699,10 +711,12 @@ class Rss(commands.Cog):
                 channel = ctx.channel
             try:
                 flow = await self.ask_id(
-                    flow_id, ctx, await self.bot._(ctx.guild.id, "rss.choose-mentions-1")
+                    flow_id,
+                    ctx,
+                    await self.bot._(ctx.guild.id, "rss.choose-mentions-1"),
                 )
                 error = None
-            except Exception: # pylint: disable=broad-exception-caught
+            except Exception:  # pylint: disable=broad-exception-caught
                 flow = []
             if flow is None:
                 return
@@ -718,7 +732,7 @@ class Rss(commands.Cog):
                     flow["ID"], channel.mention
                 )
             )
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await ctx.send(
                 str(await self.bot._(ctx.guild.id, "rss.guild-error")).format(exc)
             )
@@ -748,15 +762,21 @@ class Rss(commands.Cog):
         try:
             try:
                 flow = await self.ask_id(
-                    flow_id, ctx, await self.bot._(ctx.guild.id, "rss.choose-mentions-1")
+                    flow_id,
+                    ctx,
+                    await self.bot._(ctx.guild.id, "rss.choose-mentions-1"),
                 )
-            except Exception as exc: # pylint: disable=broad-exception-caught, unused-variable
+            except (
+                Exception
+            ) as exc:  # pylint: disable=broad-exception-caught, unused-variable
                 flow = []
             if flow is None:
                 return
             if len(flow) == 0:
                 await ctx.send(await self.bot._(ctx.guild, "rss.fail-add"))
-                await self.bot.get_cog("Errors").on_error(exc, ctx) # pylint: disable=used-before-assignment
+                await self.bot.get_cog("Errors").on_error(
+                    exc, ctx
+                )  # pylint: disable=used-before-assignment
                 return
             flow = flow[0]
             if text is None:
@@ -782,7 +802,7 @@ class Rss(commands.Cog):
                     flow["ID"], text
                 )
             )
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await ctx.send(
                 str(await self.bot._(ctx.guild.id, "rss.guild-error")).format(exc)
             )
@@ -815,9 +835,11 @@ class Rss(commands.Cog):
             error = None
             try:
                 flow = await self.ask_id(
-                    flow_id, ctx, await self.bot._(ctx.guild.id, "rss.choose-mentions-1")
+                    flow_id,
+                    ctx,
+                    await self.bot._(ctx.guild.id, "rss.choose-mentions-1"),
                 )
-            except Exception as error: # pylint: disable=broad-exception-caught
+            except Exception as error:  # pylint: disable=broad-exception-caught
                 flow = []
                 await self.bot.get_cog("Errors").on_error(error, ctx)
             if flow is None:
@@ -844,8 +866,10 @@ class Rss(commands.Cog):
 
                 def check(msg):
                     try:
-                        _ = commands.core._convert_to_bool(msg.content) # pylint: disable=protected-access, no-member
-                    except BaseException: # pylint: disable=broad-exception-caught
+                        _ = commands.core._convert_to_bool(
+                            msg.content
+                        )  # pylint: disable=protected-access, no-member
+                    except BaseException:  # pylint: disable=broad-exception-caught
                         return False
                     return msg.author == ctx.author and msg.channel == ctx.channel
 
@@ -855,7 +879,9 @@ class Rss(commands.Cog):
                     return await ctx.send(
                         await self.bot._(ctx.guild.id, "rss.too-long")
                     )
-                value = commands.core._convert_to_bool(msg.content) # pylint: disable=protected-access, no-member
+                value = commands.core._convert_to_bool(
+                    msg.content
+                )  # pylint: disable=protected-access, no-member
             if value is not None and value != flow["use_embed"]:
                 embed_data["use_embed"] = value
                 txt.append(
@@ -883,7 +909,7 @@ class Rss(commands.Cog):
                     flow["ID"], [("embed_structure", dumps(embed_data))]
                 )
             await ctx.send("\n".join(txt))
-        except Exception as error: # pylint: disable=broad-exception-caught
+        except Exception as error:  # pylint: disable=broad-exception-caught
             await ctx.send(
                 str(await self.bot._(ctx.guild.id, "rss.guild-error")).format(error)
             )
@@ -909,11 +935,15 @@ class Rss(commands.Cog):
                     txt += f"feeds.entries[0]\n```py\n{feeds.entries[0]}\n```"
                 else:
                     txt += f"feeds.entries[0].keys()\n```py\n{feeds.entries[0].keys()}\n```"
-            if arguments is not None and "feeds" in arguments and "ctx" not in arguments:
-                txt += f"\n{arguments}\n```py\n{eval(arguments)}\n```" # we checked that the user is a bot admin pylint: disable=eval-used
+            if (
+                arguments is not None
+                and "feeds" in arguments
+                and "ctx" not in arguments
+            ):
+                txt += f"\n{arguments}\n```py\n{eval(arguments)}\n```"  # we checked that the user is a bot admin pylint: disable=eval-used
             try:
                 await ctx.send(txt)
-            except Exception as exc: # pylint: disable=broad-exception-caught
+            except Exception as exc:  # pylint: disable=broad-exception-caught
                 print("[rss_test] Error:", exc)
                 await ctx.send("`Error`: " + str(exc))
                 print(txt)
@@ -954,7 +984,7 @@ class Rss(commands.Cog):
                     else:
                         txt.append(nothing + notgood + " author")
                 await ctx.send("\n".join(txt))
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await ctx.bot.get_cog("Errors").on_command_error(ctx, exc)
 
     async def check_rss_url(self, url):
@@ -971,12 +1001,14 @@ class Rss(commands.Cog):
             feed = await self.feed_parse(url, 8)
             _ = feed.entries[0]
             return True
-        except BaseException: # pylint: disable=broad-exception-caught
+        except BaseException:  # pylint: disable=broad-exception-caught
             return False
 
     async def parse_yt_url(self, url):
-        pattern = r"(?:http.*://)?(?:www.)?(?:youtube.com|youtu.be)"\
+        pattern = (
+            r"(?:http.*://)?(?:www.)?(?:youtube.com|youtu.be)"
             r"(?:(?:/channel/|/user/)(.+)|/[\w-]+$)"
+        )
         match = re.search(pattern, url)
         if match is None:
             return None
@@ -1234,9 +1266,7 @@ class Rss(commands.Cog):
                 datz = feed[published]
                 if (
                     feed[published] is None
-                    or (
-                        datetime.datetime(*feed[published][:6]) - date
-                    ).total_seconds()
+                    or (datetime.datetime(*feed[published][:6]) - date).total_seconds()
                     < self.min_time_between_posts["web"]
                 ):
                     break
@@ -1379,8 +1409,10 @@ class Rss(commands.Cog):
             form = ""
         else:
             form = await self.bot._(guild_id, "rss." + _type + "-default-flow")
-        query = f"INSERT INTO `{self.table}` (`guild`,`channel`,`type`,`link`,`structure`)"\
+        query = (
+            f"INSERT INTO `{self.table}` (`guild`,`channel`,`type`,`link`,`structure`)"
             "VALUES (:g, :c, :t, :l, :f)"
+        )
         flow_id = self.bot.db_query(
             query, {"g": guild_id, "c": channel_id, "t": _type, "l": link, "f": form}
         )
@@ -1396,7 +1428,7 @@ class Rss(commands.Cog):
 
     async def db_get_all_flows(self):
         """Get every flow of the database"""
-        query = "SELECT rowid as ID, * FROM `{}` WHERE `guild` in ({})".format( # pylint: disable=consider-using-f-string
+        query = "SELECT rowid as ID, * FROM `{}` WHERE `guild` in ({})".format(  # pylint: disable=consider-using-f-string
             self.table, ",".join([f"'{x.id}'" for x in self.bot.guilds])
         )
         liste = self.bot.db_query(query, ())
@@ -1416,7 +1448,9 @@ class Rss(commands.Cog):
         result = self.bot.db_query(query, (), fetchone=True)
         return result[0]
 
-    async def db_update_flow(self, flow_id: int, values=[(None, None)]): # pylint: disable=dangerous-default-value
+    async def db_update_flow(
+        self, flow_id: int, values=[(None, None)]
+    ):  # pylint: disable=dangerous-default-value
         """Update a flow in the database"""
         temp = ", ".join([f"{v[0]}=?" for v in values])
         values = [v[1] for v in values]
@@ -1454,7 +1488,7 @@ class Rss(commands.Cog):
                 if send_stats:
                     if statscog := self.bot.get_cog("BotStats"):
                         statscog.rss_stats["messages"] += 1
-            except Exception as exc: # pylint: disable=broad-exception-caught
+            except Exception as exc:  # pylint: disable=broad-exception-caught
                 self.logger.info(
                     "[send_rss_msg] Cannot send message on channel %i: %s",
                     channel.id,
@@ -1470,9 +1504,7 @@ class Rss(commands.Cog):
                 objs = self.cache[flow["link"]]
             else:
                 funct = getattr(self, f"rss_{flow['type']}")
-                objs = await funct(
-                    guild, flow["link"], flow["date"], session=session
-                )
+                objs = await funct(guild, flow["link"], flow["date"], session=session)
                 flow["link"] = objs
             if isinstance(objs, (str, type(None), int)) or len(objs) == 0:
                 return True
@@ -1482,14 +1514,14 @@ class Rss(commands.Cog):
                     if guild is None:
                         self.logger.info(
                             "[send_rss_msg] Can not send message on server %i (unknown)",
-                            flow['guild'],
+                            flow["guild"],
                         )
                         return False
                     chan = guild.get_channel(flow["channel"])
                     if guild is None:
                         self.logger.info(
                             "[send_rss_msg] Can not send message on channel %i (unknown)",
-                            flow['channel']
+                            flow["channel"],
                         )
                         return False
                     obj.format = flow["structure"]
@@ -1500,15 +1532,15 @@ class Rss(commands.Cog):
                     await self.send_rss_msg(obj, chan, flow["roles"], send_stats)
                 await self.db_update_flow(
                     flow["ID"],
-                    [("date", obj.date)], # pylint: disable=undefined-loop-variable
+                    [("date", obj.date)],  # pylint: disable=undefined-loop-variable
                 )
                 return True
             else:
                 return True
-        except Exception as exc: # pylint: disable=broad-exception-caught
+        except Exception as exc:  # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").senf_err_msg(
-                f"Erreur rss sur le flux {flow['link']} (type {flow['type']} -"\
-                    f"salon {flow['channel']})"
+                f"Erreur rss sur le flux {flow['link']} (type {flow['type']} -"
+                f"salon {flow['channel']})"
             )
             await self.bot.get_cog("Errors").on_error(exc, None)
             return False
@@ -1536,7 +1568,9 @@ class Rss(commands.Cog):
             try:
                 if flow["type"] == "mc":
                     if minecraft_cog := self.bot.get_cog("Minecraft"):
-                        await minecraft_cog.check_flow(flow, send_stats=guild_id is None)
+                        await minecraft_cog.check_flow(
+                            flow, send_stats=guild_id is None
+                        )
                     check += 1
                 else:
                     if await self.check_flow(
@@ -1545,7 +1579,7 @@ class Rss(commands.Cog):
                         check += 1
                     else:
                         errors.append(flow["ID"])
-            except Exception as exc: # pylint: disable=broad-exception-caught
+            except Exception as exc:  # pylint: disable=broad-exception-caught
                 await self.bot.get_cog("Errors").on_error(exc, None)
             await asyncio.sleep(self.time_between_flows_check)
         await session.close()
@@ -1560,7 +1594,9 @@ class Rss(commands.Cog):
                 statscog.rss_stats["errors"] = len(errors)
         if len(errors) > 0:
             done.append(
-                "{} errors: {}".format(len(errors), " ".join([str(x) for x in errors])) # pylint: disable=consider-using-f-string
+                "{} errors: {}".format(
+                    len(errors), " ".join([str(x) for x in errors])
+                )  # pylint: disable=consider-using-f-string
             )
         emb = discord.Embed(
             description="\n".join(done),
@@ -1598,13 +1634,13 @@ class Rss(commands.Cog):
         new_state can be start, stop or once"""
         if new_state == "start":
             try:
-                await self.loop_child.start() # pylint: disable=no-member
+                await self.loop_child.start()  # pylint: disable=no-member
             except RuntimeError:
                 await ctx.send("La boucle est déjà en cours !")
             else:
                 await ctx.send("Boucle rss relancée !")
         elif new_state == "stop":
-            await self.loop_child.cancel() # pylint: disable=no-member
+            await self.loop_child.cancel()  # pylint: disable=no-member
             self.logger.info(" Boucle rss arrêtée de force par un admin")
             await ctx.send("Boucle rss arrêtée de force !")
         elif new_state == "once":
@@ -1619,6 +1655,8 @@ class Rss(commands.Cog):
                 "Option `new_start` invalide - choisissez start, stop ou once"
             )
 
-    async def send_log(self, text: str, guild: discord.Guild): # pylint: disable=unused-argument
+    async def send_log(
+        self, text: str, guild: discord.Guild
+    ):  # pylint: disable=unused-argument
         """Send a log to the logging channel"""
         return

@@ -44,8 +44,10 @@ class MyContext(commands.Context):
         """If the bot has the right permissions to send an embed in the current context"""
         return self.bot_permissions.embed_links
 
+
 # defining allowed default mentions
 ALLOWED = discord.AllowedMentions(everyone=False, roles=False)
+
 
 class Gunibot(commands.bot.AutoShardedBot):
     """
@@ -65,7 +67,7 @@ class Gunibot(commands.bot.AutoShardedBot):
             allowed_mentions=ALLOWED,
             intents=intents,
         )
-        self.log = setup_logger('core')  # logs module
+        self.log = setup_logger("core")  # logs module
         self.beta: bool = beta  # if the bot is in beta mode
         self.database = sqlite3.connect("data/database.db")  # database connection
         self.database.row_factory = sqlite3.Row
@@ -149,6 +151,7 @@ class Gunibot(commands.bot.AutoShardedBot):
         """
         ???
         """
+
         def __missing__(self, key):
             return "{" + key + "}"
 
@@ -217,14 +220,14 @@ class Gunibot(commands.bot.AutoShardedBot):
     @property
     def _(self) -> Callable[..., Awaitable[str]]:
         """Translate something
-        
+
         :param context: The guild, channel or user for which to translate
         :param key: The key to translate
         :param kwargs: The arguments to pass to the translation
 
         :return: The translated string
         """
-        cog = self.get_cog('Languages')
+        cog = self.get_cog("Languages")
         if cog is None:
             self.log.error("Unable to load Languages cog")
             return lambda *args, **kwargs: args[1]
@@ -234,7 +237,9 @@ class Gunibot(commands.bot.AutoShardedBot):
         "Populate the app_commands_list attribute from the Discord API"
         self.app_commands_list = await self.tree.fetch_commands(guild=None)
 
-    async def fetch_app_command_by_name(self, name: str) -> Optional[app_commands.AppCommand]:
+    async def fetch_app_command_by_name(
+        self, name: str
+    ) -> Optional[app_commands.AppCommand]:
         "Get a specific app command from the Discord API"
         if self.app_commands_list is None:
             await self.fetch_app_commands()
@@ -247,7 +252,7 @@ class Gunibot(commands.bot.AutoShardedBot):
         """
         Get how a command should be mentionned (either app-command mention or raw name)
         """
-        if command := await self.fetch_app_command_by_name(command_name.split(' ')[0]):
+        if command := await self.fetch_app_command_by_name(command_name.split(" ")[0]):
             return f"</{command_name}:{command.id}>"
         if command := self.get_command(command_name):
             return f"`{command.qualified_name}`"
@@ -312,9 +317,11 @@ class CheckException(commands.CommandError):
     """
     Exception personnalisée pour les checks
     """
+
     def __init__(self, check_id, *args):
         super().__init__(message=f"Custom check '{check_id}' failed", *args)
-        self.id = check_id # pylint: disable=invalid-name
+        self.id = check_id  # pylint: disable=invalid-name
+
 
 CONFIG_OPTIONS: Dict[str, Dict[str, Any]] = {}
 
@@ -323,12 +330,12 @@ CONFIG_OPTIONS.update(
         "prefix": {
             "default": config.get("bot.default_prefix"),
             "type": "text",
-            "command": 'prefix',
+            "command": "prefix",
         },
         "language": {
             "default": config.get("bot.default_language"),
             "type": "text",
-            "command": 'language',
+            "command": "language",
         },
         "admins": {
             "default": config.get("bot.admins"),
@@ -342,8 +349,6 @@ for plugin in os.listdir("./plugins/"):
     if plugin[0] != "_":
         if os.path.isfile("./plugins/" + plugin + "/config/options.json"):
             with open(
-                "./plugins/" + plugin + "/config/options.json",
-                "r",
-                encoding="utf8"
+                "./plugins/" + plugin + "/config/options.json", "r", encoding="utf8"
             ) as config:
                 CONFIG_OPTIONS.update(json.load(config))

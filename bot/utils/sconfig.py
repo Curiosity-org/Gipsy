@@ -73,7 +73,7 @@ class Sconfig(commands.Cog):
                 if "command" in opt:
                     try:
                         self.bot.get_command("config " + opt["command"]).enabled = False
-                    except (AttributeError, TypeError): # if opt["command"] is None
+                    except (AttributeError, TypeError):  # if opt["command"] is None
                         # if the command doesn't exist
                         pass
             del self.sorted_options[cog]
@@ -197,7 +197,6 @@ class Sconfig(commands.Cog):
             cpt = 0
             embeds = []
             for module, options in sorted(self.sorted_options.items()):
-
                 subconf = {k: v for k, v in config.items() if k in options}
                 if len(subconf) == 0:
                     continue
@@ -214,7 +213,9 @@ class Sconfig(commands.Cog):
                     )
 
                 if hasattr(self.bot.get_cog(module), "_create_config"):
-                    for extra in await self.bot.get_cog(module)._create_config(ctx): # pylint: disable=protected-access
+                    for extra in await self.bot.get_cog(module)._create_config(
+                        ctx
+                    ):  # pylint: disable=protected-access
                         module_config += (
                             (f"[{extra[0]}]").ljust(max_key_length)
                             + f" {extra[1]}".ljust(max_value_length)
@@ -304,7 +305,7 @@ class Sconfig(commands.Cog):
         else:  # correct case
             await ctx.send(
                 await self.edit_config(ctx.guild.id, "language", lang)
-            ) # lang should be a string
+            )  # lang should be a string
 
     # --------------------------------------------------
     # Hypesquad

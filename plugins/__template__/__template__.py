@@ -5,14 +5,16 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-#pylint: disable=unused-import
+# pylint: disable=unused-import
 import discord
 from discord.ext import tasks, commands
 
 from utils import Gunibot, MyContext
 
-async def setup(bot:Gunibot=None):
+
+async def setup(bot: Gunibot = None):
     await bot.add_cog(Template(bot))
+
 
 class Template(commands.Cog):
     def __init__(self, bot: Gunibot):

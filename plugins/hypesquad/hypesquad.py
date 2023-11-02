@@ -27,8 +27,8 @@ class Hypesquad(commands.Cog):
             "hs_balance_role",
             "hs_none_role",
         ]
-        self.roles_loop.start() # pylint: disable=no-member
-        self.logger = setup_logger('hypesquad')
+        self.roles_loop.start()  # pylint: disable=no-member
+        self.logger = setup_logger("hypesquad")
 
         bot.get_command("config").add_command(self.hs_main)
 
@@ -84,11 +84,15 @@ class Hypesquad(commands.Cog):
             except discord.Forbidden:
                 # missing a perm
                 self.logger.warning(
-                    "Unable to give roles in guild %i (%s)", guild.id, guild.name,
+                    "Unable to give roles in guild %i (%s)",
+                    guild.id,
+                    guild.name,
                 )
         delta = round(time.time() - start, 2)
         self.logger.info(
-           "Finished roles check in %f s with %i editions", delta, count,
+            "Finished roles check in %f s with %i editions",
+            delta,
+            count,
         )
 
     @roles_loop.before_loop
@@ -211,7 +215,8 @@ class Hypesquad(commands.Cog):
                 await self.bot._(ctx.guild.id, "hypesquad.not-edited", user=user)
             )
 
-async def setup(bot:Gunibot=None):
+
+async def setup(bot: Gunibot = None):
     """
     Fonction d'initialisation du plugin
 

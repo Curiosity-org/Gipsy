@@ -115,8 +115,10 @@ class Group:
         """Transform the group to a human-readable string"""
         channel = f"<#{self.channel_id}>" if self.channel_id else "None"
         private = "True" if self.privacy == 1 else "False"
-        return f"Group: <@&{self.role_id}> (*id : {self.role_id}*)\n"\
+        return (
+            f"Group: <@&{self.role_id}> (*id : {self.role_id}*)\n"
             f"┗━▷ Owner: <@{self.owner_id}> - Channel: {channel} - Private: {private}"
+        )
 
 
 class GroupConverter(commands.Converter):
@@ -221,8 +223,7 @@ class Groups(commands.Cog):
     @commands.group(name="group", aliases=["groups"])
     @commands.guild_only()
     async def group_main(self, ctx: MyContext):
-        """Manage your groups
-        """
+        """Manage your groups"""
         if ctx.subcommand_passed is None:
             await ctx.send_help("group")
             return
@@ -475,7 +476,7 @@ class Groups(commands.Cog):
             )
             return
         txt = "**" + await self.bot._(ctx.guild.id, "groups.list") + "**\n"
-        for group in groups: # pylint: disable=not-an-iterable
+        for group in groups:  # pylint: disable=not-an-iterable
             txt += group.to_str() + "\n\n"
         if ctx.can_send_embed:
             embed = discord.Embed(description=txt)
@@ -738,6 +739,7 @@ class Groups(commands.Cog):
                     )
                 )
 
-async def setup(bot:Gunibot=None):
+
+async def setup(bot: Gunibot = None):
     if bot is not None:
         await bot.add_cog(Groups(bot), icon="🎭")

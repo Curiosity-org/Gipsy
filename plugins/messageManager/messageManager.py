@@ -13,6 +13,7 @@ from discord.ext import commands
 from utils import Gunibot
 from core import setup_logger
 
+
 # Moves a message from its original channel to a parameterized channel
 # using a given webhook
 async def move_message(
@@ -56,7 +57,7 @@ class MessageManager(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "messageManager"
-        self.logger = setup_logger('messagemanager')
+        self.logger = setup_logger("messagemanager")
 
     # -------------------#
     # Command /imitate #
@@ -78,7 +79,7 @@ class MessageManager(commands.Cog):
         webhook = await channel.create_webhook(name=member.display_name)
         await webhook.send(content=text, avatar_url=member.display_avatar)
 
-            # Deletes the original message as well as the webhook
+        # Deletes the original message as well as the webhook
         await webhook.delete()
         await ctx.message.delete()
 
@@ -105,7 +106,9 @@ class MessageManager(commands.Cog):
 
         if isinstance(channel, str):
             try:
-                channel = self.bot.get_channel(int(channel.replace("<#", "").replace(">", "")))
+                channel = self.bot.get_channel(
+                    int(channel.replace("<#", "").replace(">", ""))
+                )
             except ValueError:
                 await ctx.send(
                     await self.bot._(ctx.guild.id, "message_manager.no-channel")
@@ -132,7 +135,8 @@ class MessageManager(commands.Cog):
                 await self.bot._(ctx.guild.id, "message_manager.moveall.missing-perm")
             )
             self.logger.info(
-                '/move: Missing permissions on guild "%s"', ctx.guild.name,
+                '/move: Missing permissions on guild "%s"',
+                ctx.guild.name,
             )
             return
 
@@ -204,7 +208,9 @@ class MessageManager(commands.Cog):
 
         if isinstance(channel, str):
             try:
-                channel = self.bot.get_channel(int(channel.replace("<#", "").replace(">", "")))
+                channel = self.bot.get_channel(
+                    int(channel.replace("<#", "").replace(">", ""))
+                )
             except ValueError:
                 await ctx.send(
                     await self.bot._(ctx.guild.id, "message_manager.no-channel")
@@ -216,7 +222,6 @@ class MessageManager(commands.Cog):
             return
 
         author = channel.guild.get_member(ctx.author.id)
-
 
         # Check bot permissions
         perm1: discord.Permissions = ctx.channel.permissions_for(ctx.guild.me)
@@ -232,7 +237,8 @@ class MessageManager(commands.Cog):
                 await self.bot._(ctx.guild.id, "message_manager.moveall.missing-perm")
             )
             self.logger.info(
-                '/moveall: Missing permissions on guild "%s"', ctx.guild.name,
+                '/moveall: Missing permissions on guild "%s"',
+                ctx.guild.name,
             )
             return
 
@@ -250,9 +256,7 @@ class MessageManager(commands.Cog):
         # Checks that the messages are not the same
         if msg1 == msg2:
             await ctx.send(
-                await self.bot._(
-                    ctx.guild.id, "message_manager.moveall.same-message"
-                )
+                await self.bot._(ctx.guild.id, "message_manager.moveall.same-message")
             )
             return
 
@@ -342,7 +346,7 @@ class MessageManager(commands.Cog):
         await webhook.delete()
 
 
-async def setup(bot:Gunibot=None):
+async def setup(bot: Gunibot = None):
     """
     Fonction d'initialisation du plugin
 

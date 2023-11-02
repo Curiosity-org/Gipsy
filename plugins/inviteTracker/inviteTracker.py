@@ -14,6 +14,7 @@ from utils import Gunibot, MyContext
 from bot import checks
 from core import setup_logger
 
+
 class DatabaseInvite:
     """Represent a database invitation object"""
 
@@ -162,7 +163,7 @@ class Invite(commands.Cog):
 
     def __init__(self, bot: Gunibot):
         self.bot = bot
-        self.logger = setup_logger('invitetracker')
+        self.logger = setup_logger("invitetracker")
         self.config_options = ["invite_log"]
         bot.get_command("config").add_command(self.invite_log)
 
@@ -233,8 +234,8 @@ class Invite(commands.Cog):
                 member=member.mention,
                 guild=member.guild,
             )
-        else: # multiple invitations
-            invites_string = ', '.join(
+        else:  # multiple invitations
+            invites_string = ", ".join(
                 [
                     await self.get_invitation_string(
                         invite,
@@ -371,7 +372,7 @@ class Invite(commands.Cog):
         member: discord.Member,
     ) -> str:
         """Returns a string representation for the given invitation
-        
+
         Attributes
         ----------
         invite: DatabaseInvite
@@ -397,7 +398,8 @@ class Invite(commands.Cog):
                 uses=invite.uses,
             )
 
-async def setup(bot:Gunibot=None):
+
+async def setup(bot: Gunibot = None):
     """
     Fonction d'initialisation du plugin
 

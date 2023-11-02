@@ -8,8 +8,8 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 from LRFutils import color
 import core
 
-def run():
 
+def run():
     blue = color.fg.blue
     stop = color.stop
 

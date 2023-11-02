@@ -14,6 +14,7 @@ class QuiPyQuizz:
     QuiPyQuizz
     Utilise l'API de quipoquiz.com afin de créer un quizz interactif sur Discord
     """
+
     def __init__(self):
         with open("plugins/quizz/data/quizz.json", "r", encoding="utf-8") as file:
             self.data = json.load(file)
@@ -48,7 +49,7 @@ class QuiPyQuizz:
         request = requests.get(
             url="https://quipoquiz.com/module/sed/quiz/fr/start_quiz.snc",
             params=params,
-            timeout=10
+            timeout=10,
         )
         payload = json.loads(request.text)
         return payload["questions"]
@@ -86,7 +87,7 @@ class QuiPyQuizz:
         request = requests.get(
             url="https://quipoquiz.com/module/sed/quiz/fr/answer_question.snc",
             params=params,
-            timeout=10
+            timeout=10,
         )
         payload = json.loads(request.text)
         return payload["answer"]
@@ -120,7 +121,7 @@ class QuiPyQuizz:
         request = requests.get(
             url="https://quipoquiz.com/module/sed/quiz/fr/end_quiz.snc",
             params=params,
-            timeout=10
+            timeout=10,
         )
         payload = json.loads(request.text)
         return payload["result"]["statistics"]

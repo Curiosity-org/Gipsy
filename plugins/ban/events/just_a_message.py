@@ -15,7 +15,7 @@ async def execute(
     ban_plugin,
     ctx: commands.Context,
     user: discord.User,
-    reason: str, # pylint: disable=unused-argument
+    reason: str,  # pylint: disable=unused-argument
 ) -> bool:
     """Normally ban the user, with a little goodbye message"""
     if await ban_plugin.fake_ban(ctx, user):

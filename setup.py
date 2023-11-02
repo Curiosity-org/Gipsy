@@ -34,9 +34,9 @@ if py_version.major != 3 or py_version.minor < 10:
 def get_base_prefix_compat():
     """Get base/real prefix, or sys.prefix if there is none."""
     return (
-            getattr(sys, "base_prefix", None)
-            or getattr(sys, "real_prefix", None)
-            or sys.prefix
+        getattr(sys, "base_prefix", None)
+        or getattr(sys, "real_prefix", None)
+        or sys.prefix
     )
 
 
@@ -50,7 +50,7 @@ def in_virtualenv():
 
 def check_libs(verbose=False):
     """Check if the required libraries are installed and can be imported"""
-    with open("requirements.txt", "r", encoding='utf-8') as file:
+    with open("requirements.txt", "r", encoding="utf-8") as file:
         packages = pkg_resources.parse_requirements(file.readlines())
     try:
         pkg_resources.working_set.resolve(packages)
@@ -75,16 +75,14 @@ def check_libs(verbose=False):
 
 def setup_venv():
     opt_venv = ask_user(
-        "Do you want to create a virtual environment?",
-        default=True,
-        emoji="🏗️"
+        "Do you want to create a virtual environment?", default=True, emoji="🏗️"
     )
     if opt_venv:
         print("Creating virtual environment...")
         os.system("python3 -m venv venv")
         print("Done!")
         print(
-            "\n🔄️ \033[34mPlease activate the virtual environment using the command below that" \
+            "\n🔄️ \033[34mPlease activate the virtual environment using the command below that"
             "correspond to your system. Then restart the setup script.\033[0m\n"
         )
         print(
@@ -99,9 +97,9 @@ def setup_venv():
         print("\033[32m  Windows (in cmd.exe)\t\t:\033[0m venv\\Scripts\\activate.bat")
         print("\033[32m  Windows (in PowerShell)\t:\033[0m venv\\Scripts\\Activate.ps1")
         print(
-            '      ⮩ If you have an error like "cannot run script", you may open a new Powershell' \
-            'in administrator mode and run the following command:' \
-            'Set-ExecutionPolicy RemoteSigned\n'
+            '      ⮩ If you have an error like "cannot run script", you may open a new Powershell'
+            "in administrator mode and run the following command:"
+            "Set-ExecutionPolicy RemoteSigned\n"
         )
         exit(0)
     else:
@@ -118,7 +116,7 @@ def install_dependencies():
     opt_deps = ask_user(
         "Do you want to install dependencies on the actual environment?",
         default=False,
-        emoji="🏗️"
+        emoji="🏗️",
     )
     if opt_deps:
         print("🏗️ Installing dependencies...")
@@ -137,7 +135,7 @@ else:
 
 if not check_libs(verbose=VERBOSE):
     print(
-        "\n🏗️ You need to install the bot dependencies. The automatic script will probably upgrade" \
+        "\n🏗️ You need to install the bot dependencies. The automatic script will probably upgrade"
         "(or rarely downgrade) some python modules already installed on your machine."
     )
     if not in_virtualenv():
@@ -147,7 +145,7 @@ if not check_libs(verbose=VERBOSE):
         os.system("python3 setup.py")
     else:
         print(
-            "\n⚠️ \033[33mThe bot can't run without it's dependencies. Please install" \
+            "\n⚠️ \033[33mThe bot can't run without it's dependencies. Please install"
             "all the required modules with the following command:\033[1m\n"
         )
         print(
@@ -159,6 +157,7 @@ if not check_libs(verbose=VERBOSE):
 # ________________________________________________________________________________
 # Setup script
 
+
 def main():
     if not os.path.isdir("plugins"):
         os.mkdir("plugins")
@@ -168,8 +167,7 @@ def main():
     # Optional settings
 
     opt_bot_settings = ask_user(
-        "Do you want to configure optional bot settings?",
-        default=False
+        "Do you want to configure optional bot settings?", default=False
     )
     if opt_bot_settings:
         config.advanced_setup()
@@ -182,22 +180,18 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()
 
     # Start bot
 
     print(
-        f"\n{color.fg.yellow}⚠️ Before starting the bot, you should open the config.yaml file" \
+        f"\n{color.fg.yellow}⚠️ Before starting the bot, you should open the config.yaml file"
         f"and check that everything is correct.{color.stop} "
     )
-    opt_start = ask_user(
-        "Do you want to start the bot?",
-        default=False,
-        emoji="▶️")
+    opt_start = ask_user("Do you want to start the bot?", default=False, emoji="▶️")
     if opt_start:
-        print(
-            "   Starting the bot..."
-        )
+        print("   Starting the bot...")
         print("-" * 80)
-        subprocess.run([sys.executable, "start.py"])  # pylint: disable=subprocess-run-check
+        subprocess.run(
+            [sys.executable, "start.py"]
+        )  # pylint: disable=subprocess-run-check

@@ -15,7 +15,7 @@ async def execute(
     ban_plugin,
     ctx: commands.Context,
     user: discord.User,
-    reason: str, # pylint: disable=unused-argument
+    reason: str,  # pylint: disable=unused-argument
 ) -> bool:
     """Execute the autoban event.
     If the event doest't succeed, the function returns False.

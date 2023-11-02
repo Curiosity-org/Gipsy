@@ -21,6 +21,7 @@ from utils import Gunibot
 
 class ActionType(commands.Converter):
     """Converter for grant or revoke action types."""
+
     types = ["grant", "revoke"]
 
     def __init__(self, action: Union[str, int] = None):
@@ -32,7 +33,9 @@ class ActionType(commands.Converter):
             return
         self.name = self.types[self.type]
 
-    async def convert(self, ctx: commands.Context, argument: str): # pylint: disable=unused-argument
+    async def convert(
+        self, ctx: commands.Context, argument: str
+    ):  # pylint: disable=unused-argument
         if argument in self.types:
             return ActionType(argument)
         raise commands.errors.BadArgument("Unknown dependency action type")
@@ -40,6 +43,7 @@ class ActionType(commands.Converter):
 
 class TriggerType(commands.Converter):
     """Converter for trigger type like `get-one` or `loose-all`."""
+
     types = ["get-one", "get-all", "loose-one", "loose-all"]
 
     def __init__(self, trigger: Union[str, int] = None):
@@ -51,7 +55,9 @@ class TriggerType(commands.Converter):
             return
         self.name = self.types[self.type]
 
-    async def convert(self, ctx: commands.Context, argument: str): # pylint: disable=unused-argument
+    async def convert(
+        self, ctx: commands.Context, argument: str
+    ):  # pylint: disable=unused-argument
         if argument in self.types:
             return TriggerType(argument)
         raise commands.errors.BadArgument("Unknown dependency trigger type")
@@ -78,8 +84,10 @@ class Dependency:
         triggers = " ".join([f"<@&{r}>" for r in self.trigger_roles])
         target = f"<@&{self.target_role}>"
         depedency_id = f"{self.dependency_id}. " if user_id else ""
-        return f"{depedency_id}{self.action.name} {target} when "\
+        return (
+            f"{depedency_id}{self.action.name} {target} when "
             f"{self.trigger.name.replace('-', ' ')} of {triggers}"
+        )
 
 
 class ConflictingCyclicDependencyError(Exception):
@@ -89,7 +97,7 @@ class ConflictingCyclicDependencyError(Exception):
 class GroupRoles(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
-        self.logger = setup_logger('rolelink')
+        self.logger = setup_logger("rolelink")
         self.file = ""
 
     def db_get_config(self, guild_id: int):
@@ -120,8 +128,10 @@ class GroupRoles(commands.Cog):
             action.trigger.type,
             action.b_trigger_roles,
         )
-        query = "INSERT INTO group_roles (guild, action, target, trigger, `trigger-roles`)"\
+        query = (
+            "INSERT INTO group_roles (guild, action, target, trigger, `trigger-roles`)"
             "VALUES (?, ?, ?, ?, ?)"
+        )
         lastrowid = self.bot.db_query(query, data)
         return lastrowid
 
@@ -133,7 +143,9 @@ class GroupRoles(commands.Cog):
         return rowcount == 1
 
     async def filter_allowed_roles(
-        self, guild: discord.Guild, roles: List[discord.Role],
+        self,
+        guild: discord.Guild,
+        roles: List[discord.Role],
     ) -> List[discord.Role]:
         """Return every role that the bot is allowed to give/remove
         IE: role exists, role is under bot's highest role
@@ -165,10 +177,10 @@ class GroupRoles(commands.Cog):
             return
         names = [x.name for x in roles]
         if action.type == 0:
-            self.logger.debug("Giving roles %s to %s", ', '.join(names), repr(member))
+            self.logger.debug("Giving roles %s to %s", ", ".join(names), repr(member))
             await member.add_roles(*roles, reason="Linked roles")
         else:
-            self.logger.debug("Removing %s to %s", ', '.join(names), repr(member))
+            self.logger.debug("Removing %s to %s", ", ".join(names), repr(member))
             await member.remove_roles(*roles, reason="Linked roles")
 
     async def check_got_roles(self, member: discord.Member, roles: List[discord.Role]):
@@ -176,7 +188,7 @@ class GroupRoles(commands.Cog):
         actions = self.db_get_config(member.guild.id)
         if actions is None:
             return
-        for action in actions: # pylint: disable=not-an-iterable
+        for action in actions:  # pylint: disable=not-an-iterable
             if action.trigger.type == 0:  # if trigger is 'get-one'
                 for role in roles:
                     if (
@@ -207,7 +219,7 @@ class GroupRoles(commands.Cog):
         actions = self.db_get_config(member.guild.id)
         if actions is None:
             return
-        for action in actions: # pylint: disable=not-an-iterable
+        for action in actions:  # pylint: disable=not-an-iterable
             if action.trigger.type == 2:  # if trigger is 'loose-one'
                 for role in roles:
                     if (
@@ -339,7 +351,7 @@ class GroupRoles(commands.Cog):
             )
             return
         txt = "**" + await self.bot._(ctx.guild.id, "grouproles.list") + "**\n"
-        for action in actions: # pylint: disable=not-an-iterable
+        for action in actions:  # pylint: disable=not-an-iterable
             txt += action.to_str() + "\n"
         await ctx.send(txt)
 
@@ -356,7 +368,7 @@ class GroupRoles(commands.Cog):
             )
 
 
-async def setup(bot:Gunibot=None):
+async def setup(bot: Gunibot = None):
     """
     Fonction d'initialisation du plugin
 

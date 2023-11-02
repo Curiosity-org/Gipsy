@@ -15,11 +15,10 @@ from bot import args
 
 
 class ChannelArchive(commands.Cog):
-
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.config_options = ["archive_category", "archive_duration"]
-        self.update_loop.start() # pylint: disable=no-member
+        self.update_loop.start()  # pylint: disable=no-member
 
         bot.get_command("config").add_command(self.config_archive_category)
         bot.get_command("config").add_command(self.config_archive_duration)
@@ -36,7 +35,9 @@ class ChannelArchive(commands.Cog):
 
     @commands.command(name="archive_duration")
     async def config_archive_duration(
-        self, ctx: MyContext, duration: commands.Greedy[args.tempdelta],
+        self,
+        ctx: MyContext,
+        duration: commands.Greedy[args.tempdelta],
     ):
         duration = sum(duration)
         if duration == 0:
@@ -52,7 +53,7 @@ class ChannelArchive(commands.Cog):
         await ctx.send(msg)
 
     async def cog_unload(self):
-        self.update_loop.cancel() # pylint: disable=no-member
+        self.update_loop.cancel()  # pylint: disable=no-member
 
     async def add_to_archive(self, guild: discord.Guild, channel: discord.TextChannel):
         # Get archive category
@@ -74,7 +75,6 @@ class ChannelArchive(commands.Cog):
     async def update(
         self, guild: discord.Guild, log_channel: typing.Optional[discord.TextChannel]
     ):
-
         # Get archive duration
         config = self.bot.server_configs[guild.id]
         duration = config["archive_duration"]
@@ -107,8 +107,10 @@ class ChannelArchive(commands.Cog):
                     self.bot.get_channel(record["channel"]).category.id
                     != archive_category
                 ):
-                    query = f"DELETE FROM archive WHERE channel = {record['channel']} "\
+                    query = (
+                        f"DELETE FROM archive WHERE channel = {record['channel']} "
                         f"AND guild = {guild.id}"
+                    )
                     unarchived += 1
                     self.bot.db_query(query, ())
 
@@ -117,13 +119,17 @@ class ChannelArchive(commands.Cog):
         for record in records:
             if self.bot.get_channel(record["channel"]) is None:
                 removed_records += 1
-                query = f"DELETE FROM archive WHERE channel = {record['channel']} "\
+                query = (
+                    f"DELETE FROM archive WHERE channel = {record['channel']} "
                     f"AND guild = {guild.id}"
+                )
                 self.bot.db_query(query, ())
 
         # Get & delete old channels
-        query = f"SELECT * FROM archive WHERE timestamp <= datetime('now','-{duration} seconds') "\
+        query = (
+            f"SELECT * FROM archive WHERE timestamp <= datetime('now','-{duration} seconds') "
             f"AND guild = {guild.id}"
+        )
         records = self.bot.db_query(query, ())
 
         removed_channels = 0
@@ -136,8 +142,10 @@ class ChannelArchive(commands.Cog):
 
                     # Remove record
                     removed_records += 1
-                    query = f"DELETE FROM archive WHERE channel = {record['channel']} "\
+                    query = (
+                        f"DELETE FROM archive WHERE channel = {record['channel']} "
                         f"AND guild = {guild.id}"
+                    )
                     self.bot.db_query(query, ())
 
         # Send confirmation
@@ -171,7 +179,6 @@ class ChannelArchive(commands.Cog):
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     async def list_archive(self, ctx: MyContext):
-
         config = self.bot.server_configs[ctx.guild.id]
         if self.bot.get_channel(config["archive_category"]) is None:
             await ctx.send(
@@ -260,7 +267,6 @@ class ChannelArchive(commands.Cog):
             channel.permissions_for(ctx.author).manage_channels is True
             and channel.permissions_for(ctx.author).manage_permissions is True
         ):
-
             config = self.bot.server_configs[ctx.guild.id]
             if self.bot.get_channel(config["archive_category"]) is None:
                 await ctx.send(
@@ -278,7 +284,6 @@ class ChannelArchive(commands.Cog):
                 colour=discord.Colour(51711),
             )
         else:
-
             # Missing permission message
             embed = discord.Embed(
                 description=await self.bot._(
@@ -290,6 +295,6 @@ class ChannelArchive(commands.Cog):
         await ctx.send(embed=embed)
 
 
-async def setup(bot:Gunibot=None):
+async def setup(bot: Gunibot = None):
     if bot is not None:
         await bot.add_cog(ChannelArchive(bot), icon="🗃️")

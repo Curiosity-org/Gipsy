@@ -16,6 +16,7 @@ from discord.ext import commands
 from utils import Gunibot, MyContext
 from core import config
 
+
 async def ban_perm_check(ctx: commands.Context) -> bool:
     """Checks if the user has the permission to ban"""
 
@@ -30,12 +31,14 @@ async def ban_perm_check(ctx: commands.Context) -> bool:
 
         return await commands.has_guild_permissions(ban_members=True).predicate(ctx)
 
+
 async def fake_ban_guild_check(ctx: commands.Context) -> bool:
     """Checks if the guild is configured for the friendly ban command"""
 
     self: Ban = ctx.bot.get_cog("Ban")
 
     return ctx.guild.id in self.friendly_ban_guilds
+
 
 class Ban(commands.Cog):
     friendly_ban_guilds: list[int]
@@ -45,7 +48,7 @@ class Ban(commands.Cog):
     random_events: list
     friendly_ban_whitelisted_roles: list[int]
 
-    roles_backup: dict[int,list[discord.Role]]
+    roles_backup: dict[int, list[discord.Role]]
 
     def __init__(self, bot: Gunibot):
         self.bot = bot
@@ -73,8 +76,10 @@ class Ban(commands.Cog):
                 # send a message to the user if some roles could not be given back
                 if len(forbidden) > 0:
                     await member.send(
-                        (await self.bot._(member, "ban.gunivers.missing_roles") \
-                         + ", ".join([role.name for role in forbidden]))[:2000]
+                        (
+                            await self.bot._(member, "ban.gunivers.missing_roles")
+                            + ", ".join([role.name for role in forbidden])
+                        )[:2000]
                     )
 
     # ------------------#
@@ -188,43 +193,26 @@ class Ban(commands.Cog):
         """Loads configuration and events for the friendly ban command"""
 
         # look for the configuration, gets an empty dict if it doesn't exist
-        self.config = config.get('ban') or {}
+        self.config = config.get("ban") or {}
 
         # loads the guild ids from the configuration
         self.friendly_ban_guilds: list[int] = self.config.get("guilds", [])
 
         self.friendly_ban_whitelisted_roles: list[int] = self.config.get(
-            "whitelisted_roles",
-            []
+            "whitelisted_roles", []
         )
 
         # loads the events
         self.friendly_ban_events = [
             {
                 "name": "Autoban?",
-                "chances": None, # systematic
-                "module_name": "autoban"
+                "chances": None,  # systematic
+                "module_name": "autoban",
             },
-            {
-                "name": "UnoReverse",
-                "chances": 1,
-                "module_name": "reverse"
-            },
-            {
-                "name": "Bothban",
-                "chances": 1,
-                "module_name": "bothban"
-            },
-            {
-                "name": "Rickroll",
-                "chances": 1,
-                "module_name": "rickroll"
-            },
-            {
-                "name": "Normal ban",
-                "chances": 7,
-                "module_name": "just_a_message"
-            }
+            {"name": "UnoReverse", "chances": 1, "module_name": "reverse"},
+            {"name": "Bothban", "chances": 1, "module_name": "bothban"},
+            {"name": "Rickroll", "chances": 1, "module_name": "rickroll"},
+            {"name": "Normal ban", "chances": 7, "module_name": "just_a_message"},
         ]
         self.systematic_events: list[Callable] = []
         self.random_events: list[Callable] = []
@@ -246,7 +234,7 @@ class Ban(commands.Cog):
                     )
 
         # initiate the cache for the banned users roles
-        self.roles_backup: dict[int,list[discord.Role]] = {}
+        self.roles_backup: dict[int, list[discord.Role]] = {}
 
     async def fake_ban(
         self,
@@ -275,34 +263,29 @@ class Ban(commands.Cog):
             )
         except discord.Forbidden:
             if show_error:
-                await ctx.send(await ctx.bot._(ctx, 'ban.gunivers.whoups'))
+                await ctx.send(await ctx.bot._(ctx, "ban.gunivers.whoups"))
 
         try:
-            invite_message = await user.send(
-                invitation
-            )
+            invite_message = await user.send(invitation)
         except discord.Forbidden:
             if show_error:
-                await ctx.send(await ctx.bot._(ctx, 'ban.gunivers.whoups'))
+                await ctx.send(await ctx.bot._(ctx, "ban.gunivers.whoups"))
 
         # store the roles somewhere to give them back to the user
-        self.roles_backup[user.id] = ctx.guild.get_member(
-            user.id
-        ).roles
+        self.roles_backup[user.id] = ctx.guild.get_member(user.id).roles
 
         try:
             await ctx.guild.kick(user, reason="Auto-ban!")
         except discord.Forbidden:
             if show_error:
-                await ctx.send(
-                    await ctx.bot._(ctx, "ban.gunivers.missing_permissions")
-                )
+                await ctx.send(await ctx.bot._(ctx, "ban.gunivers.missing_permissions"))
             await invite_message.edit(
-                content=await ctx.bot._(ctx, 'ban.gunivers.urbetter')
+                content=await ctx.bot._(ctx, "ban.gunivers.urbetter")
             )
             return False
         return True
 
+
 # The end.
-async def setup(bot:Gunibot):
+async def setup(bot: Gunibot):
     await bot.add_cog(Ban(bot), icon="🔨")

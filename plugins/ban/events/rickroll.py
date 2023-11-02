@@ -19,7 +19,7 @@ async def execute(
     """Just send a rickroll"""
     await ctx.bot._(ctx.channel, "ban.gunivers.rickroll")
     await ctx.send(
-        "Never gonna give you up,\nnever gonna let you down,\nnever gonna run around and ban you :musical_note:" # pylint: disable=line-too-long
+        "Never gonna give you up,\nnever gonna let you down,\nnever gonna run around and ban you :musical_note:"  # pylint: disable=line-too-long
     )
     await ctx.send(
         "https://tenor.com/view/rickroll-roll-rick-never-gonna-give-you-up-never-gonna-gif-22954713"

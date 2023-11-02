@@ -20,7 +20,7 @@ from core import setup_logger
 class Thanks(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
-        self.logger = setup_logger('thanks')
+        self.logger = setup_logger("thanks")
         self.tasks = list()
         if bot.is_ready():
             self.schedule_tasks()
@@ -29,7 +29,7 @@ class Thanks(commands.Cog):
         bot.get_command("config").add_command(self.config_thanks_allowed_roles)
         bot.get_command("config").add_command(self.config_thanks_duration)
         self.thanks_config_main.name = "thanks"
-        self.thanks_config_main.aliases = ['thk']
+        self.thanks_config_main.aliases = ["thk"]
         bot.get_command("config").add_command(self.thanks_config_main)
 
     @commands.command(name="thanks_allowed_roles")
@@ -144,8 +144,10 @@ class Thanks(commands.Cog):
     def db_cleanup_thanks(self, guild_id: int, duration: int):
         if not isinstance(duration, (int, float)):
             return
-        query = "DELETE FROM thanks WHERE guild=? AND"\
+        query = (
+            "DELETE FROM thanks WHERE guild=? AND"
             f"timestamp < datetime('now','-{duration} seconds')"
+        )
         self.bot.db_query(query, (guild_id,))
 
     def db_set_role(self, guild_id: int, role_id: int, level: int):
@@ -203,7 +205,9 @@ class Thanks(commands.Cog):
         if roles_conf is None:
             roles_conf = self.db_get_roles(guild.id)
         for key, value in roles_conf.items():
-            if all(isinstance(x, discord.Role) for x in value):  # roles already initialized
+            if all(
+                isinstance(x, discord.Role) for x in value
+            ):  # roles already initialized
                 continue
             role = [guild.get_role(x) for x in value]
             roles_conf[key] = list(
@@ -232,14 +236,16 @@ class Thanks(commands.Cog):
                     await member.remove_roles(*roles, reason="Thanks system")
                     self.logger.debug(
                         "[Thanks] Rôles %s enlevés à %s (%i)",
-                        ', '.join([role.name for role in roles]),
+                        ", ".join([role.name for role in roles]),
                         repr(member),
                         member.id,
                     )
                     gave_anything = True
         return gave_anything
 
-    async def reload_roles(self, guild_id: int, member_id: int, date: datetime.datetime):
+    async def reload_roles(
+        self, guild_id: int, member_id: int, date: datetime.datetime
+    ):
         """Remove roles if needed"""
         delta = self.bot.server_configs[guild_id]["thanks_duration"]
         if (datetime.datetime.now() - date).total_seconds() < delta:
@@ -409,7 +415,10 @@ class Thanks(commands.Cog):
             return await self.bot._(ctx.guild.id, "thanks.thanks", count=k)
 
         text = "\n".join(
-            [await get_level(k) + " ".join([f"<@&{r}>" for r in v]) for k, v in roles.items()]
+            [
+                await get_level(k) + " ".join([f"<@&{r}>" for r in v])
+                for k, v in roles.items()
+            ]
         )
         if text == "":
             text = await self.bot._(ctx.guild.id, "thanks.no-role")
@@ -474,7 +483,8 @@ class Thanks(commands.Cog):
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "thanks.went-wrong"))
 
-async def setup(bot:Gunibot):
+
+async def setup(bot: Gunibot):
     """
     Fonction d'initialisation du plugin
 

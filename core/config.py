@@ -34,13 +34,15 @@ def ask_user(question: str, default: bool, emoji: str = "") -> bool:
             return True
         if answer.lower() in decline:
             return False
-        print(f"{color.fg.red}Please answer by yes or no. "
-              f"You can also simply hit enter to use the default option.{color.stop}")
+        print(
+            f"{color.fg.red}Please answer by yes or no. "
+            f"You can also simply hit enter to use the default option.{color.stop}"
+        )
 
 
 _global_config = {}
 
-logger = setup_logger('config')
+logger = setup_logger("config")
 
 
 def check():
@@ -78,20 +80,20 @@ def reload_config():
     Finally, it update the dict' using the config.yaml file wich is defined by the user.
     Each step overwrite the previus one."""
 
-    with open("core/default_config.yaml", "r", encoding='utf-8') as file:
+    with open("core/default_config.yaml", "r", encoding="utf-8") as file:
         _global_config.update(yaml.safe_load(file))
 
     for plugin in os.listdir("plugins"):
         if os.path.isfile(file := "plugins/" + plugin + "/config.yaml"):
-            with open(file, encoding='utf-8') as file:
+            with open(file, encoding="utf-8") as file:
                 _global_config.update({plugin: yaml.safe_load(file)})
 
     if os.path.isfile("config.yaml"):
-        with open("config.yaml", "r", encoding='utf-8') as file:
+        with open("config.yaml", "r", encoding="utf-8") as file:
             _global_config.update(yaml.safe_load(file))
 
     # Save config
-    with open("config.yaml", "w", encoding='utf-8') as file:
+    with open("config.yaml", "w", encoding="utf-8") as file:
         yaml.dump(_global_config, file)
 
 
@@ -112,12 +114,10 @@ def setup_plugins():
 
     for plugin in os.listdir("plugins"):
         if os.path.isfile("plugins/" + plugin + "/setup.py"):
-
             plugin_setup = importlib.import_module("plugins." + plugin + ".setup")
 
             opt_configure_plugin = ask_user(
-                f"Do you want to configure {plugin} plugin?",
-                default=True
+                f"Do you want to configure {plugin} plugin?", default=True
             )
 
             if opt_configure_plugin:
@@ -126,7 +126,7 @@ def setup_plugins():
                     _global_config.update({plugin: plugin_config})
 
     # Save config
-    with open("config.yaml", "w", encoding='utf-8') as file:
+    with open("config.yaml", "w", encoding="utf-8") as file:
         yaml.dump(_global_config, file)
 
 
@@ -141,9 +141,7 @@ def token_set(force_set=False):
 
     if _global_config["bot"].get("token") is not None and not force_set:
         opt_change_token = ask_user(
-            "A token is already set. Do you want to edit it?",
-            default=False,
-            emoji="🔑"
+            "A token is already set. Do you want to edit it?", default=False, emoji="🔑"
         )
         if not opt_change_token:
             return
@@ -164,7 +162,7 @@ def token_set(force_set=False):
         else:
             _global_config["bot"]["token"] = token
 
-    with open("config.yaml", "w", encoding='utf-8') as file:
+    with open("config.yaml", "w", encoding="utf-8") as file:
         yaml.dump(_global_config, file)
     return True
 
@@ -203,7 +201,7 @@ def advanced_setup():
     while error:
         error = False
         choice = input(
-            f"\n{color.fg.blue}👑 Bot admins" \
+            f"\n{color.fg.blue}👑 Bot admins"
             f"(User ID separated with comma. Let empty to ignore):{color.stop} "
         )
         if choice != "":
@@ -212,7 +210,7 @@ def advanced_setup():
                 _global_config["bot"]["admins"] = [int(admin_id) for admin_id in admins]
             except ValueError:
                 print(
-                    f"{color.fg.red}👑 Invalid entry. Only user ID (integers)," \
+                    f"{color.fg.red}👑 Invalid entry. Only user ID (integers),"
                     f"comma and space are expected.{color.stop}"
                 )
                 error = True
@@ -231,10 +229,10 @@ def advanced_setup():
                 _global_config["bot"]["error_channels"] = channel
             except ValueError:
                 print(
-                    f"{color.fg.red}🤕 Invalid entry. Only channel ID (integers) are expected." \
+                    f"{color.fg.red}🤕 Invalid entry. Only channel ID (integers) are expected."
                     f"{color.stop}"
                 )
                 error = True
 
-    with open("config.yaml", "w", encoding='utf-8') as file:
+    with open("config.yaml", "w", encoding="utf-8") as file:
         yaml.dump(_global_config, file)

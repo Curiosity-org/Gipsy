@@ -76,7 +76,7 @@ class TimeCog(discord.ext.commands.Cog):
                 )
                 try:
                     await coro(*args, **kwargs)
-                except Exception as exc: # pylint: disable=broad-exception-caught
+                except Exception as exc:  # pylint: disable=broad-exception-caught
                     self.bot.get_cog("Errors").on_error(exc)
 
         a = tasks.loop(seconds=delay, count=2)(launch)
@@ -149,30 +149,48 @@ class TimeCog(discord.ext.commands.Cog):
             inputed_time.set_from_seconds()
         if form == "digital":
             if hour:
-                inputed_hours = f"{inputed_time.hours}:{inputed_time.minutes}:"\
+                inputed_hours = (
+                    f"{inputed_time.hours}:{inputed_time.minutes}:"
                     f"{inputed_time.seconds}"
+                )
             else:
                 inputed_hours = ""
             if lang == "fr":
-                text = "{}/{}{} {}".format( # pylint: disable=consider-using-f-string
-                    inputed_time.days, inputed_time.months, "/" + str(inputed_time.years) if year\
-                        else "", inputed_hours
+                text = "{}/{}{} {}".format(  # pylint: disable=consider-using-f-string
+                    inputed_time.days,
+                    inputed_time.months,
+                    "/" + str(inputed_time.years) if year else "",
+                    inputed_hours,
                 )
             else:
-                text = "{}/{}{} {}".format( # pylint: disable=consider-using-f-string
-                    inputed_time.months, inputed_time.days, "/" + str(inputed_time.years) if year\
-                        else "", inputed_hours
+                text = "{}/{}{} {}".format(  # pylint: disable=consider-using-f-string
+                    inputed_time.months,
+                    inputed_time.days,
+                    "/" + str(inputed_time.years) if year else "",
+                    inputed_hours,
                 )
         elif form == "temp":
             text = str()
-            if inputed_time.days + inputed_time.months * 365 / 12 + inputed_time.years * 365 > 0:
+            if (
+                inputed_time.days
+                + inputed_time.months * 365 / 12
+                + inputed_time.years * 365
+                > 0
+            ):
                 inputed_days = round(inputed_time.days + inputed_time.months * 365 / 12)
                 if not year:
                     inputed_days += round(inputed_time.years * 365)
                 elif year and inputed_time.years > 0:
-                    text += str(inputed_time.years) + "a " if lang == "fr"\
+                    text += (
+                        str(inputed_time.years) + "a "
+                        if lang == "fr"
                         else str(inputed_time.years) + "y "
-                text += str(inputed_days) + "j " if lang == "fr" else str(inputed_days) + "d "
+                    )
+                text += (
+                    str(inputed_days) + "j "
+                    if lang == "fr"
+                    else str(inputed_days) + "d "
+                )
             if hour:
                 if inputed_time.hours > 0:
                     text += str(inputed_time.hours) + "h "

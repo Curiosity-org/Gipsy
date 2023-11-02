@@ -31,9 +31,10 @@ class Languages(commands.Cog):
         self.languages = ["fr", "en"]
         self.config_options = ["language"]
 
-    async def tr(self, ctx, key: str, **kwargs): # pylint: disable=invalid-name
+    async def tr(self, ctx, key: str, **kwargs):  # pylint: disable=invalid-name
         """Translate something
-        Ctx can be either a Context, a guild, a guild id, a channel or a lang directly"""
+        Ctx can be either a Context, a guild, a guild id, a channel or a lang directly
+        """
         lang = self.languages[0]
         if isinstance(ctx, commands.Context):
             if ctx.guild:

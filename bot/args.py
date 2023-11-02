@@ -12,8 +12,10 @@ from discord.ext import commands
 from utils import MyContext
 
 
-class tempdelta(commands.Converter): # pylint: disable=invalid-name
-    async def convert(self, ctx: MyContext, argument: str) -> int: # pylint: disable=unused-argument
+class tempdelta(commands.Converter):  # pylint: disable=invalid-name
+    async def convert(
+        self, ctx: MyContext, argument: str
+    ) -> int:  # pylint: disable=unused-argument
         time = 0
         found = False
         for time_spec in [
@@ -37,7 +39,7 @@ class tempdelta(commands.Converter): # pylint: disable=invalid-name
         return time
 
 
-class moderatorFlag(commands.Converter): # pylint: disable=invalid-name
+class moderatorFlag(commands.Converter):  # pylint: disable=invalid-name
     async def convert(self, ctx: MyContext, argument: str) -> str:
         logs_flags = ctx.bot.get_cog("ConfigCog").LogsFlags.FLAGS
         if argument not in logs_flags.values():
@@ -49,15 +51,19 @@ def constant(word: str):
     class Constant(commands.Converter):
         w = word
 
-        async def convert(self, ctx: MyContext, arg: str): # pylint: disable=unused-argument
+        async def convert(
+            self, ctx: MyContext, arg: str
+        ):  # pylint: disable=unused-argument
             if arg != self.w:
                 raise commands.errors.BadArgument("Unknown argument")
 
     return Constant
 
 
-class arguments(commands.Converter): # pylint: disable=invalid-name
-    async def convert(self, ctx: MyContext, argument: str) -> dict: # pylint: disable=unused-argument
+class arguments(commands.Converter):  # pylint: disable=invalid-name
+    async def convert(
+        self, ctx: MyContext, argument: str
+    ) -> dict:  # pylint: disable=unused-argument
         answer = dict()
         for result in re.finditer(r"(\w+) ?= ?\"((?:[^\"\\]|\\\"|\\)+)\"", argument):
             answer[result.group(1)] = result.group(2).replace('\\"', '"')

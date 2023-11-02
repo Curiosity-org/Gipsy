@@ -14,10 +14,10 @@ class Gunivers(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
         self.file = "gunivers"
-        self.update_loop.start() # pylint: disable=no-member
+        self.update_loop.start()  # pylint: disable=no-member
 
     async def cog_unload(self):
-        self.update_loop.cancel() # pylint: disable=no-member
+        self.update_loop.cancel()  # pylint: disable=no-member
 
     @tasks.loop(minutes=60.0 * 24.0)
     async def update_loop(self):

@@ -26,6 +26,7 @@ CHANNEL_TYPES = Union[
     discord.abc.GuildChannel,
 ]
 
+
 class General(commands.Cog):
     def __init__(self, bot: Gunibot):
         self.bot = bot
@@ -39,21 +40,25 @@ class General(commands.Cog):
         """Count the number of lines for the whole project"""
         count = 0
         try:
-            for root, dirs, files in os.walk("."): # pylint: disable=unused-variable
+            for root, dirs, files in os.walk("."):  # pylint: disable=unused-variable
                 if "/lib/python" in root:
                     continue
                 for file in files:
                     if file.endswith(".py"):
-                        with open(os.path.join(root, file), "r", encoding="utf8") as file:
+                        with open(
+                            os.path.join(root, file), "r", encoding="utf8"
+                        ) as file:
                             for line in file.read().split("\n"):
                                 if len(line.strip()) > 2 and line[0] != "#":
                                     count += 1
-        except Exception as exception: # pylint: disable=broad-exception-caught
+        except Exception as exception:  # pylint: disable=broad-exception-caught
             await self.bot.get_cog("Errors").on_error(exception, None)
         self.codelines = count
 
     @commands.command(name="hs")
-    async def hs(self, ctx: MyContext, channel: CHANNEL_TYPES = None): # pylint: disable=invalid-name
+    async def hs(
+        self, ctx: MyContext, channel: CHANNEL_TYPES = None
+    ):  # pylint: disable=invalid-name
         if channel:
             msg = await self.bot._(
                 ctx.channel,
@@ -93,7 +98,9 @@ class General(commands.Cog):
         pid = os.getpid()
         try:
             process = psutil.Process(pid)
-            ram_usage = round(process.memory_info()[0] / 2.0**30, 3)  # , py.cpu_percent()]
+            ram_usage = round(
+                process.memory_info()[0] / 2.0**30, 3
+            )  # , py.cpu_percent()]
         except OSError:
             ram_usage = latency = "?"
             process = None
@@ -105,7 +112,9 @@ class General(commands.Cog):
                 len_servers = len(ctx.bot.guilds)
                 users = len(ctx.bot.users)
                 bots = len([None for u in ctx.bot.users if u.bot])
-                stats = await self.bot._(ctx.channel, "general.stats.servs", c=len_servers)
+                stats = await self.bot._(
+                    ctx.channel, "general.stats.servs", c=len_servers
+                )
                 stats += "\n" + await self.bot._(
                     ctx.channel, "general.stats.members", c=users, bots=bots
                 )
@@ -120,7 +129,9 @@ class General(commands.Cog):
                 )
                 try:
                     branch = Repo(os.getcwd()).active_branch
-                    stats += "\n" + await self.bot._(ctx.channel, "general.stats.git", b=branch)
+                    stats += "\n" + await self.bot._(
+                        ctx.channel, "general.stats.git", b=branch
+                    )
                 except InvalidGitRepositoryError:
                     pass
                 stats += "\n" + await self.bot._(
@@ -163,7 +174,7 @@ class General(commands.Cog):
                 )
                 stats = stats.replace(cpu_txt, cpu_ended)
                 await msg.edit(content=stats)
-        except Exception as exception: # pylint: disable=broad-exception-caught
+        except Exception as exception:  # pylint: disable=broad-exception-caught
             await ctx.bot.get_cog("Errors").on_command_error(ctx, exception)
 
     @commands.command(name="halp", enabled=False)
@@ -174,6 +185,7 @@ class General(commands.Cog):
         embed.add_field(name="admin", value="Affiche les commandes admin disponibles")
         await ctx.send(embed=embed)
 
-async def setup(bot:Gunibot=None):
+
+async def setup(bot: Gunibot = None):
     if bot is not None:
         await bot.add_cog(General(bot), icon="🌍")

@@ -15,7 +15,7 @@ async def execute(
     ban_plugin,
     ctx: commands.Context,
     user: discord.User,
-    reason: str, # pylint: disable=unused-argument
+    reason: str,  # pylint: disable=unused-argument
 ) -> bool:
     """Reverse the ban, uno reverse card
     The command executor is banned instead of the targeted user.

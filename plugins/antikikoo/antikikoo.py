@@ -80,7 +80,7 @@ class Antikikoo(commands.Cog):
         if message.channel.id != config["verification_channel"]:
             return
 
-        if config["pass_message"] is None: # not set
+        if config["pass_message"] is None:  # not set
             return
 
         info_channel = f"<#{config['info_channel']}>"
@@ -105,7 +105,8 @@ class Antikikoo(commands.Cog):
                     await message.author.remove_roles(verif_role)
             except (discord.Forbidden, discord.NotFound):
                 self.logger.exception(
-                    "Cannot give or take away verification role from member %s", repr(message.author),
+                    "Cannot give or take away verification role from member %s",
+                    repr(message.author),
                 )
 
     @commands.group(name="antikikoo", aliases=["ak", "antitroll"])
@@ -137,7 +138,7 @@ class Antikikoo(commands.Cog):
         self.bot.server_configs[ctx.guild.id]["verification_info_message"] = message
         await ctx.send(await self.bot._(ctx.guild.id, "antikikoo.msg-edited"))
 
-    @commands.command(name='pass_message')
+    @commands.command(name="pass_message")
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
     async def pass_message(
@@ -148,14 +149,15 @@ class Antikikoo(commands.Cog):
         """Set the pass message required to enter the server."""
         # because of the check above, we don't need to check again
         config = self.bot.server_configs[context.guild.id]
-        config['pass_message'] = message
+        config["pass_message"] = message
         await context.send(
             await self.bot._(
-                context.guild.id, "antikikoo.pass-edited",
+                context.guild.id,
+                "antikikoo.pass-edited",
             )
         )
 
-    @commands.command(name='info_channel')
+    @commands.command(name="info_channel")
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
     async def info_channel(
@@ -166,7 +168,7 @@ class Antikikoo(commands.Cog):
         """Change the channel where users can read more informations about the rules."""
         # because of the check above, we don't need to check again
         config = self.bot.server_configs[context.guild.id]
-        config['info_channel'] = channel.id
+        config["info_channel"] = channel.id
         await context.send(
             await self.bot._(
                 context.guild.id,
@@ -175,7 +177,7 @@ class Antikikoo(commands.Cog):
             )
         )
 
-    @commands.command(name='verification_role')
+    @commands.command(name="verification_role")
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
     async def verification_role(
@@ -187,7 +189,7 @@ class Antikikoo(commands.Cog):
         Use the command "config verification_add_role" to toggle on or off.
         """
         config = self.bot.server_configs[context.guild.id]
-        config['verification_role'] = role.id
+        config["verification_role"] = role.id
         await context.send(
             await self.bot._(
                 context.guild.id,
@@ -197,7 +199,7 @@ class Antikikoo(commands.Cog):
             allowed_mentions=discord.AllowedMentions.none(),
         )
 
-    @commands.command(name='verification_add_role')
+    @commands.command(name="verification_add_role")
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
     async def verification_add_role(
@@ -205,21 +207,22 @@ class Antikikoo(commands.Cog):
         context: MyContext,
         enabled: bool = True,
     ):
-        """Enable or disable the give role feature of the verification system.
-        """
+        """Enable or disable the give role feature of the verification system."""
         config = self.bot.server_configs[context.guild.id]
-        config['verification_add_role'] = enabled
-        role = context.guild.get_role(config['verification_role'])
+        config["verification_add_role"] = enabled
+        role = context.guild.get_role(config["verification_role"])
         await context.send(
             await self.bot._(
                 context.guild.id,
-                "antikikoo.add-role-enabled" if enabled else "antikikoo.add-role-disabled",
+                "antikikoo.add-role-enabled"
+                if enabled
+                else "antikikoo.add-role-disabled",
                 role=role.mention,
             ),
             allowed_mentions=discord.AllowedMentions.none(),
         )
 
 
-async def setup(bot:Gunibot=None):
+async def setup(bot: Gunibot = None):
     if bot is not None:
         await bot.add_cog(Antikikoo(bot), icon="⛔")

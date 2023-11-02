@@ -31,7 +31,7 @@ class Perms(commands.Cog):
         self.perms_name["common_channel"] = [
             x for x in chan_perms if x in self.perms_name["general"]
         ]
-        self.logger = setup_logger('perms')
+        self.logger = setup_logger("perms")
 
     @commands.command(name="perms", aliases=["permissions"])
     @commands.guild_only()
@@ -47,7 +47,8 @@ class Perms(commands.Cog):
         target: typing.Union[discord.Member, discord.Role] = None,
     ):
         """Permissions assigned to a member/role (the user by default)
-        The channel used to view permissions is the channel in which the command is entered."""
+        The channel used to view permissions is the channel in which the command is entered.
+        """
         if target is None:
             target = ctx.author
         perms = None
@@ -77,8 +78,8 @@ class Perms(commands.Cog):
                     }
                 )
             col = target.color
-            if target.guild.icon is not None: # the guild could have no icon
-                avatar = ctx.guild.icon.with_size(256).with_format('png')
+            if target.guild.icon is not None:  # the guild could have no icon
+                avatar = ctx.guild.icon.with_size(256).with_format("png")
             else:
                 avatar = None
             name = str(target)
@@ -112,7 +113,9 @@ class Perms(commands.Cog):
                 if "perms.list." in perm:
                     # missing translation
                     perm = perm.replace("_", " ").title()
-                    self.logger.warning("[perms] missing permission translation: %s", perm)
+                    self.logger.warning(
+                        "[perms] missing permission translation: %s", perm
+                    )
                 if value:
                     permsl.append(":white_check_mark: " + perm)
                 else:
@@ -135,7 +138,8 @@ class Perms(commands.Cog):
             # Thanks to Gio for the Command.
         else:
             await ctx.send(
-                f"**Permission de '{name.replace('@', '')}' :**\n\n" + "\n".join(permsl),
+                f"**Permission de '{name.replace('@', '')}' :**\n\n"
+                + "\n".join(permsl),
             )
 
 

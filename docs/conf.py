@@ -7,8 +7,10 @@ import shutil
 
 project = "Gipsy"
 copyright = "2023, Gunivers"
-author = "Z_runner, Leirof, Aeris One, ascpial, theogiraudet, fantomitechno,"\
+author = (
+    "Z_runner, Leirof, Aeris One, ascpial, theogiraudet, fantomitechno,"
     "Just_a_Player and Aragorn"
+)
 
 # The full version, including alpha/beta/rc tags
 # release = ""
@@ -16,18 +18,18 @@ author = "Z_runner, Leirof, Aeris One, ascpial, theogiraudet, fantomitechno,"\
 # -- General configuration ----------------------------------------------------
 
 extensions = [
-    'myst_parser',
-    'sphinx_design',
-    'sphinx_togglebutton',
-    'sphinx_copybutton',
+    "myst_parser",
+    "sphinx_design",
+    "sphinx_togglebutton",
+    "sphinx_copybutton",
 ]
 myst_heading_anchors = 6
-templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # Options for HTML output -----------------------------------------------------
 
-html_theme = 'pydata_sphinx_theme'
+html_theme = "pydata_sphinx_theme"
 
 # html_css_files = [
 #     'credits.css',
@@ -35,7 +37,7 @@ html_theme = 'pydata_sphinx_theme'
 
 html_theme_options = {
     "github_url": "https://github.com/Gunivers/Gipsy",
-    "announcement": "⚠️ You are reading a doc of an undergoing development version."\
+    "announcement": "⚠️ You are reading a doc of an undergoing development version."
     "Information can be out of date and/or change at any time. ⚠️",
     "logo": {
         "image_dark": "_static/logo.png",
@@ -59,15 +61,15 @@ html_theme_options = {
             "icon": "_static/logo-discord.png",
             "type": "local",
         },
-    ]
+    ],
 }
 
 html_logo = "_static/logo.png"
 
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 html_css_files = [
-    'css/stylesheet.css',
+    "css/stylesheet.css",
 ]
 
 myst_enable_extensions = [
@@ -78,7 +80,7 @@ myst_enable_extensions = [
     "fieldlist",
     "html_admonition",
     "html_image",
-    #"linkify",
+    # "linkify",
     "replacements",
     "smartquotes",
     "strikethrough",
@@ -118,8 +120,8 @@ Feel free to leave your questions and feedbacks below!
 </script>
 """
 
-def generate_plugin_doc():
 
+def generate_plugin_doc():
     # Saving index.md file content except plugin toctree
     with open("user_guide.md", "r", encoding="utf-8") as f:
         before = []
@@ -141,18 +143,15 @@ def generate_plugin_doc():
         # Generating plugin toctree and moving pugin's doc files in the global docs folder
         path = os.path.join("", os.pardir)
         for plugin in os.listdir(f"{path}/plugins"):
-
             # Checking if plugin has a doc folder
             if not os.path.isdir(f"{path}/plugins/" + plugin + "/docs"):
                 continue
 
             # Iterate over plugin's doc files
             for file in os.listdir(f"{path}/plugins/" + plugin + "/docs"):
-
                 # Checking if file is a markdown or a restructured text file
                 if not file[-3:] == ".md" and not file[-4:] == ".rst":
                     continue
-
 
                 if not os.path.isdir(f"/plugins/{plugin}/"):
                     os.makedirs(f"plugins/{plugin}/")
@@ -165,16 +164,15 @@ def generate_plugin_doc():
                 with open(f"plugins/{plugin}/{file}", "a", encoding="utf-8") as f:
                     f.write(CONTRIBUTE)
 
-                    if "repository_url" in html_theme_options\
-                            and html_theme_options["repository_url"].startswith(
-                                "https://github.com/"
-                    ):
+                    if "repository_url" in html_theme_options and html_theme_options[
+                        "repository_url"
+                    ].startswith("https://github.com/"):
                         orga = html_theme_options["repository_url"].split("/")[3]
                         repo = html_theme_options["repository_url"].split("/")[4]
 
-                        f.write(
-                            GITHUB_DISCUSSION_FOOTER.format(orga=orga, repo=repo)
-                        )
+                        f.write(GITHUB_DISCUSSION_FOOTER.format(orga=orga, repo=repo))
 
         toctree.write("\n```")
+
+
 generate_plugin_doc()

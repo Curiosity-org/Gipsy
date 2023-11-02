@@ -15,6 +15,7 @@ from discord.ext import commands
 
 from utils import Gunibot, MyContext
 
+
 class Misc(commands.Cog):
     """Random commands.
     What do you except from a plugin called misc.
@@ -36,9 +37,9 @@ class Misc(commands.Cog):
         self.bot = bot
         self.file = "misc"
 
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
     # 🍪 Cookie
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
     @commands.command(name="cookie", aliases=["🍪"])
     @commands.guild_only()
@@ -65,7 +66,11 @@ class Misc(commands.Cog):
                 ctx.guild.id, "misc.cookie.self", to=ctx.author.mention
             )
 
-        root_channel = ctx.channel.parent if isinstance(ctx.channel, discord.Thread) else ctx.channel
+        root_channel = (
+            ctx.channel.parent
+            if isinstance(ctx.channel, discord.Thread)
+            else ctx.channel
+        )
         # # Creating a webhook that makes reference to villagers of Element Animation
         webhook: discord.Webhook = await root_channel.create_webhook(
             name=f"Villager #{random.randint(1, 9)}"
@@ -74,8 +79,8 @@ class Misc(commands.Cog):
         # Sending the message
         await webhook.send(
             content=message,
-            avatar_url="https://d31sxl6qgne2yj.cloudfront.net/wordpress/wp-content/uploads/"\
-                "20190121140737/Minecraft-Villager-Head.jpg",
+            avatar_url="https://d31sxl6qgne2yj.cloudfront.net/wordpress/wp-content/uploads/"
+            "20190121140737/Minecraft-Villager-Head.jpg",
             thread=ctx.channel if isinstance(ctx.channel, discord.Thread) else MISSING,
         )
 
@@ -86,11 +91,11 @@ class Misc(commands.Cog):
         except discord.errors.NotFound:
             pass
 
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
     # 🖥️ Hoster
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
-    @commands.command(name="hoster", aliases=["host","mtxserv","mtx","🖥️","💻"])
+    @commands.command(name="hoster", aliases=["host", "mtxserv", "mtx", "🖥️", "💻"])
     @commands.guild_only()
     async def hoster(self, ctx: MyContext):
         """Give all informations about the hoster.
@@ -100,29 +105,33 @@ class Misc(commands.Cog):
         # Building the result message
         embed = discord.Embed(colour=discord.Colour.blue())
         embed.add_field(
-            name="mTx Serv",
-            value=await self.bot._(ctx.guild.id, "misc.hoster.info")
+            name="mTx Serv", value=await self.bot._(ctx.guild.id, "misc.hoster.info")
         )
-        embed.set_thumbnail(url="http://gunivers.net/wp-content/uploads/2021/07/Logo-mTxServ.png")
+        embed.set_thumbnail(
+            url="http://gunivers.net/wp-content/uploads/2021/07/Logo-mTxServ.png"
+        )
 
         # Building the webhook that will take the appearance off the hoster
-        root_channel = ctx.channel.parent if isinstance(ctx.channel, discord.Thread) else ctx.channel
+        root_channel = (
+            ctx.channel.parent
+            if isinstance(ctx.channel, discord.Thread)
+            else ctx.channel
+        )
         webhook: discord.Webhook = await root_channel.create_webhook(name="mTx Serv")
         await webhook.send(
             embed=embed,
             avatar_url="http://gunivers.net/wp-content/uploads/2021/07/Logo-mTxServ.png",
             thread=ctx.channel if isinstance(ctx.channel, discord.Thread) else MISSING,
-
         )
 
         # Cleaning the webhook
         await webhook.delete()
 
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
     # 🪙 Flip a coin
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
-    @commands.command(name="flipacoin", aliases=["fc","coin","🪙"])
+    @commands.command(name="flipacoin", aliases=["fc", "coin", "🪙"])
     async def flip(self, ctx: MyContext):
         """Flip a coin.
         Usage:
@@ -147,14 +156,14 @@ class Misc(commands.Cog):
         )
         embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/867/867351.png")
 
-        await ctx.send(embed = embed)
+        await ctx.send(embed=embed)
 
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
     # 🎲 Roll a dice
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
-    @commands.command(name="rolladice", aliases=["rad","dice","🎲"])
-    async def rolladice(self, ctx: MyContext, *, dice:int = 6):
+    @commands.command(name="rolladice", aliases=["rad", "dice", "🎲"])
+    async def rolladice(self, ctx: MyContext, *, dice: int = 6):
         """Roll a dice.
         Usage:
         - Throw a classic dice: dice
@@ -168,7 +177,7 @@ class Misc(commands.Cog):
         except ValueError:
             embed = discord.Embed(
                 description=await self.bot._(ctx.guild.id, "misc.dice.error.not_int"),
-                colour=0xe74c3c,
+                colour=0xE74C3C,
             )
             embed.set_author(
                 name="Error",
@@ -179,8 +188,10 @@ class Misc(commands.Cog):
         # Test if the parameter is upper than 0
         if dice <= 0:
             embed = discord.Embed(
-                description=await self.bot._(ctx.guild.id, "misc.dice.error.not_positive"),
-                colour=0xe74c3c,
+                description=await self.bot._(
+                    ctx.guild.id, "misc.dice.error.not_positive"
+                ),
+                colour=0xE74C3C,
             )
             embed.set_author(
                 name="Error",
@@ -194,16 +205,20 @@ class Misc(commands.Cog):
         # Building the result message
         embed = discord.Embed(
             title=await self.bot._(ctx.guild.id, "misc.dice.title"),
-            description=await self.bot._(ctx.guild.id, "misc.dice.description", value=value),
+            description=await self.bot._(
+                ctx.guild.id, "misc.dice.description", value=value
+            ),
             colour=0x2F3136,
         )
-        embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/1055/1055855.png")
+        embed.set_thumbnail(
+            url="https://cdn-icons-png.flaticon.com/512/1055/1055855.png"
+        )
 
-        await ctx.send(embed = embed)
+        await ctx.send(embed=embed)
 
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
     # ❓ dataja
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
     @commands.command(name="dataja", aliases=["data", "ask", "❓"])
     async def dataja(self, ctx: MyContext):
@@ -216,9 +231,11 @@ class Misc(commands.Cog):
             description=await self.bot._(ctx.guild.id, "misc.dataja.description"),
             colour=0x2F3136,
         )
-        embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/1180/1180260.png")
+        embed.set_thumbnail(
+            url="https://cdn-icons-png.flaticon.com/512/1180/1180260.png"
+        )
 
-        await ctx.send(embed = embed)
+        await ctx.send(embed=embed)
 
         # Deleting command
         try:
@@ -226,16 +243,17 @@ class Misc(commands.Cog):
         except discord.errors.NotFound:
             pass
 
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
     # 🗡️ kill
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
     @commands.command(name="kill", aliases=["🗡️"])
     async def kill(self, ctx: MyContext, *, target: str = None):
         """Wanna kill someone? Take a breath
         Usage:
         - kill someone: kill <user>
-          - user: the guy you want to kill. It can be a mention, an ID or simply a name."""
+          - user: the guy you want to kill. It can be a mention, an ID or simply a name.
+        """
 
         # Suicide
         if target is None:
@@ -253,10 +271,8 @@ class Misc(commands.Cog):
         # Generating a random answer
         msg = "misc.kills"
         while msg.startswith("misc.kills") or (
-                "{0}" in msg
-                and target is None
-                and tries < 50
-            ):
+            "{0}" in msg and target is None and tries < 50
+        ):
             choice = random.randint(0, 23)
             msg = await self.bot._(ctx.channel, f"misc.kills.{choice}")
             tries += 1
@@ -269,7 +285,9 @@ class Misc(commands.Cog):
             colour=0x2F3136,
         )
         embed.set_footer(text=footer)
-        embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/3074/3074476.png")
+        embed.set_thumbnail(
+            url="https://cdn-icons-png.flaticon.com/512/3074/3074476.png"
+        )
 
         # Send it
         await ctx.send(
@@ -277,9 +295,9 @@ class Misc(commands.Cog):
             allowed_mentions=discord.AllowedMentions.none(),
         )
 
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
     # ⌚ Timestamp
-    #➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
+    # ➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖➖
 
     @commands.group(name="timestamp")
     async def timestamp(self, ctx: MyContext):
@@ -356,7 +374,7 @@ class Misc(commands.Cog):
         )
 
 
-async def setup(bot:Gunibot=None):
+async def setup(bot: Gunibot = None):
     """
     Fonction d'initialisation du plugin
 

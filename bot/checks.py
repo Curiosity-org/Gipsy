@@ -52,6 +52,8 @@ async def can_group(ctx: MyContext):
     server_config = ctx.bot.server_configs[ctx.guild.id]
     if server_config["group_allowed_role"] is None:
         return True
-    role = discord.utils.get(ctx.message.guild.roles, id=server_config["group_allowed_role"])
+    role = discord.utils.get(
+        ctx.message.guild.roles, id=server_config["group_allowed_role"]
+    )
     if role in ctx.author.roles:
         return True

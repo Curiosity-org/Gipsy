@@ -215,6 +215,6 @@ class Contact(commands.Cog):
         await ctx.send(answer)
 
 
-async def setup(bot:Gunibot=None):
+async def setup(bot: Gunibot = None):
     if bot is not None:
         await bot.add_cog(Contact(bot), icon="💬")
