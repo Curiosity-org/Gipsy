@@ -46,8 +46,9 @@ class YoutubeTrackingRemover(commands.Cog):
             return
 
         # check if message contains a youtube.com link
-        regex = r'(https?://(?:www\.)?youtube\.com/watch\?[^\s]+)'
-        matches = re.findall(regex, message.content)
+        regex_full = r'(https?://(?:www\.)?youtube\.com/watch\?[^\s]+)'
+        regex_short = r'(https?://(?:www\.)?youtu\.be/[^\s]+)'
+        matches = re.findall(regex_full, message.content) + re.findall(regex_short, message.content)
 
         content = message.content
         for match in matches:
@@ -55,39 +56,25 @@ class YoutubeTrackingRemover(commands.Cog):
             query_params = parse_qs(parsed_url.query)
             new_match = match
 
-            # replace the link with a link with only the video id
-            if 'v' in query_params:
+            # retrieve videoid
+            if parsed_url.hostname in ['youtu.be','www.youtu.be']:
+                video_id = parsed_url.path[1:]
+                new_match = parsed_url.scheme + '://' + parsed_url.hostname + '/' + video_id
+                separator = '?'
+            elif parsed_url.hostname in ['youtube.com','www.youtube.com'] and 'v' in query_params:
                 video_id = query_params['v'][0]
-                new_match = f'https://www.youtube.com/watch?v={video_id}'
+                new_match = parsed_url.scheme + '://' + parsed_url.hostname + '/watch?v=' + video_id
+                separator = '&'
+            else:
+                continue
 
             # re-add `time` and `t` parameters
             if 't' in query_params:
                 time = query_params['t'][0]
-                new_match = new_match + f'&t={time}'
+                new_match += separator + f't={time}'
             elif 'time' in query_params:
                 time = query_params['time'][0]
-                new_match = new_match + f'&time={time}'
-
-            content = content.replace(match, f'{new_match}')
-
-        # check for youtu.be links
-        regex = r'(https?://(?:www\.)?youtu\.be/[^\s]+)'
-        matches = re.findall(regex, message.content)
-
-        for match in matches:
-            parsed_url = urlparse(match)
-            query_params = parse_qs(parsed_url.query)
-
-            # remove every parameters
-            new_match = match.split('?')[0]
-
-            # re-add `time` and `t` parameters
-            if 't' in query_params:
-                time = query_params['t'][0]
-                new_match = new_match + f'?t={time}'
-            elif 'time' in query_params:
-                time = query_params['time'][0]
-                new_match = new_match + f'?time={time}'
+                new_match += separator + f'time={time}'
 
             content = content.replace(match, f'{new_match}')
 
@@ -106,7 +93,8 @@ class YoutubeTrackingRemover(commands.Cog):
                                              wait=True)
 
         # add the view
-        await webhook_message.edit(view=YoutubeTrackingRemoverView(self.bot, webhook_message, webhook, message.author.id))
+        await webhook_message.edit(
+            view=YoutubeTrackingRemoverView(self.bot, webhook_message, webhook, message.author.id))
 
         # delete the original message
         await message.delete()
