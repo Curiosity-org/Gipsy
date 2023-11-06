@@ -73,12 +73,12 @@ class GroupConverter(commands.Converter):
         try:
             # try to convert it to a role
             role = await commands.RoleConverter().convert(ctx, arg)
-        except commands.BadArgument:
+        except commands.BadArgument as exc:
             await ctx.send(
                 await ctx.bot._(ctx.channel, "groups.error.unknown-group", g=arg),
                 ephemeral=True
             )
-            raise commands.BadArgument()
+            raise exc
         # make sure the cog is actually loaded, let's not break everything
         if cog := ctx.bot.get_cog("Groups"):
             if res := cog.db_get_group(ctx.guild.id, role.id):
