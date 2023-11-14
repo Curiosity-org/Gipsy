@@ -26,19 +26,30 @@ class Monitoring(commands.Cog):
         self.config = core.config.get(self.file)
         if self.config["monitoring_enabled"]:
             # test if the url is valid
-            if requests.get(self.config["monitoring_push_url"]).status_code == 200:
-                self.ping_monitoring.start()
-                self.logger.info(
-                    f"Monitoring enabled successfully for {self.config['monitoring_push_url']}"
-                )
-            else:
+            try:
+                request = requests.get(self.config["monitoring_push_url"], timeout=5)
+                if (request.status_code != 200 or request.json()["ok"] != False):
+                    raise requests.exceptions.RequestException("URL returned an error")
+            except requests.exceptions.RequestException as e:
+                self.logger.error(f"Error while sending heartbeat to monitoring: {e}")
                 self.logger.warning(
-                    f"Monitoring disabled for this time: {self.config['monitoring_push_url']} is not valid or reachable"
+                    "Monitoring disabled for this session: an error occured while sending the heartbeat to the monitoring server.\n"
+                    "Error : %s",
+                    e,
                 )
+                return
+            #pylint: disable=no-member
+            self.ping_monitoring.start()
+            self.logger.info(
+                "Monitoring enabled successfully for %s", self.config["monitoring_push_url"]
+            )
 
     @tasks.loop(seconds=20)
     async def ping_monitoring(self):
-        requests.get(self.config["monitoring_push_url"])
+        try:
+            requests.get(self.config["monitoring_push_url"], timeout=5)
+        except requests.exceptions.RequestException as e:
+            self.logger.error("Error while sending heartbeat to monitoring: %s", e)
 
     @ping_monitoring.before_loop
     async def before_ping_monitoring(self):
