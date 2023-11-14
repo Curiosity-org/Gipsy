@@ -32,20 +32,25 @@ class Monitoring(commands.Cog):
                 if await self.ping_monitoring():
                     self.logger.info("Monitoring test ping successful")
                     self.logger.info("Monitoring enabled")
-                    self.loop.start()                #pylint: disable=no-member
+                    self.loop.start()  # pylint: disable=no-member
                     return
                 self.logger.warning("Monitoring ping failed %s times", i + 1)
                 time.sleep(5)
-            self.bot.dispatch("error", RuntimeError("Monitoring disabled due to ping failure"))
+            self.bot.dispatch(
+                "error", RuntimeError("Monitoring disabled due to ping failure")
+            )
 
     async def ping_monitoring(self):
         # retrieve Discord Ping
         ping = round(self.bot.latency * 1000, 0)
 
         # build URL
-        url = (self.config["monitoring_push_url"] +
-               self.config["monitoring_push_monitor"] +
-               "?status=up&msg=OK&ping=" + str(ping))
+        url = (
+            self.config["monitoring_push_url"]
+            + self.config["monitoring_push_monitor"]
+            + "?status=up&msg=OK&ping="
+            + str(ping)
+        )
 
         # send request
         async with self.session.get(url) as resp:
@@ -55,7 +60,9 @@ class Monitoring(commands.Cog):
             json = await resp.json()
             try:
                 if not json["ok"]:
-                    self.logger.error("Monitoring ping failed with error : %s", json["msg"])
+                    self.logger.error(
+                        "Monitoring ping failed with error : %s", json["msg"]
+                    )
                     return False
                 return True
             except KeyError:
@@ -69,8 +76,11 @@ class Monitoring(commands.Cog):
             return
         self.error_counter += 1
         if self.error_counter >= 6:
-            self.bot.dispatch("error", RuntimeError("Monitoring disabled due to multiple ping failure"))
-            self.loop.stop()                #pylint: disable=no-member
+            self.bot.dispatch(
+                "error",
+                RuntimeError("Monitoring disabled due to multiple ping failure"),
+            )
+            self.loop.stop()  # pylint: disable=no-member
 
     @loop.before_loop
     async def before_ping_monitoring(self):
