@@ -1,8 +1,8 @@
-psutil
-aiohttp
+psutil~=5.9.5
+aiohttp~=3.8.5
 gitpython >= 3.1.8
 python-i18n
-pyyaml
+pyyaml~=6.0.1
 emoji >= 2.0
 feedparser >= 6.0
 async-timeout >= 3.0

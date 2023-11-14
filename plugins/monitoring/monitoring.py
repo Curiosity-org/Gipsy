@@ -6,13 +6,11 @@ de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 import time
 
-# pylint: disable=unused-import
+import aiohttp
 from discord.ext import tasks, commands
 
-import aiohttp
-
-from utils import Gunibot, MyContext
 import core
+from utils import Gunibot
 
 
 async def setup(bot: Gunibot = None):
@@ -26,6 +24,7 @@ class Monitoring(commands.Cog):
         self.logger = core.setup_logger(self.file)
         self.config = core.config.get(self.file)
         self.error_counter = 0
+        self.session = aiohttp.ClientSession()
 
     async def cog_load(self) -> None:
         if self.config["monitoring_enabled"]:
@@ -33,7 +32,7 @@ class Monitoring(commands.Cog):
                 if await self.ping_monitoring():
                     self.logger.info("Monitoring test ping successful")
                     self.logger.info("Monitoring enabled")
-                    self.loop.start()
+                    self.loop.start()                #pylint: disable=no-member
                     return
                 else:
                     self.logger.warning("Monitoring ping failed %s times", i + 1)
@@ -50,22 +49,21 @@ class Monitoring(commands.Cog):
                "?status=up&msg=OK&ping=" + str(ping))
 
         # send request
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                if resp.status != 200:
-                    self.logger.error("Monitoring ping failed with status %s", resp.status)
-                    return False
-                else:
-                    json = await resp.json()
-                    try:
-                        if not json["ok"]:
-                            self.logger.error("Monitoring ping failed with error : %s", json["msg"])
-                            return False
-                        else:
-                            return True
-                    except KeyError:
-                        self.logger.error("Monitoring ping failed")
+        async with self.session.get(url) as resp:
+            if resp.status != 200:
+                self.logger.error("Monitoring ping failed with status %s", resp.status)
+                return False
+            else:
+                json = await resp.json()
+                try:
+                    if not json["ok"]:
+                        self.logger.error("Monitoring ping failed with error : %s", json["msg"])
                         return False
+                    else:
+                        return True
+                except KeyError:
+                    self.logger.error("Monitoring ping failed")
+                    return False
 
     @tasks.loop(seconds=20)
     async def loop(self):
@@ -75,7 +73,7 @@ class Monitoring(commands.Cog):
             self.error_counter += 1
             if self.error_counter >= 6:
                 self.logger.error("Monitoring disabled due to multiple ping failure")
-                self.loop.stop()
+                self.loop.stop()                #pylint: disable=no-member
 
     @loop.before_loop
     async def before_ping_monitoring(self):
