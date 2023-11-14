@@ -33,7 +33,7 @@ class Monitoring(commands.Cog):
                     self.loop.start()
                     return
                 else:
-                    self.logger.warning(f"Monitoring ping failed {i+1} times")
+                    self.logger.warning("Monitoring ping failed %s times", i+1)
                     time.sleep(5)
             self.logger.error("Monitoring disabled due to ping failure")
 
@@ -51,7 +51,7 @@ class Monitoring(commands.Cog):
             if (request.status_code != 200 or request.json()["ok"] != True):
                 raise requests.exceptions.RequestException(request.json()["msg"])
         except requests.exceptions.RequestException as e:
-            self.logger.error(f"Error while sending heartbeat to monitoring: {e}")
+            self.logger.error("Error while sending heartbeat to monitoring: %s", e)
             return False
         return True
 
