@@ -4,4 +4,5 @@
 # de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 
 monitoring_enabled: false
-monitoring_push_url: ""
+monitoring_push_url: "https://uptimekuma.url/api/push/"
+monitoring_push_monitor: ""
