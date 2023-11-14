@@ -34,10 +34,9 @@ class Monitoring(commands.Cog):
                     self.logger.info("Monitoring enabled")
                     self.loop.start()                #pylint: disable=no-member
                     return
-                else:
-                    self.logger.warning("Monitoring ping failed %s times", i + 1)
-                    time.sleep(5)
-            self.logger.error("Monitoring disabled due to ping failure")
+                self.logger.warning("Monitoring ping failed %s times", i + 1)
+                time.sleep(5)
+            self.bot.dispatch("error", RuntimeError("Monitoring disabled due to ping failure"))
 
     async def ping_monitoring(self):
         # retrieve Discord Ping
@@ -53,27 +52,25 @@ class Monitoring(commands.Cog):
             if resp.status != 200:
                 self.logger.error("Monitoring ping failed with status %s", resp.status)
                 return False
-            else:
-                json = await resp.json()
-                try:
-                    if not json["ok"]:
-                        self.logger.error("Monitoring ping failed with error : %s", json["msg"])
-                        return False
-                    else:
-                        return True
-                except KeyError:
-                    self.logger.error("Monitoring ping failed")
+            json = await resp.json()
+            try:
+                if not json["ok"]:
+                    self.logger.error("Monitoring ping failed with error : %s", json["msg"])
                     return False
+                return True
+            except KeyError:
+                self.logger.error("Monitoring ping failed")
+                return False
 
     @tasks.loop(seconds=20)
     async def loop(self):
         if await self.ping_monitoring():
             self.error_counter = 0
-        else:
-            self.error_counter += 1
-            if self.error_counter >= 6:
-                self.logger.error("Monitoring disabled due to multiple ping failure")
-                self.loop.stop()                #pylint: disable=no-member
+            return
+        self.error_counter += 1
+        if self.error_counter >= 6:
+            self.bot.dispatch("error", RuntimeError("Monitoring disabled due to multiple ping failure"))
+            self.loop.stop()                #pylint: disable=no-member
 
     @loop.before_loop
     async def before_ping_monitoring(self):
