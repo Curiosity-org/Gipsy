@@ -9,7 +9,7 @@ import time
 # pylint: disable=unused-import
 from discord.ext import tasks, commands
 
-import requests
+import aiohttp
 
 from utils import Gunibot, MyContext
 import core
@@ -25,40 +25,57 @@ class Monitoring(commands.Cog):
         self.file = "monitoring"
         self.logger = core.setup_logger(self.file)
         self.config = core.config.get(self.file)
+        self.error_counter = 0
+
+    async def cog_load(self) -> None:
         if self.config["monitoring_enabled"]:
             for i in range(5):
-                if self.ping_monitoring():
+                if await self.ping_monitoring():
                     self.logger.info("Monitoring test ping successful")
                     self.logger.info("Monitoring enabled")
                     self.loop.start()
                     return
                 else:
-                    self.logger.warning("Monitoring ping failed %s times", i+1)
+                    self.logger.warning("Monitoring ping failed %s times", i + 1)
                     time.sleep(5)
             self.logger.error("Monitoring disabled due to ping failure")
 
-
-    def ping_monitoring(self):
+    async def ping_monitoring(self):
         # retrieve Discord Ping
-        ping = round(self.bot.latency*1000, 0)
+        ping = round(self.bot.latency * 1000, 0)
+
         # build URL
         url = (self.config["monitoring_push_url"] +
                self.config["monitoring_push_monitor"] +
                "?status=up&msg=OK&ping=" + str(ping))
-        # send request
-        try:
-            request = requests.get(url, timeout=5)
-            if (request.status_code != 200 or request.json()["ok"] != True):
-                raise requests.exceptions.RequestException(request.json()["msg"])
-        except requests.exceptions.RequestException as e:
-            self.logger.error("Error while sending heartbeat to monitoring: %s", e)
-            return False
-        return True
 
+        # send request
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                if resp.status != 200:
+                    self.logger.error("Monitoring ping failed with status %s", resp.status)
+                    return False
+                else:
+                    json = await resp.json()
+                    try:
+                        if not json["ok"]:
+                            self.logger.error("Monitoring ping failed with error : %s", json["msg"])
+                            return False
+                        else:
+                            return True
+                    except KeyError:
+                        self.logger.error("Monitoring ping failed")
+                        return False
 
     @tasks.loop(seconds=20)
     async def loop(self):
-        self.ping_monitoring()
+        if await self.ping_monitoring():
+            self.error_counter = 0
+        else:
+            self.error_counter += 1
+            if self.error_counter >= 6:
+                self.logger.error("Monitoring disabled due to multiple ping failure")
+                self.loop.stop()
 
     @loop.before_loop
     async def before_ping_monitoring(self):
