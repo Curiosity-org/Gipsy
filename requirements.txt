@@ -1,4 +1,4 @@
-psutil~=5.9.5
+psutil~=5.9.6
 aiohttp~=3.8.5
 gitpython >= 3.1.8
 python-i18n
