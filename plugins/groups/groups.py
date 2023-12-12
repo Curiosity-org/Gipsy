@@ -46,7 +46,9 @@ class Group:
         if self.channel_id is None:
             return None
         if self._channel is None:
-            self._channel = self.bot.get_guild(self.guild_id).get_channel(self.channel_id)
+            self._channel = self.bot.get_guild(self.guild_id).get_channel(
+                self.channel_id
+            )
         return self._channel
 
     def member_is_in(self, member: discord.Member) -> bool:
@@ -60,8 +62,10 @@ class Group:
         """Transform the group to a human-readable string"""
         channel = f"<#{self.channel_id}>" if self.channel_id else "None"
         private = "True" if self.privacy == 1 else "False"
-        return f"Group: <@&{self.role_id}> (*id : {self.role_id}*)\n"\
+        return (
+            f"Group: <@&{self.role_id}> (*id : {self.role_id}*)\n"
             f"┗━▷ Owner: <@{self.owner_id}> - Channel: {channel} - Private: {private}"
+        )
 
 
 class GroupConverter(commands.Converter):
@@ -76,7 +80,7 @@ class GroupConverter(commands.Converter):
         except commands.BadArgument as exc:
             await ctx.send(
                 await ctx.bot._(ctx.channel, "groups.error.unknown-group", g=arg),
-                ephemeral=True
+                ephemeral=True,
             )
             raise exc
         # make sure the cog is actually loaded, let's not break everything
@@ -86,11 +90,13 @@ class GroupConverter(commands.Converter):
                 return res
         await ctx.send(
             await ctx.bot._(ctx.channel, "groups.error.unknown-group", g=arg),
-            ephemeral=True
+            ephemeral=True,
         )
         raise commands.BadArgument()
 
+
 GroupType = Annotated[Group, GroupConverter]
+
 
 class Groups(commands.Cog):
     def __init__(self, bot: Gunibot):
@@ -507,9 +513,7 @@ class Groups(commands.Cog):
         else:
             await ctx.author.add_roles(group.role(), reason="Joined a group")
             await ctx.send(
-                await self.bot._(
-                    ctx.guild.id, "groups.join", name=group.role().name
-                )
+                await self.bot._(ctx.guild.id, "groups.join", name=group.role().name)
             )
 
     @group_main.command(name="leave")
@@ -526,9 +530,7 @@ class Groups(commands.Cog):
             return
         await ctx.author.remove_roles(group.role(), reason="Left a group")
         await ctx.send(
-            await self.bot._(
-                ctx.guild.id, "groups.leave", name=group.role().name
-            )
+            await self.bot._(ctx.guild.id, "groups.leave", name=group.role().name)
         )
 
     @group_main.group(name="admin", aliases=["manage"])
