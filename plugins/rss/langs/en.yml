@@ -52,6 +52,6 @@ en:
     web-help: "To search for an rss feed from any website, just enter the url of the rss/atom feed as a parameter. If the feed is valid, I will return the last article posted on this site"
     web-invalid: "Oops, this url address is invalid :confused:"
     yt: "YouTube"
-    yt-default-flow: "{logo}  | New vidéo from {author}: **{title}**\nPublished on {date}\nLink: {link}\n{mentions}"
-    yt-form-last: "{logo}  | ere is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}"
+    yt-default-flow: "{logo}  | New video from {author}: **{title}**\nPublished on {date}\nLink: {link}\n{mentions}"
+    yt-form-last: "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}"
     yt-help: "To search for a youtube channel, you need to enter the id of this channel. You will find it at the end of the url of the channel, it can be either the name or a random sequence of characters"
