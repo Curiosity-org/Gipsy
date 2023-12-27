@@ -15,16 +15,29 @@ from LRFutils import logs
 from bot import checks
 from utils import Gunibot, MyContext
 
+
 def similar(msg1: discord.Message, msg2: discord.Message):
     """Check if two messages are similar. Two messages are similar if:
-        - their content is the exact same
-        - their attachments have the same filemane and the same size
+    - their content is the exact same
+    - their attachments have the same filemane and the same size
     """
     if msg1.content != msg2.content:
         return False
 
-    attachments1 = sorted([(attachment.filename, attachment.size, attachment.is_spoiler()) for attachment in msg1.attachments], key=lambda x: x[0])
-    attachments2 = sorted([(attachment.filename, attachment.size, attachment.is_spoiler()) for attachment in msg2.attachments], key=lambda x: x[0])
+    attachments1 = sorted(
+        [
+            (attachment.filename, attachment.size, attachment.is_spoiler())
+            for attachment in msg1.attachments
+        ],
+        key=lambda x: x[0],
+    )
+    attachments2 = sorted(
+        [
+            (attachment.filename, attachment.size, attachment.is_spoiler())
+            for attachment in msg2.attachments
+        ],
+        key=lambda x: x[0],
+    )
 
     return attachments1 == attachments2
 
