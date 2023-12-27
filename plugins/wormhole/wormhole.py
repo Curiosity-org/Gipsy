@@ -5,7 +5,6 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-import difflib
 from typing import Optional, Union
 
 import discord
@@ -16,10 +15,18 @@ from LRFutils import logs
 from bot import checks
 from utils import Gunibot, MyContext
 
+def similar(msg1: discord.Message, msg2: discord.Message):
+    """Check if two messages are similar. Two messages are similar if:
+        - their content is the exact same
+        - their attachments have the same filemane and the same size
+    """
+    if msg1.content != msg2.content:
+        return False
 
-def similar(msg1: str, msg2: str):
-    "Check if a message is similar to another one with 80% similarity"
-    return difflib.SequenceMatcher(a=msg1.lower(), b=msg2.lower()).ratio() > 0.8
+    attachments1 = sorted([(attachment.filename, attachment.size, attachment.is_spoiler()) for attachment in msg1.attachments], key=lambda x: x[0])
+    attachments2 = sorted([(attachment.filename, attachment.size, attachment.is_spoiler()) for attachment in msg2.attachments], key=lambda x: x[0])
+
+    return attachments1 == attachments2
 
 
 async def get_corresponding_answer(
@@ -28,10 +35,10 @@ async def get_corresponding_answer(
     "Get the corresponding answered message in other channels"
     date = message.created_at
     async for msg in channel.history(limit=20, after=date, oldest_first=True):
-        if similar(message.content, msg.content):
+        if similar(message, msg):
             return msg
     async for msg in channel.history(limit=20, before=date, oldest_first=False):
-        if similar(message.content, msg.content):
+        if similar(message, msg):
             return msg
     return None
 
@@ -45,7 +52,11 @@ async def send_message(
     thread: discord.Thread = None,
 ):
     "Send a message into a wormhole entry"
-    files = [await x.to_file() for x in msg.attachments]
+    files = []
+    for attachment in msg.attachments:
+        file = await attachment.to_file()
+        file.spoiler = attachment.is_spoiler()
+        files.append(file)
     # grab mentions from the source message
     mentions = discord.AllowedMentions(
         everyone=msg.mention_everyone, users=msg.mentions, roles=msg.role_mentions
