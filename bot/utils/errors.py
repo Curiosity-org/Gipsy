@@ -182,15 +182,6 @@ class Errors(commands.Cog):
                     ),
                     ephemeral=True,
                 )
-            # Group "twitter" not found.
-            result = re.search(r"Group \"([^\"]+)\" not found", raw_error)
-            if result is not None:
-                return await ctx.send(
-                    await self.bot._(
-                        ctx.channel, "errors.unknown-group", g=result.group(1)
-                    ),
-                    ephemeral=True,
-                )
             # Too many text channels
             if raw_error == "Too many text channels":
                 return await ctx.send(
@@ -236,6 +227,7 @@ class Errors(commands.Cog):
                     ephemeral=True,
                 )
             print("errors -", error)
+            return
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(
                 await self.bot._(ctx.channel, "errors.missing-arg", a=error.param.name),

@@ -33,7 +33,6 @@ en:
     unknown-role: "Unable to find the role %{r} :confused:"
     unknown-server: Unknown server
     unknown-user: "Unable to find user %{u} :confused:"
-    unknown-group: "Unable to find group %{u} :confused:"
   general:
     stats:
       title: "Bot statistics"

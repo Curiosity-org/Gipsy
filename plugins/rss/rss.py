@@ -322,7 +322,7 @@ class Rss(commands.Cog):
             )
             self.logger.info(
                 "RSS feed added into server %i (%s - %i)",
-                ctx.guild.ig,
+                ctx.guild.id,
                 link,
                 feed_id,
             )
@@ -1524,7 +1524,7 @@ class Rss(commands.Cog):
                             flow["channel"],
                         )
                         return False
-                    obj.format = flow["structure"]
+                    obj.message_format = flow["structure"]
                     obj.embed = bool(flow["use_embed"])
                     if obj.embed:
                         obj.fill_embed_data(flow)
