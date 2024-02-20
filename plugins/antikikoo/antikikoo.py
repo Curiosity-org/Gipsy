@@ -214,9 +214,11 @@ class Antikikoo(commands.Cog):
         await context.send(
             await self.bot._(
                 context.guild.id,
-                "antikikoo.add-role-enabled"
-                if enabled
-                else "antikikoo.add-role-disabled",
+                (
+                    "antikikoo.add-role-enabled"
+                    if enabled
+                    else "antikikoo.add-role-disabled"
+                ),
                 role=role.mention,
             ),
             allowed_mentions=discord.AllowedMentions.none(),
