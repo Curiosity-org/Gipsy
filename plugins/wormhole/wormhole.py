@@ -201,9 +201,7 @@ class WormholeChannel:
         perms = (
             "Write and Read"
             if self.perms == "wr"
-            else "Read"
-            if self.perms == "r"
-            else "Write"
+            else "Read" if self.perms == "r" else "Write"
         )
         return (
             f"Channel: <#{self.channel_id}>\n┗━▷ Linked to"
@@ -521,10 +519,10 @@ class Wormholes(commands.Cog):
                 if connected_channel.channel_id == message.channel.id:
                     continue
 
-                channel: Union[
-                    discord.TextChannel, discord.Thread
-                ] = self.bot.get_channel(
-                    connected_channel.channel_id,
+                channel: Union[discord.TextChannel, discord.Thread] = (
+                    self.bot.get_channel(
+                        connected_channel.channel_id,
+                    )
                 )
 
                 if not channel:

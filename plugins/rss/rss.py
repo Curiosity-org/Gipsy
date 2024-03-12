@@ -858,9 +858,11 @@ class Rss(commands.Cog):
                 await ctx.send(
                     await self.bot._(
                         ctx.guild.id,
-                        "rss.use_embed_true"
-                        if flow["use_embed"]
-                        else "use_embed_false",
+                        (
+                            "rss.use_embed_true"
+                            if flow["use_embed"]
+                            else "use_embed_false"
+                        ),
                     )
                 )
 
@@ -1304,9 +1306,9 @@ class Rss(commands.Cog):
                     title=title,
                     date=datz,
                     author=author,
-                    channel=feeds.feed["title"]
-                    if "title" in feeds.feed.keys()
-                    else "?",
+                    channel=(
+                        feeds.feed["title"] if "title" in feeds.feed.keys() else "?"
+                    ),
                     image=img,
                 )
                 liste.append(obj)

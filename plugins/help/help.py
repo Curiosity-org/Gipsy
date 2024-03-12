@@ -289,7 +289,7 @@ class Help(commands.HelpCommand):
             short_doc = await self.context.bot._(
                 self.context,
                 "help.short_doc",
-                short_doc=command.short_doc  # [:40]
+                short_doc=command.short_doc,  # [:40]
                 # + ("…" if len(command.short_doc) > 40 else ""),
             )
             short_doc = short_doc[3:-1]
