@@ -45,18 +45,20 @@ for plugin in os.listdir("./plugins/"):
 
 def print_ascii_art():
     """
-    Print GIPSY 2.0 ascii art
+    Print GIPSY 1.5 ascii art
     """
     # Disable some pylints warning violations in this function
     # pylint: disable=anomalous-backslash-in-string
     # pylint: disable=trailing-whitespace
     print(
         f"""{color.fg.blue}
-      ___  ____  ____  ___  _  _    __     __  
-     / __)(_  _)(  _ \/ __)( \/ )  /  )   /. | 
-    ( (_-. _)(_  )___/\__ \ \  /    )(   (_  _)
-     \___/(____)(__)  (___/ (__)   (__)()  (_)
-
+   _____ _____ _____   _______     __  __   _____ 
+  / ____|_   _|  __ \ / ____\ \   / / /_ | | ____|
+ | |  __  | | | |__) | (___  \ \_/ /   | | | |__  
+ | | |_ | | | |  ___/ \___ \  \   /    | | |___ \ 
+ | |__| |_| |_| |     ____) |  | |     | |_ ___) |
+  \_____|_____|_|    |_____/   |_|     |_(_)____/ 
+                                                  
         {color.stop}"""
     )
 

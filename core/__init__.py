@@ -5,7 +5,7 @@ utiliser, modifier et/ou redistribuer ce programme sous les conditions
 de la licence CeCILL diffusée sur le site "http://www.cecill.info".
 """
 
-version = (1, 4)
-version_string = "1.4"
+version = (1, 5)
+version_string = "1.5"
 
 from .logger import *
