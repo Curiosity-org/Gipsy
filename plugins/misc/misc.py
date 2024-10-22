@@ -277,7 +277,7 @@ class Misc(commands.Cog):
             msg = await self.bot._(ctx.channel, f"misc.kills.{choice}")
             tries += 1
 
-        footer = self.bot._(ctx.channel, "misc.kills.footer")
+        footer = await self.bot._(ctx.channel, "misc.kills.footer")
 
         # Building the result message
         embed = discord.Embed(
