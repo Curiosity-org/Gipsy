@@ -126,7 +126,7 @@ class Ban(commands.Cog):
                 )
             else:
                 await ctx.send(f"{user} a bien été banni !")
-            await ctx.send("https://thumbs.gfycat.com/LikelyColdBasil-small.gif")
+            await ctx.send("https://media.tenor.com/d0VNnBZkSUkAAAAM/bongocat-banhammer.gif")
             return
 
         # Friendly ban if the guild is in the config
@@ -187,7 +187,7 @@ class Ban(commands.Cog):
                 )
             else:
                 await ctx.send(f"{user} a bien été banni !")
-            await ctx.send("https://thumbs.gfycat.com/LikelyColdBasil-small.gif")
+            await ctx.send("https://media.tenor.com/d0VNnBZkSUkAAAAM/bongocat-banhammer.gif")
 
     def load_friendly_ban(self):
         """Loads configuration and events for the friendly ban command"""
