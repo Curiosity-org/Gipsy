@@ -65,6 +65,13 @@ async def send_message(
     thread: discord.Thread = None,
 ):
     "Send a message into a wormhole entry"
+    msg_content = []
+    if len(msg.content) > 2000:
+        msg_content.append(msg.content[:2000])
+        msg_content.append(msg.content[2000:])
+    else:
+        msg_content.append(msg.content)
+        
     files = []
     for attachment in msg.attachments:
         file = await attachment.to_file()
@@ -81,7 +88,7 @@ async def send_message(
     )
     avatar_url = msg.author.display_avatar
     if pp_guild:
-        avatar_url = msg.guild.icon_url
+        avatar_url = msg.guild.icon.url
 
     embeds = [embed for embed in msg.embeds if embed.type == "rich"]
     if embed_reply and embeds:
@@ -93,8 +100,8 @@ async def send_message(
 
     if thread is None:
         new_msg: discord.WebhookMessage = await webhook.send(
-            content=msg.content,
-            files=files,
+            content=msg_content[0],
+            files=files if len(msg_content) == 1 else [],
             embeds=embeds,
             avatar_url=avatar_url,
             username=username,
@@ -103,8 +110,8 @@ async def send_message(
         )
     else:
         new_msg: discord.WebhookMessage = await webhook.send(
-            content=msg.content,
-            files=files,
+            content=msg_content[0],
+            files=files if len(msg_content) == 1 else [],
             embeds=embeds,
             thread=thread,
             avatar_url=avatar_url,
@@ -115,6 +122,19 @@ async def send_message(
     # edit the message to include mentions without notifications
     if mentions.roles or mentions.users or mentions.everyone:
         await new_msg.edit(allowed_mentions=mentions)
+
+    # If the length of the message is longer than 2000 characters, we will split it
+    # Since nitro allows for a max of 4000 characters, it should be fine
+    if len(msg.content) > 2000:
+        await webhook.send(
+            content=msg_content[1],
+            avatar_url=msg.author.display_avatar,
+            files=files,
+            username=username,
+            allowed_mentions=discord.AllowedMentions.none(),
+            wait=True,
+        )
+
 
 
 class PermissionType(commands.Converter):
