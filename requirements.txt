@@ -5,7 +5,7 @@ python-i18n
 pyyaml~=6.0.1
 emoji >= 2.0
 feedparser >= 6.0
-async-timeout >= 3.0
+async-timeout >= 5.0.1
 argparse
 numpy
 discord.py ~= 2.3.2
